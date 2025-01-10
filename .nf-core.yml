@@ -9,9 +9,9 @@ lint:
     - .prettierignore
     - .prettierignore
     - CODE_OF_CONDUCT.md
-    - assets/nf-core-assembly-analysis-pipeline_logo_light.png
-    - docs/images/nf-core-assembly-analysis-pipeline_logo_light.png
-    - docs/images/nf-core-assembly-analysis-pipeline_logo_dark.png
+    - assets/nf-core-ASSEMBLY_ANALYSIS_PIPELINE_logo_light.png
+    - docs/images/nf-core-ASSEMBLY_ANALYSIS_PIPELINE_logo_light.png
+    - docs/images/nf-core-ASSEMBLY_ANALYSIS_PIPELINE_logo_dark.png
     - .github/ISSUE_TEMPLATE/bug_report.yml
     - .github/CONTRIBUTING.md
     - .github/PULL_REQUEST_TEMPLATE.md
@@ -34,16 +34,16 @@ lint:
     - conf/igenomes_ignored.config
     - CHANGELOG.md
     - CODE_OF_CONDUCT.md
-    - assets/nf-core-assembly-analysis-pipeline_logo_light.png
-    - docs/images/nf-core-assembly-analysis-pipeline_logo_light.png
-    - docs/images/nf-core-assembly-analysis-pipeline_logo_dark.png
+    - assets/nf-core-ASSEMBLY_ANALYSIS_PIPELINE_logo_light.png
+    - docs/images/nf-core-ASSEMBLY_ANALYSIS_PIPELINE_logo_light.png
+    - docs/images/nf-core-ASSEMBLY_ANALYSIS_PIPELINE_logo_dark.png
     - .github/ISSUE_TEMPLATE/config.yml
     - .github/workflows/awstest.yml
     - .github/workflows/awsfulltest.yml
 
 template:
   org: ebi-metagenomics
-  name: assembly-analysis-pipeline
+  name: ASSEMBLY_ANALYSIS_PIPELINE
   description: MGnify's assembly analysis pipeline performs taxonomic classification,
     protein function prediction, and identifies metabolic pathways and biosynthetic
     gene clusters.

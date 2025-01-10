@@ -1,9 +1,9 @@
 #!/usr/bin/env nextflow
 /*
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    ebi-metagenomics/assembly-analysis-pipeline
+    ebi-metagenomics/ASSEMBLY_ANALYSIS_PIPELINE
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    Github : https://github.com/ebi-metagenomics/assembly-analysis-pipeline
+    Github : https://github.com/ebi-metagenomics/ASSEMBLY_ANALYSIS_PIPELINE
 ----------------------------------------------------------------------------------------
 */
 
@@ -13,9 +13,9 @@
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 */
 
-include { ASSEMBLY-ANALYSIS-PIPELINE  } from './workflows/assembly-analysis-pipeline'
-include { PIPELINE_INITIALISATION } from './subworkflows/local/utils_nfcore_assembly-analysis-pipeline_pipeline'
-include { PIPELINE_COMPLETION     } from './subworkflows/local/utils_nfcore_assembly-analysis-pipeline_pipeline'
+include { ASSEMBLY_ANALYSIS_PIPELINE  } from './workflows/ASSEMBLY_ANALYSIS_PIPELINE'
+include { PIPELINE_INITIALISATION } from './subworkflows/local/utils_nfcore_ASSEMBLY_ANALYSIS_PIPELINE_pipeline'
+include { PIPELINE_COMPLETION     } from './subworkflows/local/utils_nfcore_ASSEMBLY_ANALYSIS_PIPELINE_pipeline'
 /*
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     NAMED WORKFLOWS FOR PIPELINE
@@ -25,7 +25,7 @@ include { PIPELINE_COMPLETION     } from './subworkflows/local/utils_nfcore_asse
 //
 // WORKFLOW: Run main analysis pipeline depending on type of input
 //
-workflow EBIMETAGENOMICS_ASSEMBLY-ANALYSIS-PIPELINE {
+workflow EBIMETAGENOMICS_ASSEMBLY_ANALYSIS_PIPELINE {
 
     take:
     samplesheet // channel: samplesheet read in from --input
@@ -35,11 +35,11 @@ workflow EBIMETAGENOMICS_ASSEMBLY-ANALYSIS-PIPELINE {
     //
     // WORKFLOW: Run pipeline
     //
-    ASSEMBLY-ANALYSIS-PIPELINE (
+    ASSEMBLY_ANALYSIS_PIPELINE (
         samplesheet
     )
     emit:
-    multiqc_report = ASSEMBLY-ANALYSIS-PIPELINE.out.multiqc_report // channel: /path/to/multiqc_report.html
+    multiqc_report = ASSEMBLY_ANALYSIS_PIPELINE.out.multiqc_report // channel: /path/to/multiqc_report.html
 }
 /*
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -65,7 +65,7 @@ workflow {
     //
     // WORKFLOW: Run main workflow
     //
-    EBIMETAGENOMICS_ASSEMBLY-ANALYSIS-PIPELINE (
+    EBIMETAGENOMICS_ASSEMBLY_ANALYSIS_PIPELINE (
         PIPELINE_INITIALISATION.out.samplesheet
     )
     //
@@ -77,7 +77,7 @@ workflow {
         params.plaintext_email,
         params.outdir,
         params.monochrome_logs,
-        EBIMETAGENOMICS_ASSEMBLY-ANALYSIS-PIPELINE.out.multiqc_report
+        EBIMETAGENOMICS_ASSEMBLY_ANALYSIS_PIPELINE.out.multiqc_report
     )
 }
 

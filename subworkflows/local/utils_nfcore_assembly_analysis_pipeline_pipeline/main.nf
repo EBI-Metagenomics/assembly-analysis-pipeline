@@ -1,5 +1,5 @@
 //
-// Subworkflow with functionality specific to the ebi-metagenomics/assembly-analysis-pipeline pipeline
+// Subworkflow with functionality specific to the ebi-metagenomics/ASSEMBLY_ANALYSIS_PIPELINE pipeline
 //
 
 /*

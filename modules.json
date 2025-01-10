@@ -1,10 +1,20 @@
 {
-    "name": "ebi-metagenomics/assembly-analysis-pipeline",
-    "homePage": "https://github.com/ebi-metagenomics/assembly-analysis-pipeline",
+    "name": "ebi-metagenomics/ASSEMBLY_ANALYSIS_PIPELINE",
+    "homePage": "https://github.com/ebi-metagenomics/ASSEMBLY_ANALYSIS_PIPELINE",
     "repos": {
         "https://github.com/nf-core/modules.git": {
             "modules": {
                 "nf-core": {
+                    "antismash/antismashlite": {
+                        "branch": "master",
+                        "git_sha": "666652151335353eef2fcd58880bcef5bc2928e1",
+                        "installed_by": ["modules"]
+                    },
+                    "diamond/blastp": {
+                        "branch": "master",
+                        "git_sha": "666652151335353eef2fcd58880bcef5bc2928e1",
+                        "installed_by": ["modules"]
+                    },
                     "multiqc": {
                         "branch": "master",
                         "git_sha": "cf17ca47590cc578dfb47db1c2a44ef86f89976d",
@@ -27,6 +37,56 @@
                     "utils_nfschema_plugin": {
                         "branch": "master",
                         "git_sha": "2fd2cd6d0e7b273747f32e465fdc6bcc3ae0814e",
+                        "installed_by": ["subworkflows"]
+                    }
+                }
+            }
+        },
+        "https://www.github.com/ebi-metagenomics/nf-modules": {
+            "modules": {
+                "ebi-metagenomics": {
+                    "combinedgenecaller/merge": {
+                        "branch": "main",
+                        "git_sha": "057f6665bbc5867298e5815c214fe4d5c9a63aa2",
+                        "installed_by": ["combined_gene_caller"]
+                    },
+                    "eggnogmapper": {
+                        "branch": "main",
+                        "git_sha": "90d26eb24748f4b7d7d54798bac65f265a9d7f58",
+                        "installed_by": ["modules"]
+                    },
+                    "fraggenescan": {
+                        "branch": "main",
+                        "git_sha": "3d083143b561d1aeb64b9bb0adae17076141d83f",
+                        "installed_by": ["combined_gene_caller"]
+                    },
+                    "genomeproperties": {
+                        "branch": "main",
+                        "git_sha": "7c67b0652fb83c8239bd5bace72364f6676e3e39",
+                        "installed_by": ["modules"]
+                    },
+                    "interproscan": {
+                        "branch": "main",
+                        "git_sha": "ec492eb39d957295da813734513c574361689ecf",
+                        "installed_by": ["modules"]
+                    },
+                    "prodigal": {
+                        "branch": "main",
+                        "git_sha": "8d975f424cc4ca285fcfe038c3ce205dbf92dac7",
+                        "installed_by": ["combined_gene_caller"]
+                    },
+                    "sanntis": {
+                        "branch": "main",
+                        "git_sha": "816cc2f6fdea59ccdd1e4b1da63bbed834b66288",
+                        "installed_by": ["modules"]
+                    }
+                }
+            },
+            "subworkflows": {
+                "ebi-metagenomics": {
+                    "combined_gene_caller": {
+                        "branch": "main",
+                        "git_sha": "8ab24cc0d240480f94c178ef6c9758feea4f90bf",
                         "installed_by": ["subworkflows"]
                     }
                 }

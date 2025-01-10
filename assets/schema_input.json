@@ -1,7 +1,7 @@
 {
     "$schema": "https://json-schema.org/draft/2020-12/schema",
-    "$id": "https://raw.githubusercontent.com/ebi-metagenomics/assembly-analysis-pipeline/main/assets/schema_input.json",
-    "title": "ebi-metagenomics/assembly-analysis-pipeline pipeline - params.input schema",
+    "$id": "https://raw.githubusercontent.com/ebi-metagenomics/ASSEMBLY_ANALYSIS_PIPELINE/main/assets/schema_input.json",
+    "title": "ebi-metagenomics/ASSEMBLY_ANALYSIS_PIPELINE pipeline - params.input schema",
     "description": "Schema for the file provided with params.input",
     "type": "array",
     "items": {
