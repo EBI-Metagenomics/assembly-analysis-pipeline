@@ -1,4 +1,4 @@
-# ebi-metagenomics/ASSEMBLY_ANALYSIS_PIPELINE: Citations
+# ebi-metagenomics/assembly-analysis-pipeline: Citations
 
 ## [nf-core](https://pubmed.ncbi.nlm.nih.gov/32055031/)
 

@@ -1,4 +1,4 @@
-# ebi-metagenomics/ASSEMBLY_ANALYSIS_PIPELINE: Output
+# ebi-metagenomics/assembly-analysis-pipeline: Output
 
 ## Introduction
 

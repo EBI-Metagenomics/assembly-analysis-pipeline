@@ -14,22 +14,25 @@ include { methodsDescriptionText  } from '../subworkflows/local/utils_nfcore_ass
    NF-CORE MODULES and SUBWORKFLOWS
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 */
-include { ANTISMASH_ANTISMASHLITE } from '../modules/nf-core/antismash/antismashlite/main'
-include { DIAMOND_BLASTP          } from '../modules/nf-core/diamond/blastp/main'
+
+include { ASSEMBLY_QC    } from '../subworkflows/local/assembly_qc'
 
 /*
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
    EBI-METAGENOMICS MODULES and SUBWORKFLOWS
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 */
+include { COMBINED_GENE_CALLER } from '../subworkflows/ebi-metagenomics/combined_gene_caller/main'
 
-include { INTERPROSCAN            } from '../modules/ebi-metagenomics/interproscan/main'
-include { EGGNOGMAPPER            } from '../modules/ebi-metagenomics/eggnogmapper/main'
-include { SANNTIS                 } from '../modules/ebi-metagenomics/sanntis/main'
-include { GENOMEPROPERTIES        } from '../modules/ebi-metagenomics/genomeproperties/main'
+/*
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   LOCAL MODULES and SUBWORKFLOWS
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+*/
 
-
-include { COMBINED_GENE_CALLER    } from '../subworkflows/ebi-metagenomics/combined_gene_caller/main'
+include { RRNA_EXTRACTION       } from '../subworkflows/ebi-metagenomics/rrna_extraction/main'
+include { FUNCTIONAL_ANNOTATION } from '../subworkflows/local/functional_annotation'
+include { BGC_ANNOTATION        } from '../subworkflows/local/bgc_annotation'
 
 /*
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -39,17 +42,70 @@ include { COMBINED_GENE_CALLER    } from '../subworkflows/ebi-metagenomics/combi
 
 workflow ASSEMBLY_ANALYSIS_PIPELINE {
     take:
-    ch_samplesheet // channel: samplesheet read in from --input
+    ch_assembly // tuple( meta, assembly_fasta )
 
     main:
 
     ch_versions = Channel.empty()
     ch_multiqc_files = Channel.empty()
 
+    /*
+    * The first step is to:
+    * - Gather some statistics about the assembly
+    * - Filter by length
+    * - Chunk into evenly sized files (using pb as the unit for chunking)
+    */
+    ASSEMBLY_QC(
+        ch_assembly
+    )
 
+    RRNA_EXTRACTION(
+        ASSEMBLY_QC.out.assembly_filtered,
+        file(params.rrnas_rfam_covariance_model, checkIfExists: true),
+        file(params.rrnas_rfam_claninf, checkIfExists: true)
+    )
 
+    ch_versions = ch_versions.mix(RRNA_EXTRACTION.out.versions)
 
+    /*
+    * Protein prediction with the combined-gene-caller, and masking the rRNAs genes
+    */
 
+    // We need to sync the sequences and the rRNA outputs //
+    def ch_cgc = ASSEMBLY_QC.out.assembly_filtered.join(RRNA_EXTRACTION.out.cmsearch_deoverlap_out).multiMap { meta, assembly_fasta, cmsearch_deoverlap_out ->
+        assembly: [meta, assembly_fasta]
+        cmsearch_deoverlap: cmsearch_deoverlap_out
+    }
+
+    COMBINED_GENE_CALLER(
+        ch_cgc.assembly,
+        ch_cgc.cmsearch_deoverlap // used to mask the rRNA genes in the assembly
+    )
+
+    ch_versions = ch_versions.mix(COMBINED_GENE_CALLER.out.versions)
+
+    /*
+    * Annotation of the proteins.
+    * The pipeline has two main modules: the functional and biosynthetic gene clusters (BGC) annotations.
+    */
+    FUNCTIONAL_ANNOTATION(
+        COMBINED_GENE_CALLER.out.faa
+    )
+
+    ch_versions = ch_versions.mix(FUNCTIONAL_ANNOTATION.out.versions)
+
+    /*
+    * BGC annotations
+    */
+    BGC_ANNOTATION(
+        COMBINED_GENE_CALLER.out.faa.join(
+            FUNCTIONAL_ANNOTATION.out.interproscan_tsv
+        ).join(
+            FUNCTIONAL_ANNOTATION.out.interproscan_gff3
+        )
+    )
+
+    ch_versions = ch_versions.mix(BGC_ANNOTATION.out.versions)
 
     //
     // Collate and save software versions

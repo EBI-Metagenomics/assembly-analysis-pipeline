@@ -1,7 +1,7 @@
 {
     "$schema": "https://json-schema.org/draft/2020-12/schema",
-    "$id": "https://raw.githubusercontent.com/ebi-metagenomics/ASSEMBLY_ANALYSIS_PIPELINE/main/nextflow_schema.json",
-    "title": "ebi-metagenomics/ASSEMBLY_ANALYSIS_PIPELINE pipeline parameters",
+    "$id": "https://raw.githubusercontent.com/ebi-metagenomics/assembly-analysis-pipeline/main/nextflow_schema.json",
+    "title": "ebi-metagenomics/assembly-analysis-pipeline pipeline parameters",
     "description": "MGnify's assembly analysis pipeline performs taxonomic classification, protein function prediction, and identifies metabolic pathways and biosynthetic gene clusters.",
     "type": "object",
     "$defs": {
@@ -42,6 +42,64 @@
                     "fa_icon": "fas fa-file-signature"
                 }
             }
+        },
+        "reference_databases": {
+            "title": "Reference databases for the pipeline",
+            "type": "object",
+            "description": "Paths to the different reference databases needed for the pipeline",
+            "default": "",
+            "properties": {
+                "rrnas_rfam_covariance_model": {
+                    "type": "string",
+                    "format": "file-path",
+                    "fa_icon": "fas fa-database",
+                    "description": "Path to the Rfam rRNA covariance models file. This file is generated with https://github.com/EBI-Metagenomics/taxdb_generation_nf and is available in our team FTP."
+                },
+                "rrnas_rfam_claninfo": {
+                    "type": "string",
+                    "format": "file-path",
+                    "fa_icon": "fas fa-database",
+                    "description": "Path to the Rfam rRNA covariance models claninfo subset. This file is generated with https://github.com/EBI-Metagenomics/taxdb_generation_nf and is available in our team FTP."
+                },
+                "interproscan_database": {
+                    "type": "string",
+                    "format": "directory-path",
+                    "fa_icon": "fas fa-folder-open",
+                    "description": "Path to the interproscan database (untarred ftp://ftp.ebi.ac.uk/pub/software/unix/iprscan/5/${version_major}-${version_minor}/interproscan-${version_major}-${version_minor}-64-bit.tar.gz)"
+                },
+                "interproscan_database_version": {
+                    "type": "string",
+                    "default": 5.5991,
+                    "description": "The EggNOG reference database version.",
+                    "fa_icon": "fas fa-code-branch"
+                },
+                "eggnog_database": {
+                    "type": "string",
+                    "format": "directory-path",
+                    "fa_icon": "fas fa-database",
+                    "description": "The EggNOG reference database folder, https://github.com/eggnogdb/eggnog-mapper/wiki/eggNOG-mapper-v2.1.5-to-v2.1.12#requirements",
+                    "help_text": "Set this variable to the path of the uncompressed tarball for the database."
+                },
+                "eggnog_database_version": {
+                    "type": "string",
+                    "default": "5.0.2",
+                    "description": "The EggNOG reference database version.",
+                    "fa_icon": "fas fa-code-branch"
+                },
+                "antismash_database": {
+                    "type": "string",
+                    "description": "Path to user-defined local antiSMASH database.",
+                    "fa_icon": "fas fa-database",
+                    "help_text": "Pre downloaded antiSMASH databases, TODO: https://nf-co.re/funcscan/usage#antismash-1 this docs. The flag `--antismash_installdir` is also required, please check it out for important information."
+                },
+                "antismash_installdir": {
+                    "type": "string",
+                    "description": "Path to user-defined local antiSMASH directory. Only required when running with docker/singularity.",
+                    "fa_icon": "far fa-folder-open",
+                    "help_text": "This is required when running with **docker and singularity** (not required for conda), due to attempted 'modifications' of files during database checks in the installation directory, something that cannot be done in immutable docker/singularity containers.\n\nTherefore, a local installation directory needs to be mounted (including all modified files from the downloading step) to the container as a workaround.\n\nThe contents of the installation directory should include directories such as `common/` `config/` and files such as `custom_typing.py` `custom_typing.pyi` etc. in the top level.\n\nSee the pipeline [documentation](https://nf-co.re/funcscan/usage#antismash-1) for details on how to download this. If running with docker or singularity, please also check `--bgc_antismash_installdir` for important information."
+                }
+            },
+            "fa_icon": "fas fa-database"
         },
         "institutional_config_options": {
             "title": "Institutional config options",
@@ -185,6 +243,9 @@
     "allOf": [
         {
             "$ref": "#/$defs/input_output_options"
+        },
+        {
+            "$ref": "#/$defs/reference_databases"
         },
         {
             "$ref": "#/$defs/institutional_config_options"

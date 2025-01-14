@@ -1,5 +1,5 @@
 name: Feature request
-description: Suggest an idea for the ebi-metagenomics/ASSEMBLY_ANALYSIS_PIPELINE pipeline
+description: Suggest an idea for the ebi-metagenomics/assembly-analysis-pipeline pipeline
 labels: enhancement
 body:
   - type: textarea

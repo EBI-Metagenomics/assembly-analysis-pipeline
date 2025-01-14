@@ -1,6 +1,6 @@
 {
-    "name": "ebi-metagenomics/ASSEMBLY_ANALYSIS_PIPELINE",
-    "homePage": "https://github.com/ebi-metagenomics/ASSEMBLY_ANALYSIS_PIPELINE",
+    "name": "ebi-metagenomics/assembly-analysis-pipeline",
+    "homePage": "https://github.com/ebi-metagenomics/assembly-analysis-pipeline",
     "repos": {
         "https://github.com/nf-core/modules.git": {
             "modules": {
@@ -15,9 +15,29 @@
                         "git_sha": "666652151335353eef2fcd58880bcef5bc2928e1",
                         "installed_by": ["modules"]
                     },
+                    "interproscan": {
+                        "branch": "master",
+                        "git_sha": "666652151335353eef2fcd58880bcef5bc2928e1",
+                        "installed_by": ["modules"]
+                    },
                     "multiqc": {
                         "branch": "master",
                         "git_sha": "cf17ca47590cc578dfb47db1c2a44ef86f89976d",
+                        "installed_by": ["modules"]
+                    },
+                    "seqkit/seq": {
+                        "branch": "master",
+                        "git_sha": "666652151335353eef2fcd58880bcef5bc2928e1",
+                        "installed_by": ["modules"]
+                    },
+                    "seqkit/split2": {
+                        "branch": "master",
+                        "git_sha": "666652151335353eef2fcd58880bcef5bc2928e1",
+                        "installed_by": ["modules"]
+                    },
+                    "seqkit/stats": {
+                        "branch": "master",
+                        "git_sha": "666652151335353eef2fcd58880bcef5bc2928e1",
                         "installed_by": ["modules"]
                     }
                 }
@@ -45,15 +65,30 @@
         "https://www.github.com/ebi-metagenomics/nf-modules": {
             "modules": {
                 "ebi-metagenomics": {
+                    "cmsearchtbloutdeoverlap": {
+                        "branch": "main",
+                        "git_sha": "696324c637a7e0cf06fe331faffee42e36826898",
+                        "installed_by": ["rrna_extraction"]
+                    },
                     "combinedgenecaller/merge": {
                         "branch": "main",
                         "git_sha": "057f6665bbc5867298e5815c214fe4d5c9a63aa2",
                         "installed_by": ["combined_gene_caller"]
                     },
+                    "easel/eslsfetch": {
+                        "branch": "main",
+                        "git_sha": "f1bf089cb679ca1e363aa81c99a512114402472c",
+                        "installed_by": ["rrna_extraction"]
+                    },
                     "eggnogmapper": {
                         "branch": "main",
                         "git_sha": "90d26eb24748f4b7d7d54798bac65f265a9d7f58",
                         "installed_by": ["modules"]
+                    },
+                    "extractcoords": {
+                        "branch": "main",
+                        "git_sha": "c249cf1afd1b7ceaacde6ba44fd9c919bf688c6d",
+                        "installed_by": ["rrna_extraction"]
                     },
                     "fraggenescan": {
                         "branch": "main",
@@ -65,10 +100,10 @@
                         "git_sha": "7c67b0652fb83c8239bd5bace72364f6676e3e39",
                         "installed_by": ["modules"]
                     },
-                    "interproscan": {
+                    "infernal/cmsearch": {
                         "branch": "main",
-                        "git_sha": "ec492eb39d957295da813734513c574361689ecf",
-                        "installed_by": ["modules"]
+                        "git_sha": "62e22fb1fd131d27ed043f305f317a0cf741b900",
+                        "installed_by": ["rrna_extraction"]
                     },
                     "prodigal": {
                         "branch": "main",
@@ -87,6 +122,11 @@
                     "combined_gene_caller": {
                         "branch": "main",
                         "git_sha": "8ab24cc0d240480f94c178ef6c9758feea4f90bf",
+                        "installed_by": ["subworkflows"]
+                    },
+                    "rrna_extraction": {
+                        "branch": "main",
+                        "git_sha": "29fd1389152934e9ca5da16d4637fee44764d25d",
                         "installed_by": ["subworkflows"]
                     }
                 }

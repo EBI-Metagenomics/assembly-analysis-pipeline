@@ -1,9 +1,9 @@
 #!/usr/bin/env nextflow
 /*
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    ebi-metagenomics/ASSEMBLY_ANALYSIS_PIPELINE
+    ebi-metagenomics/assembly-analysis-pipeline
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    Github : https://github.com/ebi-metagenomics/ASSEMBLY_ANALYSIS_PIPELINE
+    Github : https://github.com/ebi-metagenomics/assembly-analysis-pipeline
 ----------------------------------------------------------------------------------------
 */
 
@@ -13,9 +13,9 @@
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 */
 
-include { ASSEMBLY_ANALYSIS_PIPELINE  } from './workflows/ASSEMBLY_ANALYSIS_PIPELINE'
-include { PIPELINE_INITIALISATION } from './subworkflows/local/utils_nfcore_ASSEMBLY_ANALYSIS_PIPELINE_pipeline'
-include { PIPELINE_COMPLETION     } from './subworkflows/local/utils_nfcore_ASSEMBLY_ANALYSIS_PIPELINE_pipeline'
+include { ASSEMBLY_ANALYSIS_PIPELINE  } from './workflows/assembly_analysis_pipeline'
+include { PIPELINE_INITIALISATION     } from './subworkflows/local/utils_nfcore_assembly_analysis_pipeline_pipeline'
+include { PIPELINE_COMPLETION         } from './subworkflows/local/utils_nfcore_assembly_analysis_pipeline_pipeline'
 /*
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     NAMED WORKFLOWS FOR PIPELINE
