@@ -8,27 +8,27 @@ include { SANNTIS                 } from '../../modules/ebi-metagenomics/sanntis
 workflow BGC_ANNOTATION {
 
     take:
-    ch_predicted_proteins // tule (meta, faa, gff, ips_tsv)
+    ch_contigs_and_predicted_proteins // tule (meta, fasta, faa, gff, ips_tsv)
 
     main:
 
     ch_versions = Channel.empty()
 
-    antismash_ch = ch_predicted_proteins.multiMap { meta, faa, gff, _ips_tsv ->
-        faa: [meta, faa]
+    antismash_ch = ch_contigs_and_predicted_proteins.multiMap { meta, fasta, _faa, gff, _ips_tsv ->
+        fasta: [meta, fasta]
         gff: gff
     }
 
     ANTISMASH_ANTISMASHLITE(
-        antismash_ch.faa,
-        params.antismash_database,
-        params.antismash_installdir,
+        antismash_ch.fasta,
+        file(params.antismash_database, checkIfExists: true),
         antismash_ch.gff
     )
 
-    SANNTIS(
-        ch_predicted_proteins.map { meta, _faa, _gff, ips_tsv -> [meta, ips_tsv]}
-    )
+    // TODO: Sanntis will get support for GFF as the sole input -> https://www.ebi.ac.uk/panda/jira/browse/EMG-7254
+    // SANNTIS(
+    //     ch_predicted_proteins.map { meta, _faa, _gff, ips_tsv -> [meta, ips_tsv]}
+    // )
 
     emit:
     versions = ch_versions

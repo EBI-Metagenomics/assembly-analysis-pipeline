@@ -22,13 +22,13 @@ process SANNTIS {
     def prefix = task.ext.prefix ?: "${meta.id}"
     """
     grep -v "/protein_id=" ${gbk} > ${prefix}_prepped.gbk
+
     sanntis \
         --ip-file ${interproscan_output} \
         --outfile ${prefix}_sanntis.gff \
         --cpu ${task.cpus} \
         ${args} \
         ${prefix}_prepped.gbk
-
 
     cat <<-END_VERSIONS > versions.yml
     "${task.process}":

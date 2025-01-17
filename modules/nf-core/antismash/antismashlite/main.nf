@@ -3,22 +3,11 @@ process ANTISMASH_ANTISMASHLITE {
     label 'process_medium'
 
     conda "${moduleDir}/environment.yml"
-    container "${ workflow.containerEngine == 'singularity' && !task.ext.singularity_pull_docker_container ?
-        'https://depot.galaxyproject.org/singularity/antismash-lite:7.1.0--pyhdfd78af_0' :
-        'biocontainers/antismash-lite:7.1.0--pyhdfd78af_0' }"
-
-    containerOptions {
-        workflow.containerEngine == 'singularity' ?
-        "-B $antismash_dir:/usr/local/lib/python3.10/site-packages/antismash" :
-        workflow.containerEngine == 'docker' ?
-        "-v \$PWD/$antismash_dir:/usr/local/lib/python3.10/site-packages/antismash" :
-        ''
-        }
+    container 'quay.io/microbiome-informatics/antismash:7.1.0.1_2'
 
     input:
     tuple val(meta), path(sequence_input)
     path(databases)
-    path(antismash_dir) // Optional input: AntiSMASH installation folder. It is not needed for using this module with conda, but required for docker/singularity (see meta.yml).
     path(gff)
 
     output:
@@ -46,18 +35,39 @@ process ANTISMASH_ANTISMASHLITE {
     script:
     def args = task.ext.args ?: ''
     prefix = task.ext.suffix ? "${meta.id}${task.ext.suffix}" : "${meta.id}"
-    gff_flag = gff ? "--genefinding-gff3 ${gff}" : ""
-
+    def gff_flag = gff ? "--genefinding-gff3 ${gff}" : ""
+    def is_compressed = sequence_input.getExtension() == "gz" ? true : false
+    def sequence_file = is_compressed ? sequence_input.getBaseName() : sequence_input
     """
     ## We specifically do not include on-the-fly annotations (--genefinding-tool none) as
-    ## this should be run as a separate module for versioning purposes
+    ## this should be run as a separate module for versioning purposes    
+    if [ "${is_compressed}" == "true" ]; then
+        # - remove in case of retry - #
+        rm -f ${sequence_file}
+        gzip -c -d ${sequence_input} > ${sequence_file}
+    fi
+
+    #######################
+    # Clean the GFF3 file #
+    #######################
+    # TODO: This is a patch to allow antiSMASH to ingest the InterProScan GFF3. It should probably be a Python script.
+    # InterProScan runs on the proteins, which are labeled based on the Combined Gene Caller conventions (which come from Prodigal and FragGeneScan).
+    # AntiSMASH needs the ID (the first column) to match the contig, which is the first element of this AWK expression, to convert the following:
+    # A FGS example: contig-2-length-2192_210_335_+ -> contig-2-length-2192 (the contig name).
+    # The second part is to change the third column from IPS to CDS (which is what AS expects... I know).
+    # Finally, the last part is to remove the Name="<name>" from IPS, as AS doesn't like repeated values there... again, I know.
+    # Example: Name=mobidb-lite will be in every prediction that comes from MobiDBLite.
+
+    # - remove in case of retry - #
+    rm -f input.gff
+    cat ${gff} | awk 'BEGIN{FS=OFS="\t"} /^#/{print; next} {split(\$1,a,"_"); \$1=a[1]; \$3="CDS"; sub(/Name=[^;]+;/, "", \$9); print}' > input.gff
 
     antismash \\
-        $args \\
-        $gff_flag \\
-        -c $task.cpus \\
-        --output-dir $prefix \\
-        --output-basename $prefix \\
+        ${args} \\
+        --genefinding-gff3 input.gff \\
+        -c ${task.cpus} \\
+        --output-dir ${prefix} \\
+        --output-basename ${prefix} \\
         --genefinding-tool none \\
         --logfile $prefix/${prefix}.log \\
         --databases $databases \\

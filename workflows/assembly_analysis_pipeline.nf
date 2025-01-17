@@ -62,7 +62,7 @@ workflow ASSEMBLY_ANALYSIS_PIPELINE {
     RRNA_EXTRACTION(
         ASSEMBLY_QC.out.assembly_filtered,
         file(params.rrnas_rfam_covariance_model, checkIfExists: true),
-        file(params.rrnas_rfam_claninf, checkIfExists: true)
+        file(params.rrnas_rfam_claninfo, checkIfExists: true)
     )
 
     ch_versions = ch_versions.mix(RRNA_EXTRACTION.out.versions)
@@ -74,7 +74,7 @@ workflow ASSEMBLY_ANALYSIS_PIPELINE {
     // We need to sync the sequences and the rRNA outputs //
     def ch_cgc = ASSEMBLY_QC.out.assembly_filtered.join(RRNA_EXTRACTION.out.cmsearch_deoverlap_out).multiMap { meta, assembly_fasta, cmsearch_deoverlap_out ->
         assembly: [meta, assembly_fasta]
-        cmsearch_deoverlap: cmsearch_deoverlap_out
+        cmsearch_deoverlap: [meta, cmsearch_deoverlap_out]
     }
 
     COMBINED_GENE_CALLER(
@@ -98,10 +98,12 @@ workflow ASSEMBLY_ANALYSIS_PIPELINE {
     * BGC annotations
     */
     BGC_ANNOTATION(
-        COMBINED_GENE_CALLER.out.faa.join(
-            FUNCTIONAL_ANNOTATION.out.interproscan_tsv
+        ASSEMBLY_QC.out.assembly_filtered.join(
+            COMBINED_GENE_CALLER.out.faa
         ).join(
             FUNCTIONAL_ANNOTATION.out.interproscan_gff3
+        ).join(
+            FUNCTIONAL_ANNOTATION.out.interproscan_tsv
         )
     )
 

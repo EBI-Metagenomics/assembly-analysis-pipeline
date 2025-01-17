@@ -1,6 +1,7 @@
 
 /* NF-CORE */
-include { INTERPROSCAN            } from '../../modules/nf-core/interproscan/main'
+// include { INTERPROSCAN            } from '../../modules/nf-core/interproscan/main'
+include { INTERPROSCAN } from '../../modules/ebi-metagenomics/interproscan/main'
 // include { DIAMOND_BLASTP       } from '../../modules/nf-core/diamond/blastp/main'
 
 /* EBI-METAGENOMICS */
@@ -21,17 +22,17 @@ workflow FUNCTIONAL_ANNOTATION {
 
     INTERPROSCAN(
         ch_predicted_proteins,
-        params.interproscan_database
+        [ file(params.interproscan_database), params.interproscan_database_version ]
     )
 
     ch_versions = ch_versions.mix(INTERPROSCAN.out.versions)
 
     EGGNOGMAPPER(
         ch_predicted_proteins,
-        [], // tuple val(meta2), path(annotation_hit_table)
+        [[], []], // tuple val(meta2), path(annotation_hit_table)
         params.eggnog_data_dir,
         params.eggnog_database,
-        params.eggnog_diamond_db,
+        params.eggnog_diamond_database,
     )
 
     ch_versions = ch_versions.mix(EGGNOGMAPPER.out.versions)
@@ -44,7 +45,6 @@ workflow FUNCTIONAL_ANNOTATION {
 
     emit:
     interproscan_tsv  = INTERPROSCAN.out.tsv
-    // TODO: review this, he gff3 is used with antiSMASH
     interproscan_gff3 = INTERPROSCAN.out.gff3
     versions          = ch_versions
 }

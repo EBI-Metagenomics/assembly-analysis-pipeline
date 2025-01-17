@@ -75,10 +75,24 @@
                 },
                 "eggnog_database": {
                     "type": "string",
-                    "format": "directory-path",
+                    "format": "file-path",
                     "fa_icon": "fas fa-database",
                     "description": "The EggNOG reference database folder, https://github.com/eggnogdb/eggnog-mapper/wiki/eggNOG-mapper-v2.1.5-to-v2.1.12#requirements",
                     "help_text": "Set this variable to the path of the uncompressed tarball for the database."
+                },
+                "eggnog_data_dir": {
+                    "type": "string",
+                    "format": "directory-path",
+                    "fa_icon": "fas fa-database",
+                    "description": "TODO",
+                    "help_text": "TODO"
+                },
+                "eggnog_diamond_database": {
+                    "type": "string",
+                    "format": "file-path",
+                    "fa_icon": "fas fa-database",
+                    "description": "TODO",
+                    "help_text": "TODO"
                 },
                 "eggnog_database_version": {
                     "type": "string",
@@ -91,12 +105,6 @@
                     "description": "Path to user-defined local antiSMASH database.",
                     "fa_icon": "fas fa-database",
                     "help_text": "Pre downloaded antiSMASH databases, TODO: https://nf-co.re/funcscan/usage#antismash-1 this docs. The flag `--antismash_installdir` is also required, please check it out for important information."
-                },
-                "antismash_installdir": {
-                    "type": "string",
-                    "description": "Path to user-defined local antiSMASH directory. Only required when running with docker/singularity.",
-                    "fa_icon": "far fa-folder-open",
-                    "help_text": "This is required when running with **docker and singularity** (not required for conda), due to attempted 'modifications' of files during database checks in the installation directory, something that cannot be done in immutable docker/singularity containers.\n\nTherefore, a local installation directory needs to be mounted (including all modified files from the downloading step) to the container as a workaround.\n\nThe contents of the installation directory should include directories such as `common/` `config/` and files such as `custom_typing.py` `custom_typing.pyi` etc. in the top level.\n\nSee the pipeline [documentation](https://nf-co.re/funcscan/usage#antismash-1) for details on how to download this. If running with docker or singularity, please also check `--bgc_antismash_installdir` for important information."
                 }
             },
             "fa_icon": "fas fa-database"

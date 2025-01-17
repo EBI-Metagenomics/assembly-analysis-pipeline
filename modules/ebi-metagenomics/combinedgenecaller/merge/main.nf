@@ -19,6 +19,7 @@ process COMBINEDGENECALLER_MERGE {
     script:
     def args = task.ext.args ?: ''
     def prefix = task.ext.prefix ?: "${meta.id}"
+    // TODO: fix in CGC
     def mask_param = mask_file ? " --mask mask_file_uncompressed.txt " : ""
     """
     gzip -cdf $prodigal_sco > prodigal_uncompressed.sco
@@ -27,7 +28,7 @@ process COMBINEDGENECALLER_MERGE {
     gzip -cdf $fgs_out > fgs_uncompressed.out
     gzip -cdf $fgs_ffn > fgs_uncompressed.ffn
     gzip -cdf $fgs_faa > fgs_uncompressed.faa
-    gzip -cdf $mask_file > mask_file_uncompressed.txt || true
+    # gzip -cdf $mask_file > mask_file_uncompressed.txt || true
 
     combined_gene_caller \\
         -n $prefix \\
@@ -36,9 +37,11 @@ process COMBINEDGENECALLER_MERGE {
         --prodigal-faa prodigal_uncompressed.faa \\
         --fgs-out fgs_uncompressed.out \\
         --fgs-ffn fgs_uncompressed.ffn \\
-        --fgs-faa fgs_uncompressed.faa $mask_param $args
+        --fgs-faa fgs_uncompressed.faa \\
+        -k $mask_file \\
+        $args
 
-    gzip -n $prefix.*
+    gzip -n $prefix.{faa,ffn}
 
     cat <<-END_VERSIONS > versions.yml
     "${task.process}":

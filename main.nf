@@ -25,7 +25,7 @@ include { PIPELINE_COMPLETION         } from './subworkflows/local/utils_nfcore_
 //
 // WORKFLOW: Run main analysis pipeline depending on type of input
 //
-workflow EBIMETAGENOMICS_ASSEMBLY_ANALYSIS_PIPELINE {
+workflow EBIMETAGENOMICS {
 
     take:
     samplesheet // channel: samplesheet read in from --input
@@ -65,7 +65,7 @@ workflow {
     //
     // WORKFLOW: Run main workflow
     //
-    EBIMETAGENOMICS_ASSEMBLY_ANALYSIS_PIPELINE (
+    EBIMETAGENOMICS (
         PIPELINE_INITIALISATION.out.samplesheet
     )
     //
@@ -77,7 +77,7 @@ workflow {
         params.plaintext_email,
         params.outdir,
         params.monochrome_logs,
-        EBIMETAGENOMICS_ASSEMBLY_ANALYSIS_PIPELINE.out.multiqc_report
+        EBIMETAGENOMICS.out.multiqc_report
     )
 }
 

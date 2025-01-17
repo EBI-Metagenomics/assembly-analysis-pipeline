@@ -33,7 +33,8 @@ process PRODIGAL {
         -a "${prefix}.faa" \\
         -s "${prefix}_all.txt"
 
-    pigz -nm ${prefix}*
+    # TODO: fix in module
+    pigz -nm ${prefix}{.fna,.${output_format},.faa,_all.txt}
 
     cat <<-END_VERSIONS > versions.yml
     "${task.process}":
