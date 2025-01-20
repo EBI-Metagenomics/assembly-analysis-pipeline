@@ -1,6 +1,7 @@
 
 /* NF-CORE */
 include { DIAMOND_BLASTP          } from '../../modules/nf-core/diamond/blastp/main'
+include { KOFAMSCAN               } from '../../modules/nf-core/kofamscan/main'
 
 /* EBI-METAGENOMICS */
 include { INTERPROSCAN            } from '../../modules/ebi-metagenomics/interproscan/main'
@@ -56,7 +57,13 @@ workflow FUNCTIONAL_ANNOTATION {
 
     ch_versions = ch_versions.mix(DIAMOND_BLASTP.out.versions)
 
-    // TODO: test KOFAM //
+    KOFAMSCAN(
+        ch_predicted_proteins,
+        file("${params.kofam_profiles}", checkIfExists: true),
+        file(params.kofam_ko_list, checkIfExists: true),
+    )
+
+    ch_versions = ch_versions.mix(KOFAMSCAN.out.versions)
 
     emit:
     interproscan_tsv  = INTERPROSCAN.out.tsv

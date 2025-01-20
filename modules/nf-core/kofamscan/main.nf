@@ -24,14 +24,22 @@ process KOFAMSCAN {
     def args = task.ext.args ?: ''
     def prefix = task.ext.prefix ?: "${meta.id}"
     def extension = args.contains("--format detail-tsv") ? "tsv" : "txt"
+    def is_compressed = fasta.getExtension() == "gz" ? true : false
+    def fasta_file = is_compressed ? fasta.getBaseName() : fasta
     """
+    if [ "${is_compressed}" == "true" ]; then
+        # - remove in case of retry - #
+        rm -f ${fasta_file}
+        gzip -c -d ${fasta} > ${fasta_file}
+    fi
+
     exec_annotation \\
         -p $profiles \\
         -k $ko_list \\
         $args \\
         --cpu $task.cpus \\
         -o ${prefix}.${extension} \\
-        $fasta
+        ${fasta_file}
 
     cat <<-END_VERSIONS > versions.yml
     "${task.process}":
