@@ -1,10 +1,9 @@
 
 /* NF-CORE */
-// include { INTERPROSCAN            } from '../../modules/nf-core/interproscan/main'
-include { INTERPROSCAN } from '../../modules/ebi-metagenomics/interproscan/main'
-// include { DIAMOND_BLASTP       } from '../../modules/nf-core/diamond/blastp/main'
+include { DIAMOND_BLASTP          } from '../../modules/nf-core/diamond/blastp/main'
 
 /* EBI-METAGENOMICS */
+include { INTERPROSCAN            } from '../../modules/ebi-metagenomics/interproscan/main'
 include { EGGNOGMAPPER            } from '../../modules/ebi-metagenomics/eggnogmapper/main'
 include { GENOMEPROPERTIES        } from '../../modules/ebi-metagenomics/genomeproperties/main'
 
@@ -18,7 +17,7 @@ workflow FUNCTIONAL_ANNOTATION {
 
     ch_versions = Channel.empty()
 
-    // TODO: add chunking
+    // TODO: add chunking //
 
     INTERPROSCAN(
         ch_predicted_proteins,
@@ -42,6 +41,22 @@ workflow FUNCTIONAL_ANNOTATION {
     )
 
     ch_versions = ch_versions.mix(GENOMEPROPERTIES.out.versions)
+
+    /*
+    * Perform a DIAMOND search against the UniRef90 database.
+    * This step identifies UniRef hits and retrieves the corresponding NCBI taxonomy IDs
+    */
+    // TODO: this is to be reviewed - https://www.ebi.ac.uk/panda/jira/browse/EMG-6975?src=confmacro
+    DIAMOND_BLASTP(
+        ch_predicted_proteins,
+        [["id": "uniref90"] , file(params.uniref90_diamond_database, checkIfExists: true)],
+        "txt", // Blast
+        "qseqid sseqid pident length mismatch gapopen qstart qend sstart send evalue bitscore staxids sphylums skingdoms sscinames"
+    )
+
+    ch_versions = ch_versions.mix(DIAMOND_BLASTP.out.versions)
+
+    // TODO: test KOFAM //
 
     emit:
     interproscan_tsv  = INTERPROSCAN.out.tsv

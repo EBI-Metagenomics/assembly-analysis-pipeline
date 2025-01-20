@@ -102,9 +102,17 @@
                 },
                 "antismash_database": {
                     "type": "string",
+                    "format": "directory-path",
                     "description": "Path to user-defined local antiSMASH database.",
                     "fa_icon": "fas fa-database",
-                    "help_text": "Pre downloaded antiSMASH databases, TODO: https://nf-co.re/funcscan/usage#antismash-1 this docs. The flag `--antismash_installdir` is also required, please check it out for important information."
+                    "help_text": "Pre downloaded antiSMASH databases, TODO: https://nf-co.re/funcscan/usage#antismash-1 this docs."
+                },
+                "uniref90_diamond_database": {
+                    "type": "string",
+                    "format": "file-path",
+                    "description": "This is a diamond database created from the Uniref90 fasta file..",
+                    "fa_icon": "fas fa-database",
+                    "help_text": "Path to user-defined local Uniref90 diamond database file."
                 }
             },
             "fa_icon": "fas fa-database"
