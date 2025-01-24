@@ -36,18 +36,14 @@ workflow ASSEMBLY_QC {
 
     ch_versions = ch_versions.mix(SEQKIT_SEQ.out.versions)
 
-    // TODO: decide when and how to chunk
-    // // Split the fasta into chunks of ~max ${params.fasta_chunk_size} pb //
-    // SEQKIT_SPLIT2(
-    //     SEQKIT_SEQ.out.fastx
-    // )
-    // ch_versions = ch_versions.mix(SEQKIT_SPLIT2.out.versions)
+    // Chumk the fasta into files with at most >= params.TODO size
+    SEQKIT_SPLIT2(
+        SEQKIT_SEQ.out.fastx
+    )
 
-    // TODO: do we need to format this?
-    // Re-format the output from
-    // tuple(meta, path(*.chunks))
+    ch_versions = ch_versions.mix(SEQKIT_SPLIT2.out.versions)
 
     emit:
-    assembly_filtered = SEQKIT_SEQ.out.fastx
+    assembly_filtered = SEQKIT_SPLIT2.out.assembly.transpose()
     versions          = ch_versions
 }

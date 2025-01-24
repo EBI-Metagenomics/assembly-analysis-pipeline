@@ -1,13 +1,14 @@
 
 /* NF-CORE */
-include { DIAMOND_BLASTP          } from '../../modules/nf-core/diamond/blastp/main'
-include { KOFAMSCAN               } from '../../modules/nf-core/kofamscan/main'
+include { DIAMOND_BLASTP                  } from '../../modules/nf-core/diamond/blastp/main'
 
 /* EBI-METAGENOMICS */
-include { INTERPROSCAN            } from '../../modules/ebi-metagenomics/interproscan/main'
-include { EGGNOGMAPPER            } from '../../modules/ebi-metagenomics/eggnogmapper/main'
-include { GENOMEPROPERTIES        } from '../../modules/ebi-metagenomics/genomeproperties/main'
+include { INTERPROSCAN                    } from '../../modules/ebi-metagenomics/interproscan/main'
+include { EGGNOGMAPPER                    } from '../../modules/ebi-metagenomics/eggnogmapper/main'
+include { GENOMEPROPERTIES                } from '../../modules/ebi-metagenomics/genomeproperties/main'
 
+/* LOCAL */
+include { HMMER_HMMSCAN as HMMSCAN_KOFAMS } from '../../modules/local/hmmer/hmmscan/main'
 
 workflow FUNCTIONAL_ANNOTATION {
 
@@ -20,12 +21,12 @@ workflow FUNCTIONAL_ANNOTATION {
 
     // TODO: add chunking //
 
-    INTERPROSCAN(
-        ch_predicted_proteins,
-        [ file(params.interproscan_database), params.interproscan_database_version ]
-    )
+    // INTERPROSCAN(
+    //     ch_predicted_proteins,
+    //     [ file(params.interproscan_database), params.interproscan_database_version ]
+    // )
 
-    ch_versions = ch_versions.mix(INTERPROSCAN.out.versions)
+    // ch_versions = ch_versions.mix(INTERPROSCAN.out.versions)
 
     EGGNOGMAPPER(
         ch_predicted_proteins,
@@ -37,11 +38,11 @@ workflow FUNCTIONAL_ANNOTATION {
 
     ch_versions = ch_versions.mix(EGGNOGMAPPER.out.versions)
 
-    GENOMEPROPERTIES(
-        INTERPROSCAN.out.tsv
-    )
+    // GENOMEPROPERTIES(
+    //     INTERPROSCAN.out.tsv
+    // )
 
-    ch_versions = ch_versions.mix(GENOMEPROPERTIES.out.versions)
+    // ch_versions = ch_versions.mix(GENOMEPROPERTIES.out.versions)
 
     /*
     * Perform a DIAMOND search against the UniRef90 database.
@@ -51,22 +52,29 @@ workflow FUNCTIONAL_ANNOTATION {
     DIAMOND_BLASTP(
         ch_predicted_proteins,
         [["id": "uniref90"] , file(params.uniref90_diamond_database, checkIfExists: true)],
-        "txt", // Blast
+        "txt", // blast like txt output
         "qseqid sseqid pident length mismatch gapopen qstart qend sstart send evalue bitscore staxids sphylums skingdoms sscinames"
     )
 
     ch_versions = ch_versions.mix(DIAMOND_BLASTP.out.versions)
 
-    KOFAMSCAN(
-        ch_predicted_proteins,
-        file("${params.kofam_profiles}", checkIfExists: true),
-        file(params.kofam_ko_list, checkIfExists: true),
+    /*
+     * KEGG Orthologous annotation. This step uses hmmscan to annotation the sequences aginst the kofam HMM models.§
+     These HMM models have been extended as described TODO: link to the mgnify_pipelines_reference_databases pipeline
+     *
+    */
+    // TODO: these results needs to be processsed
+    HMMSCAN_KOFAMS(
+        ch_predicted_proteins.map { meta, proteins -> {
+                [meta, file("${params.kofam_hmm_database}/*.hmm*", checkIfExists: true), proteins, true, true, true ]
+            }
+        }
     )
 
-    ch_versions = ch_versions.mix(KOFAMSCAN.out.versions)
+    ch_versions = ch_versions.mix(HMMSCAN_KOFAMS.out.versions)
 
     emit:
-    interproscan_tsv  = INTERPROSCAN.out.tsv
-    interproscan_gff3 = INTERPROSCAN.out.gff3
+    // interproscan_tsv  = INTERPROSCAN.out.tsv
+    // interproscan_gff3 = INTERPROSCAN.out.gff3
     versions          = ch_versions
 }

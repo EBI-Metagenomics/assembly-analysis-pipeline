@@ -114,16 +114,9 @@
                     "fa_icon": "fas fa-database",
                     "help_text": "Path to user-defined local Uniref90 diamond database file."
                 },
-                "kofam_profiles": {
+                "kofam_hmm_database": {
                     "type": "string",
                     "format": "directory-path",
-                    "description": "TODO",
-                    "fa_icon": "fas fa-database",
-                    "help_text": "TODO"
-                },
-                "kofam_ko_list": {
-                    "type": "string",
-                    "format": "file-path",
                     "description": "TODO",
                     "fa_icon": "fas fa-database",
                     "help_text": "TODO"

@@ -2,9 +2,7 @@ process INTERPROSCAN {
     tag "$meta.id"
     label 'process_long'
 
-    container "${ workflow.containerEngine == 'singularity' && !task.ext.singularity_pull_docker_container ?
-        'https://depot.galaxyproject.org/singularity/interproscan:5.72-103.0' :
-        'biocontainers/interproscan:5.72-103.0' }"
+    container "quay.io/microbiome-informatics/interproscan:5.72-103.0"
 
     containerOptions {
         if (workflow.containerEngine == 'singularity') {

@@ -97,17 +97,17 @@ workflow ASSEMBLY_ANALYSIS_PIPELINE {
     /*
     * BGC annotations
     */
-    BGC_ANNOTATION(
-        ASSEMBLY_QC.out.assembly_filtered.join(
-            COMBINED_GENE_CALLER.out.faa
-        ).join(
-            FUNCTIONAL_ANNOTATION.out.interproscan_gff3
-        ).join(
-            FUNCTIONAL_ANNOTATION.out.interproscan_tsv
-        )
-    )
+    // BGC_ANNOTATION(
+    //     ASSEMBLY_QC.out.assembly_filtered.join(
+    //         COMBINED_GENE_CALLER.out.faa
+    //     ).join(
+    //         FUNCTIONAL_ANNOTATION.out.interproscan_gff3
+    //     ).join(
+    //         FUNCTIONAL_ANNOTATION.out.interproscan_tsv
+    //     )
+    // )
 
-    ch_versions = ch_versions.mix(BGC_ANNOTATION.out.versions)
+    // ch_versions = ch_versions.mix(BGC_ANNOTATION.out.versions)
 
     //
     // Collate and save software versions
