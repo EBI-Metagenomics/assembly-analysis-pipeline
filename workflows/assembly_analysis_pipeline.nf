@@ -33,6 +33,7 @@ include { COMBINED_GENE_CALLER } from '../subworkflows/ebi-metagenomics/combined
 include { RRNA_EXTRACTION       } from '../subworkflows/ebi-metagenomics/rrna_extraction/main'
 include { FUNCTIONAL_ANNOTATION } from '../subworkflows/local/functional_annotation'
 include { BGC_ANNOTATION        } from '../subworkflows/local/bgc_annotation'
+include { RENAME_CONTIGS } from '../modules/local/rename_contigs.nf'
 
 /*
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -49,6 +50,16 @@ workflow ASSEMBLY_ANALYSIS_PIPELINE {
     ch_versions = Channel.empty()
     ch_multiqc_files = Channel.empty()
 
+
+    /*
+     * Renam the contigs using the prodivded prefix, seqs will be named >{prefix}_{n}
+     * there n is just an autoincrement
+    */
+    RENAME_CONTIGS(
+        ch_assembly,
+        "MGYA" // The contig prefix
+    )
+
     /*
     * The first step is to:
     * - Gather some statistics about the assembly
@@ -56,8 +67,10 @@ workflow ASSEMBLY_ANALYSIS_PIPELINE {
     * - Chunk into evenly sized files (using pb as the unit for chunking)
     */
     ASSEMBLY_QC(
-        ch_assembly
+        RENAME_CONTIGS.out.renamed_fasta
     )
+
+    ch_versions = ch_versions.mix(ASSEMBLY_QC.out.versions)
 
     RRNA_EXTRACTION(
         ASSEMBLY_QC.out.assembly_filtered,
@@ -70,7 +83,6 @@ workflow ASSEMBLY_ANALYSIS_PIPELINE {
     /*
     * Protein prediction with the combined-gene-caller, and masking the rRNAs genes
     */
-
     // We need to sync the sequences and the rRNA outputs //
     def ch_cgc = ASSEMBLY_QC.out.assembly_filtered.join(RRNA_EXTRACTION.out.cmsearch_deoverlap_out).multiMap { meta, assembly_fasta, cmsearch_deoverlap_out ->
         assembly: [meta, assembly_fasta]
@@ -97,17 +109,17 @@ workflow ASSEMBLY_ANALYSIS_PIPELINE {
     /*
     * BGC annotations
     */
-    // BGC_ANNOTATION(
-    //     ASSEMBLY_QC.out.assembly_filtered.join(
-    //         COMBINED_GENE_CALLER.out.faa
-    //     ).join(
-    //         FUNCTIONAL_ANNOTATION.out.interproscan_gff3
-    //     ).join(
-    //         FUNCTIONAL_ANNOTATION.out.interproscan_tsv
-    //     )
-    // )
+    BGC_ANNOTATION(
+        ASSEMBLY_QC.out.assembly_filtered.join(
+            COMBINED_GENE_CALLER.out.faa
+        ).join(
+            FUNCTIONAL_ANNOTATION.out.interproscan_gff3
+        ).join(
+            FUNCTIONAL_ANNOTATION.out.interproscan_tsv
+        )
+    )
 
-    // ch_versions = ch_versions.mix(BGC_ANNOTATION.out.versions)
+    ch_versions = ch_versions.mix(BGC_ANNOTATION.out.versions)
 
     //
     // Collate and save software versions

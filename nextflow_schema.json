@@ -110,9 +110,16 @@
                 "uniref90_diamond_database": {
                     "type": "string",
                     "format": "file-path",
-                    "description": "This is a diamond database created from the Uniref90 fasta file..",
+                    "description": "This is a diamond database created from the Uniref90 fasta file.",
                     "fa_icon": "fas fa-database",
                     "help_text": "Path to user-defined local Uniref90 diamond database file."
+                },
+                "uniref90rheachebi_diamond_database": {
+                    "type": "string",
+                    "format": "file-path",
+                    "description": "This is a diamond database created from the Uniref90 ammended with Rhea and CHEMI annotations.",
+                    "fa_icon": "fas fa-database",
+                    "help_text": "Path to user-defined local Uniref90 + Rhea and CHEMI annotations diamond database file."
                 },
                 "kofam_hmm_database": {
                     "type": "string",
@@ -120,6 +127,27 @@
                     "description": "TODO",
                     "fa_icon": "fas fa-database",
                     "help_text": "TODO"
+                },
+                "go_obo": {
+                    "type": "string",
+                    "format": "file-path",
+                    "description": "Gene ontology .OBO file, for example go-basic. Can usually be downloaded here https://geneontology.org/docs/download-ontology/",
+                    "fa_icon": "fas fa-database",
+                    "help_text": "Path to the .obo file"
+                },
+                "goslim_ids": {
+                    "type": "string",
+                    "format": "file-path",
+                    "description": "Text file containing the GO terms that make up the input GO-slim",
+                    "fa_icon": "fas fa-database",
+                    "help_text": "Path to the GO terms txt file, to make the GO-slim"
+                },
+                "go_banding": {
+                    "type": "string",
+                    "format": "file-path",
+                    "description": "Text file containing the GO terms and descriptions that make up the input GO-slim",
+                    "fa_icon": "fas fa-database",
+                    "help_text": "Path to the GO terms and descriptions, to make the GO-slim"
                 }
             },
             "fa_icon": "fas fa-database"

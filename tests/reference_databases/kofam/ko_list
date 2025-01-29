@@ -1,4 +1,0 @@
-knum	threshold	score_type	profile_type	F-measure	nseq	nseq_used	alen	mlen	eff_nseq	re/pos	definition
-K21766	170.53	full	all	0.957506	1113	1075	2538	472	9.76	0.590	tubulin-specific chaperone C
-K18433	172.17	full	all	1.000000	16	13	168	150	0.97	0.590	type IV secretion system T-DNA border endonuclease VirD1
-K05700	544.77	full	all	0.995594	849	797	6168	1048	2.10	0.590	vinculin
