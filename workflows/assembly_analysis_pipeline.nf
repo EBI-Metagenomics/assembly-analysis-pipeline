@@ -33,7 +33,7 @@ include { COMBINED_GENE_CALLER } from '../subworkflows/ebi-metagenomics/combined
 include { RRNA_EXTRACTION       } from '../subworkflows/ebi-metagenomics/rrna_extraction/main'
 include { FUNCTIONAL_ANNOTATION } from '../subworkflows/local/functional_annotation'
 include { BGC_ANNOTATION        } from '../subworkflows/local/bgc_annotation'
-include { RENAME_CONTIGS } from '../modules/local/rename_contigs.nf'
+include { RENAME_CONTIGS        } from '../modules/local/rename_contigs.nf'
 
 /*
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

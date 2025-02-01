@@ -1,0 +1,27 @@
+nextflow_process {
+
+    name "Test Process RENAME_CONTIGS"
+    script "modules/local/rename_contigs.nf"
+    process "RENAME_CONTIGS"
+
+    test("Should rename a fasta properly") {
+
+        when {
+            process {
+                """
+                input[0] = [
+                    [test: "test"]. file("https://raw.githubusercontent.com/EBI-Metagenomics/nf-modules/refs/heads/main/modules/ebi-metagenomics/extractcoords/tests/test.fasta"),
+                    "FAKE_PREFIX"
+                ]
+                """
+            }
+        }
+
+        then {
+            assert process.success
+            assert snapshot(process.out).match()
+        }
+
+    }
+
+}

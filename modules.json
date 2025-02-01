@@ -13,7 +13,7 @@
                     },
                     "diamond/blastp": {
                         "branch": "master",
-                        "git_sha": "666652151335353eef2fcd58880bcef5bc2928e1",
+                        "git_sha": "e65e04b49cdd7001326b935d829b7bbb5832c62a",
                         "installed_by": ["modules"]
                     },
                     "multiqc": {

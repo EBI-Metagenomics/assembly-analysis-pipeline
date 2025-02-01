@@ -1,13 +1,12 @@
 
 /* NF-CORE */
-include { DIAMOND_BLASTP                          } from '../../modules/nf-core/diamond/blastp/main'
-include { DIAMOND_BLASTP as DIAMOND_FOR_RHEACHEBI } from '../../modules/nf-core/diamond/blastp/main'
+include { DIAMOND_BLASTP                  } from '../../modules/nf-core/diamond/blastp/main'
+include { DIAMOND_RHEACHEBI               } from '../../modules/local/diamond_rheachebi'
 
 /* EBI-METAGENOMICS */
-include { INTERPROSCAN                               } from '../../modules/ebi-metagenomics/interproscan/main'
-include { EGGNOGMAPPER                               } from '../../modules/ebi-metagenomics/eggnogmapper/main'
-include { GENOMEPROPERTIES                           } from '../../modules/ebi-metagenomics/genomeproperties/main'
-include { MGNIFYPIPELINESTOOLKIT_RHEACHEBIANNOTATION } from '../../modules/ebi-metagenomics/mgnifypipelinestoolkit/rheachebiannotation/main'
+include { INTERPROSCAN                    } from '../../modules/ebi-metagenomics/interproscan/main'
+include { EGGNOGMAPPER                    } from '../../modules/ebi-metagenomics/eggnogmapper/main'
+include { GENOMEPROPERTIES                } from '../../modules/ebi-metagenomics/genomeproperties/main'
 
 include { GOSLIM_SWF                      } from '../../subworkflows/ebi-metagenomics/goslim_swf/main'
 
@@ -54,11 +53,13 @@ workflow FUNCTIONAL_ANNOTATION {
     DIAMOND_BLASTP(
         ch_predicted_proteins,
         [["id": "uniref90"] , file(params.uniref90_diamond_database, checkIfExists: true)],
-        "txt", // blast like txt output
+        6, // blast like txt output
         "qseqid sseqid pident length mismatch gapopen qstart qend sstart send evalue bitscore staxids sphylums skingdoms sscinames"
     )
 
     ch_versions = ch_versions.mix(DIAMOND_BLASTP.out.versions)
+
+    // TODO: collate the taxonomy hits from the diamond output, cols - 'staxids sphylums skingdoms sscinames'
 
     /*
      * Assign Rhea and CHEMI tags to the proteins.
@@ -66,16 +67,15 @@ workflow FUNCTIONAL_ANNOTATION {
      * 1 - run diamond against a post-processed UniProt90 + Rhea DB
      * 2 - extract the hits using the mgnif toolkit add rhea annotations script
     */
-    DIAMOND_FOR_RHEACHEBI(
+    // TODO: We need a small test db @ochkalova probably has one
+    // TODO: This diamond module and the RHEACHEBIANNOTATION will be merged into one
+    //       That is because the diamond results are just an intermediary result and to save
+    //       storage the rheachebi script reads from the stdin
+    DIAMOND_RHEACHEBI(
         ch_predicted_proteins,
-        [["id": "uniref90rheachebi"] , file(params.uniref90rheachebi_diamond_database, checkIfExists: true)],
-        "txt", // blast like txt output
-        "qseqid sseqid pident length mismatch gapopen qstart qend sstart send evalue bitscore"
-    )
-
-    MGNIFYPIPELINESTOOLKIT_RHEACHEBIANNOTATION(
-        ch_predicted_proteins.join( DIAMOND_FOR_RHEACHEBI.out.tsv ),
-        file(params.uniref90_diamond_database, checkIfExists: true)
+        file(params.uniref90rhea_diamond_database, checkIfExists: true),
+        file(params.rheachebi_mapping_tsv, checkIfExists: true),
+        "qseqid sseqid evalue bitscore stitle"
     )
 
     /*

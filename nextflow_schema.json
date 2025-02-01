@@ -114,12 +114,19 @@
                     "fa_icon": "fas fa-database",
                     "help_text": "Path to user-defined local Uniref90 diamond database file."
                 },
-                "uniref90rheachebi_diamond_database": {
+                "uniref90rhea_diamond_database": {
                     "type": "string",
                     "format": "file-path",
                     "description": "This is a diamond database created from the Uniref90 ammended with Rhea and CHEMI annotations.",
                     "fa_icon": "fas fa-database",
                     "help_text": "Path to user-defined local Uniref90 + Rhea and CHEMI annotations diamond database file."
+                },
+                "rheachebi_mapping_tsv": {
+                    "type": "string",
+                    "format": "file-path",
+                    "description": "TODO",
+                    "fa_icon": "fas fa-database",
+                    "help_text": "TODO"
                 },
                 "kofam_hmm_database": {
                     "type": "string",
