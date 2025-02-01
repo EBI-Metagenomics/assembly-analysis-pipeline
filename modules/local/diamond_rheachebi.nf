@@ -35,9 +35,9 @@ process DIAMOND_RHEACHEBI {
         --threads ${task.cpus} \\
         --db ${db} \\
         --query ${fasta} \\
-        --outfmt ${outfmt} ${columns} --out COSO
-    add_rhea_chebi_annotation \\
-        --diamond_hits COSO \\
+        --outfmt ${outfmt} ${columns} | \\
+    add_rhea_chebi_annotation_patched.py \\
+        --diamond_hits - \\
         --proteins ${fasta_name} \\
         --rhea2chebi ${rhea2chebi} \\
         --output ${prefix}.tsv
