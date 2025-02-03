@@ -15,7 +15,6 @@ workflow BGC_ANNOTATION {
     ch_versions = Channel.empty()
 
     // TODO: filter those contigs shorter than 1000pb and chunk
-
     antismash_ch = ch_contigs_and_predicted_proteins.multiMap { meta, fasta, _faa, gff, _ips_tsv ->
         fasta: [meta, fasta]
         gff: gff

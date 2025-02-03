@@ -9,6 +9,7 @@ process SEQKIT_SPLIT2 {
 
     input:
     tuple val(meta), path(assembly)
+    val(length)
 
     output:
     tuple val(meta), path("**/*.gz"), emit: assembly
@@ -24,6 +25,7 @@ process SEQKIT_SPLIT2 {
     seqkit \\
         split2 \\
         $args \\
+        --by-length ${length} \\
         --threads $task.cpus \\
         ${assembly} \\
         --out-dir ${prefix}

@@ -30,7 +30,7 @@ def rename_fasta_sequences(input_fasta, output_fasta, prefix, mapping_file):
         writer.writerow(["original", "renamed"])
 
         for index, (name, seq) in enumerate(fasta, start=1):
-            new_name = f"{prefix}_{index}"
+            new_name = f"{prefix}{index}"
             out_fasta.write(f">{new_name}\n{seq}\n")
             writer.writerow([name, new_name])
 

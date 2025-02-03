@@ -13,6 +13,14 @@
                         ],
                         "patch": "modules/nf-core/antismash/antismashlite/antismash-antismashlite.diff"
                     },
+                    "cat/cat": {
+                        "branch": "master",
+                        "git_sha": "666652151335353eef2fcd58880bcef5bc2928e1",
+                        "installed_by": [
+                            "modules"
+                        ],
+                        "patch": "modules/nf-core/cat/cat/cat-cat.diff"
+                    },
                     "diamond/blastp": {
                         "branch": "master",
                         "git_sha": "e65e04b49cdd7001326b935d829b7bbb5832c62a",

@@ -64,7 +64,6 @@ workflow ASSEMBLY_ANALYSIS_PIPELINE {
     * The first step is to:
     * - Gather some statistics about the assembly
     * - Filter by length
-    * - Chunk into evenly sized files (using pb as the unit for chunking)
     */
     ASSEMBLY_QC(
         RENAME_CONTIGS.out.renamed_fasta

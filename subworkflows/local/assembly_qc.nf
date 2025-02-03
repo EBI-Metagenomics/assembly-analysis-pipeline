@@ -2,7 +2,6 @@
 include { SEQKIT_STATS as PRE_FILTER_STATS  } from '../../modules/nf-core/seqkit/stats/main'
 include { SEQKIT_STATS as POST_FILTER_STATS } from '../../modules/nf-core/seqkit/stats/main'
 include { SEQKIT_SEQ                        } from '../../modules/nf-core/seqkit/seq/main'
-include { SEQKIT_SPLIT2                     } from '../../modules/nf-core/seqkit/split2/main'
 
 /* EBI-METAGENOMICS */
 
@@ -36,14 +35,7 @@ workflow ASSEMBLY_QC {
 
     ch_versions = ch_versions.mix(SEQKIT_SEQ.out.versions)
 
-    // Chumk the fasta into files with at most >= params.TODO size
-    SEQKIT_SPLIT2(
-        SEQKIT_SEQ.out.fastx
-    )
-
-    ch_versions = ch_versions.mix(SEQKIT_SPLIT2.out.versions)
-
     emit:
-    assembly_filtered = SEQKIT_SPLIT2.out.assembly.transpose()
+    assembly_filtered = SEQKIT_SEQ.out.fastx
     versions          = ch_versions
 }
