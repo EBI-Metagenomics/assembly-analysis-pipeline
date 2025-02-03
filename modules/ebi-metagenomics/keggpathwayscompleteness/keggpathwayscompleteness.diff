@@ -1,0 +1,97 @@
+Changes in component 'ebi-metagenomics/keggpathwayscompleteness'
+'modules/ebi-metagenomics/keggpathwayscompleteness/environment.yml' is unchanged
+'modules/ebi-metagenomics/keggpathwayscompleteness/meta.yml' is unchanged
+Changes in 'keggpathwayscompleteness/main.nf':
+--- modules/ebi-metagenomics/keggpathwayscompleteness/main.nf
++++ modules/ebi-metagenomics/keggpathwayscompleteness/main.nf
+@@ -5,48 +5,66 @@
+ 
+     conda "${moduleDir}/environment.yml"
+     container "${ workflow.containerEngine == 'singularity' && !task.ext.singularity_pull_docker_container ?
+-        'https://depot.galaxyproject.org/singularity/kegg-pathways-completeness:1.0.5--pyhdfd78af_0':
+-        'biocontainers/kegg-pathways-completeness:1.0.5--pyhdfd78af_0' }"
++        'https://depot.galaxyproject.org/singularity/kegg-pathways-completeness:1.3.0--pyhdfd78af_0':
++        'biocontainers/kegg-pathways-completeness:1.3.0--pyhdfd78af_0' }"
+ 
+     input:
+-    tuple val(meta), path(filtered_tbl), path(ko_list)
++    tuple val(meta), path(proteins_fasta), path(hmmscan_domtbl)
+ 
+     output:
+-    tuple val(meta), path("*_contigs.tsv") , emit: kegg_contigs
+-    tuple val(meta), path("*_pathways.tsv"), emit: kegg_pathways
+-    path "versions.yml"                    , emit: versions
++    // TODO: this contig file is not generated for the example
++    // tuple val(meta), path("*_contigs.tsv") , emit: kegg_contigs
++    tuple val(meta), path("${prefix}/summary.kegg_pathways.tsv"), emit: kegg_pathways
++    path "versions.yml"                                         , emit: versions
+ 
+     when:
+     task.ext.when == null || task.ext.when
+ 
+     script:
+     def args = task.ext.args ?: ''
+-    def prefix = task.ext.prefix ?: "${meta.id}"
+-    def kegg_input = ko_list ? "-l ${ko_list}" : "-i ${filtered_tbl}"
++    prefix = task.ext.prefix ?: "${meta.id}"
++    // Handle compressde files
++    def is_proteins_fasta_compressed = proteins_fasta.name.endsWith(".gz")
++    def is_hmmscan_domtbl_compresssed = hmmscan_domtbl.name.endsWith(".gz")
++    def proteins_fasta_filename = proteins_fasta.name.replace(".gz", "")
++    def hmmscan_domtbl_filename = hmmscan_domtbl.name.replace(".gz", "")
++    """
++    if [ "${is_proteins_fasta_compressed}" == "true" ]; then
++        gzip -c -d ${proteins_fasta} > ${proteins_fasta_filename}
++    fi
++    if [ "${is_hmmscan_domtbl_compresssed}" == "true" ]; then
++        gzip -c -d ${hmmscan_domtbl} > ${hmmscan_domtbl_filename}
++    fi
+ 
+-    if (ko_list && filtered_tbl){
+-        log.warn("Both \$ko_list and \$filtered_tbl were given as input types, will fall back to using \$ko_list i.e. ${ko_list}");
+-    }
+-    """
+-    give_pathways ${kegg_input} -o ${prefix}
++    make_hmmer_table_tab_separated \\
++        -i ${hmmscan_domtbl_filename} \\
++        -o ${prefix}_kos.tsv
++
++    parse_hmmer_tab_separated_table -t hmmscan \\
++        -i ${prefix}_kos.tsv \\
++        -f ${proteins_fasta_filename} \\
++        -o ${prefix}_per_contig_kos
++
++    give_completeness \\
++        -i ${prefix}_per_contig_kos/${prefix}_kos.tsv_parsed \\
++        -o ${prefix}
+ 
+     cat <<-END_VERSIONS > versions.yml
+     "${task.process}":
+-        kegg-pathways-completeness: \$(give_pathways --version | cut -d' ' -f2)
++        kegg-pathways-completeness: \$(give_completeness --version | cut -d' ' -f2)
+     END_VERSIONS
+     """
+ 
+     stub:
+     def args = task.ext.args ?: ''
+-    def prefix = task.ext.prefix ?: "${meta.id}"
+-
++    prefix = task.ext.prefix ?: "${meta.id}"
+     """
+     touch ${prefix}.kegg_contigs.tsv
+     touch ${prefix}.kegg_pathways.tsv
+ 
+     cat <<-END_VERSIONS > versions.yml
+     "${task.process}":
+-        kegg-pathways-completeness: \$(give_pathways --version | cut -d' ' -f2)
++        kegg-pathways-completeness: \$(give_completeness --version | cut -d' ' -f2)
+     END_VERSIONS
+     """
+ }
+
+'modules/ebi-metagenomics/keggpathwayscompleteness/tests/main.nf.test.snap' is unchanged
+'modules/ebi-metagenomics/keggpathwayscompleteness/tests/tags.yml' is unchanged
+'modules/ebi-metagenomics/keggpathwayscompleteness/tests/main.nf.test' is unchanged
+'modules/ebi-metagenomics/keggpathwayscompleteness/tests/fixtures/test_kos.txt' is unchanged
+'modules/ebi-metagenomics/keggpathwayscompleteness/tests/fixtures/test_filtered.tbl' is unchanged
+************************************************************

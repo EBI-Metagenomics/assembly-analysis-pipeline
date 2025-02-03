@@ -12,6 +12,7 @@ include { GOSLIM_SWF                      } from '../../subworkflows/ebi-metagen
 
 /* LOCAL */
 include { HMMER_HMMSCAN as HMMSCAN_KOFAMS } from '../../modules/local/hmmer/hmmscan/main'
+include { KEGGPATHWAYSCOMPLETENESS        } from '../../modules/ebi-metagenomics/keggpathwayscompleteness/main'
 
 workflow FUNCTIONAL_ANNOTATION {
 
@@ -92,6 +93,12 @@ workflow FUNCTIONAL_ANNOTATION {
     )
 
     ch_versions = ch_versions.mix(HMMSCAN_KOFAMS.out.versions)
+
+    KEGGPATHWAYSCOMPLETENESS(
+        ch_predicted_proteins.join( HMMSCAN_KOFAMS.out.domain_summary )
+    )
+
+    ch_versions = ch_versions.mix(KEGGPATHWAYSCOMPLETENESS.out.versions)
 
     /*
      * Get GO term and GO-slim term counts out of an InterProScan .tsv output file
