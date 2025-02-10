@@ -19,9 +19,15 @@ workflow ASSEMBLY_QC {
         ch_assembly
     )
 
+
+    // TODOs:
+    // Check 5 trimming, ambigous bases and other bits
+    // Decont for human stuff
+
     ch_versions = ch_versions.mix(PRE_FILTER_STATS.out.versions)
 
     // Filter sequences shorter than ${params.min_contig_length} //
+    // TODO: metaT size is 200 for MAP - 1kb
     SEQKIT_SEQ(
         ch_assembly
     )

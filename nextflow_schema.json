@@ -43,6 +43,20 @@
                 }
             }
         },
+        "nucleotide_and_protein_fasta_file_chunking_options": {
+            "title": "Nucleotide and protein fasta file chunking options",
+            "type": "object",
+            "description": "Chunking input fasta files is used to parallelize the execution of some tools",
+            "properties": {
+                "proteins_chunksize": {
+                    "type": "integer",
+                    "default": 100000,
+                    "description": "Number of amino acids each chunk should contain. The proteins are not truncated, and this is the maximum value a record can have per chunk.",
+                    "fa_icon": "fas fa-weight"
+                }
+            },
+            "fa_icon": "fas fa-cut"
+        },
         "reference_databases": {
             "title": "Reference databases for the pipeline",
             "type": "object",
@@ -69,7 +83,7 @@
                 },
                 "interproscan_database_version": {
                     "type": "string",
-                    "default": 5.5991,
+                    "default": "5.59_91",
                     "description": "The EggNOG reference database version.",
                     "fa_icon": "fas fa-code-branch"
                 },
@@ -301,6 +315,9 @@
     "allOf": [
         {
             "$ref": "#/$defs/input_output_options"
+        },
+        {
+            "$ref": "#/$defs/nucleotide_and_protein_fasta_file_chunking_options"
         },
         {
             "$ref": "#/$defs/reference_databases"

@@ -30,7 +30,7 @@ include { COMBINED_GENE_CALLER } from '../subworkflows/ebi-metagenomics/combined
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 */
 
-include { RRNA_EXTRACTION       } from '../subworkflows/ebi-metagenomics/rrna_extraction/main'
+include { TAXONOMIC_ANNOTATION  } from '../subworkflows/local/taxonomic_annotation'
 include { FUNCTIONAL_ANNOTATION } from '../subworkflows/local/functional_annotation'
 include { BGC_ANNOTATION        } from '../subworkflows/local/bgc_annotation'
 include { RENAME_CONTIGS        } from '../modules/local/rename_contigs.nf'
@@ -64,6 +64,7 @@ workflow ASSEMBLY_ANALYSIS_PIPELINE {
     * The first step is to:
     * - Gather some statistics about the assembly
     * - Filter by length
+    * - TODO: Remove human and any other host specified
     */
     ASSEMBLY_QC(
         RENAME_CONTIGS.out.renamed_fasta
@@ -71,23 +72,25 @@ workflow ASSEMBLY_ANALYSIS_PIPELINE {
 
     ch_versions = ch_versions.mix(ASSEMBLY_QC.out.versions)
 
-    RRNA_EXTRACTION(
-        ASSEMBLY_QC.out.assembly_filtered,
-        file(params.rrnas_rfam_covariance_model, checkIfExists: true),
-        file(params.rrnas_rfam_claninfo, checkIfExists: true)
-    )
+    /*
+     * Taxonomic annotation
+    */
 
-    ch_versions = ch_versions.mix(RRNA_EXTRACTION.out.versions)
+    TAXONOMIC_ANNOTATION(
+        ASSEMBLY_QC.out.assembly_filtered
+    )
+    ch_versions = ch_versions.mix(TAXONOMIC_ANNOTATION.out.versions)
 
     /*
     * Protein prediction with the combined-gene-caller, and masking the rRNAs genes
     */
     // We need to sync the sequences and the rRNA outputs //
-    def ch_cgc = ASSEMBLY_QC.out.assembly_filtered.join(RRNA_EXTRACTION.out.cmsearch_deoverlap_out).multiMap { meta, assembly_fasta, cmsearch_deoverlap_out ->
+    def ch_cgc = ASSEMBLY_QC.out.assembly_filtered.join(TAXONOMIC_ANNOTATION.out.rrna_cmsearch_deoverlap_out).multiMap { meta, assembly_fasta, cmsearch_deoverlap_out ->
         assembly: [meta, assembly_fasta]
         cmsearch_deoverlap: [meta, cmsearch_deoverlap_out]
     }
 
+    // TODO: handle LR - FGS flip parameter
     COMBINED_GENE_CALLER(
         ch_cgc.assembly,
         ch_cgc.cmsearch_deoverlap // used to mask the rRNA genes in the assembly
@@ -108,17 +111,18 @@ workflow ASSEMBLY_ANALYSIS_PIPELINE {
     /*
     * BGC annotations
     */
-    BGC_ANNOTATION(
-        ASSEMBLY_QC.out.assembly_filtered.join(
-            COMBINED_GENE_CALLER.out.faa
-        ).join(
-            FUNCTIONAL_ANNOTATION.out.interproscan_gff3
-        ).join(
-            FUNCTIONAL_ANNOTATION.out.interproscan_tsv
-        )
-    )
+    // FIXME: there is an issue with the GFF - antiSMASH doesn't like the one we currently provide
+    // BGC_ANNOTATION(
+    //     ASSEMBLY_QC.out.assembly_filtered.join(
+    //         COMBINED_GENE_CALLER.out.faa
+    //     ).join(
+    //         FUNCTIONAL_ANNOTATION.out.interproscan_gff3
+    //     ).join(
+    //         FUNCTIONAL_ANNOTATION.out.interproscan_tsv
+    //     )
+    // )
 
-    ch_versions = ch_versions.mix(BGC_ANNOTATION.out.versions)
+    // ch_versions = ch_versions.mix(BGC_ANNOTATION.out.versions)
 
     //
     // Collate and save software versions
