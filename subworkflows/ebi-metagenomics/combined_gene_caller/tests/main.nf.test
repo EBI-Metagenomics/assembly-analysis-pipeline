@@ -1,0 +1,88 @@
+nextflow_workflow {
+
+    name "Test Subworkflow COMBINED_GENE_CALLER"
+    script "../main.nf"
+    workflow "COMBINED_GENE_CALLER"
+    config "./nextflow.config"
+
+    tag "subworkflows"
+    tag "subworkflows_ebimetagenomics"
+    tag "subworkflows/combined_gene_caller"
+    tag "combinedgenecaller/merge"
+    tag "prodigal"
+    tag "fraggenescan"
+
+    test("cgc assembly fasta") {
+
+        when {
+            workflow {
+                """
+                input[0] = [
+                    [ id:'test', single_end:false ],
+                    file("${moduleDir}/tests/data/test_assembly.fasta.gz", checkIfExists: true)
+                ]
+                input[1] = channel.empty()
+            """
+            }
+        }
+        then {
+            assertAll(
+                { assert workflow.success },
+                { assert snapshot(workflow.out).match() }
+            )
+        }
+    }
+
+    test("cgc assembly fasta and cmsearch mask file") {
+
+        when {
+            workflow {
+                """
+                input[0] = [
+                    [ id:'test', single_end:false ],
+                    file("${moduleDir}/tests/data/test_assembly.fasta.gz", checkIfExists: true)
+                ]
+                input[1] = channel.of([
+                    [ id:'test', single_end:false ],
+                    file("${moduleDir}/tests/data/test_tblout.deoverlapped", checkIfExists: true)
+                ])
+            """
+            }
+        }
+        then {
+            assertAll(
+                { assert workflow.success },
+                { assert snapshot(workflow.out).match() },
+                {
+                    def fasta = path(workflow.out.faa.get(0).get(1)).fasta
+                    assert "MGYA1_3 # 2446 # 2682 # 1 # ID=1_3;partial=00;start_type=TTG;rbs_motif=AGGAG;rbs_spacer=5-10bp;gc_cont=0.287" in fasta
+                    assert "MGYA2_210_335_+" in fasta
+                    assert fasta.size() == 42
+                }
+            )
+        }
+    }
+
+    test("cgc assembly fasta - stub") {
+
+        options "-stub"
+
+        when {
+            workflow {
+                """
+                input[0] = [
+                    [ id:'test', single_end:false ],
+                    file("${moduleDir}/tests/data/test_assembly.fasta.gz", checkIfExists: true)
+                ]
+                input[1] = channel.empty()
+            """
+            }
+        }
+        then {
+            assertAll(
+                { assert workflow.success },
+                { assert snapshot(workflow.out).match() }
+            )
+        }
+    }
+}
