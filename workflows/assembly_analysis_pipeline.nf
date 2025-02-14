@@ -14,15 +14,18 @@ include { methodsDescriptionText  } from '../subworkflows/local/utils_nfcore_ass
    NF-CORE MODULES and SUBWORKFLOWS
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 */
-
-include { ASSEMBLY_QC    } from '../subworkflows/local/assembly_qc'
+include { PIGZ_UNCOMPRESS as PIGZ_CONTIGS  } from '../modules/nf-core/pigz/uncompress/main'
+include { PIGZ_UNCOMPRESS as PIGZ_PROTEINS } from '../modules/nf-core/pigz/uncompress/main'
+include { ASSEMBLY_QC                      } from '../subworkflows/local/assembly_qc'
 
 /*
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
    EBI-METAGENOMICS MODULES and SUBWORKFLOWS
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 */
-include { COMBINED_GENE_CALLER } from '../subworkflows/ebi-metagenomics/combined_gene_caller/main'
+include { RRNA_EXTRACTION                   } from '../subworkflows/ebi-metagenomics/rrna_extraction/main'
+include { COMBINED_GENE_CALLER              } from '../subworkflows/ebi-metagenomics/combined_gene_caller/main'
+include { CONTIGS_TAXONOMIC_CLASSIFICATION  } from '../subworkflows/ebi-metagenomics/contigs_taxonomic_classification/main'
 
 /*
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -30,7 +33,6 @@ include { COMBINED_GENE_CALLER } from '../subworkflows/ebi-metagenomics/combined
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 */
 
-include { TAXONOMIC_ANNOTATION  } from '../subworkflows/local/taxonomic_annotation'
 include { FUNCTIONAL_ANNOTATION } from '../subworkflows/local/functional_annotation'
 include { BGC_ANNOTATION        } from '../subworkflows/local/bgc_annotation'
 include { RENAME_CONTIGS        } from '../modules/local/rename_contigs.nf'
@@ -50,9 +52,8 @@ workflow ASSEMBLY_ANALYSIS_PIPELINE {
     ch_versions = Channel.empty()
     ch_multiqc_files = Channel.empty()
 
-
     /*
-     * Renam the contigs using the prodivded prefix, seqs will be named >{prefix}_{n}
+     * Rename the contigs using the prodivded prefix, seqs will be named >{prefix}_{n}
      * there n is just an autoincrement
     */
     RENAME_CONTIGS(
@@ -64,39 +65,49 @@ workflow ASSEMBLY_ANALYSIS_PIPELINE {
     * The first step is to:
     * - Gather some statistics about the assembly
     * - Filter by length
-    * - TODO: Remove human and any other host specified
+    * - TODO: Remove human and any other host specified - https://www.ebi.ac.uk/panda/jira/browse/EMG-7487
     */
     ASSEMBLY_QC(
         RENAME_CONTIGS.out.renamed_fasta
     )
-
     ch_versions = ch_versions.mix(ASSEMBLY_QC.out.versions)
 
     /*
-     * Taxonomic annotation
+     * rRNAs
     */
-
-    TAXONOMIC_ANNOTATION(
-        ASSEMBLY_QC.out.assembly_filtered
+    RRNA_EXTRACTION(
+        ch_assembly,
+        file(params.rrnas_rfam_covariance_model, checkIfExists: true),
+        file(params.rrnas_rfam_claninfo, checkIfExists: true)
     )
-    ch_versions = ch_versions.mix(TAXONOMIC_ANNOTATION.out.versions)
+    ch_versions = ch_versions.mix(RRNA_EXTRACTION.out.versions)
 
     /*
     * Protein prediction with the combined-gene-caller, and masking the rRNAs genes
     */
     // We need to sync the sequences and the rRNA outputs //
-    def ch_cgc = ASSEMBLY_QC.out.assembly_filtered.join(TAXONOMIC_ANNOTATION.out.rrna_cmsearch_deoverlap_out).multiMap { meta, assembly_fasta, cmsearch_deoverlap_out ->
+    def ch_cgc = ASSEMBLY_QC.out.assembly_filtered.join(RRNA_EXTRACTION.out.cmsearch_deoverlap_out).multiMap { meta, assembly_fasta, cmsearch_deoverlap_out ->
         assembly: [meta, assembly_fasta]
         cmsearch_deoverlap: [meta, cmsearch_deoverlap_out]
     }
 
-    // TODO: handle LR - FGS flip parameter
+    // TODO: handle LR - FGS flip parameter //
     COMBINED_GENE_CALLER(
         ch_cgc.assembly,
         ch_cgc.cmsearch_deoverlap // used to mask the rRNA genes in the assembly
     )
-
     ch_versions = ch_versions.mix(COMBINED_GENE_CALLER.out.versions)
+
+    /*
+     * Taxonomic classification of the contigs with CATPACK
+    */
+    CONTIGS_TAXONOMIC_CLASSIFICATION(
+        PIGZ_CONTIGS(ASSEMBLY_QC.out.assembly_filtered).file,
+        PIGZ_PROTEINS(COMBINED_GENE_CALLER.out.faa).file,
+        [[id: "cat_diamond_db"], file(params.cat_diamond_database, checkIfExists: true)],
+        [[id: "cat_taxonomy_db"], file(params.cat_taxonomy_database, checkIfExists: true)]
+    )
+    ch_versions = ch_versions.mix(CONTIGS_TAXONOMIC_CLASSIFICATION.out.versions)
 
     /*
     * Annotation of the proteins.
@@ -105,24 +116,23 @@ workflow ASSEMBLY_ANALYSIS_PIPELINE {
     FUNCTIONAL_ANNOTATION(
         COMBINED_GENE_CALLER.out.faa
     )
-
     ch_versions = ch_versions.mix(FUNCTIONAL_ANNOTATION.out.versions)
 
     /*
     * BGC annotations
     */
     // FIXME: there is an issue with the GFF - antiSMASH doesn't like the one we currently provide
-    // BGC_ANNOTATION(
-    //     ASSEMBLY_QC.out.assembly_filtered.join(
-    //         COMBINED_GENE_CALLER.out.faa
-    //     ).join(
-    //         FUNCTIONAL_ANNOTATION.out.interproscan_gff3
-    //     ).join(
-    //         FUNCTIONAL_ANNOTATION.out.interproscan_tsv
-    //     )
-    // )
-
-    // ch_versions = ch_versions.mix(BGC_ANNOTATION.out.versions)
+    // FIXME: enable SanntiS after - https://github.com/EBI-Metagenomics/nf-modules/pull/81
+    BGC_ANNOTATION(
+        ASSEMBLY_QC.out.assembly_filtered.join(
+            COMBINED_GENE_CALLER.out.faa
+        ).join(
+            FUNCTIONAL_ANNOTATION.out.interproscan_gff3
+        ).join(
+            FUNCTIONAL_ANNOTATION.out.interproscan_tsv
+        )
+    )
+    ch_versions = ch_versions.mix(BGC_ANNOTATION.out.versions)
 
     //
     // Collate and save software versions

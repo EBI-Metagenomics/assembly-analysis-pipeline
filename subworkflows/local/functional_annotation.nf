@@ -1,13 +1,14 @@
 /* NF-CORE */
 include { SEQKIT_SPLIT2                           } from '../../modules/nf-core/seqkit/split2/main'
-include { DIAMOND_BLASTP                          } from '../../modules/nf-core/diamond/blastp/main'
 include { DIAMOND_RHEACHEBI                       } from '../../modules/local/diamond_rheachebi'
 include { CAT_CAT as CONCATENATE_INTERPROSCAN_TSV } from '../../modules/nf-core/cat/cat/main'
 
 /* EBI-METAGENOMICS */
 include { INTERPROSCAN                            } from '../../modules/ebi-metagenomics/interproscan/main'
+include { DIAMOND_BLASTP                          } from '../../modules/ebi-metagenomics/diamond/blastp/main'
 include { EGGNOGMAPPER                            } from '../../modules/ebi-metagenomics/eggnogmapper/main'
 include { GENOMEPROPERTIES                        } from '../../modules/ebi-metagenomics/genomeproperties/main'
+include { DBCAN                                   } from '../../modules/ebi-metagenomics/dbcan/dbcan/main'
 
 include { GOSLIM_SWF                              } from '../../subworkflows/ebi-metagenomics/goslim_swf/main'
 
@@ -17,6 +18,7 @@ include { EXTRACT_PFAM_COUNTS                     } from '../../modules/local/ex
 include { HMMER_HMMSCAN as HMMSCAN_KOFAMS         } from '../../modules/local/hmmer/hmmscan/main'
 include { KEGGPATHWAYSCOMPLETENESS                } from '../../modules/ebi-metagenomics/keggpathwayscompleteness/main'
 
+
 workflow FUNCTIONAL_ANNOTATION {
     take:
     ch_predicted_proteins // tule (meta, faa)
@@ -24,7 +26,6 @@ workflow FUNCTIONAL_ANNOTATION {
     main:
 
     ch_versions = Channel.empty()
-
 
     // Chunk the fasta into files with at most >= params - TODO: this needs to be a param
     SEQKIT_SPLIT2(
@@ -114,9 +115,6 @@ workflow FUNCTIONAL_ANNOTATION {
      * 1 - run diamond against a post-processed UniProt90 + Rhea DB
      * 2 - extract the hits using the mgnif toolkit add rhea annotations script
     */
-    // TODO: This diamond module and the RHEACHEBIANNOTATION will be merged into one
-    //       That is because the diamond results are just an intermediary result and to save
-    //       storage the rheachebi script reads from the stdin
     // TODO: should we chunk?
     DIAMOND_RHEACHEBI(
         ch_predicted_proteins,
@@ -137,14 +135,29 @@ workflow FUNCTIONAL_ANNOTATION {
             }
         }
     )
-
     ch_versions = ch_versions.mix(HMMSCAN_KOFAMS.out.versions)
 
     KEGGPATHWAYSCOMPLETENESS(
         chunked_proteins.join(HMMSCAN_KOFAMS.out.domain_summary)
     )
-
     ch_versions = ch_versions.mix(KEGGPATHWAYSCOMPLETENESS.out.versions)
+
+    // TODO: Do we need to consolidate the GFF before DBCan?
+    ch_gff = CONCATENATE_INTERPROSCAN_GFFS.out.concatenated_gff
+        .join(ch_predicted_proteins)
+        .multiMap { meta, gff, faa ->
+            gff: [meta, gff]
+            faa: [meta, faa]
+        }
+
+    // TODO: should we chunk?
+    DBCAN(
+        ch_gff.faa,
+        ch_gff.gff,
+        file(params.dbcan_database, checkIfExists: true),
+        "protein" // the DBCAN mode
+    )
+    ch_versions = ch_versions.mix(DBCAN.out.versions)
 
     emit:
     interproscan_tsv  = CONCATENATE_INTERPROSCAN_TSV.out.file_out

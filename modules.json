@@ -16,14 +16,14 @@
                         "installed_by": ["modules"],
                         "patch": "modules/nf-core/cat/cat/cat-cat.diff"
                     },
-                    "diamond/blastp": {
-                        "branch": "master",
-                        "git_sha": "e65e04b49cdd7001326b935d829b7bbb5832c62a",
-                        "installed_by": ["modules"]
-                    },
                     "multiqc": {
                         "branch": "master",
                         "git_sha": "cf17ca47590cc578dfb47db1c2a44ef86f89976d",
+                        "installed_by": ["modules"]
+                    },
+                    "pigz/uncompress": {
+                        "branch": "master",
+                        "git_sha": "c70357ea249a541df53dd5b479b3c32b0c26c4d2",
                         "installed_by": ["modules"]
                     },
                     "seqkit/seq": {
@@ -67,6 +67,11 @@
         "https://www.github.com/ebi-metagenomics/nf-modules": {
             "modules": {
                 "ebi-metagenomics": {
+                    "catpack/contigs": {
+                        "branch": "main",
+                        "git_sha": "b08ed4ae81778706db8c5be504bfd8dd2817a121",
+                        "installed_by": ["contigs_taxonomic_classification"]
+                    },
                     "cmsearchtbloutdeoverlap": {
                         "branch": "main",
                         "git_sha": "696324c637a7e0cf06fe331faffee42e36826898",
@@ -76,6 +81,16 @@
                         "branch": "main",
                         "git_sha": "e33ec070bdeac12f8a79ff1742992a7aa557d039",
                         "installed_by": ["combined_gene_caller"]
+                    },
+                    "dbcan/dbcan": {
+                        "branch": "main",
+                        "git_sha": "2f2f837279b44825254ea736b12ea4797b350d0a",
+                        "installed_by": ["modules"]
+                    },
+                    "diamond/blastp": {
+                        "branch": "main",
+                        "git_sha": "f85a33e88680924f76aaccb3c120983ff4134747",
+                        "installed_by": ["contigs_taxonomic_classification"]
                     },
                     "easel/eslsfetch": {
                         "branch": "main",
@@ -155,6 +170,11 @@
                     "combined_gene_caller": {
                         "branch": "main",
                         "git_sha": "e33ec070bdeac12f8a79ff1742992a7aa557d039",
+                        "installed_by": ["subworkflows"]
+                    },
+                    "contigs_taxonomic_classification": {
+                        "branch": "main",
+                        "git_sha": "0f14803147e378a670e94970421b248fa2ee2829",
                         "installed_by": ["subworkflows"]
                     },
                     "goslim_swf": {
