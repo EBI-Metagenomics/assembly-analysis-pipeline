@@ -2,13 +2,13 @@ process INTERPROSCAN {
     tag "$meta.id"
     label 'process_long'
 
-    container "quay.io/microbiome-informatics/interproscan:5.72-103.0"
+    container 'microbiome-informatics/interproscan:5.73-104.0'
 
     containerOptions {
         if (workflow.containerEngine == 'singularity') {
-            return "--bind ${interproscan_db}:/opt/interproscan-5.72-103.0/data"
+            return "--bind ${interproscan_db}:/opt/interproscan/data"
         } else {
-            return "-v ${task.workDir}/${interproscan_db}:/opt/interproscan-5.72-103.0/data"
+            return "-v ${task.workDir}/${interproscan_db}:/opt/interproscan/data"
         }
     }
 
@@ -17,11 +17,11 @@ process INTERPROSCAN {
     tuple path(interproscan_db), val(db_version)
 
     output:
-    tuple val(meta), path('*.tsv') , emit: tsv
-    tuple val(meta), path('*.xml') , emit: xml
-    tuple val(meta), path('*.gff3'), emit: gff3
-    tuple val(meta), path('*.json'), emit: json
-    path "versions.yml"            , emit: versions
+    tuple val(meta), path('*.tsv.gz') , emit: tsv
+    tuple val(meta), path('*.xml.gz') , emit: xml
+    tuple val(meta), path('*.gff3.gz'), emit: gff3
+    tuple val(meta), path('*.json.gz'), emit: json
+    path "versions.yml"               , emit: versions
 
     when:
     task.ext.when == null || task.ext.when
@@ -29,20 +29,23 @@ process INTERPROSCAN {
     script:
     def args = task.ext.args ?: ''
     def prefix = task.ext.prefix ?: "${meta.id}"
-    def is_compressed = fasta.name.endsWith(".gz")
-    def fasta_name = fasta.name.replace(".gz", "")
-    // -dp (disable precalculation) is on so no online dependency //
+    def is_compressed = fasta.getExtension() == "gz"
+    def fasta_file_name = fasta.name.replace(".gz", "")
+
+    // -dp (disable precalculation) is on so no online dependency
     """
-    if ${is_compressed} ; then
-        gzip -c -d ${fasta} > ${fasta_name}
+    if [ "$is_compressed" == "true" ]; then
+        gzip -c -d ${fasta} > ${fasta_file_name}
     fi
 
     interproscan.sh \\
-        -cpu ${task.cpus} \\
-        -i ${fasta_name} \\
+        -cpu $task.cpus \\
+        -i ${fasta_file_name} \\
         -dp \\
         ${args} \\
         --output-file-base ${prefix}
+
+    gzip ${prefix}.{tsv,xml,gff3,json}
 
     cat <<-END_VERSIONS > versions.yml
     "${task.process}":
@@ -54,7 +57,8 @@ process INTERPROSCAN {
     stub:
     def prefix = task.ext.prefix ?: "${meta.id}"
     """
-    touch ${prefix}.{tsv,xml,gff3,json}
+    echo '' > ${prefix}.{tsv,xml,gff3,json}
+    gzip ${prefix}.{tsv,xml,gff3,json}
 
     cat <<-END_VERSIONS > versions.yml
     "${task.process}":

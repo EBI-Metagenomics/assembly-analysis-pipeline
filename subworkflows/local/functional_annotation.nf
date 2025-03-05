@@ -21,15 +21,18 @@ include { KEGGPATHWAYSCOMPLETENESS                } from '../../modules/ebi-meta
 
 workflow FUNCTIONAL_ANNOTATION {
     take:
-    ch_predicted_proteins // tule (meta, faa)
+    ch_predicted_proteins // tule (meta, faa, gff)
 
     main:
 
     ch_versions = Channel.empty()
 
+    ch_proteins_faa = ch_predicted_proteins.map { meta, faa, _gff -> [meta, faa] }
+    ch_proteins_gff = ch_predicted_proteins.map { meta, _faa, gff -> [meta, gff] }
+
     // Chunk the fasta into files with at most >= params - TODO: this needs to be a param
     SEQKIT_SPLIT2(
-        ch_predicted_proteins,
+        ch_proteins_faa,
         params.proteins_chunksize,
     )
 
@@ -38,14 +41,14 @@ workflow FUNCTIONAL_ANNOTATION {
     def chunked_proteins = SEQKIT_SPLIT2.out.assembly.transpose()
 
     INTERPROSCAN(
-        chunked_proteins,
+        ch_proteins_faa,
         [file(params.interproscan_database), params.interproscan_database_version],
     )
 
     ch_versions = ch_versions.mix(INTERPROSCAN.out.versions)
 
     EGGNOGMAPPER(
-        chunked_proteins,
+        ch_proteins_faa,
         [[], []],
         params.eggnog_data_dir,
         params.eggnog_database,
@@ -96,20 +99,6 @@ workflow FUNCTIONAL_ANNOTATION {
     ch_versions = ch_versions.mix(GOSLIM_SWF.out.versions)
 
     /*
-    * Perform a DIAMOND search against the UniRef90 database.
-    * This step identifies UniRef hits and retrieves the corresponding NCBI taxonomy IDs
-    */
-    // TODO: this is to be reviewed - https://www.ebi.ac.uk/panda/jira/browse/EMG-6975?src=confmacro
-    // TODO: should we chunk?
-    DIAMOND_BLASTP(
-        ch_predicted_proteins,
-        [["id": "uniref90"], file(params.uniref90_diamond_database, checkIfExists: true)],
-        6, // txt - blast like
-        "qseqid sseqid pident length mismatch gapopen qstart qend sstart send evalue bitscore staxids sphylums skingdoms sscinames",
-    )
-    ch_versions = ch_versions.mix(DIAMOND_BLASTP.out.versions)
-
-    /*
      * Assign Rhea and CHEBI tags to the proteins.
      * This is a 2 step process
      * 1 - run diamond against a post-processed UniProt90 + Rhea DB
@@ -117,7 +106,7 @@ workflow FUNCTIONAL_ANNOTATION {
     */
     // TODO: should we chunk?
     DIAMOND_RHEACHEBI(
-        ch_predicted_proteins,
+        ch_proteins_faa,
         file(params.uniref90rhea_diamond_database, checkIfExists: true),
         file(params.rheachebi_mapping_tsv, checkIfExists: true),
         "qseqid sseqid evalue bitscore stitle",
@@ -129,31 +118,31 @@ workflow FUNCTIONAL_ANNOTATION {
     */
     // TODO: review the v5 models - they have a description and a GA value
     HMMSCAN_KOFAMS(
-        chunked_proteins.map { meta, proteins ->
+        ch_proteins_faa.map { meta, faa ->
             {
-                [meta, file("${params.kofam_hmm_database}/*.hmm*", checkIfExists: true), proteins, true, true, true]
+                [meta, file("${params.kofam_hmm_database}/*.hmm*", checkIfExists: true), faa, true, true, true]
             }
         }
     )
     ch_versions = ch_versions.mix(HMMSCAN_KOFAMS.out.versions)
 
     KEGGPATHWAYSCOMPLETENESS(
-        chunked_proteins.join(HMMSCAN_KOFAMS.out.domain_summary)
+        ch_proteins_faa.join(HMMSCAN_KOFAMS.out.domain_summary)
     )
     ch_versions = ch_versions.mix(KEGGPATHWAYSCOMPLETENESS.out.versions)
 
     // TODO: Do we need to consolidate the GFF before DBCan?
-    ch_gff = CONCATENATE_INTERPROSCAN_GFFS.out.concatenated_gff
-        .join(ch_predicted_proteins)
-        .multiMap { meta, gff, faa ->
-            gff: [meta, gff]
+    ch_dbcan = ch_proteins_faa
+        .join(ch_proteins_gff)
+        .multiMap { meta, faa, gff ->
             faa: [meta, faa]
+            gff: [meta, gff]
         }
 
     // TODO: should we chunk?
     DBCAN(
-        ch_gff.faa,
-        ch_gff.gff,
+        ch_dbcan.faa,
+        ch_dbcan.gff,
         file(params.dbcan_database, checkIfExists: true),
         "protein" // the DBCAN mode
     )

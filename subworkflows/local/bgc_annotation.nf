@@ -28,7 +28,6 @@ workflow BGC_ANNOTATION {
         antismash_ch.gff
     )
 
-    // TODO: Sanntis will get support for GFF as the sole input -> https://www.ebi.ac.uk/panda/jira/browse/EMG-7254
     // SANNTIS(
     //     ch_predicted_proteins.map { meta, _faa, _gff, ips_tsv -> [meta, ips_tsv]}
     // )

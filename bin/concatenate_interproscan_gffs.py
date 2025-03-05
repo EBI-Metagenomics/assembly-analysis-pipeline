@@ -16,19 +16,19 @@
 
 import csv
 import argparse
+import gzip
 from typing import List
 
 
 def concatenate_gff_files(gffs: List[str], output_file: str) -> None:
-    with open(output_file, "w", newline="") as outfile:
+    with gzip.open(output_file, "wt", newline="") as outfile:
         writer = csv.writer(outfile, delimiter="\t")
         outfile.write("##gff-version 3\n")
         for input_gff in gffs:
-            with open(input_gff, "r") as ingff:
+            with gzip.open(input_gff, "rt") as ingff:
                 for line in ingff:
-                    line = line.rstrip()  # Remove trailing newline characters
+                    line = line.rstrip()
                     if line.startswith("##FASTA"):
-                        # Stop processing this file when we reach the #FASTA line
                         break
                     elif not line.startswith("#"):
                         writer.writerow(line.split("\t"))

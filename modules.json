@@ -26,6 +26,11 @@
                         "git_sha": "c70357ea249a541df53dd5b479b3c32b0c26c4d2",
                         "installed_by": ["modules"]
                     },
+                    "pyrodigal": {
+                        "branch": "master",
+                        "git_sha": "938e803109104e30773f76a7142442722498fef1",
+                        "installed_by": ["modules"]
+                    },
                     "seqkit/seq": {
                         "branch": "master",
                         "git_sha": "666652151335353eef2fcd58880bcef5bc2928e1",
@@ -129,7 +134,7 @@
                     },
                     "interproscan": {
                         "branch": "main",
-                        "git_sha": "ec492eb39d957295da813734513c574361689ecf",
+                        "git_sha": "75bee0dac2cb4b978fb62a8e8b8aab491507bb04",
                         "installed_by": ["modules"]
                     },
                     "keggpathwayscompleteness": {

@@ -114,7 +114,7 @@ workflow ASSEMBLY_ANALYSIS_PIPELINE {
     * The pipeline has two main modules: the functional and biosynthetic gene clusters (BGC) annotations.
     */
     FUNCTIONAL_ANNOTATION(
-        COMBINED_GENE_CALLER.out.faa
+        COMBINED_GENE_CALLER.out.faa.join( COMBINED_GENE_CALLER.out.gff )
     )
     ch_versions = ch_versions.mix(FUNCTIONAL_ANNOTATION.out.versions)
 
@@ -127,7 +127,7 @@ workflow ASSEMBLY_ANALYSIS_PIPELINE {
         ASSEMBLY_QC.out.assembly_filtered.join(
             COMBINED_GENE_CALLER.out.faa
         ).join(
-            FUNCTIONAL_ANNOTATION.out.interproscan_gff3
+            COMBINED_GENE_CALLER.out.gff
         ).join(
             FUNCTIONAL_ANNOTATION.out.interproscan_tsv
         )

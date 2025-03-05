@@ -8,7 +8,7 @@ process CAT_CAT {
         'biocontainers/pigz:2.3.4' }"
 
     input:
-    tuple val(meta), path(files_in, name: "*.tsv")
+    tuple val(meta), path(files_in)
 
     output:
     tuple val(meta), path("${prefix}"), emit: file_out

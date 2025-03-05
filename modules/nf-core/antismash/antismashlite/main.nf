@@ -34,7 +34,9 @@ process ANTISMASH_ANTISMASHLITE {
     script:
     def args = task.ext.args ?: ''
     prefix = task.ext.suffix ? "${meta.id}${task.ext.suffix}" : "${meta.id}"
-    gff_flag = gff ? "--genefinding-gff3 input.gff" : ""
+    
+    def gff_flag = gff ? "--genefinding-gff3 ${gff.name.replace('.gz', '')}" : ""
+    
     def is_compressed = sequence_input.getExtension() == "gz" ? true : false
     def sequence_file = is_compressed ? sequence_input.getBaseName() : sequence_input
     """
@@ -47,20 +49,8 @@ process ANTISMASH_ANTISMASHLITE {
         gzip -c -d ${sequence_input} > ${sequence_file}
     fi
 
-    #######################
-    # Clean the GFF3 file #
-    #######################
-    # TODO: This is a patch to allow antiSMASH to ingest the InterProScan GFF3. It should probably be a Python script.
-    # InterProScan runs on the proteins, which are labeled based on the Combined Gene Caller conventions (which come from Prodigal and FragGeneScan).
-    # AntiSMASH needs the ID (the first column) to match the contig, which is the first element of this AWK expression, to convert the following:
-    # A FGS example: contig-2-length-2192_210_335_+ -> contig-2-length-2192 (the contig name).
-    # The second part is to change the third column from IPS to CDS (which is what AS expects... I know).
-    # Finally, the last part is to remove the Name="<name>" from IPS, as AS doesn't like repeated values there... again, I know.
-    # Example: Name=mobidb-lite will be in every prediction that comes from MobiDBLite.
-
-    # - remove in case of retry - #
-    rm -f input.gff
-    cat ${gff} | awk 'BEGIN{FS=OFS="\t"} /^#/{print; next} {split(\$1,a,"_"); \$1=a[1]; \$3="CDS"; sub(/Name=[^;]+;/, "", \$9); print}' > input.gff
+    # TODO: handle this as the fasta file
+    gunzip -c -d ${gff} > ${gff.name.replace('.gz', '')}
 
     antismash \\
         ${args} \\

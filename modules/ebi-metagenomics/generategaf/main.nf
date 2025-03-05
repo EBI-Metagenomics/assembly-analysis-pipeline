@@ -20,9 +20,15 @@ process GENERATEGAF {
 
     script:
     def prefix = task.ext.prefix ?: "${meta.id}"
+    def is_compressed = ips.getExtension() == "gz"
+    def ips_file_name = ips.name.replace(".gz", "")
     """
+    if [ "$is_compressed" == "true" ]; then
+        gzip -c -d ${ips} > ${ips_file_name}
+    fi
+
     generate_gaf \\
-        -i ${ips} \\
+        -i ${ips_file_name} \\
         -o ${prefix} \\
 
     cat <<-END_VERSIONS > versions.yml
