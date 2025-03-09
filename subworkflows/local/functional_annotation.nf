@@ -4,11 +4,12 @@ include { DIAMOND_RHEACHEBI                       } from '../../modules/local/di
 include { CAT_CAT as CONCATENATE_INTERPROSCAN_TSV } from '../../modules/nf-core/cat/cat/main'
 
 /* EBI-METAGENOMICS */
-include { INTERPROSCAN                            } from '../../modules/ebi-metagenomics/interproscan/main'
-include { DIAMOND_BLASTP                          } from '../../modules/ebi-metagenomics/diamond/blastp/main'
-include { EGGNOGMAPPER                            } from '../../modules/ebi-metagenomics/eggnogmapper/main'
-include { GENOMEPROPERTIES                        } from '../../modules/ebi-metagenomics/genomeproperties/main'
-include { DBCAN                                   } from '../../modules/ebi-metagenomics/dbcan/dbcan/main'
+include { INTERPROSCAN                             } from '../../modules/ebi-metagenomics/interproscan/main'
+include { DIAMOND_BLASTP                           } from '../../modules/ebi-metagenomics/diamond/blastp/main'
+include { EGGNOGMAPPER as EGGNOGMAPPER_ORTHOLOGS   } from '../../modules/ebi-metagenomics/eggnogmapper/main'
+include { EGGNOGMAPPER as EGGNOGMAPPER_ANNOTATIONS } from '../../modules/ebi-metagenomics/eggnogmapper/main'
+include { GENOMEPROPERTIES                         } from '../../modules/ebi-metagenomics/genomeproperties/main'
+include { DBCAN                                    } from '../../modules/ebi-metagenomics/dbcan/dbcan/main'
 
 include { GOSLIM_SWF                              } from '../../subworkflows/ebi-metagenomics/goslim_swf/main'
 
@@ -38,24 +39,37 @@ workflow FUNCTIONAL_ANNOTATION {
 
     ch_versions = ch_versions.mix(SEQKIT_SPLIT2.out.versions)
 
-    def chunked_proteins = SEQKIT_SPLIT2.out.assembly.transpose()
+    def ch_protein_splits = SEQKIT_SPLIT2.out.assembly.transpose()
 
     INTERPROSCAN(
-        ch_proteins_faa,
+        ch_protein_splits,
         [file(params.interproscan_database), params.interproscan_database_version],
     )
 
     ch_versions = ch_versions.mix(INTERPROSCAN.out.versions)
 
-    EGGNOGMAPPER(
-        ch_proteins_faa,
+    EGGNOGMAPPER_ORTHOLOGS(
+        ch_protein_splits,
         [[], []],
         params.eggnog_data_dir,
         params.eggnog_database,
         params.eggnog_diamond_database,
     )
 
-    ch_versions = ch_versions.mix(EGGNOGMAPPER.out.versions)
+    ch_versions = ch_versions.mix(EGGNOGMAPPER_ORTHOLOGS.out.versions.first())
+
+    EGGNOGMAPPER_ANNOTATIONS(
+        [[], []],
+        EGGNOGMAPPER_ORTHOLOGS.out.annotations,
+        params.eggnog_data_dir,
+        params.eggnog_database,
+        params.eggnog_diamond_database,
+    )
+
+    ch_versions = ch_versions.mix(EGGNOGMAPPER_ANNOTATIONS.out.versions.first())
+
+    // TODO: this is debug code
+    EGGNOGMAPPER_ANNOTATIONS.out.orthologs.collectFile(name: "${params.outdir}/eggnogmapper_orthologs.out")
 
     /*
      * We have to concatenate the IPS tsv and gff files for the downstream tools.
@@ -116,7 +130,6 @@ workflow FUNCTIONAL_ANNOTATION {
      * KEGG Orthologous annotation. This step uses hmmscan to annotation the sequences aginst the kofam HMM models.
      * These HMM models have been extended as described -> TODO: link to the mgnify_pipelines_reference_databases pipeline
     */
-    // TODO: review the v5 models - they have a description and a GA value
     HMMSCAN_KOFAMS(
         ch_proteins_faa.map { meta, faa ->
             {

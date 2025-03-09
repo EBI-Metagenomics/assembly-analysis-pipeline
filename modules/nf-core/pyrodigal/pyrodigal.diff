@@ -1,0 +1,25 @@
+Changes in component 'nf-core/pyrodigal'
+'modules/nf-core/pyrodigal/environment.yml' is unchanged
+'modules/nf-core/pyrodigal/meta.yml' is unchanged
+Changes in 'pyrodigal/main.nf':
+--- modules/nf-core/pyrodigal/main.nf
++++ modules/nf-core/pyrodigal/main.nf
+@@ -25,12 +25,9 @@
+     def args = task.ext.args ?: ''
+     def prefix = task.ext.prefix ?: "${meta.id}"
+     """
+-    pigz -cdf ${fasta} > pigz_fasta.fna
+-
+-    pyrodigal \\
++    pigz -cdf ${fasta} | pyrodigal \\
+         -j ${task.cpus} \\
+         $args \\
+-        -i pigz_fasta.fna \\
+         -f $output_format \\
+         -o "${prefix}.${output_format}" \\
+         -d ${prefix}.fna \\
+
+'modules/nf-core/pyrodigal/tests/main.nf.test.snap' is unchanged
+'modules/nf-core/pyrodigal/tests/tags.yml' is unchanged
+'modules/nf-core/pyrodigal/tests/main.nf.test' is unchanged
+************************************************************

@@ -27,10 +27,10 @@ process EXTRACT_PFAM_COUNTS {
     # 4. Adds headers ('pfam', 'description' and 'count') the TSV.
     # 5. Inverts the columns - we need count to the be first
 
-    csvtk filter2 --tabs --no-header-row  --filter '\$4 == "Pfam"' ${interproscan_tsv} | \\
+    csvtk filter2 --tabs --no-header-row --filter '\$4 == "Pfam"' ${interproscan_tsv} | \\
     csvtk cut --tabs --no-header-row --fields 5,6 | \\
     csvtk freq --tabs --no-header-row --fields 1,2 -n | \\
-    csvtk add-header --tabs --no-header-row  --names pfam,description,count | \\
+    csvtk add-header --tabs --no-header-row --names pfam,description,count | \\
     csvtk cut --tabs --fields count,pfam,description > ${prefix}_pfam.tsv
 
     cat <<-END_VERSIONS > versions.yml

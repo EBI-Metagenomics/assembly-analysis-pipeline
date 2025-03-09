@@ -1,4 +1,18 @@
-#!/usr/bin/env python3
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+
+# Copyright 2024-2025 EMBL - European Bioinformatics Institute
+#
+# Licensed under the Apache License, Version 2.0 (the 'License');
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an 'AS IS' BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
 
 import argparse
 import json
@@ -15,6 +29,18 @@ MASK_OVERLAP_THRESHOLD = 5
 
 
 def parse_gff(gff_file):
+    """
+    Parse a GFF file and extract CDS features as Interval objects.
+
+    Args:
+        gff_file (str): Path to the GFF file.
+
+    Returns:
+        dict: A nested dictionary with sequence IDs as keys, and within each,
+            strand (+/-) as keys, containing a list of Intervals for CDS regions.
+            Each Interval object apart from the start and end positions of the CDS region
+            also stores the protein ID.
+    """
     predictions = defaultdict(lambda: defaultdict(list))
     with open(gff_file, "r") as gff_in:
         for line in gff_in:
@@ -38,11 +64,20 @@ def parse_gff(gff_file):
 
 def parse_pyrodigal_output(file):
     """
-    Parse pyrodigal *.out file.
-    Example:
+    Parse Pyrodigal *.out file to extract gene predictions as Interval objects.
+    Example of *.out file:
     # Sequence Data: seqnum=1;seqlen=25479;seqhdr="Bifidobacterium-longum-subsp-infantis-MC2-contig1"
-    # Model Data: version=pyrodigal.v2.6.3;run_type=Single;model="Ab initio";gc_cont=59.94;transl_table=11;uses_sd=1
+    # Model Data: version=Pyrodigal.v2.6.3;run_type=Single;model="Ab initio";gc_cont=59.94;transl_table=11;uses_sd=1
     >1_1_279_+
+
+    Args:
+        file (str): Path to the Pyrodigal *.out file.
+
+    Returns:
+        dict: A nested dictionary with sequence IDs as keys, and within each,
+            strand (+/-) as keys, containing a list of Intervals for CDS regions.
+            Each Interval object apart from the start and end positions of the CDS region
+            also stores the protein ID.
     """
     predictions = defaultdict(lambda: defaultdict(list))
     with open(file) as file_in:
@@ -56,7 +91,7 @@ def parse_pyrodigal_output(file):
             else:
                 fields = line[1:].strip().split("_")
                 # Fragment_id is an index of the fragment
-                # pyrodigal uses these (rather than coordinates) to identify sequences in the fasta output
+                # Pyrodigal uses these (rather than coordinates) to identify sequences in the fasta output
                 fragment_id, start, end, strand = fields
                 protein_id = f"{seq_id}_{fragment_id}"
                 predictions[seq_id][strand].append(
@@ -67,12 +102,21 @@ def parse_pyrodigal_output(file):
     return predictions
 
 
-def parse_fgs_output(file):
+def parse_fgsrs_output(file):
     """
-    Parse FGS *.out file.
-    Example:
+    Parse FragGeneScanRS *.out file to extract gene predictions as Interval objects.
+    Example of *.out file:
     >Bifidobacterium-longum-subsp-infantis-MC2-contig1
     256	2133	-	1	1.263995	I:	D:
+
+    Args:
+        file (str): Path to the FragGeneScanRS *.out file.
+
+    Returns:
+        dict: A nested dictionary with sequence IDs as keys, and within each,
+            strand (+/-) as keys, containing a list of Intervals for CDS regions.
+            Each Interval object apart from the start and end positions of the CDS region
+            also stores the protein ID.
     """
     predictions = defaultdict(lambda: defaultdict(list))
     with open(file) as file_in:
@@ -92,12 +136,20 @@ def parse_fgs_output(file):
 
 
 def parse_cmsearch_output(mask_file):
+    """
+    Parse masking regions from a cmsearch output file and store them as Intervals.
+
+    Args:
+        mask_file (str): Path to the masking file (possibly BED or GFF-like format).
+
+    Returns:
+        dict: A dictionary with sequence IDs as keys, and a list of Intervals representing masked regions.
+    """
     regions = defaultdict(list)
     with open(mask_file) as file_in:
         for line in file_in:
             if line.startswith("#"):
                 continue
-            # TODO maybe it's TSV?
             fields = line.rstrip().split()
             seq_id = fields[0]
             start = int(fields[7])
@@ -111,6 +163,19 @@ def parse_cmsearch_output(mask_file):
 
 
 def mask_regions(predictions, mask):
+    """
+    Apply masking to predictions by removing regions that overlap significantly
+    (more than MASK_OVERLAP_THRESHOLD)
+    with masked regions.
+
+    Args:
+        predictions (dict): A nested dictionary with sequence IDs as keys, and within each,
+            strand (+/-) as keys, containing a list of Intervals as values.
+        mask (dict): A dictionary with sequence IDs as keys, and a list of Intervals as values.
+
+    Returns:
+        dict: Updated predictions with masked regions removed.
+    """
     masked = defaultdict(lambda: defaultdict(list))
 
     for seq_id, strand_dict in predictions.items():
@@ -143,6 +208,17 @@ def mask_regions(predictions, mask):
 
 
 def merge_predictions(predictions, priority):
+    """
+    Merge gene predictions from two sources, applying a priority order.
+
+    Args:
+        predictions (dict): Nested dictionary containing gene predictions from both sources.
+        priority (list): List specifying the order of priority for merging the predictions.
+
+    Returns:
+        dict: Nested dictionary with all predictions of the first priority source merged with non-overlapping predictions
+            the secondary source.
+    """
     merged = defaultdict(lambda: defaultdict((lambda: defaultdict(list))))
     primary, secondary = priority
 
@@ -164,7 +240,17 @@ def merge_predictions(predictions, priority):
 
 
 def check_against_gaps(regions, candidates):
-    # TODO there is no check if region is empty, is it a problem?
+    """
+    Check candidate regions against existing regions and select those
+    that do not overlap with any existing ones.
+
+    Args:
+        regions (list): Interval objects for existing regions.
+        candidates (list): Interval objects for candidate regions.
+
+    Returns:
+        list: Selected candidate Intervals that do not overlap with existing ones.
+    """
     regions_tree = create_interval_tree(regions)
     selected_candidates = []
     for candidate in candidates:
@@ -175,6 +261,17 @@ def check_against_gaps(regions, candidates):
 
 
 def output_fasta_files(predictions, files_dict, output_faa, output_ffn):
+    """
+    Write FASTA output files containing protein and transcript sequences for
+    the predicted genes after merging.
+
+    Args:
+        predictions (dict): Nested dictionary with merged gene predictions as Interval objects.
+            Each Interval object stores a protein ID in the data attribute.
+        files_dict (dict): Dictionary containing input FASTA files for both Pyrodigal and FragGeneScanRS.
+        output_faa (str): Path to output protein FASTA file.
+        output_ffn (str): Path to output transcript FASTA file.
+    """
     with (
         open(output_faa, "w") as output_faa_fh,
         open(output_ffn, "w") as output_ffn_fh,
@@ -194,12 +291,23 @@ def output_fasta_files(predictions, files_dict, output_faa, output_ffn):
                 sequences = []
                 for record in SeqIO.parse(input_file, "fasta"):
                     if record.id in proteins:
+                        # Replace ending * #
                         record.seq = record.seq.rstrip("*")
+                        # Replace "*" with "X"
+                        record.seq = record.seq.replace("*", "X")
                         sequences.append(record)
                 SeqIO.write(sequences, output_file, "fasta")
 
 
 def output_gff(predictions, output_gff):
+    """
+    Write merged gene predictions to a GFF output file.
+
+    Args:
+        predictions (dict): Nested dictionary with merged gene predictions as Interval objects.
+            Each Interval object stores a protein ID in the data attribute.
+        output_gff (str): Path to the output GFF file.
+    """
     with open(output_gff, "w") as gff_out:
         writer = csv.writer(gff_out, delimiter="\t")
         gff_out.write("##gff-version 3\n")
@@ -223,11 +331,27 @@ def output_gff(predictions, output_gff):
 
 
 def output_summary(summary, output_file):
+    """
+    Write a summary of gene counts to a text file in JSON format.
+
+    Args:
+        summary (dict): Summary of gene counts.
+        output_file (str): Path to the summary output file.
+    """
     with open(output_file, "w") as sf:
         sf.write(json.dumps(summary, sort_keys=True, indent=4) + "\n")
 
 
 def get_counts(predictions):
+    """
+    Count the number of gene predictions for each caller.
+
+    Args:
+        predictions (dict): Nested dictionary with gene predictions for each caller.
+
+    Returns:
+        dict: Total count of genes for each caller.
+    """
     total = {}
     for caller, seq_data in predictions.items():
         count = sum(
@@ -238,6 +362,15 @@ def get_counts(predictions):
 
 
 def create_interval_tree(regions):
+    """
+    Create an IntervalTree from a list of regions.
+
+    Args:
+        regions (list): List of Interval objects.
+
+    Returns:
+        IntervalTree: An interval tree for efficient overlap checking.
+    """
     tree = IntervalTree()
     for region in regions:
         tree.add(region)
@@ -248,7 +381,7 @@ def main():
     parser = argparse.ArgumentParser(
         """
         MGnify gene caller combiner.
-        This script merges gene predictions made by pyrodigal and FragGeneScan (FGS)
+        This script merges gene predictions made by Pyrodigal and FragGeneScanRS (FGS)
         and outputs FASTA and GFF files.
         For each gene caller, the script expects a set of files:
         - GFF file with gene predictions OR *.out file
@@ -269,10 +402,10 @@ def main():
     parser.add_argument(
         "--mask",
         "-m",
-        help="Masked regions (in GFF or BED format)",  # TODO why GFF or BED?
+        help="Regions for masking (Infernal cmsearch output file)",
     )
-    parser.add_argument("--pyrodigal-gff", "-pg", help="pyrodigal *.gff file")
-    parser.add_argument("--pyrodigal-out", "-po", help="pyrodigal *.out file")
+    parser.add_argument("--pyrodigal-gff", "-pg", help="Pyrodigal *.gff file")
+    parser.add_argument("--pyrodigal-out", "-po", help="Pyrodigal *.out file")
     parser.add_argument(
         "--pyrodigal-ffn",
         "-pt",
@@ -280,7 +413,10 @@ def main():
         help="Pyrodigal *.ffn file with transcripts",
     )
     parser.add_argument(
-        "--pyrodigal-faa", "-pp", required=True, help="pyrodigal *.faa file with proteins"
+        "--pyrodigal-faa",
+        "-pp",
+        required=True,
+        help="Pyrodigal *.faa file with proteins",
     )
     parser.add_argument("--fgsrs-gff", "-fg", help="FragGeneScanRS *.gff file")
     parser.add_argument("--fgsrs-out", "-fo", help="FragGeneScanRS *.out file")
@@ -291,7 +427,10 @@ def main():
         help="FragGeneScanRS *.ffn file with transcripts",
     )
     parser.add_argument(
-        "--fgsrs-faa", "-fp", required=True, help="FragGeneScanRS *.faa file with proteins"
+        "--fgsrs-faa",
+        "-fp",
+        required=True,
+        help="FragGeneScanRS *.faa file with proteins",
     )
     parser.add_argument(
         "--verbose", "-v", action="store_true", help="Increase verbosity level to debug"
@@ -311,7 +450,9 @@ def main():
         )
 
     if not args.fgsrs_out and not args.fgsrs_gff:
-        parser.error("For FragGeneScanRS, you must provide either --fgsrs-out or --fgsrs-gff")
+        parser.error(
+            "For FragGeneScanRS, you must provide either --fgsrs-out or --fgsrs-gff"
+        )
 
     summary = {}
     all_predictions = {}
@@ -327,7 +468,7 @@ def main():
 
     logging.info("Parsing FragGeneScanRS annotations...")
     if args.fgsrs_out:
-        all_predictions["FragGeneScanRS"] = parse_fgs_output(args.fgsrs_out)
+        all_predictions["FragGeneScanRS"] = parse_fgsrs_output(args.fgsrs_out)
     elif args.fgsrs_gff:
         all_predictions["FragGeneScanRS"] = parse_gff(args.fgsrs_gff)
 
@@ -352,7 +493,10 @@ def main():
     output_summary(summary, f"{args.name}.summary.txt")
     output_gff(merged_predictions, f"{args.name}.gff")
     files = {
-        "Pyrodigal": {"proteins": args.pyrodigal_faa, "transcripts": args.pyrodigal_ffn},
+        "Pyrodigal": {
+            "proteins": args.pyrodigal_faa,
+            "transcripts": args.pyrodigal_ffn,
+        },
         "FragGeneScanRS": {"proteins": args.fgsrs_faa, "transcripts": args.fgsrs_ffn},
     }
     output_fasta_files(
