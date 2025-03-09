@@ -161,7 +161,7 @@
                     },
                     "sanntis": {
                         "branch": "main",
-                        "git_sha": "816cc2f6fdea59ccdd1e4b1da63bbed834b66288",
+                        "git_sha": "0d489b1617f2015cd99eea7f9369491723eb9260",
                         "installed_by": ["modules"]
                     },
                     "summarisegoslims": {
