@@ -11,7 +11,7 @@ include { EGGNOGMAPPER as EGGNOGMAPPER_ANNOTATIONS } from '../../modules/ebi-met
 include { GENOMEPROPERTIES                         } from '../../modules/ebi-metagenomics/genomeproperties/main'
 include { DBCAN                                    } from '../../modules/ebi-metagenomics/dbcan/dbcan/main'
 
-include { GOSLIM_SWF                              } from '../../subworkflows/ebi-metagenomics/goslim_swf/main'
+include { GOSLIM_SWF                               } from '../../subworkflows/ebi-metagenomics/goslim_swf/main'
 
 /* LOCAL */
 include { CONCATENATE_INTERPROSCAN_GFFS           } from '../../modules/local/concatenate_interproscan_gffs'
@@ -31,7 +31,7 @@ workflow FUNCTIONAL_ANNOTATION {
     ch_proteins_faa = ch_predicted_proteins.map { meta, faa, _gff -> [meta, faa] }
     ch_proteins_gff = ch_predicted_proteins.map { meta, _faa, gff -> [meta, gff] }
 
-    // Chunk the fasta into files with at most >= params - TODO: this needs to be a param
+    // Chunk the fasta into files with at most >= params
     SEQKIT_SPLIT2(
         ch_proteins_faa,
         params.proteins_chunksize,
@@ -118,7 +118,6 @@ workflow FUNCTIONAL_ANNOTATION {
      * 1 - run diamond against a post-processed UniProt90 + Rhea DB
      * 2 - extract the hits using the mgnif toolkit add rhea annotations script
     */
-    // TODO: should we chunk?
     DIAMOND_RHEACHEBI(
         ch_proteins_faa,
         file(params.uniref90rhea_diamond_database, checkIfExists: true),
@@ -145,7 +144,7 @@ workflow FUNCTIONAL_ANNOTATION {
     ch_versions = ch_versions.mix(KEGGPATHWAYSCOMPLETENESS.out.versions)
 
     // TODO: Do we need to consolidate the GFF before DBCan?
-    ch_dbcan = ch_proteins_faa
+    def ch_dbcan = ch_proteins_faa
         .join(ch_proteins_gff)
         .multiMap { meta, faa, gff ->
             faa: [meta, faa]
