@@ -21,13 +21,15 @@ workflow BGC_ANNOTATION {
 
     ch_versions = ch_versions.mix(SEQKIT_SEQ_BGC.out.versions)
 
-    def ch_chuunked_assembly_fasta = SEQKIT_SEQ_BGC.out.fastx.transpose()
+    def ch_chunked_assembly_fasta = SEQKIT_SEQ_BGC.out.fastx.transpose()
 
     // TODO: Filter also the GFF
-    def antismash_ch = ch_chuunked_assembly_fasta.join(ch_contigs_and_predicted_proteins).multiMap { meta, chunked_fasta, _fasta, _faa, gff, ips_tsv ->
+    ch_chunked_assembly_fasta.join(ch_contigs_and_predicted_proteins).multiMap { meta, chunked_fasta, _fasta, _faa, gff, ips_tsv ->
         fasta: [meta, chunked_fasta]
         ips_tsv: [meta, ips_tsv]
         gff: gff
+    }.set {
+        antismash_ch
     }
 
     ANTISMASH_ANTISMASHLITE(

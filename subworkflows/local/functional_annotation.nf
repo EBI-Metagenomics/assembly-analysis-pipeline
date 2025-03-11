@@ -28,8 +28,8 @@ workflow FUNCTIONAL_ANNOTATION {
 
     ch_versions = Channel.empty()
 
-    ch_proteins_faa = ch_predicted_proteins.map { meta, faa, _gff -> [meta, faa] }
-    ch_proteins_gff = ch_predicted_proteins.map { meta, _faa, gff -> [meta, gff] }
+    def ch_proteins_faa = ch_predicted_proteins.map { meta, faa, _gff -> [meta, faa] }
+    def ch_proteins_gff = ch_predicted_proteins.map { meta, _faa, gff -> [meta, gff] }
 
     // Chunk the fasta into files with at most >= params
     SEQKIT_SPLIT2(
@@ -144,12 +144,12 @@ workflow FUNCTIONAL_ANNOTATION {
     ch_versions = ch_versions.mix(KEGGPATHWAYSCOMPLETENESS.out.versions)
 
     // TODO: Do we need to consolidate the GFF before DBCan?
-    def ch_dbcan = ch_proteins_faa
-        .join(ch_proteins_gff)
-        .multiMap { meta, faa, gff ->
-            faa: [meta, faa]
-            gff: [meta, gff]
-        }
+    ch_proteins_faa.join( ch_proteins_gff ).multiMap { meta, faa, gff ->
+        faa: [meta, faa]
+        gff: [meta, gff]
+    }.set {
+        ch_dbcan
+    }
 
     // TODO: should we chunk?
     DBCAN(

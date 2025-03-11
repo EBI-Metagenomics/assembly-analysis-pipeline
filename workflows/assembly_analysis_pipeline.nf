@@ -86,9 +86,11 @@ workflow ASSEMBLY_ANALYSIS_PIPELINE {
     * Protein prediction with the combined-gene-caller, and masking the rRNAs genes
     */
     // We need to sync the sequences and the rRNA outputs //
-    def ch_cgc = ASSEMBLY_QC.out.assembly_filtered.join(RRNA_EXTRACTION.out.cmsearch_deoverlap_out).multiMap { meta, assembly_fasta, cmsearch_deoverlap_out ->
+    ASSEMBLY_QC.out.assembly_filtered.join(RRNA_EXTRACTION.out.cmsearch_deoverlap_out).multiMap { meta, assembly_fasta, cmsearch_deoverlap_out ->
         assembly: [meta, assembly_fasta]
         cmsearch_deoverlap: [meta, cmsearch_deoverlap_out]
+    }.set {
+        ch_cgc
     }
 
     // TODO: handle LR - FGS flip parameter //
