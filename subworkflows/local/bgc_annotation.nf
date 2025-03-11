@@ -1,8 +1,9 @@
 /* NF-CORE */
-include { ANTISMASH_ANTISMASHLITE } from '../../modules/nf-core/antismash/antismashlite/main'
+include { SEQKIT_SEQ as SEQKIT_SEQ_BGC      } from '../../modules/nf-core/seqkit/seq/main'
+include { ANTISMASH_ANTISMASHLITE           } from '../../modules/nf-core/antismash/antismashlite/main'
 
 /* EBI-METAGENOMICS */
-include { SANNTIS                 } from '../../modules/ebi-metagenomics/sanntis/main'
+include { SANNTIS                           } from '../../modules/ebi-metagenomics/sanntis/main'
 
 
 workflow BGC_ANNOTATION {
@@ -14,11 +15,18 @@ workflow BGC_ANNOTATION {
 
     ch_versions = Channel.empty()
 
-    // TODO: is it safe to chunk for antiSMASH
-    // TODO: filter those contigs shorter than 1000pb and chunk
+    SEQKIT_SEQ_BGC(
+        ch_contigs_and_predicted_proteins.map {  meta, fasta, _faa, _gff, _ips_tsv -> [ meta, fasta ] }
+    )
 
-    antismash_ch = ch_contigs_and_predicted_proteins.multiMap { meta, fasta, _faa, gff, _ips_tsv ->
-        fasta: [meta, fasta]
+    ch_versions = ch_versions.mix(SEQKIT_SEQ_BGC.out.versions)
+
+    def ch_chuunked_assembly_fasta = SEQKIT_SEQ_BGC.out.fastx.transpose()
+
+    // TODO: Filter also the GFF
+    def antismash_ch = ch_chuunked_assembly_fasta.join(ch_contigs_and_predicted_proteins).multiMap { meta, chunked_fasta, _fasta, _faa, gff, ips_tsv ->
+        fasta: [meta, chunked_fasta]
+        ips_tsv: [meta, ips_tsv]
         gff: gff
     }
 
@@ -27,10 +35,13 @@ workflow BGC_ANNOTATION {
         file(params.antismash_database, checkIfExists: true),
         antismash_ch.gff
     )
+    ch_versions = ch_versions.mix(ANTISMASH_ANTISMASHLITE.out.versions)
 
+    // TODO: enable
     // SANNTIS(
     //     ch_predicted_proteins.map { meta, _faa, _gff, ips_tsv -> [meta, ips_tsv]}
     // )
+    // ch_versions = ch_versions.mix(SANNTIS.out.versions)
 
     emit:
     versions = ch_versions

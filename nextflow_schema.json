@@ -43,6 +43,26 @@
                 }
             }
         },
+        "contigs_filtering_thresholds": {
+            "title": "Contigs Filtering Thresholds",
+            "type": "object",
+            "description": "Set of threshold values used when filtering contigs.",
+            "properties": {
+                "min_contig_length": {
+                    "type": "integer",
+                    "default": 500,
+                    "description": "Minimum length of a contig; contigs shorter than this will not be considered by the pipeline.",
+                    "fa_icon": "fas fa-weight"
+                },
+                "bgc_min_contig_length": {
+                    "type": "integer",
+                    "default": 100,
+                    "description": "Minimum length of a contig to be analyzed by the Biosynthetic Gene Cluster subworkflow.",
+                    "fa_icon": "fas fa-weight"
+                }
+            },
+            "fa_icon": "fas fa-cut"
+        },
         "nucleotide_and_protein_fasta_file_chunking_options": {
             "title": "Nucleotide and protein fasta file chunking options",
             "type": "object",
@@ -120,13 +140,6 @@
                     "description": "Path to user-defined local antiSMASH database.",
                     "fa_icon": "fas fa-database",
                     "help_text": "Pre downloaded antiSMASH databases, TODO: https://nf-co.re/funcscan/usage#antismash-1 this docs."
-                },
-                "uniref90_diamond_database": {
-                    "type": "string",
-                    "format": "file-path",
-                    "description": "This is a diamond database created from the Uniref90 fasta file.",
-                    "fa_icon": "fas fa-database",
-                    "help_text": "Path to user-defined local Uniref90 diamond database file."
                 },
                 "uniref90rhea_diamond_database": {
                     "type": "string",
@@ -315,6 +328,9 @@
     "allOf": [
         {
             "$ref": "#/$defs/input_output_options"
+        },
+        {
+            "$ref": "#/$defs/contigs_filtering_thresholds"
         },
         {
             "$ref": "#/$defs/nucleotide_and_protein_fasta_file_chunking_options"
