@@ -3,7 +3,7 @@ process COMBINEDGENECALLER_MERGE {
     label 'process_single'
 
     container "${ workflow.containerEngine == 'singularity' && !task.ext.singularity_pull_docker_container ?
-        'https://depot.galaxyproject.org/singularity/mgnify-pipelines-toolkit:0.2.1--pyhdfd78af_0':
+        'oras://community.wave.seqera.io/library/pip_biopython_intervaltree:79ad05207693a92d':
         'community.wave.seqera.io/library/pip_biopython_intervaltree:ffe95e598c911ae0' }"
 
     input:
