@@ -1,4 +1,4 @@
-process EXTRACT_PFAM_COUNTS {
+process PFAM_SUMMARY {
 
     tag "$meta.id"
     label 'process_single'
@@ -11,8 +11,8 @@ process EXTRACT_PFAM_COUNTS {
     tuple val(meta), path(interproscan_tsv)
 
     output:
-    tuple val(meta), path("${prefix}_pfam.tsv"), emit: output
-    path "versions.yml"                        , emit: versions
+    tuple val(meta), path("${prefix}_pfam_summary.tsv"), emit: pfam_summary
+    path "versions.yml"                                , emit: versions
 
     when:
     task.ext.when == null || task.ext.when
@@ -31,7 +31,7 @@ process EXTRACT_PFAM_COUNTS {
     csvtk cut --tabs --no-header-row --fields 5,6 | \\
     csvtk freq --tabs --no-header-row --fields 1,2 -n | \\
     csvtk add-header --tabs --no-header-row --names pfam,description,count | \\
-    csvtk cut --tabs --fields count,pfam,description > ${prefix}_pfam.tsv
+    csvtk cut --tabs --fields count,pfam,description > ${prefix}_pfam_summary.tsv
 
     cat <<-END_VERSIONS > versions.yml
     "${task.process}":
@@ -42,7 +42,7 @@ process EXTRACT_PFAM_COUNTS {
     stub:
     prefix = task.ext.prefix ?: "${meta.id}"
     """
-    touch ${prefix}_pfam.tsv
+    touch ${prefix}_pfam_summary.tsv
     cat <<-END_VERSIONS > versions.yml
     "${task.process}":
         csvtk: \$(echo \$( csvtk version | sed -e "s/csvtk v//g" ))

@@ -8,10 +8,9 @@ process HMMER_HMMSCAN {
         'biocontainers/hmmer:3.4--hdbdd923_1' }"
 
     input:
-    tuple val(meta), path(hmmfile), path(seqdb), val(write_align), val(write_target), val(write_domain)
+    tuple val(meta), path(hmmfile), path(seqdb), val(write_target), val(write_domain)
 
     output:
-    tuple val(meta), path('*.txt.gz')   , emit: output
     tuple val(meta), path('*.tbl.gz')   , emit: target_summary, optional: true
     tuple val(meta), path('*.domtbl.gz'), emit: domain_summary, optional: true
     path "versions.yml"                 , emit: versions
@@ -22,24 +21,22 @@ process HMMER_HMMSCAN {
     script:
     def args       = task.ext.args   ?: ''
     def prefix     = task.ext.prefix ?: "${meta.id}"
-    output         = "${prefix}.txt"
-    // alignment      = write_align     ? "-A ${prefix}.sto" : ''
     target_summary = write_target    ? "--tblout ${prefix}.tbl" : ''
     domain_summary = write_domain    ? "--domtblout ${prefix}.domtbl" : ''
     """
     HMMDB=`find -L ./ -name "*.hmm"`
 
     hmmscan \\
+        --noali \\
+        --cut_ga \\
         $args \\
         --cpu $task.cpus \\
-        -o $output \\
         $target_summary \\
         $domain_summary \\
         \$HMMDB \\
-        $seqdb
+        $seqdb > /dev/null
 
-    gzip --no-name *.txt \\
-        ${write_target ? '*.tbl' : ''} \\
+    gzip --no-name ${write_target ? '*.tbl' : ''} \\
         ${write_domain ? '*.domtbl' : ''}
 
     cat <<-END_VERSIONS > versions.yml
@@ -51,14 +48,11 @@ process HMMER_HMMSCAN {
     stub:
     def prefix = task.ext.prefix ?: "${meta.id}"
     """
-    touch "${prefix}.txt"
     ${write_align ? "touch ${prefix}.sto" : ''} \\
     ${write_target ? "touch ${prefix}.tbl" : ''} \\
     ${write_domain ? "touch ${prefix}.domtbl" : ''}
 
-    gzip --no-name *.txt \\
-        ${write_align ? '*.sto' : ''} \\
-        ${write_target ? '*.tbl' : ''} \\
+    gzip --no-name  ${write_target ? '*.tbl' : ''} \\
         ${write_domain ? '*.domtbl' : ''}
 
     cat <<-END_VERSIONS > versions.yml

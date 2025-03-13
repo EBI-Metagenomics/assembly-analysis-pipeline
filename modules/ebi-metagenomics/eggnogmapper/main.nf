@@ -25,7 +25,10 @@ process EGGNOGMAPPER {
 
     script:
     def args = task.ext.args ?: ''
-    def prefix = task.ext.prefix ?: (meta ? "${meta.id}" : "${meta2.id}")
+    // def prefix = task.ext.prefix ?: (meta ? "${meta.id}" : "${meta2.id}")
+    // TODO: we dropped the number to make it easier for the downstream handling of chunked files
+    //       files at this poing will be chunked and have 00N chunk number on it
+    def prefix = "${fasta.simpleName}"
     def annotation_hit_input = annotation_hit_table ? "--annotate_hits_table ${annotation_hit_table}" : ""
     // TODO: this is an ugly hack to get by... the anntotations mode will fail with a file already here error otherwise
     if ( annotation_hit_input ) {

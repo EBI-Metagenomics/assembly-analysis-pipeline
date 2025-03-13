@@ -9,7 +9,7 @@ process KEGGPATHWAYSCOMPLETENESS {
         'biocontainers/kegg-pathways-completeness:1.3.0--pyhdfd78af_0' }"
 
     input:
-    tuple val(meta), path(proteins_fasta), path(hmmscan_domtbl)
+    tuple val(meta), path(proteins_fasta), path(ko_contig_tsv)
 
     output:
     // TODO: this contig file is not generated for the example
