@@ -1,9 +1,9 @@
 /* NF-CORE */
-include { SEQKIT_SEQ as SEQKIT_SEQ_BGC      } from '../../modules/nf-core/seqkit/seq/main'
-include { ANTISMASH_ANTISMASHLITE           } from '../../modules/nf-core/antismash/antismashlite/main'
+include { SEQKIT_SEQ as SEQKIT_SEQ_BGC } from '../../modules/nf-core/seqkit/seq/main'
+include { ANTISMASH_ANTISMASHLITE      } from '../../modules/nf-core/antismash/antismashlite/main'
 
 /* EBI-METAGENOMICS */
-include { SANNTIS                           } from '../../modules/ebi-metagenomics/sanntis/main'
+include { SANNTIS                      } from '../../modules/ebi-metagenomics/sanntis/main'
 
 
 workflow BGC_ANNOTATION {
@@ -15,6 +15,9 @@ workflow BGC_ANNOTATION {
 
     ch_versions = Channel.empty()
 
+    /*
+    * For BGC the pipeline uses a different min contig size
+    */
     SEQKIT_SEQ_BGC(
         ch_contigs_and_predicted_proteins.map {  meta, fasta, _faa, _gff, _ips_tsv -> [ meta, fasta ] }
     )

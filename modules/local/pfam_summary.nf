@@ -21,15 +21,17 @@ process PFAM_SUMMARY {
     prefix = task.ext.prefix ?: "${meta.id}"
     """
     # This csvtk minipipeline extracts Pfam rows:
-    # 1. Picks the Pfam rows.
-    # 2. Extracts the 5th (Pfam accession) and 6th (description) columns.
-    # 3. Counts the frequency of the pfams (we use pfam accession and description because we need the description too)
-    # 4. Adds headers ('pfam', 'description' and 'count') the TSV.
-    # 5. Inverts the columns - we need count to the be first
+    # . Fix the quotation, sometimes the TSV has quotes where it shouldn't
+    # . Picks the Pfam rows.
+    # . Extracts the 5th (Pfam accession) and 6th (description) columns.
+    # . Counts the frequency of the pfams (we use pfam accession and description because we need the description too)
+    # . Adds headers ('pfam', 'description' and 'count') the TSV.
+    # . Inverts the columns - we need count to the be first
 
-    csvtk filter2 --tabs --no-header-row --filter '\$4 == "Pfam"' ${interproscan_tsv} | \\
+    csvtk fix-quotes --tabs --no-header-row ${interproscan_tsv} | \\
+    csvtk filter2 --tabs --no-header-row --filter '\$4 == "Pfam"' | \\
     csvtk cut --tabs --no-header-row --fields 5,6 | \\
-    csvtk freq --tabs --no-header-row --fields 1,2 -n | \\
+    csvtk freq --tabs --no-header-row --fields 1,2 --reverse --sort-by-freq | \\
     csvtk add-header --tabs --no-header-row --names pfam,description,count | \\
     csvtk cut --tabs --fields count,pfam,description > ${prefix}_pfam_summary.tsv
 

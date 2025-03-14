@@ -28,10 +28,7 @@ process INTERPROSCAN {
 
     script:
     def args = task.ext.args ?: ''
-    // def prefix = task.ext.prefix ?: "${meta.id}"
-    // TODO: we dropped the number to make it easier for the downstream handling of chunked files
-    //       files at this poing will be chunked and have 00N chunk number on it
-    def prefix = "${fasta.simpleName}"
+    def prefix = task.ext.prefix ?: "${meta.id}"
     def is_compressed = fasta.getExtension() == "gz"
     def fasta_file_name = fasta.name.replace(".gz", "")
 

@@ -1,8 +1,10 @@
 /* NF-CORE */
-include { SEQKIT_SPLIT2                           } from '../../modules/nf-core/seqkit/split2/main'
-include { DIAMOND_RHEACHEBI                       } from '../../modules/local/diamond_rheachebi'
-include { CAT_CAT as CONCATENATE_INTERPROSCAN_TSV } from '../../modules/nf-core/cat/cat/main'
-include { CAT_CAT as CONCATENATE_HMMSARCH_TBLOUT  } from '../../modules/nf-core/cat/cat/main'
+include { SEQKIT_SPLIT2                                   } from '../../modules/nf-core/seqkit/split2/main'
+include { DIAMOND_RHEACHEBI                               } from '../../modules/local/diamond_rheachebi'
+include { CAT_CAT as CONCATENATE_EGGNOGMAPPER_ORTHOLOGOUS } from '../../modules/nf-core/cat/cat/main'
+include { CAT_CAT as CONCATENATE_EGGNOGMAPPER_ANNOTATIONS } from '../../modules/nf-core/cat/cat/main'
+include { CAT_CAT as CONCATENATE_INTERPROSCAN_TSV         } from '../../modules/nf-core/cat/cat/main'
+include { CAT_CAT as CONCATENATE_HMMSARCH_TBLOUT          } from '../../modules/nf-core/cat/cat/main'
 
 /* EBI-METAGENOMICS */
 include { INTERPROSCAN                             } from '../../modules/ebi-metagenomics/interproscan/main'
@@ -43,13 +45,29 @@ workflow FUNCTIONAL_ANNOTATION {
 
     def ch_protein_splits = SEQKIT_SPLIT2.out.assembly.transpose()
 
+    /*
+     * InterProScan results are concatenated (TSV and GFF) and passed on to downstream tools:
+     * - GO Slim subworkflow
+     * - Genomes properties
+     * The concatenated TSV is also used to extract the PFAM and InterPro summaries
+    */
     INTERPROSCAN(
         ch_protein_splits,
         [file(params.interproscan_database, checkIfExists: true), params.interproscan_database_version],
     )
-
     ch_versions = ch_versions.mix(INTERPROSCAN.out.versions)
 
+    CONCATENATE_INTERPROSCAN_TSV(
+        INTERPROSCAN.out.tsv.groupTuple()
+    )
+    ch_versions = ch_versions.mix(CONCATENATE_INTERPROSCAN_TSV.out.versions)
+
+    /*
+     * EggNOG mapper results are concatenated (TSV and GFF) and passed on to downstream tools:
+     * - GO Slim subworkflow
+     * - Genomes properties
+     * The concatenated TSV is also used to extract the PFAM and InterPro summaries
+    */
     EGGNOGMAPPER_ORTHOLOGS(
         ch_protein_splits,
         [[], []],
@@ -57,31 +75,31 @@ workflow FUNCTIONAL_ANNOTATION {
         params.eggnog_database,
         params.eggnog_diamond_database,
     )
-
     ch_versions = ch_versions.mix(EGGNOGMAPPER_ORTHOLOGS.out.versions.first())
+
+    CONCATENATE_EGGNOGMAPPER_ORTHOLOGOUS(
+        EGGNOGMAPPER_ORTHOLOGS.out.orthologs.groupTuple()
+    )
+    ch_versions = ch_versions.mix(CONCATENATE_EGGNOGMAPPER_ORTHOLOGOUS.out.versions.first())
 
     EGGNOGMAPPER_ANNOTATIONS(
         [[], []],
         EGGNOGMAPPER_ORTHOLOGS.out.annotations,
         params.eggnog_data_dir,
-        params.eggnog_database,
-        params.eggnog_diamond_database,
+        [],
+        []
     )
 
     ch_versions = ch_versions.mix(EGGNOGMAPPER_ANNOTATIONS.out.versions.first())
 
-    // TODO: this is debug code
-    EGGNOGMAPPER_ANNOTATIONS.out.orthologs.collectFile(name: "${params.outdir}/eggnogmapper_orthologs.out")
-
-    /*
-     * We have to concatenate the IPS tsv and gff files for the downstream tools.
-     * For the tsv files we can use `cat`, the tsv doesn't have a header row.
-     * The GFF it's a bit tricker, that is why we have a custom script to do so.
-    */
-    CONCATENATE_INTERPROSCAN_TSV(
-        INTERPROSCAN.out.tsv.groupTuple()
+    CONCATENATE_EGGNOGMAPPER_ANNOTATIONS(
+        EGGNOGMAPPER_ANNOTATIONS.out.annotations.groupTuple()
     )
-    ch_versions = ch_versions.mix(CONCATENATE_INTERPROSCAN_TSV.out.versions)
+    ch_versions = ch_versions.mix(CONCATENATE_EGGNOGMAPPER_ANNOTATIONS.out.versions.first())
+
+    //************************************************//
+    //                    Summaries                   //
+    //***********************************************//
 
     /*
      * Process the interproscan TSV and extract the Pfam entries counts
@@ -98,6 +116,10 @@ workflow FUNCTIONAL_ANNOTATION {
         CONCATENATE_INTERPROSCAN_TSV.out.file_out
     )
     ch_versions = ch_versions.mix(INTERPRO_SUMMARY.out.versions)
+
+    //*********************************************//
+    //              More annotations              //
+    //********************************************//
 
     CONCATENATE_INTERPROSCAN_GFFS(
         INTERPROSCAN.out.gff3.groupTuple()
@@ -154,7 +176,7 @@ workflow FUNCTIONAL_ANNOTATION {
     * but because the pipeline processes this file subsequently in this pipeline, this doesn't matter
     */
     CONCATENATE_HMMSARCH_TBLOUT(
-        HMMSCAN_KOFAMS.out.target_summary
+        HMMSCAN_KOFAMS.out.target_summary.groupTuple()
     )
     ch_versions = ch_versions.mix(CONCATENATE_HMMSARCH_TBLOUT.out.versions)
 

@@ -21,15 +21,17 @@ process INTERPRO_SUMMARY {
     prefix = task.ext.prefix ?: "${meta.id}"
     """
     # This csvtk minipipeline extracts InterProScan - IPS counts:
-    # 1. Picks the rows with an IPS hit
-    # 2. Extracts the 12th InterPro annotations - accession (e.g. IPR002093) and 13th InterPro annotations - description (e.g. BRCA2 repeat)xq
-    # 3. Counts the frequency of the IPS accessions (we use accession and description because we need the description too)
-    # 4. Adds headers ('interpro_accession', 'description' and 'count') the TSV.
-    # 5. Inverts the columns - we need count to the be first
+    # . Fix the quotation, sometimes the TSV has quotes where it shouldn't
+    # . Picks the rows with an IPS hit
+    # . Extracts the 12th InterPro annotations - accession (e.g. IPR002093) and 13th InterPro annotations - description (e.g. BRCA2 repeat)xq
+    # . Counts the frequency of the IPS accessions (we use accession and description because we need the description too)
+    # . Adds headers ('interpro_accession', 'description' and 'count') the TSV.
+    # . Inverts the columns - we need count to the be first
 
-    csvtk filter2 --tabs --no-header-row --filter '\$12 != ""' ${interproscan_tsv} | \\
+    csvtk fix-quotes --tabs --no-header-row ${interproscan_tsv} | \\
+    csvtk filter2 --tabs --no-header-row --filter '\$12 != ""' | \\
     csvtk cut --tabs --no-header-row --fields 12,13 | \\
-    csvtk freq --tabs --no-header-row --fields 1,2 -n | \\
+    csvtk freq --tabs --no-header-row --fields 1,2 --reverse --sort-by-freq | \\
     csvtk add-header --tabs --no-header-row --names interpro_accession,description,count | \\
     csvtk cut --tabs --fields count,interpro_accession,description > ${prefix}_intepro_summary.tsv
 
