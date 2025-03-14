@@ -28,7 +28,7 @@ process KEGG_ORTHOLOGS_SUMMARY {
     #    - stream 1: Extracts the first two fields and saves them to ko_per_contig.tsv
     #    - stream 2: Extracts the third field, calculates the frequency of each unique value in the first two fields,
     #                adds header names, reorders the fields, and saves the result to ${prefix}_ko_summary.tsv
-    hmmscan_tblout_to_tsv.py < zcat ${hmmscan_concatenated_tblout} |
+    gunzip -c ${hmmscan_concatenated_tblout} | hmmscan_tblout_to_tsv.py | \\
         tee \
             >(csvtk cut --tabs --no-header-row --fields 1,2 > ${prefix}_ko_per_contig.tsv) \
             >(
