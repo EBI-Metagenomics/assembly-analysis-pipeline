@@ -22,21 +22,25 @@ process KEGG_ORTHOLOGS_SUMMARY {
     script:
     prefix = task.ext.prefix ?: "${meta.id}"
     """
-    # This minipipline performs the following steps:
-    # 1. Runs the hmmscan_tblout_to_tsv.py script and pipes the output
-    # 2. Splits the output into two separate streams using the tee command:
-    #    - stream 1: Extracts the first two fields and saves them to ko_per_contig.tsv
-    #    - stream 2: Extracts the third field, calculates the frequency of each unique value in the first two fields,
+    # This pipeline performs the following steps:
+    # 1. Decompresses the hmmscan_concatenated_tblout file using gunzip
+    # 2. Runs the hmmscan_tblout_to_tsv.py script and pipes the output
+    # 3. Splits the output into two separate streams using tee:
+    #    - stream 1: Extracts the first and third fields (KO ID and KO description),
+    #                calculates the frequency of each unique KO ID,
     #                adds header names, reorders the fields, and saves the result to ${prefix}_ko_summary.tsv
+    #    - stream 2: Extracts the first and second fields (KO ID and contig ID)
+    #                and saves the result to ${prefix}_ko_per_contig.tsv - this file will be be downstream in the pipeline
+
     gunzip -c ${hmmscan_concatenated_tblout} | hmmscan_tblout_to_tsv.py | \\
-        tee \
-            >(csvtk cut --tabs --no-header-row --fields 1,2 > ${prefix}_ko_per_contig.tsv) \
-            >(
-                csvtk cut --tabs --no-header-row --fields 1,3 |
-                csvtk freq --tabs --no-header-row --fields 1,2 -n |
-                csvtk add-header --tabs --no-header-row --names ko,description,count |
-                csvtk cut --tabs --fields count,ko,description > ${prefix}_ko_summary.tsv
-            )
+    tee \\
+        >(csvtk cut --tabs --no-header-row --fields 1,3 | \\
+          csvtk freq --tabs --no-header-row --fields 1,2 --reverse --sort-by-freq | \\
+          csvtk add-header --tabs --no-header-row --names ko,description,count | \\
+          csvtk cut --tabs --fields count,ko,description > ${prefix}_ko_summary.tsv
+        ) | \\
+        csvtk cut --tabs --no-header-row --fields 1,2 | \\
+        csvtk add-header --tabs --no-header-row --names ko,contig_id  ${prefix}_ko_per_contig.tsv
 
     cat <<-END_VERSIONS > versions.yml
     "${task.process}":

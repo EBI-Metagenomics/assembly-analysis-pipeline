@@ -1,13 +1,15 @@
 #!/usr/bin/env python
 
 import sys
+import csv
 from Bio import SearchIO
 
 def parse_hmmscan(input_handle, output_handle):
+    writer = csv.writer(output_handle, delimiter='\t')
     for qresult in SearchIO.parse(input_handle, 'hmmer3-tab'):
+        contig_id = qresult.id
         for hit in qresult.hits:
-            # This prints the hit id (KO id), the query id (the contig id) and the KO description
-            output_handle.write(f"{hit.id}\t{hit.name}\t\"{hit.description}\"")
+            writer.writerow([hit.id, contig_id, hit.description])
 
 if __name__ == '__main__':
     """
