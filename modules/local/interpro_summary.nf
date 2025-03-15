@@ -20,16 +20,16 @@ process INTERPRO_SUMMARY {
     script:
     prefix = task.ext.prefix ?: "${meta.id}"
     """
-    # This csvtk minipipeline extracts InterProScan - IPS counts:
+    # This csvtk minipipeline extracts InterProScan - InterPro accession counts:
     # . Fix the quotation, sometimes the TSV has quotes where it shouldn't
-    # . Picks the rows with an IPS hit
-    # . Extracts the 12th InterPro annotations - accession (e.g. IPR002093) and 13th InterPro annotations - description (e.g. BRCA2 repeat)xq
+    # . Picks the rows with an InterPro hit which are those where the InterPro column is not empty or with "-" character
+    # . Extracts the 12th InterPro annotations - accession (e.g. IPR002093) and 13th InterPro annotations - description (e.g. BRCA2 repeat)
     # . Counts the frequency of the IPS accessions (we use accession and description because we need the description too)
     # . Adds headers ('interpro_accession', 'description' and 'count') the TSV.
     # . Inverts the columns - we need count to the be first
 
     csvtk fix-quotes --tabs --no-header-row ${interproscan_tsv} | \\
-    csvtk filter2 --tabs --no-header-row --filter '\$12 != ""' | \\
+    csvtk filter2 --tabs --no-header-row --filter '\$12 != "" && \$12 != "-"' | \\
     csvtk cut --tabs --no-header-row --fields 12,13 | \\
     csvtk freq --tabs --no-header-row --fields 1,2 --reverse --sort-by-freq | \\
     csvtk add-header --tabs --no-header-row --names interpro_accession,description,count | \\
