@@ -1,5 +1,5 @@
 process EGGNOGMAPPER {
-    tag { meta ? "${meta.id}" : "${meta2.id}" }
+    tag "${meta?.id ?: meta2.id}"
     label 'process_long'
 
     conda "bioconda::eggnog-mapper=2.1.12"
@@ -15,10 +15,10 @@ process EGGNOGMAPPER {
     path(eggnog_diamond_db)
 
     output:
-    tuple val(meta), path("*.hits")           , emit: hits, optional: true
-    tuple val(meta), path("*.annotations")    , emit: annotations, optional: true
-    tuple val(meta2), path("*.seed_orthologs"), emit: orthologs, optional: true
-    path "versions.yml"                       , emit: versions
+    tuple val(meta), path("*.hits")          , emit: hits, optional: true
+    tuple val(meta), path("*.seed_orthologs"), emit: orthologs, optional: true
+    tuple val(meta2), path("*.annotations")  , emit: annotations, optional: true
+    path "versions.yml"                      , emit: versions
 
     when:
     task.ext.when == null || task.ext.when

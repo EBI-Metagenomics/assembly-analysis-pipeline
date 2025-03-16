@@ -62,6 +62,8 @@ workflow FUNCTIONAL_ANNOTATION {
     )
     ch_versions = ch_versions.mix(CONCATENATE_INTERPROSCAN_TSV.out.versions)
 
+    // TODO: review Eggnog - it is late and I think I'm mixing orth and annotations up
+
     /*
      * EggNOG mapper results are concatenated (TSV and GFF) and passed on to downstream tools:
      * - GO Slim subworkflow
@@ -77,20 +79,20 @@ workflow FUNCTIONAL_ANNOTATION {
     )
     ch_versions = ch_versions.mix(EGGNOGMAPPER_ORTHOLOGS.out.versions.first())
 
+    EGGNOGMAPPER_ANNOTATIONS(
+        [[], []],
+        EGGNOGMAPPER_ORTHOLOGS.out.orthologs,
+        params.eggnog_data_dir,
+        [],
+        []
+    )
+    ch_versions = ch_versions.mix(EGGNOGMAPPER_ANNOTATIONS.out.versions.first())
+
     CONCATENATE_EGGNOGMAPPER_ORTHOLOGOUS(
         EGGNOGMAPPER_ORTHOLOGS.out.orthologs.groupTuple()
     )
     ch_versions = ch_versions.mix(CONCATENATE_EGGNOGMAPPER_ORTHOLOGOUS.out.versions.first())
 
-    EGGNOGMAPPER_ANNOTATIONS(
-        [[], []],
-        EGGNOGMAPPER_ORTHOLOGS.out.annotations,
-        params.eggnog_data_dir,
-        [],
-        []
-    )
-
-    ch_versions = ch_versions.mix(EGGNOGMAPPER_ANNOTATIONS.out.versions.first())
 
     CONCATENATE_EGGNOGMAPPER_ANNOTATIONS(
         EGGNOGMAPPER_ANNOTATIONS.out.annotations.groupTuple()

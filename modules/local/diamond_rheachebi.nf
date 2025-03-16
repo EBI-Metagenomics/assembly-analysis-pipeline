@@ -13,8 +13,8 @@ process DIAMOND_RHEACHEBI {
     val blast_columns
 
     output:
-    tuple val(meta), path("*.tsv"), emit: rhea2proteins_tsv
-    path "versions.yml"           , emit: versions
+    tuple val(meta), path("*_rhea2proteins.tsv.gz"), emit: rhea2proteins_tsv
+    path "versions.yml"                            , emit: versions
 
     when:
     task.ext.when == null || task.ext.when
@@ -33,6 +33,11 @@ process DIAMOND_RHEACHEBI {
     diamond \\
         blastp \\
         --threads ${task.cpus} \\
+        --evalue 1e-10 \\
+        --query-cover 80 \\
+        --subject-cover 80 \\
+        --id 50 \\
+        -k 0 \\
         --db ${db} \\
         --query ${fasta} \\
         --outfmt ${outfmt} ${columns} | \\
@@ -40,7 +45,9 @@ process DIAMOND_RHEACHEBI {
         --diamond_hits - \\
         --proteins ${fasta_name} \\
         --rhea2chebi ${rhea2chebi} \\
-        --output ${prefix}.tsv
+        --output ${prefix}_rhea2proteins.tsv
+
+    gzip ${prefix}_rhea2proteins.tsv
 
     cat <<-END_VERSIONS > versions.yml
     "${task.process}":

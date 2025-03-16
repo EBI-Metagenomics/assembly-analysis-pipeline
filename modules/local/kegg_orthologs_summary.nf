@@ -12,9 +12,9 @@ process KEGG_ORTHOLOGS_SUMMARY {
     tuple val(meta), path(hmmscan_concatenated_tblout)
 
     output:
-    tuple val(meta), path("${prefix}_ko_summary.tsv"),    emit: ko_summary_tsv
-    tuple val(meta), path("${prefix}_ko_per_contig.tsv"), emit: ko_per_contig_tsv
-    path "versions.yml"                                 , emit: versions
+    tuple val(meta), path("${prefix}_ko_summary.tsv.gz"),    emit: ko_summary_tsv
+    tuple val(meta), path("${prefix}_ko_per_contig.tsv.gz"), emit: ko_per_contig_tsv
+    path "versions.yml"                                    , emit: versions
 
     when:
     task.ext.when == null || task.ext.when
@@ -34,13 +34,13 @@ process KEGG_ORTHOLOGS_SUMMARY {
 
     gunzip -c ${hmmscan_concatenated_tblout} | hmmscan_tblout_to_tsv.py | \\
     tee \\
-        >(csvtk cut --tabs --no-header-row --fields 1,3 | \\
-          csvtk freq --tabs --no-header-row --fields 1,2 --reverse --sort-by-freq | \\
-          csvtk add-header --tabs --no-header-row --names ko,description,count | \\
-          csvtk cut --tabs --fields count,ko,description > ${prefix}_ko_summary.tsv
+        >(csvtk cut --num-cpus ${task.cpus} --tabs --no-header-row --fields 1,3 | \\
+          csvtk freq --num-cpus ${task.cpus} --tabs --no-header-row --fields 1,2 --reverse --sort-by-freq | \\
+          csvtk add-header --num-cpus ${task.cpus} --tabs --no-header-row --names ko,description,count | \\
+          csvtk cut --num-cpus ${task.cpus} --tabs --fields count,ko,description > ${prefix}_ko_summary.tsv.gz
         ) | \\
-        csvtk cut --tabs --no-header-row --fields 1,2 | \\
-        csvtk add-header --tabs --no-header-row --names ko,contig_id > ${prefix}_ko_per_contig.tsv
+        csvtk cut --num-cpus ${task.cpus} --tabs --no-header-row --fields 1,2 | \\
+        csvtk add-header --num-cpus ${task.cpus} --tabs --no-header-row --names ko,contig_id > ${prefix}_ko_per_contig.tsv.gz
 
     cat <<-END_VERSIONS > versions.yml
     "${task.process}":
