@@ -40,7 +40,7 @@ process KEGG_ORTHOLOGS_SUMMARY {
           csvtk cut --tabs --fields count,ko,description > ${prefix}_ko_summary.tsv
         ) | \\
         csvtk cut --tabs --no-header-row --fields 1,2 | \\
-        csvtk add-header --tabs --no-header-row --names ko,contig_id  ${prefix}_ko_per_contig.tsv
+        csvtk add-header --tabs --no-header-row --names ko,contig_id > ${prefix}_ko_per_contig.tsv
 
     cat <<-END_VERSIONS > versions.yml
     "${task.process}":
