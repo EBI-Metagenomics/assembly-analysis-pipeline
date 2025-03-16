@@ -42,11 +42,10 @@ workflow BGC_ANNOTATION {
     )
     ch_versions = ch_versions.mix(ANTISMASH_ANTISMASHLITE.out.versions)
 
-    // TODO: enable
-    // SANNTIS(
-    //     ch_predicted_proteins.map { meta, _faa, _gff, ips_tsv -> [meta, ips_tsv]}
-    // )
-    // ch_versions = ch_versions.mix(SANNTIS.out.versions)
+    SANNTIS(
+        ch_contigs_and_predicted_proteins.map { meta, _fasta, faa, _gff, ips_tsv -> [meta, ips_tsv, [], faa]}
+    )
+    ch_versions = ch_versions.mix(SANNTIS.out.versions)
 
     emit:
     versions = ch_versions
