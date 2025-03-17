@@ -12,8 +12,8 @@ process KEGGPATHWAYSCOMPLETENESS {
     tuple val(meta), path(ko_contig_tsv)
 
     output:
-    tuple val(meta), path("${prefix}/summary.kegg_pathways.tsv"), emit: kegg_pathways
-    path "versions.yml"                                         , emit: versions
+    tuple val(meta), path("${prefix}/summary.kegg_pathways.tsv.gz"), emit: kegg_pathways
+    path "versions.yml"                                            , emit: versions
 
     when:
     task.ext.when == null || task.ext.when
@@ -21,13 +21,27 @@ process KEGGPATHWAYSCOMPLETENESS {
     script:
     def args = task.ext.args ?: ''
     prefix = task.ext.prefix ?: "${meta.id}"
-    // Handle compressde files
     """
-    gunzip -c ${ko_contig_tsv} > ${prefix}_ko_contig.tsv
+    # This is a custom script used to adjust the structure of the ko per contig tsv:
+    # From:
+    # ko      contig_id
+    # K07082  MGYA1767_1
+    # K09458  MGYA1767_1
+    # K02990  MGYA1767_1
+    # to ->
+    # MGYA1767_1    K07082  K09458  K02990
+
+    aggregate_kos_per_contig.py \\
+        -i ${ko_contig_tsv} \\
+        -o ${prefix}_aggregated_kos_per_contig.tsv
 
     give_completeness \\
-        -i ${prefix}_ko_contig.tsv \\
+        -i ${prefix}_aggregated_kos_per_contig.tsv \\
         -o ${prefix}
+
+    mv ${prefix}/summary.kegg_pathways.tsv ${prefix}_summary_kegg_pathways.tsv
+
+    gzip ${prefix}_summary_kegg_pathways.tsv
 
     cat <<-END_VERSIONS > versions.yml
     "${task.process}":
@@ -39,8 +53,9 @@ process KEGGPATHWAYSCOMPLETENESS {
     def args = task.ext.args ?: ''
     prefix = task.ext.prefix ?: "${meta.id}"
     """
-    touch ${prefix}.kegg_contigs.tsv
-    touch ${prefix}.kegg_pathways.tsv
+    touch ${prefix}_summary_kegg_pathways.tsv
+
+    gzip ${prefix}_summary_kegg_pathways.tsv
 
     cat <<-END_VERSIONS > versions.yml
     "${task.process}":
