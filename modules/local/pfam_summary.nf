@@ -11,8 +11,8 @@ process PFAM_SUMMARY {
     tuple val(meta), path(interproscan_tsv)
 
     output:
-    tuple val(meta), path("${prefix}_pfam_summary.tsv"), emit: pfam_summary
-    path "versions.yml"                                , emit: versions
+    tuple val(meta), path("${prefix}_pfam_summary.tsv.gz"), emit: pfam_summary
+    path "versions.yml"                                   , emit: versions
 
     when:
     task.ext.when == null || task.ext.when
@@ -33,7 +33,7 @@ process PFAM_SUMMARY {
     csvtk cut --tabs --no-header-row --fields 5,6 | \\
     csvtk freq --tabs --no-header-row --fields 1,2 --reverse --sort-by-freq | \\
     csvtk add-header --tabs --no-header-row --names pfam,description,count | \\
-    csvtk cut --tabs --fields count,pfam,description > ${prefix}_pfam_summary.tsv
+    csvtk cut --tabs --fields count,pfam,description > ${prefix}_pfam_summary.tsv.gz
 
     cat <<-END_VERSIONS > versions.yml
     "${task.process}":
