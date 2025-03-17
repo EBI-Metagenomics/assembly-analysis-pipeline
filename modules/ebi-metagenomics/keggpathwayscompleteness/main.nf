@@ -12,7 +12,7 @@ process KEGGPATHWAYSCOMPLETENESS {
     tuple val(meta), path(ko_contig_tsv)
 
     output:
-    tuple val(meta), path("${prefix}/summary.kegg_pathways.tsv.gz"), emit: kegg_pathways
+    tuple val(meta), path("${prefix}_summary_kegg_pathways.tsv.gz"), emit: kegg_pathways
     path "versions.yml"                                            , emit: versions
 
     when:
