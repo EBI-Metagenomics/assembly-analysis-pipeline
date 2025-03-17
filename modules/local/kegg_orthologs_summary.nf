@@ -32,6 +32,10 @@ process KEGG_ORTHOLOGS_SUMMARY {
     #    - stream 2: Extracts the first and second fields (KO ID and contig ID)
     #                and saves the result to ${prefix}_ko_per_contig.tsv - this file will be be downstream in the pipeline
 
+    # If there is a retry csvtk will fail with the files already exist
+    rm -f ${prefix}_ko_per_contig.tsv.gz || true
+    rm -f ${prefix}_ko_summary.tsv.gz || true
+
     gunzip -c ${hmmscan_concatenated_tblout} | hmmscan_tblout_to_tsv.py | \\
     tee \\
         >(csvtk cut --num-cpus ${task.cpus} --tabs --no-header-row --fields 1,3 | \\
