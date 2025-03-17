@@ -187,11 +187,10 @@ workflow FUNCTIONAL_ANNOTATION {
     )
     ch_versions = ch_versions.mix(KEGG_ORTHOLOGS_SUMMARY.out.versions)
 
-    // TODO: adjust this one - it's missing one parameter
-    // KEGGPATHWAYSCOMPLETENESS(
-    //     ch_proteins_faa.join(KEGG_ORTHOLOGS_SUMMARY.out.ko_per_contig_tsv)
-    // )
-    // ch_versions = ch_versions.mix(KEGGPATHWAYSCOMPLETENESS.out.versions)
+    KEGGPATHWAYSCOMPLETENESS(
+        KEGG_ORTHOLOGS_SUMMARY.out.ko_per_contig_tsv
+    )
+    ch_versions = ch_versions.mix(KEGGPATHWAYSCOMPLETENESS.out.versions)
 
     // TODO: Do we need to consolidate the GFF before DBCan?
     ch_proteins_faa.join( ch_proteins_gff ).multiMap { meta, faa, gff ->
