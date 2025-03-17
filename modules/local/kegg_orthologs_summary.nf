@@ -36,15 +36,26 @@ process KEGG_ORTHOLOGS_SUMMARY {
     rm -f ${prefix}_ko_per_contig.tsv.gz || true
     rm -f ${prefix}_ko_summary.tsv.gz || true
 
+
     gunzip -c ${hmmscan_concatenated_tblout} | hmmscan_tblout_to_tsv.py | \\
-    tee \\
-        >(csvtk cut --num-cpus ${task.cpus} --tabs --no-header-row --fields 1,3 | \\
-          csvtk freq --num-cpus ${task.cpus} --tabs --no-header-row --fields 1,2 --reverse --sort-by-freq | \\
-          csvtk add-header --num-cpus ${task.cpus} --tabs --no-header-row --names ko,description,count | \\
-          csvtk cut --num-cpus ${task.cpus} --tabs --fields count,ko,description --out-file ${prefix}_ko_summary.tsv.gz
-        ) | \\
-        csvtk cut --num-cpus ${task.cpus} --tabs --no-header-row --fields 1,2 | \\
-        csvtk add-header --num-cpus ${task.cpus} --tabs --no-header-row --names ko,contig_id --out-file ${prefix}_ko_per_contig.tsv.gz
+    csvtk cut --num-cpus ${task.cpus} --tabs --no-header-row --fields 1,3 | \\
+    csvtk freq --num-cpus ${task.cpus} --tabs --no-header-row --fields 1,2 --reverse --sort-by-freq | \\
+    csvtk add-header --num-cpus ${task.cpus} --tabs --no-header-row --names ko,description,count | \\
+    csvtk cut --num-cpus ${task.cpus} --tabs --fields count,ko,description --out-file ${prefix}_ko_summary.tsv.gz
+
+    gunzip -c ${hmmscan_concatenated_tblout} | hmmscan_tblout_to_tsv.py | \\
+    csvtk cut --num-cpus ${task.cpus} --tabs --no-header-row --fields 1,2 | \\
+    csvtk add-header --num-cpus ${task.cpus} --tabs --no-header-row --names ko,contig_id --out-file ${prefix}_ko_per_contig.tsv.gz
+
+    # gunzip -c ${hmmscan_concatenated_tblout} | hmmscan_tblout_to_tsv.py | \\
+    # tee \\
+    #     >(csvtk cut --num-cpus ${task.cpus} --tabs --no-header-row --fields 1,3 | \\
+    #       csvtk freq --num-cpus ${task.cpus} --tabs --no-header-row --fields 1,2 --reverse --sort-by-freq | \\
+    #       csvtk add-header --num-cpus ${task.cpus} --tabs --no-header-row --names ko,description,count | \\
+    #       csvtk cut --num-cpus ${task.cpus} --tabs --fields count,ko,description --out-file ${prefix}_ko_summary.tsv.gz
+    #     ) | \\
+    #     csvtk cut --num-cpus ${task.cpus} --tabs --no-header-row --fields 1,2 | \\
+    #     csvtk add-header --num-cpus ${task.cpus} --tabs --no-header-row --names ko,contig_id --out-file ${prefix}_ko_per_contig.tsv.gz
 
     cat <<-END_VERSIONS > versions.yml
     "${task.process}":
