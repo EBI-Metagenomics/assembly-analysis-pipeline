@@ -66,4 +66,4 @@ if __name__ == "__main__":
     )
     args = parser.parse_args()
 
-    convert_ko_per_contig(args.input_file, args.output_file)
+    convert_ko_per_contig(args.input, args.output)
