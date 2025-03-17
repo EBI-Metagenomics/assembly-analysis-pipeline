@@ -33,7 +33,7 @@ process INTERPRO_SUMMARY {
     csvtk cut --tabs --no-header-row --fields 12,13 | \\
     csvtk freq --tabs --no-header-row --fields 1,2 --reverse --sort-by-freq | \\
     csvtk add-header --tabs --no-header-row --names interpro_accession,description,count | \\
-    csvtk cut --tabs --fields count,interpro_accession,description > ${prefix}_intepro_summary.tsv.gz
+    csvtk cut --tabs --fields count,interpro_accession,description --out-file ${prefix}_intepro_summary.tsv.gz
 
     cat <<-END_VERSIONS > versions.yml
     "${task.process}":
