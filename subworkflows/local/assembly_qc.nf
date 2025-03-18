@@ -19,9 +19,7 @@ workflow ASSEMBLY_QC {
         ch_assembly
     )
 
-    // TODOs:
-    // Check 5 trimming, ambigous bases and other bits
-    // Decont for human stuff
+    // TODO: add the decontamination module
 
     ch_versions = ch_versions.mix(PRE_FILTER_STATS.out.versions)
 
