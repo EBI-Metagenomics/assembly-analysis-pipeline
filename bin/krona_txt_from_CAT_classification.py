@@ -31,7 +31,7 @@ def main():
 
     lineage_counter = Counter()
 
-    with open(args.input_file) as infile:
+    with open(args.cat_output) as infile:
         reader = csv.reader(infile, delimiter='\t')
         next(reader)  # Skip the header row
         for row in reader:
@@ -56,7 +56,7 @@ def main():
                 lineage = "\t".join(taxon_parts) if taxon_parts else "unclassified"
             lineage_counter[lineage] += 1
 
-    with open(args.output_file, "w") as outfile:
+    with open(args.krona_txt, "w") as outfile:
         for lineage, count in lineage_counter.items():
             outfile.write(f"{count}\t{lineage}\n")
 
