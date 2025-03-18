@@ -62,8 +62,6 @@ workflow FUNCTIONAL_ANNOTATION {
     )
     ch_versions = ch_versions.mix(CONCATENATE_INTERPROSCAN_TSV.out.versions)
 
-    // TODO: review Eggnog - it is late and I think I'm mixing orth and annotations up
-
     /*
      * EggNOG mapper results are concatenated (TSV and GFF) and passed on to downstream tools:
      * - GO Slim subworkflow
@@ -155,15 +153,14 @@ workflow FUNCTIONAL_ANNOTATION {
     DIAMOND_RHEACHEBI(
         ch_proteins_faa,
         file(params.uniref90rhea_diamond_database, checkIfExists: true),
-        file(params.rheachebi_mapping_tsv, checkIfExists: true),
-        "qseqid sseqid evalue bitscore stitle",
+        file(params.rheachebi_mapping_tsv, checkIfExists: true)
     )
 
     /*
      * KEGG Orthologous annotation. This step uses hmmscan to annotation the sequences aginst the kofam HMM models.
      * These HMM models have been extended as described -> TODO: link to the mgnify_pipelines_reference_databases pipeline
     */
-    // TODO: check the split size in v5
+    // TODO: check the split size in v5 - it's taking a long time ATM (the longest on my tests)
     HMMSCAN_KOFAMS(
         ch_protein_splits.map { meta, faa ->
             {
@@ -200,7 +197,6 @@ workflow FUNCTIONAL_ANNOTATION {
         ch_dbcan
     }
 
-    // TODO: should we chunk?
     DBCAN(
         ch_dbcan.faa,
         ch_dbcan.gff,

@@ -10,7 +10,6 @@ process DIAMOND_RHEACHEBI {
     tuple val(meta) , path(fasta)
     path(db)
     path(rhea2chebi)
-    val blast_columns
 
     output:
     tuple val(meta), path("*_rhea2proteins.tsv.gz"), emit: rhea2proteins_tsv
@@ -21,8 +20,6 @@ process DIAMOND_RHEACHEBI {
 
     script:
     def prefix = task.ext.prefix ?: "${meta.id}"
-    def columns = blast_columns ? "${blast_columns}" : ''
-    def outfmt = '6' // txt
     def is_compressed = fasta.getExtension() == "gz" ? true : false
     def fasta_name = is_compressed ? fasta.getBaseName() : fasta
     """
@@ -40,7 +37,7 @@ process DIAMOND_RHEACHEBI {
         -k 0 \\
         --db ${db} \\
         --query ${fasta} \\
-        --outfmt ${outfmt} ${columns} | \\
+        --outfmt 6 qseqid sseqid evalue bitscore salltitles | \\
     add_rhea_chebi_annotation_patched.py \\
         --diamond_hits - \\
         --proteins ${fasta_name} \\
