@@ -15,13 +15,13 @@ process CATPACK_CONTIGS {
     tuple val(meta5), path(diamond_table)
 
     output:
-    tuple val(meta), path("*.ORF2LCA.txt"), emit: orf2lca
-    tuple val(meta), path("*.contig2classification.txt"), emit: contig2classification
-    tuple val(meta), path("*.log"), emit: log
-    tuple val(meta), path("*.diamond"), optional: true, emit: diamond
-    tuple val(meta), path("*.predicted_proteins.faa"), optional: true, emit: faa
-    tuple val(meta), path("*.gff"), optional: true, emit: gff
-    path "versions.yml", emit: versions
+    tuple val(meta), path("*.ORF2LCA.txt.gz"),                            emit: orf2lca
+    tuple val(meta), path("*.contig2classification.txt.gz"),              emit: contig2classification
+    tuple val(meta), path("*.log.gz"),                                    emit: log
+    tuple val(meta), path("*.diamond"),                   optional: true, emit: diamond
+    tuple val(meta), path("*.predicted_proteins.faa.gz"), optional: true, emit: faa
+    tuple val(meta), path("*.gff.gz"),                    optional: true, emit: gff
+    path "versions.yml",                                                  emit: versions
 
     when:
     task.ext.when == null || task.ext.when
@@ -41,6 +41,20 @@ process CATPACK_CONTIGS {
         ${premade_proteins} \\
         ${premade_table} \\
         ${args}
+
+    gzip ${prefix}.ORF2LCA.txt
+    gzip ${prefix}.contig2classification.txt
+
+    # Check the optional files
+    if [ -f "${prefix}.log" ]; then
+        gzip "${prefix}.log"
+    fi
+    if [ -f "${prefix}.faa" ]; then
+        gzip "${prefix}.faa"
+    fi
+    if [ -f "${prefix}.gff" ]; then
+        gzip "${prefix}.gff"
+    fi
 
     cat <<-END_VERSIONS > versions.yml
     "${task.process}":
