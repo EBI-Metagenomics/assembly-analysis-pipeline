@@ -38,7 +38,10 @@ process DBCAN {
     def args = task.ext.args ?: ''
     prefix = task.ext.prefix ?: "${meta.id}"
     """
+    # TODO: post the gunzips to the nf module
     gunzip ${fasta}
+    gunzip ${gff}
+
     run_dbcan \\
         --dia_cpu ${task.cpus} \\
         --hmm_cpu ${task.cpus} \\

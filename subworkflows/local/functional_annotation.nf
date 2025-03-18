@@ -189,7 +189,6 @@ workflow FUNCTIONAL_ANNOTATION {
     )
     ch_versions = ch_versions.mix(KEGGPATHWAYSCOMPLETENESS.out.versions)
 
-    // TODO: Do we need to consolidate the GFF before DBCan?
     ch_proteins_faa.join( ch_proteins_gff ).multiMap { meta, faa, gff ->
         faa: [meta, faa]
         gff: [meta, gff]
@@ -200,8 +199,8 @@ workflow FUNCTIONAL_ANNOTATION {
     DBCAN(
         ch_dbcan.faa,
         ch_dbcan.gff,
-        file(params.dbcan_database, checkIfExists: true),
-        "protein" // the DBCAN mode
+        [file(params.dbcan_database, checkIfExists: true), params.dbcan_database_version],
+        "protein" // mode
     )
     ch_versions = ch_versions.mix(DBCAN.out.versions)
 
