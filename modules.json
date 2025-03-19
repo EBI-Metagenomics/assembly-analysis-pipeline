@@ -29,8 +29,7 @@
                     "pyrodigal": {
                         "branch": "master",
                         "git_sha": "938e803109104e30773f76a7142442722498fef1",
-                        "installed_by": ["modules"],
-                        "patch": "modules/nf-core/pyrodigal/pyrodigal.diff"
+                        "installed_by": ["modules"]
                     },
                     "seqkit/seq": {
                         "branch": "master",
@@ -85,7 +84,7 @@
                     },
                     "combinedgenecaller/merge": {
                         "branch": "main",
-                        "git_sha": "e33ec070bdeac12f8a79ff1742992a7aa557d039",
+                        "git_sha": "b84a0c52b92eef58ba2aeb2d22ae45d5bc6ae294",
                         "installed_by": ["combined_gene_caller"]
                     },
                     "dbcan/dbcan": {
@@ -154,9 +153,9 @@
                         "git_sha": "fb9a33114fe9083dc5b203fc4608825a9c51fdf6",
                         "installed_by": ["goslim_swf"]
                     },
-                    "prodigal": {
+                    "pyrodigal": {
                         "branch": "main",
-                        "git_sha": "c4a0701311843a95aea81c97c48dcfccb9b638de",
+                        "git_sha": "62a62db0834d95722de5a155778d70074b211dd6",
                         "installed_by": ["combined_gene_caller"]
                     },
                     "sanntis": {
@@ -175,12 +174,12 @@
                 "ebi-metagenomics": {
                     "combined_gene_caller": {
                         "branch": "main",
-                        "git_sha": "e33ec070bdeac12f8a79ff1742992a7aa557d039",
+                        "git_sha": "b84a0c52b92eef58ba2aeb2d22ae45d5bc6ae294",
                         "installed_by": ["subworkflows"]
                     },
                     "contigs_taxonomic_classification": {
                         "branch": "main",
-                        "git_sha": "0f14803147e378a670e94970421b248fa2ee2829",
+                        "git_sha": "489db3d33a99055f04088080e9b65a9237286afa",
                         "installed_by": ["subworkflows"]
                     },
                     "goslim_swf": {

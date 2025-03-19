@@ -3,8 +3,8 @@ process COMBINEDGENECALLER_MERGE {
     label 'process_single'
 
     container "${ workflow.containerEngine == 'singularity' && !task.ext.singularity_pull_docker_container ?
-        'oras://community.wave.seqera.io/library/pip_biopython_intervaltree:79ad05207693a92d':
-        'community.wave.seqera.io/library/pip_biopython_intervaltree:ffe95e598c911ae0' }"
+        'https://depot.galaxyproject.org/singularity/mgnify-pipelines-toolkit:1.0.1--pyhdfd78af_0':
+        'biocontainers/mgnify-pipelines-toolkit:1.0.1--pyhdfd78af_0' }"
 
     input:
     tuple val(meta), path(pyrodigal_gff, stageAs: "pyrodigal/"), path(pyrodigal_ffn, stageAs: "pyrodigal/"), path(pyrodigal_faa, stageAs: "pyrodigal/"), path(fgs_gff, stageAs: "fgsrs/"), path(fgs_ffn, stageAs: "fgsrs/"), path(fgs_faa, stageAs: "fgsrs/"), path(mask)
@@ -67,7 +67,7 @@ process COMBINEDGENECALLER_MERGE {
         gunzip ${mask}
     fi
 
-    combined_gene_caller_merge.py \\
+    combined_gene_caller_merge \\
         ${args} \\
         -n ${prefix} \\
         --pyrodigal-gff ${pyrodigal_gff_file} \\
@@ -88,9 +88,9 @@ process COMBINEDGENECALLER_MERGE {
     stub:
     def prefix = task.ext.prefix ?: "${meta.id}"
     """
-    touch ${prefix}.{faa,ffn,out}
+    touch ${prefix}.{faa,ffn,gff}
 
-    gzip -n ${prefix}.{faa,ffn,out}
+    gzip -n ${prefix}.{faa,ffn,gff}
 
     cat <<-END_VERSIONS > versions.yml
     "${task.process}":

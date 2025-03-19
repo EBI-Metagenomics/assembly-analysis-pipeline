@@ -97,30 +97,6 @@ workflow FUNCTIONAL_ANNOTATION {
     )
     ch_versions = ch_versions.mix(CONCATENATE_EGGNOGMAPPER_ANNOTATIONS.out.versions.first())
 
-    //************************************************//
-    //                    Summaries                   //
-    //***********************************************//
-
-    /*
-     * Process the interproscan TSV and extract the Pfam entries counts
-    */
-    PFAM_SUMMARY(
-        CONCATENATE_INTERPROSCAN_TSV.out.file_out
-    )
-    ch_versions = ch_versions.mix(PFAM_SUMMARY.out.versions)
-
-    /*
-     * Process the interproscan TSV and extract the InterProScan counts
-    */
-    INTERPRO_SUMMARY(
-        CONCATENATE_INTERPROSCAN_TSV.out.file_out
-    )
-    ch_versions = ch_versions.mix(INTERPRO_SUMMARY.out.versions)
-
-    //*********************************************//
-    //              More annotations              //
-    //********************************************//
-
     CONCATENATE_INTERPROSCAN_GFFS(
         INTERPROSCAN.out.gff3.groupTuple()
     )
@@ -157,6 +133,24 @@ workflow FUNCTIONAL_ANNOTATION {
     )
 
     /*
+     * DBCan - CAZymes
+    */
+    ch_proteins_faa.join( ch_proteins_gff ).multiMap { meta, faa, gff ->
+        faa: [meta, faa]
+        gff: [meta, gff]
+    }.set {
+        ch_dbcan
+    }
+
+    DBCAN(
+        ch_dbcan.faa,
+        ch_dbcan.gff,
+        [file(params.dbcan_database, checkIfExists: true), params.dbcan_database_version],
+        "protein" // mode
+    )
+    ch_versions = ch_versions.mix(DBCAN.out.versions)
+
+    /*
      * KEGG Orthologous annotation. This step uses hmmscan to annotation the sequences aginst the kofam HMM models.
      * These HMM models have been extended as described -> TODO: link to the mgnify_pipelines_reference_databases pipeline
     */
@@ -179,6 +173,26 @@ workflow FUNCTIONAL_ANNOTATION {
     )
     ch_versions = ch_versions.mix(CONCATENATE_HMMSARCH_TBLOUT.out.versions)
 
+    //************************************************//
+    //                    Summaries                   //
+    //***********************************************//
+
+    /*
+     * Process the interproscan TSV and extract the Pfam entries counts
+    */
+    PFAM_SUMMARY(
+        CONCATENATE_INTERPROSCAN_TSV.out.file_out
+    )
+    ch_versions = ch_versions.mix(PFAM_SUMMARY.out.versions)
+
+    /*
+     * Process the interproscan TSV and extract the InterProScan counts
+    */
+    INTERPRO_SUMMARY(
+        CONCATENATE_INTERPROSCAN_TSV.out.file_out
+    )
+    ch_versions = ch_versions.mix(INTERPRO_SUMMARY.out.versions)
+
     KEGG_ORTHOLOGS_SUMMARY(
         CONCATENATE_HMMSARCH_TBLOUT.out.file_out
     )
@@ -188,21 +202,6 @@ workflow FUNCTIONAL_ANNOTATION {
         KEGG_ORTHOLOGS_SUMMARY.out.ko_per_contig_tsv
     )
     ch_versions = ch_versions.mix(KEGGPATHWAYSCOMPLETENESS.out.versions)
-
-    ch_proteins_faa.join( ch_proteins_gff ).multiMap { meta, faa, gff ->
-        faa: [meta, faa]
-        gff: [meta, gff]
-    }.set {
-        ch_dbcan
-    }
-
-    DBCAN(
-        ch_dbcan.faa,
-        ch_dbcan.gff,
-        [file(params.dbcan_database, checkIfExists: true), params.dbcan_database_version],
-        "protein" // mode
-    )
-    ch_versions = ch_versions.mix(DBCAN.out.versions)
 
     emit:
     interproscan_tsv  = CONCATENATE_INTERPROSCAN_TSV.out.file_out
