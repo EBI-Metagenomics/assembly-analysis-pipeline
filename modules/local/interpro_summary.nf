@@ -4,15 +4,17 @@ process INTERPRO_SUMMARY {
     label 'process_single'
 
     container "${ workflow.containerEngine == 'singularity' && !task.ext.singularity_pull_docker_container ?
-        'https://depot.galaxyproject.org/singularity/csvtk:0.31.0--h9ee0642_0':
-        'biocontainers/csvtk:0.31.0--h9ee0642_0' }"
+        'oras://community.wave.seqera.io/library/csvtk_tabix_pip_biopython:e6e033af2a05a562':
+        'community.wave.seqera.io/library/csvtk_tabix_pip_biopython:7eabdb397e7420a3' }"
 
     input:
     tuple val(meta), path(interproscan_tsv)
 
+    // The gzi are optional, it's possible that the summaries are empty and in that case the .gzi are not created
     output:
-    tuple val(meta), path("${prefix}_intepro_summary.tsv.gz"), emit: interpro_summary
-    path "versions.yml"                                      , emit: versions
+    tuple val(meta), path("${prefix}_intepro_summary.tsv.gz"),                  emit: interpro_summary
+    tuple val(meta), path("${prefix}_intepro_summary.tsv.gzi"), optional: true, emit: interpro_summary_gzi
+    path "versions.yml",                                                        emit: versions
 
     when:
     task.ext.when == null || task.ext.when
@@ -33,11 +35,12 @@ process INTERPRO_SUMMARY {
     csvtk cut --tabs --no-header-row --fields 12,13 | \\
     csvtk freq --tabs --no-header-row --fields 1,2 --reverse --sort-by-freq | \\
     csvtk add-header --tabs --no-header-row --names interpro_accession,description,count | \\
-    csvtk cut --tabs --fields count,interpro_accession,description --out-file ${prefix}_intepro_summary.tsv.gz
+    csvtk cut --tabs --fields count,interpro_accession,description | bgzip -@${task.cpus} > ${prefix}_intepro_summary.tsv.gz
 
     cat <<-END_VERSIONS > versions.yml
     "${task.process}":
         csvtk: \$(echo \$( csvtk version | sed -e "s/csvtk v//g" ))
+        tabix: \$(echo \$(tabix -h 2>&1) | sed 's/^.*Version: //; s/ .*\$//')
     END_VERSIONS
     """
 
@@ -48,6 +51,7 @@ process INTERPRO_SUMMARY {
     cat <<-END_VERSIONS > versions.yml
     "${task.process}":
         csvtk: \$(echo \$( csvtk version | sed -e "s/csvtk v//g" ))
+        tabix: \$(echo \$(tabix -h 2>&1) | sed 's/^.*Version: //; s/ .*\$//')
     END_VERSIONS
     """
 }

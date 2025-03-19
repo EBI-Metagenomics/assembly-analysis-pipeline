@@ -3,18 +3,20 @@ process KEGG_ORTHOLOGS_SUMMARY {
     tag "$meta.id"
     label 'process_single'
 
-    // TODO: create image with csvtk and biopython on quay
     container "${ workflow.containerEngine == 'singularity' && !task.ext.singularity_pull_docker_container ?
-        'oras://community.wave.seqera.io/library/csvtk_pip_biopython:251498c060995b91':
-        'community.wave.seqera.io/library/csvtk_pip_biopython:e8661a0f869190e7' }"
+        'oras://community.wave.seqera.io/library/csvtk_tabix_pip_biopython:e6e033af2a05a562':
+        'community.wave.seqera.io/library/csvtk_tabix_pip_biopython:7eabdb397e7420a3' }"
 
     input:
     tuple val(meta), path(hmmscan_concatenated_tblout)
 
+    // The gzi are optional, it's possible that the summaries are empty and in that case the .gzi are not created
     output:
-    tuple val(meta), path("${prefix}_ko_summary.tsv.gz"),    emit: ko_summary_tsv
-    tuple val(meta), path("${prefix}_ko_per_contig.tsv.gz"), emit: ko_per_contig_tsv
-    path "versions.yml"                                    , emit: versions
+    tuple val(meta), path("${prefix}_ko_summary.tsv.gz"),                     emit: ko_summary_tsv
+    tuple val(meta), path("${prefix}_ko_summary.tsv.gzi"),    optional: true, emit: ko_summary_tsv_gzi
+    tuple val(meta), path("${prefix}_ko_per_contig.tsv.gz"),                  emit: ko_per_contig_tsv
+    tuple val(meta), path("${prefix}_ko_per_contig.tsv.gzi"), optional: true, emit: ko_per_contig_tsb_gzi
+    path "versions.yml",                                                      emit: versions
 
     when:
     task.ext.when == null || task.ext.when
@@ -23,7 +25,7 @@ process KEGG_ORTHOLOGS_SUMMARY {
     prefix = task.ext.prefix ?: "${meta.id}"
     """
     # This pipeline performs the following steps:
-    # 1. Decompresses the hmmscan_concatenated_tblout file using gunzip
+    # 1. Decompresses the hmmscan_concatenated_tblout file using bgzip (useful for streaming it on the website)
     # 2. Runs the hmmscan_tblout_to_tsv.py script and pipes the output
     # 3. Splits the output into two separate streams using tee:
     #    - stream 1: Extracts the first and third fields (KO ID and KO description),
@@ -41,15 +43,16 @@ process KEGG_ORTHOLOGS_SUMMARY {
         >(csvtk cut --num-cpus ${task.cpus} --tabs --no-header-row --fields 1,3 | \\
           csvtk freq --num-cpus ${task.cpus} --tabs --no-header-row --fields 1,2 --reverse --sort-by-freq | \\
           csvtk add-header --num-cpus ${task.cpus} --tabs --no-header-row --names ko,description,count | \\
-          csvtk cut --num-cpus ${task.cpus} --tabs --fields count,ko,description --out-file ${prefix}_ko_summary.tsv.gz
+          csvtk cut --num-cpus ${task.cpus} --tabs --fields count,ko,description | bgzip -@${task.cpus} > ${prefix}_ko_summary.tsv.gz
         ) | \\
         csvtk cut --num-cpus ${task.cpus} --tabs --no-header-row --fields 1,2 | \\
-        csvtk add-header --num-cpus ${task.cpus} --tabs --no-header-row --names ko,contig_id --out-file ${prefix}_ko_per_contig.tsv.gz
+        csvtk add-header --num-cpus ${task.cpus} --tabs --no-header-row --names ko,contig_id | bgzip -@${task.cpus} > ${prefix}_ko_per_contig.tsv.gz
 
     cat <<-END_VERSIONS > versions.yml
     "${task.process}":
         biopython: \$(python -c "import Bio; print(Bio.__version__)")
         csvtk: \$(echo \$( csvtk version | sed -e "s/csvtk v//g" ))
+        tabix: \$(echo \$(tabix -h 2>&1) | sed 's/^.*Version: //; s/ .*\$//')
     END_VERSIONS
     """
 
@@ -62,6 +65,7 @@ process KEGG_ORTHOLOGS_SUMMARY {
     "${task.process}":
         biopython: \$(python -c "import Bio; print(Bio.__version__)")
         csvtk: \$(echo \$( csvtk version | sed -e "s/csvtk v//g" ))
+        tabix: \$(echo \$(tabix -h 2>&1) | sed 's/^.*Version: //; s/ .*\$//')
     END_VERSIONS
     """
 }
