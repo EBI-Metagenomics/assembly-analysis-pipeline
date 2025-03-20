@@ -25,9 +25,11 @@ process CATPACK_ADDNAMES {
         error("Input and output names are the same, set prefix in module configuration to disambiguate!")
     }
     """
+    gunzip ${input}
+
     CAT_pack add_names \\
         ${args} \\
-        -i ${input} \\
+        -i ${input.name.replace(".gz", "")} \\
         -t ${taxonomy} \\
         -o ${prefix}.txt
 
