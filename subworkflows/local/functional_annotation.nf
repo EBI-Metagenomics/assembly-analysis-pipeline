@@ -4,6 +4,7 @@ include { DIAMOND_RHEACHEBI                               } from '../../modules/
 include { CAT_CAT as CONCATENATE_EGGNOGMAPPER_ORTHOLOGOUS } from '../../modules/nf-core/cat/cat/main'
 include { CAT_CAT as CONCATENATE_EGGNOGMAPPER_ANNOTATIONS } from '../../modules/nf-core/cat/cat/main'
 include { CAT_CAT as CONCATENATE_INTERPROSCAN_TSV         } from '../../modules/nf-core/cat/cat/main'
+include { CAT_CAT as CONCATENATE_DBCAN_OVERVIEW           } from '../../modules/nf-core/cat/cat/main'
 include { CAT_CAT as CONCATENATE_HMMSEARCH_TBLOUT         } from '../../modules/nf-core/cat/cat/main'
 
 /* EBI-METAGENOMICS */
@@ -12,16 +13,16 @@ include { EGGNOGMAPPER as EGGNOGMAPPER_ORTHOLOGS   } from '../../modules/ebi-met
 include { EGGNOGMAPPER as EGGNOGMAPPER_ANNOTATIONS } from '../../modules/ebi-metagenomics/eggnogmapper/main'
 include { GENOMEPROPERTIES                         } from '../../modules/ebi-metagenomics/genomeproperties/main'
 include { DBCAN                                    } from '../../modules/ebi-metagenomics/dbcan/dbcan/main'
-
 include { GOSLIM_SWF                               } from '../../subworkflows/ebi-metagenomics/goslim_swf/main'
 
 /* LOCAL */
-include { CONCATENATE_GFFS                        } from '../../modules/local/concatenate_gffs'
-include { PFAM_SUMMARY                            } from '../../modules/local/pfam_summary'
-include { INTERPRO_SUMMARY                        } from '../../modules/local/interpro_summary'
-include { HMMER_HMMSEARCH as HMMSEARCH_KOFAMS     } from '../../modules/nf-core/hmmer/hmmsearch/main'
-include { KEGG_ORTHOLOGS_SUMMARY                  } from '../../modules/local/kegg_orthologs_summary'
-include { KEGGPATHWAYSCOMPLETENESS                } from '../../modules/ebi-metagenomics/keggpathwayscompleteness/main'
+include { CONCATENATE_GFFS as CONCATENATE_INTERPROSCAN_GFFS } from '../../modules/local/concatenate_gffs'
+include { CONCATENATE_GFFS as CONCATENATE_DBCAN_GFFS        } from '../../modules/local/concatenate_gffs'
+include { PFAM_SUMMARY                                      } from '../../modules/local/pfam_summary'
+include { INTERPRO_SUMMARY                                  } from '../../modules/local/interpro_summary'
+include { HMMER_HMMSEARCH as HMMSEARCH_KOFAMS               } from '../../modules/nf-core/hmmer/hmmsearch/main'
+include { KEGG_ORTHOLOGS_SUMMARY                            } from '../../modules/local/kegg_orthologs_summary'
+include { KEGGPATHWAYSCOMPLETENESS                          } from '../../modules/ebi-metagenomics/keggpathwayscompleteness/main'
 
 
 workflow FUNCTIONAL_ANNOTATION {
@@ -34,6 +35,10 @@ workflow FUNCTIONAL_ANNOTATION {
 
     def ch_proteins_faa = ch_predicted_proteins.map { meta, faa, _gff -> [meta, faa] }
     def ch_proteins_gff = ch_predicted_proteins.map { meta, _faa, gff -> [meta, gff] }
+
+    /*********************/
+    /* PROTEINS CHUNKING */
+    /*********************/
 
     // Chunk the fasta into files with at most >= params
     SEQKIT_SPLIT2(
@@ -97,10 +102,10 @@ workflow FUNCTIONAL_ANNOTATION {
     )
     ch_versions = ch_versions.mix(CONCATENATE_EGGNOGMAPPER_ANNOTATIONS.out.versions.first())
 
-    CONCATENATE_GFFS(
+    CONCATENATE_INTERPROSCAN_GFFS(
         INTERPROSCAN.out.gff3.groupTuple()
     )
-    ch_versions = ch_versions.mix(CONCATENATE_GFFS.out.versions)
+    ch_versions = ch_versions.mix(CONCATENATE_INTERPROSCAN_GFFS.out.versions)
 
     GENOMEPROPERTIES(
         CONCATENATE_INTERPROSCAN_TSV.out.file_out
@@ -133,9 +138,9 @@ workflow FUNCTIONAL_ANNOTATION {
     )
 
     /*
-     * DBCan - CAZymes
+     * DBCan
     */
-    ch_proteins_faa.join( ch_proteins_gff ).multiMap { meta, faa, gff ->
+    ch_protein_splits.join( ch_proteins_gff ).multiMap { meta, faa, gff ->
         faa: [meta, faa]
         gff: [meta, gff]
     }.set {
@@ -149,6 +154,17 @@ workflow FUNCTIONAL_ANNOTATION {
         "protein" // mode
     )
     ch_versions = ch_versions.mix(DBCAN.out.versions)
+
+    CONCATENATE_DBCAN_GFFS(
+        DBCAN.out.cgc_gff.groupTuple()
+    )
+    ch_versions = ch_versions.mix(CONCATENATE_DBCAN_GFFS.out.versions)
+
+    // TODO: the header is repeated here
+    CONCATENATE_DBCAN_OVERVIEW(
+        DBCAN.out.overview_output.groupTuple()
+    )
+    ch_versions = ch_versions.mix(CONCATENATE_DBCAN_OVERVIEW.out.versions)
 
     /*
      * KEGG Orthologous annotation. This step uses hmmscan to annotation the sequences aginst the kofam HMM models.
@@ -198,6 +214,6 @@ workflow FUNCTIONAL_ANNOTATION {
 
     emit:
     interproscan_tsv  = CONCATENATE_INTERPROSCAN_TSV.out.file_out
-    interproscan_gff3 = CONCATENATE_GFFS.out.concatenated_gff
+    interproscan_gff3 = CONCATENATE_INTERPROSCAN_GFFS   .out.concatenated_gff
     versions          = ch_versions
 }
