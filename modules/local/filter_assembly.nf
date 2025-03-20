@@ -11,8 +11,8 @@ process FILTER_ASSEMBLY {
     tuple val(meta), path(assembly)
 
     output:
-    tuple val(meta), path("${prefix}_filtered.fasta.gz") , emit: fastx
-    path "versions.yml"                            , emit: versions
+    tuple val(meta), path("${prefix}_filtered.fasta.gz") , emit: fasta
+    path "versions.yml"                                  , emit: versions
 
     when:
     task.ext.when == null || task.ext.when
@@ -40,7 +40,7 @@ process FILTER_ASSEMBLY {
     """
 
     stub:
-    prefix          = task.ext.prefix ?: "${meta.id}"
+    prefix = task.ext.prefix ?: "${meta.id}"
     """
     touch ${prefix}_filtered.fasta.gz
 
