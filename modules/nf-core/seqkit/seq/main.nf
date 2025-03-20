@@ -12,8 +12,8 @@ process SEQKIT_SEQ {
     tuple val(meta), path(fastx)
 
     output:
-    tuple val(meta), path("${prefix}.*")    , emit: fastx
-    path "versions.yml"                     , emit: versions
+    tuple val(meta), path("${prefix}_qc.fasta.gz") , emit: fastx
+    path "versions.yml"                            , emit: versions
 
     when:
     task.ext.when == null || task.ext.when
@@ -27,16 +27,20 @@ process SEQKIT_SEQ {
         extension   = "fasta"
     }
     extension       = fastx.toString().endsWith('.gz') ? "${extension}.gz" : extension
-    def call_gzip   = extension.endsWith('.gz') ? "| gzip -c $args2" : ''
     if("${prefix}.${extension}" == "$fastx") error "Input and output names are the same, use \"task.ext.prefix\" to disambiguate!"
     """
     seqkit \\
         seq \\
         --threads $task.cpus \\
         $args \\
-        $fastx \\
-        $call_gzip \\
-        > ${prefix}.${extension}
+        $fastx | \\
+    seqkit fx2tab \\
+        --threads $task.cpus \\
+        --base-content N | \\
+    awk '\$3 < 10' | \\
+    seqkit tab2fx \\
+        --threads $task.cpus \\
+        --out-file ${prefix}_qc.fasta.gz
 
     cat <<-END_VERSIONS > versions.yml
     "${task.process}":
