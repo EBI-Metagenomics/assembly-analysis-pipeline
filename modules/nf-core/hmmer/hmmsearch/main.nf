@@ -28,6 +28,8 @@ process HMMER_HMMSEARCH {
     target_summary = write_target    ? "--tblout ${prefix}.tbl" : ''
     domain_summary = write_domain    ? "--domtblout ${prefix}.domtbl" : ''
     """
+    gunzip ${seqdb}
+
     hmmsearch \\
         $args \\
         --cpu $task.cpus \\
@@ -36,7 +38,7 @@ process HMMER_HMMSEARCH {
         $target_summary \\
         $domain_summary \\
         $hmmfile \\
-        $seqdb
+        ${seqdb.name.replace(".gz", "")}
 
     gzip --no-name *.txt \\
         ${write_align ? '*.sto' : ''} \\
