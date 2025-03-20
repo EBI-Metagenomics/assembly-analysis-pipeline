@@ -12,9 +12,9 @@ process INTERPRO_SUMMARY {
 
     // The gzi are optional, it's possible that the summaries are empty and in that case the .gzi are not created
     output:
-    tuple val(meta), path("${prefix}_intepro_summary.tsv.gz"),                  emit: interpro_summary
-    tuple val(meta), path("${prefix}_intepro_summary.tsv.gzi"), optional: true, emit: interpro_summary_gzi
-    path "versions.yml",                                                        emit: versions
+    tuple val(meta), path("${prefix}_intepro_summary.tsv.gz"),     emit: interpro_summary
+    tuple val(meta), path("${prefix}_intepro_summary.tsv.gz.gzi"), emit: interpro_summary_gzi
+    path "versions.yml",                                           emit: versions
 
     when:
     task.ext.when == null || task.ext.when
@@ -29,13 +29,15 @@ process INTERPRO_SUMMARY {
     # . Counts the frequency of the IPS accessions (we use accession and description because we need the description too)
     # . Adds headers ('interpro_accession', 'description' and 'count') the TSV.
     # . Inverts the columns - we need count to the be first
+    # . The TSV is compressed with bgzip (which is fully compatible with gzip), the index is (.gzi) used on the website.
 
     csvtk fix-quotes --tabs --no-header-row ${interproscan_tsv} | \\
     csvtk filter2 --tabs --no-header-row --filter '\$12 != "" && \$12 != "-"' | \\
     csvtk cut --tabs --no-header-row --fields 12,13 | \\
     csvtk freq --tabs --no-header-row --fields 1,2 --reverse --sort-by-freq | \\
     csvtk add-header --tabs --no-header-row --names interpro_accession,description,count | \\
-    csvtk cut --tabs --fields count,interpro_accession,description | bgzip -@${task.cpus} > ${prefix}_intepro_summary.tsv.gz
+    csvtk cut --tabs --fields count,interpro_accession,description | \\
+    bgzip --stdout -@${task.cpus} --index --index-name ${prefix}_intepro_summary.tsv.gz.gzi > ${prefix}_intepro_summary.tsv.gz
 
     cat <<-END_VERSIONS > versions.yml
     "${task.process}":

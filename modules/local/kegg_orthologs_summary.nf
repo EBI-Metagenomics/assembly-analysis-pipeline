@@ -10,13 +10,12 @@ process KEGG_ORTHOLOGS_SUMMARY {
     input:
     tuple val(meta), path(hmmscan_concatenated_tblout)
 
-    // The gzi are optional, it's possible that the summaries are empty and in that case the .gzi are not created
     output:
-    tuple val(meta), path("${prefix}_ko_summary.tsv.gz"),                     emit: ko_summary_tsv
-    tuple val(meta), path("${prefix}_ko_summary.tsv.gzi"),    optional: true, emit: ko_summary_tsv_gzi
-    tuple val(meta), path("${prefix}_ko_per_contig.tsv.gz"),                  emit: ko_per_contig_tsv
-    tuple val(meta), path("${prefix}_ko_per_contig.tsv.gzi"), optional: true, emit: ko_per_contig_tsb_gzi
-    path "versions.yml",                                                      emit: versions
+    tuple val(meta), path("${prefix}_ko_summary.tsv.gz"),        emit: ko_summary_tsv
+    tuple val(meta), path("${prefix}_ko_summary.tsv.gz.gzi"),    emit: ko_summary_tsv_gzi
+    tuple val(meta), path("${prefix}_ko_per_contig.tsv.gz"),     emit: ko_per_contig_tsv
+    tuple val(meta), path("${prefix}_ko_per_contig.tsv.gz.gzi"), emit: ko_per_contig_tsb_gzi
+    path "versions.yml",                                         emit: versions
 
     when:
     task.ext.when == null || task.ext.when
@@ -33,6 +32,8 @@ process KEGG_ORTHOLOGS_SUMMARY {
     #                adds header names, reorders the fields, and saves the result to ${prefix}_ko_summary.tsv
     #    - stream 2: Extracts the first and second fields (KO ID and contig ID)
     #                and saves the result to ${prefix}_ko_per_contig.tsv - this file will be be downstream in the pipeline
+    # Both TSV files are compressed with bgzip, and an index is created. The compressed files are compatible with gz, the index is
+    # used on the website.
 
     # If there is a retry csvtk will fail with the files already exist
     rm -f ${prefix}_ko_per_contig.tsv.gz || true
@@ -43,10 +44,12 @@ process KEGG_ORTHOLOGS_SUMMARY {
         >(csvtk cut --num-cpus ${task.cpus} --tabs --no-header-row --fields 1,3 | \\
           csvtk freq --num-cpus ${task.cpus} --tabs --no-header-row --fields 1,2 --reverse --sort-by-freq | \\
           csvtk add-header --num-cpus ${task.cpus} --tabs --no-header-row --names ko,description,count | \\
-          csvtk cut --num-cpus ${task.cpus} --tabs --fields count,ko,description | bgzip -@${task.cpus} > ${prefix}_ko_summary.tsv.gz
+          csvtk cut --num-cpus ${task.cpus} --tabs --fields count,ko,description | \\
+          bgzip --stdout -@${task.cpus} --index --index-name ${prefix}_ko_summary.tsv.gz.gzi > ${prefix}_ko_summary.tsv.gz
         ) | \\
         csvtk cut --num-cpus ${task.cpus} --tabs --no-header-row --fields 1,2 | \\
-        csvtk add-header --num-cpus ${task.cpus} --tabs --no-header-row --names ko,contig_id | bgzip -@${task.cpus} > ${prefix}_ko_per_contig.tsv.gz
+        csvtk add-header --num-cpus ${task.cpus} --tabs --no-header-row --names ko,contig_id | \\
+        bgzip --stdout -@${task.cpus} --index --index-name ${prefix}_ko_per_contig.tsv.gz.gzi > ${prefix}_ko_per_contig.tsv.gz
 
     cat <<-END_VERSIONS > versions.yml
     "${task.process}":
