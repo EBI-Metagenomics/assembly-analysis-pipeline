@@ -157,7 +157,7 @@
                 },
                 "kofam_hmm_database": {
                     "type": "string",
-                    "format": "directory-path",
+                    "format": "file-path",
                     "description": "TODO",
                     "fa_icon": "fas fa-database",
                     "help_text": "TODO"

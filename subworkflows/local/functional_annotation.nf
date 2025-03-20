@@ -16,7 +16,7 @@ include { DBCAN                                    } from '../../modules/ebi-met
 include { GOSLIM_SWF                               } from '../../subworkflows/ebi-metagenomics/goslim_swf/main'
 
 /* LOCAL */
-include { CONCATENATE_INTERPROSCAN_GFFS           } from '../../modules/local/concatenate_interproscan_gffs'
+include { CONCATENATE_GFFS                        } from '../../modules/local/concatenate_gffs'
 include { PFAM_SUMMARY                            } from '../../modules/local/pfam_summary'
 include { INTERPRO_SUMMARY                        } from '../../modules/local/interpro_summary'
 include { HMMER_HMMSEARCH as HMMSEARCH_KOFAMS     } from '../../modules/nf-core/hmmer/hmmsearch/main'
@@ -97,10 +97,10 @@ workflow FUNCTIONAL_ANNOTATION {
     )
     ch_versions = ch_versions.mix(CONCATENATE_EGGNOGMAPPER_ANNOTATIONS.out.versions.first())
 
-    CONCATENATE_INTERPROSCAN_GFFS(
+    CONCATENATE_GFFS(
         INTERPROSCAN.out.gff3.groupTuple()
     )
-    ch_versions = ch_versions.mix(CONCATENATE_INTERPROSCAN_GFFS.out.versions)
+    ch_versions = ch_versions.mix(CONCATENATE_GFFS.out.versions)
 
     GENOMEPROPERTIES(
         CONCATENATE_INTERPROSCAN_TSV.out.file_out
@@ -157,7 +157,7 @@ workflow FUNCTIONAL_ANNOTATION {
     HMMSEARCH_KOFAMS(
         ch_protein_splits.map { meta, faa ->
             {
-                [meta, file("${params.kofam_hmm_database}/*.hmm*", checkIfExists: true), faa, true, true] // boolean flags are: write tblout and domtbl
+                [meta, file(params.kofam_hmm_database, checkIfExists: true), faa, false, true, true] // boolean flags are: write alingment, tblout and domtbl
             }
         }
     )
@@ -198,6 +198,6 @@ workflow FUNCTIONAL_ANNOTATION {
 
     emit:
     interproscan_tsv  = CONCATENATE_INTERPROSCAN_TSV.out.file_out
-    interproscan_gff3 = CONCATENATE_INTERPROSCAN_GFFS.out.concatenated_gff
+    interproscan_gff3 = CONCATENATE_GFFS.out.concatenated_gff
     versions          = ch_versions
 }
