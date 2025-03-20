@@ -12,7 +12,7 @@ process FILTER_ASSEMBLY {
 
     output:
     tuple val(meta), path("${prefix}_filtered.fasta.gz") , emit: fastx
-    path "versions.yml"                            , emit: versions
+    path "versions.yml"                                  , emit: versions
 
     when:
     task.ext.when == null || task.ext.when
