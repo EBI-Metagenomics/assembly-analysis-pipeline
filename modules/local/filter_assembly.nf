@@ -40,7 +40,7 @@ process FILTER_ASSEMBLY {
     """
 
     stub:
-    prefix          = task.ext.prefix ?: "${meta.id}"
+    prefix = task.ext.prefix ?: "${meta.id}"
     """
     touch ${prefix}_filtered.fasta.gz
 
