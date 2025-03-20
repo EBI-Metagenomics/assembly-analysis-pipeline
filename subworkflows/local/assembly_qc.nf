@@ -36,12 +36,12 @@ workflow ASSEMBLY_QC {
 
     // Post filter stats //
     POST_FILTER_STATS(
-        FILTER_ASSEMBLY.out.fastx
+        FILTER_ASSEMBLY.out.fasta
     )
 
     ch_versions = ch_versions.mix(FILTER_ASSEMBLY.out.versions)
 
     emit:
-    assembly_filtered = FILTER_ASSEMBLY.out.fastx
+    assembly_filtered = FILTER_ASSEMBLY.out.fasta
     versions          = ch_versions
 }

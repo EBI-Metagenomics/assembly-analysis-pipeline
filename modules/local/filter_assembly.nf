@@ -11,7 +11,7 @@ process FILTER_ASSEMBLY {
     tuple val(meta), path(assembly)
 
     output:
-    tuple val(meta), path("${prefix}_filtered.fasta.gz") , emit: fastx
+    tuple val(meta), path("${prefix}_filtered.fasta.gz") , emit: fasta
     path "versions.yml"                                  , emit: versions
 
     when:
