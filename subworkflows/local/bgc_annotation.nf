@@ -1,5 +1,6 @@
 /* NF-CORE */
 include { SEQKIT_SEQ as SEQKIT_SEQ_BGC } from '../../modules/nf-core/seqkit/seq/main'
+include { SEQKIT_SPLIT2                } from '../../modules/nf-core/seqkit/split2/main'
 include { ANTISMASH_ANTISMASHLITE      } from '../../modules/nf-core/antismash/antismashlite/main'
 
 /* EBI-METAGENOMICS */
@@ -21,12 +22,16 @@ workflow BGC_ANNOTATION {
     SEQKIT_SEQ_BGC(
         ch_contigs_and_predicted_proteins.map {  meta, fasta, _faa, _gff, _ips_tsv -> [ meta, fasta ] }
     )
-
     ch_versions = ch_versions.mix(SEQKIT_SEQ_BGC.out.versions)
 
-    def ch_chunked_assembly_fasta = SEQKIT_SEQ_BGC.out.fastx.transpose()
+    // Chunk the fasta into files with at most >= params
+    SEQKIT_SPLIT2(
+        SEQKIT_SEQ_BGC.out.fastx,
+        params.bgc_contigs_chunksize
+    )
 
-    // TODO: Filter also the GFF
+    def ch_chunked_assembly_fasta = SEQKIT_SPLIT2.transpose()
+
     ch_chunked_assembly_fasta.join(ch_contigs_and_predicted_proteins).multiMap { meta, chunked_fasta, _fasta, _faa, gff, ips_tsv ->
         fasta: [meta, chunked_fasta]
         ips_tsv: [meta, ips_tsv]

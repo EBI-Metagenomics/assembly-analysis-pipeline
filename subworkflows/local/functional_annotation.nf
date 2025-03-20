@@ -4,7 +4,7 @@ include { DIAMOND_RHEACHEBI                               } from '../../modules/
 include { CAT_CAT as CONCATENATE_EGGNOGMAPPER_ORTHOLOGOUS } from '../../modules/nf-core/cat/cat/main'
 include { CAT_CAT as CONCATENATE_EGGNOGMAPPER_ANNOTATIONS } from '../../modules/nf-core/cat/cat/main'
 include { CAT_CAT as CONCATENATE_INTERPROSCAN_TSV         } from '../../modules/nf-core/cat/cat/main'
-include { CAT_CAT as CONCATENATE_HMMSARCH_TBLOUT          } from '../../modules/nf-core/cat/cat/main'
+include { CAT_CAT as CONCATENATE_HMMSEARCH_TBLOUT         } from '../../modules/nf-core/cat/cat/main'
 
 /* EBI-METAGENOMICS */
 include { INTERPROSCAN                             } from '../../modules/ebi-metagenomics/interproscan/main'
@@ -19,7 +19,7 @@ include { GOSLIM_SWF                               } from '../../subworkflows/eb
 include { CONCATENATE_INTERPROSCAN_GFFS           } from '../../modules/local/concatenate_interproscan_gffs'
 include { PFAM_SUMMARY                            } from '../../modules/local/pfam_summary'
 include { INTERPRO_SUMMARY                        } from '../../modules/local/interpro_summary'
-include { HMMER_HMMSCAN as HMMSCAN_KOFAMS         } from '../../modules/local/hmmer/hmmscan/main'
+include { HMMER_HMMSEARCH as HMMSEARCH_KOFAMS     } from '../../modules/nf-core/hmmer/hmmsearch/main'
 include { KEGG_ORTHOLOGS_SUMMARY                  } from '../../modules/local/kegg_orthologs_summary'
 include { KEGGPATHWAYSCOMPLETENESS                } from '../../modules/ebi-metagenomics/keggpathwayscompleteness/main'
 
@@ -154,47 +154,40 @@ workflow FUNCTIONAL_ANNOTATION {
      * KEGG Orthologous annotation. This step uses hmmscan to annotation the sequences aginst the kofam HMM models.
      * These HMM models have been extended as described -> TODO: link to the mgnify_pipelines_reference_databases pipeline
     */
-    // TODO: check the split size in v5 - it's taking a long time ATM (the longest on my tests)
-    HMMSCAN_KOFAMS(
+    HMMSEARCH_KOFAMS(
         ch_protein_splits.map { meta, faa ->
             {
                 [meta, file("${params.kofam_hmm_database}/*.hmm*", checkIfExists: true), faa, true, true] // boolean flags are: write tblout and domtbl
             }
         }
     )
-    ch_versions = ch_versions.mix(HMMSCAN_KOFAMS.out.versions)
+    ch_versions = ch_versions.mix(HMMSEARCH_KOFAMS.out.versions)
 
     /*
     * We concatenate the tblout together, this file is not valid as it has the comments too (the ones that start with #)
     * but because the pipeline processes this file subsequently in this pipeline, this doesn't matter
     */
-    CONCATENATE_HMMSARCH_TBLOUT(
-        HMMSCAN_KOFAMS.out.target_summary.groupTuple()
+    CONCATENATE_HMMSEARCH_TBLOUT(
+        HMMSEARCH_KOFAMS.out.target_summary.groupTuple()
     )
-    ch_versions = ch_versions.mix(CONCATENATE_HMMSARCH_TBLOUT.out.versions)
+    ch_versions = ch_versions.mix(CONCATENATE_HMMSEARCH_TBLOUT.out.versions)
 
     //************************************************//
     //                    Summaries                   //
     //***********************************************//
 
-    /*
-     * Process the interproscan TSV and extract the Pfam entries counts
-    */
     PFAM_SUMMARY(
         CONCATENATE_INTERPROSCAN_TSV.out.file_out
     )
     ch_versions = ch_versions.mix(PFAM_SUMMARY.out.versions)
 
-    /*
-     * Process the interproscan TSV and extract the InterProScan counts
-    */
     INTERPRO_SUMMARY(
         CONCATENATE_INTERPROSCAN_TSV.out.file_out
     )
     ch_versions = ch_versions.mix(INTERPRO_SUMMARY.out.versions)
 
     KEGG_ORTHOLOGS_SUMMARY(
-        CONCATENATE_HMMSARCH_TBLOUT.out.file_out
+        CONCATENATE_HMMSEARCH_TBLOUT.out.file_out
     )
     ch_versions = ch_versions.mix(KEGG_ORTHOLOGS_SUMMARY.out.versions)
 
