@@ -6,12 +6,14 @@ include { CAT_CAT as CONCATENATE_EGGNOGMAPPER_ANNOTATIONS } from '../../modules/
 include { CAT_CAT as CONCATENATE_INTERPROSCAN_TSV         } from '../../modules/nf-core/cat/cat/main'
 include { CAT_CAT as CONCATENATE_DBCAN_OVERVIEW           } from '../../modules/nf-core/cat/cat/main'
 include { CAT_CAT as CONCATENATE_HMMSEARCH_TBLOUT         } from '../../modules/nf-core/cat/cat/main'
+// TODO: this is temporal to create a bgzip and index for the goslim summaries
+include { TABIX_BGZIP as TABIX_BGZIP_GO                   } from '../../modules/nf-core/tabix/bgzip/main'
+include { TABIX_BGZIP as TABIX_BGZIP_GOSLIM               } from '../../modules/nf-core/tabix/bgzip/main'
 
 /* EBI-METAGENOMICS */
 include { INTERPROSCAN                             } from '../../modules/ebi-metagenomics/interproscan/main'
 include { EGGNOGMAPPER as EGGNOGMAPPER_ORTHOLOGS   } from '../../modules/ebi-metagenomics/eggnogmapper/main'
 include { EGGNOGMAPPER as EGGNOGMAPPER_ANNOTATIONS } from '../../modules/ebi-metagenomics/eggnogmapper/main'
-include { GENOMEPROPERTIES                         } from '../../modules/ebi-metagenomics/genomeproperties/main'
 include { DBCAN                                    } from '../../modules/ebi-metagenomics/dbcan/dbcan/main'
 include { GOSLIM_SWF                               } from '../../subworkflows/ebi-metagenomics/goslim_swf/main'
 
@@ -107,11 +109,6 @@ workflow FUNCTIONAL_ANNOTATION {
     )
     ch_versions = ch_versions.mix(CONCATENATE_INTERPROSCAN_GFFS.out.versions)
 
-    GENOMEPROPERTIES(
-        CONCATENATE_INTERPROSCAN_TSV.out.file_out
-    )
-    ch_versions = ch_versions.mix(GENOMEPROPERTIES.out.versions)
-
     /*
      * Get GO term and GO-slim term counts out of an InterProScan .tsv output file
      * We ran GOSLIM once per assembly, hence the groupTuple (the IPS results are one per chunk )
@@ -122,8 +119,18 @@ workflow FUNCTIONAL_ANNOTATION {
         file(params.goslim_ids, checkIfExists: true),
         file(params.go_banding, checkIfExists: true),
     )
-
     ch_versions = ch_versions.mix(GOSLIM_SWF.out.versions)
+
+    // TODO: remove this once GOSLIM_SWF produces bgzip/index tsvs
+    TABIX_BGZIP_GO(
+        GOSLIM_SWF.out.go_summary
+    )
+    ch_versions = ch_versions.mix(TABIX_BGZIP_GO.out.versions)
+    TABIX_BGZIP_GOSLIM(
+        GOSLIM_SWF.out.goslim_summary
+    )
+    ch_versions = ch_versions.mix(TABIX_BGZIP_GOSLIM.out.versions)
+
 
     /*
      * Assign Rhea and CHEBI tags to the proteins.
@@ -214,6 +221,6 @@ workflow FUNCTIONAL_ANNOTATION {
 
     emit:
     interproscan_tsv  = CONCATENATE_INTERPROSCAN_TSV.out.file_out
-    interproscan_gff3 = CONCATENATE_INTERPROSCAN_GFFS   .out.concatenated_gff
+    interproscan_gff3 = CONCATENATE_INTERPROSCAN_GFFS.out.concatenated_gff
     versions          = ch_versions
 }

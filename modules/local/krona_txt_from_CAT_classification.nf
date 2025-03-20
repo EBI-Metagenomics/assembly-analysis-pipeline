@@ -15,7 +15,7 @@ process KRONA_TXT_FROM_CAT_CLASSIFICATION {
 
     script:
     """
-    krona_txt_from_CAT_classification.py \\
+    krona_txt_from_cat_classification.py \\
         -i ${cat_output} \\
         -o ${meta.id}.krona.txt
 

@@ -57,7 +57,7 @@ def main():
             lineage_counter[lineage] += 1
 
     with open(args.krona_txt, "w") as outfile:
-        for lineage, count in lineage_counter.items():
+        for lineage, count in lineage_counter.most_common():
             outfile.write(f"{count}\t{lineage}\n")
 
 if __name__ == "__main__":

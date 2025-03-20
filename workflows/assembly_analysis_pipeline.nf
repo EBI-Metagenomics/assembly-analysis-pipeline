@@ -33,9 +33,9 @@ include { CONTIGS_TAXONOMIC_CLASSIFICATION  } from '../subworkflows/ebi-metageno
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 */
 
+include { RENAME_CONTIGS        } from '../modules/local/rename_contigs'
 include { FUNCTIONAL_ANNOTATION } from '../subworkflows/local/functional_annotation'
-include { BGC_ANNOTATION        } from '../subworkflows/local/bgc_annotation'
-include { RENAME_CONTIGS        } from '../modules/local/rename_contigs.nf'
+include { PATHWAYS_AND_SYSTEMS  } from '../subworkflows/local/pathways_and_systems'
 
 /*
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -103,6 +103,7 @@ workflow ASSEMBLY_ANALYSIS_PIPELINE {
     /*
      * Taxonomic classification of the contigs with CATPACK
     */
+    // TOOD: handle gzip files in this subworkflow instead of uncompress this files
     CONTIGS_TAXONOMIC_CLASSIFICATION(
         PIGZ_CONTIGS(ASSEMBLY_QC.out.assembly_filtered).file,
         PIGZ_PROTEINS(COMBINED_GENE_CALLER.out.faa).file,
@@ -113,7 +114,6 @@ workflow ASSEMBLY_ANALYSIS_PIPELINE {
 
     /*
     * Annotation of the proteins.
-    * The pipeline has two main modules: the functional and biosynthetic gene clusters (BGC) annotations.
     */
     FUNCTIONAL_ANNOTATION(
         COMBINED_GENE_CALLER.out.faa.join( COMBINED_GENE_CALLER.out.gff )
@@ -121,11 +121,9 @@ workflow ASSEMBLY_ANALYSIS_PIPELINE {
     ch_versions = ch_versions.mix(FUNCTIONAL_ANNOTATION.out.versions)
 
     /*
-    * BGC annotations
+    * Pathway and systems annotations
     */
-    // FIXME: there is an issue with the GFF - antiSMASH doesn't like the one we currently provide
-    // FIXME: enable SanntiS after - https://github.com/EBI-Metagenomics/nf-modules/pull/81
-    BGC_ANNOTATION(
+    PATHWAYS_AND_SYSTEMS(
         ASSEMBLY_QC.out.assembly_filtered.join(
             COMBINED_GENE_CALLER.out.faa
         ).join(
@@ -134,7 +132,7 @@ workflow ASSEMBLY_ANALYSIS_PIPELINE {
             FUNCTIONAL_ANNOTATION.out.interproscan_tsv
         )
     )
-    ch_versions = ch_versions.mix(BGC_ANNOTATION.out.versions)
+    ch_versions = ch_versions.mix(PATHWAYS_AND_SYSTEMS.out.versions)
 
     //
     // Collate and save software versions

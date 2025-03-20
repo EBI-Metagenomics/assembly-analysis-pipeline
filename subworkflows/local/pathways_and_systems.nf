@@ -5,13 +5,13 @@ include { ANTISMASH_ANTISMASHLITE      } from '../../modules/nf-core/antismash/a
 
 /* EBI-METAGENOMICS */
 include { SANNTIS                      } from '../../modules/ebi-metagenomics/sanntis/main'
+include { GENOMEPROPERTIES             } from '../../modules/ebi-metagenomics/genomeproperties/main'
 
 /* LOCAL */
 include { ANTISMASH_JSON_TO_GFF        } from '../../modules/local/antismash_json_to_gff'
 include { CONCATENATE_GFFS             } from '../../modules/local/concatenate_gffs'
 
-
-workflow BGC_ANNOTATION {
+workflow PATHWAYS_AND_SYSTEMS {
 
     take:
     ch_contigs_and_predicted_proteins // tule (meta, fasta, faa, gff, ips_tsv)
@@ -19,6 +19,11 @@ workflow BGC_ANNOTATION {
     main:
 
     ch_versions = Channel.empty()
+
+    GENOMEPROPERTIES(
+        ch_contigs_and_predicted_proteins.map { meta, _fasta, _faa, _gff, interpro_tsv -> [meta, interpro_tsv] }
+    )
+    ch_versions = ch_versions.mix(GENOMEPROPERTIES.out.versions)
 
     /*
     * For BGC the pipeline uses a different min contig size
