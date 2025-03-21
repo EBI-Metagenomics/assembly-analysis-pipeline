@@ -120,51 +120,42 @@ if __name__ == "__main__":
         
     # ----- Assemble tsv table ----- #
 
-    # constants = {
-    #     "start" : 0,
-    #     "end" : 0,
-    #     "strandedness" : 1,
-    #     "taxonomy" = ""
-    # }
-    
-    # for cds in CDSs:
-    #     if cds in KEGGs:
-    #         rank = "C"
-    #     elif cds in Pfams:
-    #         rank = "D"
-    #     else:
-    #         rank = "E"
-
-    # test if this works without "constants" field
     table_header = ["", "fasta", "scaffold", "gene_position", "kegg_id", "kegg_hit", "pfam_hits", "cazy_hits"]
-    # table_header = ["", "fasta", "scaffold", "gene_position", "start_position", "end_position", 
-    #     "strandedness", "rank", "kegg_id", "kegg_hit", "pfam_hits", "cazy_hits", "bin_taxonomy"]
-
+    functional_summary = []
+    
     for MGYA in MGYAs:
         all_contigs = MGYAs[MGYA]
-        
-        output_matrix = pd.DataFrame("", index=all_contigs, columns=table_header)
         for contig in all_contigs:
-            output_matrix.at[contig, "fasta"] = MGYA + "_" + contig
-            output_matrix.at[contig, "scaffold"] = MGYA
-            output_matrix.at[contig, "gene_position"] = contig
+            rowList = []
+            rowList.extend([
+                contig,
+                MGYA + "_" + contig,  # fasta
+                MGYA,                 # scaffold
+                contig                # gene_position
+            ])
+            try:
+                rowList.extend([
+                    KEGGs[contig],                    # kegg_id
+                    contigs_KEGGs_description[contig] # kegg_hit
+                ])
+            except KeyError:
+                rowList.extend(["", ""])
+            try:
+                rowList.append(
+                    Pfams[contig] # pfam_hits
+                )
+            except KeyError:
+                rowList.append("")
+            try:
+                rowList.append(
+                    CAZys[contig] # kegg_hit
+                )
+            except KeyError:
+                rowList.append("")
 
-            try:
-                output_matrix.at[contig, "kegg_id"] = KEGGs[contig]
-                output_matrix.at[contig, "kegg_hit"] = contigs_KEGGs_description[contig]
-            except KeyError:
-                pass
-            try:
-                output_matrix.at[contig, "pfam_hits"] = Pfams[contig]
-            except KeyError:
-                pass
-
-            try:
-                output_matrix.at[contig, "cazy_hits"] = CAZys[MGYA_contig]
-            except KeyError:
-                pass
+            functional_summary.append(rowList)
 
     # add mechanism to join more tbales together
 
-    output_matrix.to_csv("DRAM_input.tsv", sep='\t', header=True, index=False)
-
+    output_matrix = pd.DataFrame(functional_summary, index=all_contigs, columns=table_header)
+    output_matrix.to_csv("summary_for_DRAM.tsv", sep='\t', header=True, index=False)
