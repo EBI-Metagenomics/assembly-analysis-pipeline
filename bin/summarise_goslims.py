@@ -61,15 +61,14 @@ def parse_args():
 def parse_mapped_gaf_file(gaf_file: Path) -> defaultdict[set]:
     mapped_go_dict = defaultdict(set)
     if os.path.exists(gaf_file):
-        handle = open(gaf_file, "r")
-        for line in handle:
-            if not line.startswith("!"):
-                line = line.strip()
-                splitted_line = line.split("\t")
-                go_id = splitted_line[1]
-                mapped_go_id = splitted_line[4]
-                mapped_go_dict[go_id].add(mapped_go_id)
-
+        with open(gaf_file, "r") as handle:
+            for line in handle:
+                if not line.startswith("!"):
+                    line = line.strip()
+                    fields = line.split("\t")
+                    go_id = fields[1]
+                    mapped_go_id = fields[4]
+                    mapped_go_dict[go_id].add(mapped_go_id)
     return mapped_go_dict
 
 
