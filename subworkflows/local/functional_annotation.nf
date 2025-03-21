@@ -9,6 +9,7 @@ include { CAT_CAT as CONCATENATE_HMMSEARCH_TBLOUT         } from '../../modules/
 // TODO: this is temporal to create a bgzip and index for the goslim summaries
 include { TABIX_BGZIP as TABIX_BGZIP_GO                   } from '../../modules/nf-core/tabix/bgzip/main'
 include { TABIX_BGZIP as TABIX_BGZIP_GOSLIM               } from '../../modules/nf-core/tabix/bgzip/main'
+include { TABIX_BGZIP as TABIX_BGZIP_RHEADCHEBI           } from '../../modules/nf-core/tabix/bgzip/main'
 
 /* EBI-METAGENOMICS */
 include { INTERPROSCAN                             } from '../../modules/ebi-metagenomics/interproscan/main'
@@ -24,7 +25,6 @@ include { PFAM_SUMMARY                                      } from '../../module
 include { INTERPRO_SUMMARY                                  } from '../../modules/local/interpro_summary'
 include { HMMER_HMMSEARCH as HMMSEARCH_KOFAMS               } from '../../modules/nf-core/hmmer/hmmsearch/main'
 include { KEGG_ORTHOLOGS_SUMMARY                            } from '../../modules/local/kegg_orthologs_summary'
-include { KEGGPATHWAYSCOMPLETENESS                          } from '../../modules/ebi-metagenomics/keggpathwayscompleteness/main'
 
 
 workflow FUNCTIONAL_ANNOTATION {
@@ -143,6 +143,12 @@ workflow FUNCTIONAL_ANNOTATION {
         file(params.uniref90rhea_diamond_database, checkIfExists: true),
         file(params.rheachebi_mapping_tsv, checkIfExists: true)
     )
+    ch_versions = ch_versions.mix(DIAMOND_RHEACHEBI.out.versions)
+
+    TABIX_BGZIP_RHEADCHEBI(
+        DIAMOND_RHEACHEBI.out.rhea2proteins_tsv
+    )
+    ch_versions = ch_versions.mix(TABIX_BGZIP_RHEADCHEBI.out.versions)
 
     /*
      * DBCan
@@ -214,13 +220,9 @@ workflow FUNCTIONAL_ANNOTATION {
     )
     ch_versions = ch_versions.mix(KEGG_ORTHOLOGS_SUMMARY.out.versions)
 
-    KEGGPATHWAYSCOMPLETENESS(
-        KEGG_ORTHOLOGS_SUMMARY.out.ko_per_contig_tsv
-    )
-    ch_versions = ch_versions.mix(KEGGPATHWAYSCOMPLETENESS.out.versions)
-
     emit:
-    interproscan_tsv  = CONCATENATE_INTERPROSCAN_TSV.out.file_out
-    interproscan_gff3 = CONCATENATE_INTERPROSCAN_GFFS.out.concatenated_gff
-    versions          = ch_versions
+    interproscan_tsv            = CONCATENATE_INTERPROSCAN_TSV.out.file_out
+    interproscan_gff3           = CONCATENATE_INTERPROSCAN_GFFS.out.concatenated_gff
+    kegg_orthologs_summary_tsv  = KEGG_ORTHOLOGS_SUMMARY.out.ko_per_contig_tsv
+    versions                    = ch_versions
 }

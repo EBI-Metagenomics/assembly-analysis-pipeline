@@ -130,7 +130,8 @@ workflow ASSEMBLY_ANALYSIS_PIPELINE {
             COMBINED_GENE_CALLER.out.gff
         ).join(
             FUNCTIONAL_ANNOTATION.out.interproscan_tsv
-        )
+        ),
+        FUNCTIONAL_ANNOTATION.out.kegg_orthologs_summary_tsv
     )
     ch_versions = ch_versions.mix(PATHWAYS_AND_SYSTEMS.out.versions)
 
@@ -145,7 +146,6 @@ workflow ASSEMBLY_ANALYSIS_PIPELINE {
             newLine: true,
         )
         .set { ch_collated_versions }
-
 
     //
     // MODULE: MultiQC

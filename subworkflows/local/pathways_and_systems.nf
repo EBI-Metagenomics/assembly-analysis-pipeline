@@ -1,8 +1,8 @@
 /* NF-CORE */
-include { SEQKIT_SEQ as SEQKIT_SEQ_BGC } from '../../modules/nf-core/seqkit/seq/main'
-include { SEQKIT_SPLIT2                } from '../../modules/nf-core/seqkit/split2/main'
-include { ANTISMASH_ANTISMASHLITE      } from '../../modules/nf-core/antismash/antismashlite/main'
-
+include { SEQKIT_SEQ as SEQKIT_SEQ_BGC                        } from '../../modules/nf-core/seqkit/seq/main'
+include { SEQKIT_SPLIT2                                       } from '../../modules/nf-core/seqkit/split2/main'
+include { ANTISMASH_ANTISMASHLITE                             } from '../../modules/nf-core/antismash/antismashlite/main'
+include { TABIX_BGZIP as TABIX_BGZIP_KEGGPATHWAYSCOMPLETENESS } from '../../modules/nf-core/tabix/bgzip/main'
 /* EBI-METAGENOMICS */
 include { SANNTIS                      } from '../../modules/ebi-metagenomics/sanntis/main'
 include { GENOMEPROPERTIES             } from '../../modules/ebi-metagenomics/genomeproperties/main'
@@ -10,15 +10,28 @@ include { GENOMEPROPERTIES             } from '../../modules/ebi-metagenomics/ge
 /* LOCAL */
 include { ANTISMASH_JSON_TO_GFF        } from '../../modules/local/antismash_json_to_gff'
 include { CONCATENATE_GFFS             } from '../../modules/local/concatenate_gffs'
+include { KEGGPATHWAYSCOMPLETENESS     } from '../../modules/ebi-metagenomics/keggpathwayscompleteness/main'
+
 
 workflow PATHWAYS_AND_SYSTEMS {
 
     take:
-    ch_contigs_and_predicted_proteins // tule (meta, fasta, faa, gff, ips_tsv)
+    ch_contigs_and_predicted_proteins // tuple (meta, fasta, faa, gff, ips_tsv)
+    ch_kegg_orthologs_summary_tsv     // tuple (meta, kos_summary_tsv)
 
     main:
 
     ch_versions = Channel.empty()
+
+    KEGGPATHWAYSCOMPLETENESS(
+        ch_kegg_orthologs_summary_tsv
+    )
+    ch_versions = ch_versions.mix(KEGGPATHWAYSCOMPLETENESS.out.versions)
+
+    TABIX_BGZIP_KEGGPATHWAYSCOMPLETENESS(
+        KEGGPATHWAYSCOMPLETENESS.out.kegg_pathways
+    )
+    ch_versions = ch_versions.mix(TABIX_BGZIP_KEGGPATHWAYSCOMPLETENESS.out.versions)
 
     GENOMEPROPERTIES(
         ch_contigs_and_predicted_proteins.map { meta, _fasta, _faa, _gff, interpro_tsv -> [meta, interpro_tsv] }
