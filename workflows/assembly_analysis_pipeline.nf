@@ -24,6 +24,7 @@ include { ASSEMBLY_QC                      } from '../subworkflows/local/assembl
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 */
 include { RRNA_EXTRACTION                   } from '../subworkflows/ebi-metagenomics/rrna_extraction/main'
+include { DETECT_RNA                        } from '../subworkflows/ebi-metagenomics/detect_rna/main'
 include { COMBINED_GENE_CALLER              } from '../subworkflows/ebi-metagenomics/combined_gene_caller/main'
 include { CONTIGS_TAXONOMIC_CLASSIFICATION  } from '../subworkflows/ebi-metagenomics/contigs_taxonomic_classification/main'
 
@@ -76,11 +77,19 @@ workflow ASSEMBLY_ANALYSIS_PIPELINE {
      * rRNAs
     */
     RRNA_EXTRACTION(
-        ch_assembly,
+        RENAME_CONTIGS.out.renamed_fasta,
         file(params.rrnas_rfam_covariance_model, checkIfExists: true),
         file(params.rrnas_rfam_claninfo, checkIfExists: true)
     )
     ch_versions = ch_versions.mix(RRNA_EXTRACTION.out.versions)
+
+    // TODO: testing cmsearch against the whole of Rfam
+    DETECT_RNA(
+        RENAME_CONTIGS.out.renamed_fasta,
+        params.rfam_cm,
+        params.rfam_claninfo,
+        "cmsearch"
+    )
 
     /*
     * Protein prediction with the combined-gene-caller, and masking the rRNAs genes
