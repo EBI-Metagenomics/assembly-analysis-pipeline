@@ -38,6 +38,7 @@ workflow PATHWAYS_AND_SYSTEMS {
         SEQKIT_SEQ_BGC.out.fastx,
         params.bgc_contigs_chunksize
     )
+    ch_versions = ch_versions.mix(SEQKIT_SPLIT2.out.versions)
 
     def ch_chunked_assembly_fasta = SEQKIT_SPLIT2.out.assembly.transpose()
 
