@@ -16,8 +16,8 @@ process SUMMARISEGOSLIMS {
 
     output:
     tuple val(meta), path("*_summary.tsv"), emit: go_summary
-    tuple val(meta), path("*_slim.tsv"),    emit: goslim_summary
-    path "versions.yml",                    emit: versions
+    tuple val(meta), path("*_slim.tsv")   , emit: goslim_summary
+    path "versions.yml"                   , emit: versions
 
     when:
     task.ext.when == null || task.ext.when
