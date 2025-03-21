@@ -1,4 +1,4 @@
-process HMMER_HMMSCAN {
+process HMMER_HMMSEARCH {
     tag "$meta.id"
     label 'process_medium'
 
@@ -8,9 +8,11 @@ process HMMER_HMMSCAN {
         'biocontainers/hmmer:3.4--hdbdd923_1' }"
 
     input:
-    tuple val(meta), path(hmmfile), path(seqdb), val(write_target), val(write_domain)
+    tuple val(meta), path(hmmfile), path(seqdb), val(write_align), val(write_target), val(write_domain)
 
     output:
+    tuple val(meta), path('*.txt.gz')   , emit: output
+    tuple val(meta), path('*.sto.gz')   , emit: alignments    , optional: true
     tuple val(meta), path('*.tbl.gz')   , emit: target_summary, optional: true
     tuple val(meta), path('*.domtbl.gz'), emit: domain_summary, optional: true
     path "versions.yml"                 , emit: versions
@@ -21,43 +23,50 @@ process HMMER_HMMSCAN {
     script:
     def args       = task.ext.args   ?: ''
     def prefix     = task.ext.prefix ?: "${meta.id}"
+    output         = "${prefix}.txt"
+    alignment      = write_align     ? "-A ${prefix}.sto" : ''
     target_summary = write_target    ? "--tblout ${prefix}.tbl" : ''
     domain_summary = write_domain    ? "--domtblout ${prefix}.domtbl" : ''
     """
-    HMMDB=`find -L ./ -name "*.hmm"`
+    gunzip ${seqdb}
 
-    hmmscan \\
-        --noali \\
-        --cut_ga \\
+    hmmsearch \\
         $args \\
         --cpu $task.cpus \\
+        -o $output \\
+        $alignment \\
         $target_summary \\
         $domain_summary \\
-        \$HMMDB \\
-        $seqdb > /dev/null
+        $hmmfile \\
+        ${seqdb.name.replace(".gz", "")}
 
-    gzip --no-name ${write_target ? '*.tbl' : ''} \\
+    gzip --no-name *.txt \\
+        ${write_align ? '*.sto' : ''} \\
+        ${write_target ? '*.tbl' : ''} \\
         ${write_domain ? '*.domtbl' : ''}
 
     cat <<-END_VERSIONS > versions.yml
     "${task.process}":
-        hmmer: \$(hmmscan -h | grep -o '^# HMMER [0-9.]*' | sed 's/^# HMMER *//')
+        hmmer: \$(hmmsearch -h | grep -o '^# HMMER [0-9.]*' | sed 's/^# HMMER *//')
     END_VERSIONS
     """
 
     stub:
     def prefix = task.ext.prefix ?: "${meta.id}"
     """
+    touch "${prefix}.txt"
     ${write_align ? "touch ${prefix}.sto" : ''} \\
     ${write_target ? "touch ${prefix}.tbl" : ''} \\
     ${write_domain ? "touch ${prefix}.domtbl" : ''}
 
-    gzip --no-name  ${write_target ? '*.tbl' : ''} \\
+    gzip --no-name *.txt \\
+        ${write_align ? '*.sto' : ''} \\
+        ${write_target ? '*.tbl' : ''} \\
         ${write_domain ? '*.domtbl' : ''}
 
     cat <<-END_VERSIONS > versions.yml
     "${task.process}":
-        hmmer: \$(hmmscan -h | grep -o '^# HMMER [0-9.]*' | sed 's/^# HMMER *//')
+        hmmer: \$(hmmsearch -h | grep -o '^# HMMER [0-9.]*' | sed 's/^# HMMER *//')
     END_VERSIONS
     """
 }

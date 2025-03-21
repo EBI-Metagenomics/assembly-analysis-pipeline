@@ -1,8 +1,12 @@
-include { DIAMOND_BLASTP                    } from '../../../modules/ebi-metagenomics/diamond/blastp/main'
-include { CATPACK_CONTIGS                   } from '../../../modules/ebi-metagenomics/catpack/contigs/main'
-include { CATPACK_ADDNAMES                  } from '../../../modules/ebi-metagenomics/catpack/addnames/main'
-include { KRONA_TXT_FROM_CAT_CLASSIFICATION } from '../../../modules/local/krona_txt_from_CAT_classification.nf'
-include { KRONA_KTIMPORTTEXT                } from '../../../modules/nf-core/krona/ktimporttext/main'
+include { DIAMOND_BLASTP                     } from '../../../modules/ebi-metagenomics/diamond/blastp/main'
+include { CATPACK_CONTIGS                    } from '../../../modules/ebi-metagenomics/catpack/contigs/main'
+/* Extension, this will be merge into nf-modules */
+include { CATPACK_ADDNAMES                   } from '../../../modules/local/catpack/addnames/main'
+include { KRONA_TXT_FROM_CAT_CLASSIFICATION  } from '../../../modules/local/krona_txt_from_cat_classification'
+include { KRONA_KTIMPORTTEXT                 } from '../../../modules/local/krona/ktimporttext/main'
+
+// TODO: this is an extension to generate a bgzip file (used on the website)
+include { TABIX_BGZIP as TABIX_BGZIP_KRONATXT } from '../../../modules/nf-core/tabix/bgzip/main'
 
 workflow CONTIGS_TAXONOMIC_CLASSIFICATION {
     take:
@@ -57,6 +61,11 @@ workflow CONTIGS_TAXONOMIC_CLASSIFICATION {
         CATPACK_ADDNAMES.out.txt
     )
     ch_versions = ch_versions.mix(KRONA_TXT_FROM_CAT_CLASSIFICATION.out.versions.first())
+
+    TABIX_BGZIP_KRONATXT(
+        KRONA_TXT_FROM_CAT_CLASSIFICATION.out.krona_txt
+    )
+    ch_versions = ch_versions.mix(TABIX_BGZIP_KRONATXT.out.versions.first())
 
     KRONA_KTIMPORTTEXT(
         KRONA_TXT_FROM_CAT_CLASSIFICATION.out.krona_txt

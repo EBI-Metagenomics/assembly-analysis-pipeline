@@ -12,8 +12,8 @@ process KEGGPATHWAYSCOMPLETENESS {
     tuple val(meta), path(ko_contig_tsv)
 
     output:
-    tuple val(meta), path("${prefix}_summary_kegg_pathways.tsv.gz"), emit: kegg_pathways
-    path "versions.yml"                                            , emit: versions
+    tuple val(meta), path("${prefix}_summary_kegg_pathways.tsv"), emit: kegg_pathways
+    path "versions.yml",                                          emit: versions
 
     when:
     task.ext.when == null || task.ext.when
@@ -41,8 +41,6 @@ process KEGGPATHWAYSCOMPLETENESS {
 
     mv ${prefix}/summary.kegg_pathways.tsv ${prefix}_summary_kegg_pathways.tsv
 
-    gzip ${prefix}_summary_kegg_pathways.tsv
-
     cat <<-END_VERSIONS > versions.yml
     "${task.process}":
         kegg-pathways-completeness: \$(give_completeness --version | cut -d' ' -f2)
@@ -54,8 +52,6 @@ process KEGGPATHWAYSCOMPLETENESS {
     prefix = task.ext.prefix ?: "${meta.id}"
     """
     touch ${prefix}_summary_kegg_pathways.tsv
-
-    gzip ${prefix}_summary_kegg_pathways.tsv
 
     cat <<-END_VERSIONS > versions.yml
     "${task.process}":

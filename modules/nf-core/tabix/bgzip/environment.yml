@@ -3,5 +3,7 @@
 channels:
   - conda-forge
   - bioconda
+
 dependencies:
-  - bioconda::seqkit=2.9.0
+  - bioconda::htslib=1.20
+  - bioconda::tabix=1.11

@@ -12,8 +12,8 @@ process DIAMOND_RHEACHEBI {
     path(rhea2chebi)
 
     output:
-    tuple val(meta), path("*_rhea2proteins.tsv.gz"), emit: rhea2proteins_tsv
-    path "versions.yml"                            , emit: versions
+    tuple val(meta), path("*_rhea2proteins.tsv"), emit: rhea2proteins_tsv
+    path "versions.yml"                         , emit: versions
 
     when:
     task.ext.when == null || task.ext.when
@@ -43,8 +43,6 @@ process DIAMOND_RHEACHEBI {
         --proteins ${fasta_name} \\
         --rhea2chebi ${rhea2chebi} \\
         --output ${prefix}_rhea2proteins.tsv
-
-    gzip ${prefix}_rhea2proteins.tsv
 
     cat <<-END_VERSIONS > versions.yml
     "${task.process}":

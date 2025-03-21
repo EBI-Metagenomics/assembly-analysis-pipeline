@@ -1,4 +1,4 @@
-process CONCATENATE_INTERPROSCAN_GFFS {
+process CONCATENATE_GFFS {
     tag "$meta.id"
     label 'process_single'
 
@@ -19,7 +19,7 @@ process CONCATENATE_INTERPROSCAN_GFFS {
     script:
     def prefix = task.ext.prefix ?: "${meta.id}"
     """
-    concatenate_interproscan_gffs.py \\
+    concatenate_gffs.py \\
     --gffs gffs/*.gff.gz  \\
     --output ${prefix}_concatenated.gff
 
@@ -38,7 +38,6 @@ process CONCATENATE_INTERPROSCAN_GFFS {
     cat <<-END_VERSIONS > versions.yml
     "${task.process}":
         python: \$(python --version 2>&1 | sed 's/Python //g')
-        pyfastax: \$(python -c "import pkg_resources; print(pkg_resources.get_distribution('pyfastax').version)")
     END_VERSIONS
     """
 }
