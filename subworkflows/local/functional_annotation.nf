@@ -214,6 +214,8 @@ workflow FUNCTIONAL_ANNOTATION {
     )
     ch_versions = ch_versions.mix(INTERPRO_SUMMARY.out.versions)
 
+
+    // TODO: review this one as I was using hmmscan before hand (the parser of tblout may be incorrect - query and source may be flipped!)
     KEGG_ORTHOLOGS_SUMMARY(
         CONCATENATE_HMMSEARCH_TBLOUT.out.file_out
     )
