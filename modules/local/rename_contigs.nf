@@ -20,7 +20,7 @@ process RENAME_CONTIGS {
     script:
     def prefix = task.ext.prefix ?: "${meta.id}"
     """
-    rename_contigs.py --prefix ${meta.id} \\
+    rename_contigs.py --prefix ${meta.id}_ \\
     --input ${fasta} \\
     --output ${prefix}_renamed.fasta \\
     --mapping ${prefix}_mapping.csv
