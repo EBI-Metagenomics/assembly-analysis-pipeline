@@ -1,6 +1,5 @@
 /* NF-CORE */
 include { SEQKIT_SPLIT2                                   } from '../../modules/nf-core/seqkit/split2/main'
-include { DIAMOND_RHEACHEBI                               } from '../../modules/local/diamond_rheachebi'
 include { CAT_CAT as CONCATENATE_EGGNOGMAPPER_ORTHOLOGOUS } from '../../modules/nf-core/cat/cat/main'
 include { CAT_CAT as CONCATENATE_EGGNOGMAPPER_ANNOTATIONS } from '../../modules/nf-core/cat/cat/main'
 include { CAT_CAT as CONCATENATE_INTERPROSCAN_TSV         } from '../../modules/nf-core/cat/cat/main'
@@ -25,7 +24,7 @@ include { PFAM_SUMMARY                                      } from '../../module
 include { INTERPRO_SUMMARY                                  } from '../../modules/local/interpro_summary'
 include { HMMER_HMMSEARCH as HMMSEARCH_KOFAMS               } from '../../modules/nf-core/hmmer/hmmsearch/main'
 include { KEGG_ORTHOLOGS_SUMMARY                            } from '../../modules/local/kegg_orthologs_summary'
-
+include { DIAMOND_RHEACHEBI                                 } from '../../modules/local/diamond_rheachebi'
 
 workflow FUNCTIONAL_ANNOTATION {
     take:
@@ -98,7 +97,6 @@ workflow FUNCTIONAL_ANNOTATION {
     )
     ch_versions = ch_versions.mix(CONCATENATE_EGGNOGMAPPER_ORTHOLOGOUS.out.versions.first())
 
-
     CONCATENATE_EGGNOGMAPPER_ANNOTATIONS(
         EGGNOGMAPPER_ANNOTATIONS.out.annotations.groupTuple()
     )
@@ -126,6 +124,7 @@ workflow FUNCTIONAL_ANNOTATION {
         GOSLIM_SWF.out.go_summary
     )
     ch_versions = ch_versions.mix(TABIX_BGZIP_GO.out.versions)
+
     TABIX_BGZIP_GOSLIM(
         GOSLIM_SWF.out.goslim_summary
     )

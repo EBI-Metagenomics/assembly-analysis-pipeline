@@ -8,7 +8,6 @@ process RENAME_CONTIGS {
 
     input:
     tuple val(meta), path(fasta)
-    val(sequence_prefix)
 
     output:
     tuple val(meta), path('*.fasta') , emit: renamed_fasta
@@ -21,7 +20,7 @@ process RENAME_CONTIGS {
     script:
     def prefix = task.ext.prefix ?: "${meta.id}"
     """
-    rename_contigs.py --prefix ${sequence_prefix} \\
+    rename_contigs.py --prefix ${meta.id} \\
     --input ${fasta} \\
     --output ${prefix}_renamed.fasta \\
     --mapping ${prefix}_mapping.csv

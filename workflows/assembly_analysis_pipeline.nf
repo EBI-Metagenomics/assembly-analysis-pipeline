@@ -14,6 +14,7 @@ include { methodsDescriptionText  } from '../subworkflows/local/utils_nfcore_ass
    NF-CORE MODULES and SUBWORKFLOWS
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 */
+include { SEQKIT_SPLIT2                    } from '../modules/nf-core/seqkit/split2/main'
 include { PIGZ_UNCOMPRESS as PIGZ_CONTIGS  } from '../modules/nf-core/pigz/uncompress/main'
 include { PIGZ_UNCOMPRESS as PIGZ_PROTEINS } from '../modules/nf-core/pigz/uncompress/main'
 include { ASSEMBLY_QC                      } from '../subworkflows/local/assembly_qc'
@@ -58,8 +59,7 @@ workflow ASSEMBLY_ANALYSIS_PIPELINE {
      * there n is just an autoincrement
     */
     RENAME_CONTIGS(
-        ch_assembly,
-        "MGYA" // The contig prefix
+        ch_assembly
     )
 
     /*
@@ -74,22 +74,33 @@ workflow ASSEMBLY_ANALYSIS_PIPELINE {
     ch_versions = ch_versions.mix(ASSEMBLY_QC.out.versions)
 
     /*
-     * rRNAs
+     * rRNAs, these are masked in the combined gene caller
     */
     RRNA_EXTRACTION(
-        RENAME_CONTIGS.out.renamed_fasta,
+        ASSEMBLY_QC.out.assembly_filtered,
         file(params.rrnas_rfam_covariance_model, checkIfExists: true),
         file(params.rrnas_rfam_claninfo, checkIfExists: true)
     )
     ch_versions = ch_versions.mix(RRNA_EXTRACTION.out.versions)
 
-    // TODO: testing cmsearch against the whole of Rfam
+    /*****************************************************/
+    /* TODO: testing cmsearch against the whole of Rfam */
+    /*****************************************************/
+
+    // Chunk the fasta into files with at most >= params
+    SEQKIT_SPLIT2(
+        ASSEMBLY_QC.out.assembly_filtered,
+        params.bgc_contigs_chunksize // Define a chunk size for this one
+    )
+    ch_versions = ch_versions.mix(SEQKIT_SPLIT2.out.versions)
+
     DETECT_RNA(
-        RENAME_CONTIGS.out.renamed_fasta,
-        params.rfam_cm,
-        params.rfam_claninfo,
+        SEQKIT_SPLIT2.out.assembly.transpose(),
+        file(params.rfam_cm, checkIfExists: true),
+        file(params.rfam_claninfo, checkIfExists: true),
         "cmsearch"
     )
+    ch_versions = ch_versions.mix(DETECT_RNA.out.versions)
 
     /*
     * Protein prediction with the combined-gene-caller, and masking the rRNAs genes
