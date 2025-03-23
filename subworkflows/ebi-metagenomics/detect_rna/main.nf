@@ -12,6 +12,8 @@ include { CONVERTCMSCANTOCMSEARCH     } from '../../../modules/ebi-metagenomics/
 include { CMSEARCHTBLOUTDEOVERLAP     } from '../../../modules/ebi-metagenomics/cmsearchtbloutdeoverlap/main'
 include { EASEL_ESLSFETCH             } from '../../../modules/ebi-metagenomics/easel/eslsfetch/main'
 
+// Extension to join the infernal_cmsearch tables as this pipeline chunks the contigs
+include { CAT_CAT                     } from '../../../modules/nf-core/cat/cat/main'
 
 workflow DETECT_RNA {
 
@@ -32,7 +34,12 @@ workflow DETECT_RNA {
             rfam
         )
         ch_versions = ch_versions.mix(INFERNAL_CMSEARCH.out.versions.first())
-        cmsearch_ch = INFERNAL_CMSEARCH.out.cmsearch_tbl
+
+        CAT_CAT(
+            INFERNAL_CMSEARCH.out.cmsearch_tbl.groupTuple()
+        )
+        cmsearch_ch = CAT_CAT.out.file_out
+        ch_versions = ch_versions.mix(CAT_CAT.out.versions.first())
     }
     else if (mode == 'cmscan') {
        INFERNAL_CMSCAN(
