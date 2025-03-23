@@ -95,7 +95,7 @@ workflow ASSEMBLY_ANALYSIS_PIPELINE {
     ch_versions = ch_versions.mix(SEQKIT_SPLIT2.out.versions)
 
     DETECT_RNA(
-        ASSEMBLY_QC.out.assembly_filtered.join( SEQKIT_SPLIT2.out.assembly.transpose() ),
+        ASSEMBLY_QC.out.assembly_filtered.join( SEQKIT_SPLIT2.out.assembly ),
         file(params.rfam_cm, checkIfExists: true),
         file(params.rfam_claninfo, checkIfExists: true),
         "cmsearch"

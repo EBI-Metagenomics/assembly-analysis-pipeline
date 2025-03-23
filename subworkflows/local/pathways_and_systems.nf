@@ -38,9 +38,9 @@ workflow PATHWAYS_AND_SYSTEMS {
     )
     ch_versions = ch_versions.mix(GENOMEPROPERTIES.out.versions)
 
-    /*
+    /*************************************************************
     * For BGC the pipeline uses a different min contig size
-    */
+    *************************************************************/
     SEQKIT_SEQ_BGC(
         ch_contigs_and_predicted_proteins.map {  meta, fasta, _faa, _gff, _ips_tsv -> [ meta, fasta ] }
     )
@@ -53,20 +53,21 @@ workflow PATHWAYS_AND_SYSTEMS {
     )
     ch_versions = ch_versions.mix(SEQKIT_SPLIT2.out.versions)
 
+    /*************************************************************
+     * Rearrange the channel. We need to create a channel so that
+     * each chunk of the FASTA has the GFF and IPS TSV (these two are for the whole assembly).
+    /*************************************************************/
     def ch_chunked_assembly_fasta = SEQKIT_SPLIT2.out.assembly.transpose()
 
-    ch_chunked_assembly_fasta.join(ch_contigs_and_predicted_proteins).multiMap { meta, chunked_fasta, _fasta, _faa, gff, ips_tsv ->
-        fasta: [meta, chunked_fasta]
-        ips_tsv: [meta, ips_tsv]
-        gff: gff
-    }.set {
-        antismash_ch
-    }
+    def bgc_channel = channel.empty()
+    // Note: if I do "def bgc_channel = .. combine(...)"" I get this error:
+    // def bgc_channel = ch_contigs_and_predicted_proteins.combine(ch_chunked_assembly_fasta, by: 0)
+    // weird, that is why there if def ... = channel.empty() and then I assign it
+    bgc_channel = ch_contigs_and_predicted_proteins.combine(ch_chunked_assembly_fasta, by: 0)
 
     ANTISMASH_ANTISMASHLITE(
-        antismash_ch.fasta,
-        file(params.antismash_database, checkIfExists: true),
-        antismash_ch.gff
+        bgc_channel.map { meta, _all_contigs_fasta, _faa, gff, _ips_tsv, contigs_chunk -> [meta, contigs_chunk, gff] },
+        file(params.antismash_database, checkIfExists: true)
     )
     ch_versions = ch_versions.mix(ANTISMASH_ANTISMASHLITE.out.versions)
 
@@ -80,11 +81,12 @@ workflow PATHWAYS_AND_SYSTEMS {
     )
     ch_versions = ch_versions.mix(CONCATENATE_GFFS.out.versions)
 
-    // TODO: chunk here too, it's taking a long time
-    SANNTIS(
-        ch_contigs_and_predicted_proteins.map { meta, _fasta, faa, _gff, ips_tsv -> [meta, ips_tsv, [], faa]}
-    )
-    ch_versions = ch_versions.mix(SANNTIS.out.versions)
+    // TODO: Chunk here too; it's taking a long time.
+    // This chunking is different. We could use the chunks from IPS, but we would need to do the matching by chunk or something similar.
+    // SANNTIS(
+    //     ch_contigs_and_predicted_proteins.map { meta, _fasta, faa, _gff, ips_tsv -> [meta, ips_tsv, [], faa]}
+    // )
+    // ch_versions = ch_versions.mix(SANNTIS.out.versions)
 
     emit:
     versions = ch_versions

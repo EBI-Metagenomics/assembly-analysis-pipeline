@@ -28,8 +28,8 @@ workflow DETECT_RNA {
     ch_versions = Channel.empty()
     cmsearch_ch = Channel.empty()
 
-    ch_chunked_fasta = ch_fasta.map { meta, chunks, _fasta -> [meta, chunks] }
-    ch_nonchuncked_fasta = ch_fasta.map { meta, _chunks, fasta -> [meta, fasta] }
+    ch_chunked_fasta = ch_fasta.map { meta, _fasta, chunks -> [meta, chunks] }.transpose()
+    ch_nonchuncked_fasta = ch_fasta.map { meta, fasta, _chunks -> [meta, fasta] }
 
     if ( mode == 'cmsearch' ) {
         INFERNAL_CMSEARCH(
