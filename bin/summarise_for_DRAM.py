@@ -113,8 +113,8 @@ if __name__ == "__main__":
                 contig_annotations = []
                 contig_annotations.extend([
                     contig,
-                    MGYA + "_" + contig,  # fasta
-                    MGYA,                 # scaffold
+                    MGYA,                 # fasta
+                    MGYA + "_" + contig,  # scaffold
                     contig                # gene_position
                 ])
                 try:
@@ -146,4 +146,4 @@ if __name__ == "__main__":
         except NameError:
             output_matrix = partial_matrix
 
-    output_matrix.to_csv("summary_for_DRAM_split.tsv", sep='\t', header=True, index=False)
+    output_matrix.to_csv("summary_for_DRAM.tsv", sep='\t', header=True, index=False)
