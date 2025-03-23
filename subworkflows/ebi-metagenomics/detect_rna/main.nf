@@ -18,32 +18,41 @@ include { CAT_CAT                     } from '../../../modules/nf-core/cat/cat/m
 workflow DETECT_RNA {
 
     take:
-    ch_fasta     // channel: [ val(meta), [ fasta ] ]
-    rfam         // folder: rfam for cmsearch/cmscan
-    claninfo     // file: claninfo for cmsearchtbloutdeoverlap
-    mode         // cmsearch/cmscan
+    ch_fasta  // channel: [ val(meta), [ fasta_chunks... ], fasta ]
+    rfam      // folder: rfam for cmsearch/cmscan
+    claninfo  // file: claninfo for cmsearchtbloutdeoverlap
+    mode      // cmsearch/cmscan
 
     main:
 
     ch_versions = Channel.empty()
     cmsearch_ch = Channel.empty()
 
+    ch_chunked_fasta = ch_fasta.map { meta, chunks, _fasta -> [meta, chunks] }
+    ch_nonchuncked_fasta = ch_fasta.map { meta, _chunks, fasta -> [meta, fasta] }
+
     if ( mode == 'cmsearch' ) {
         INFERNAL_CMSEARCH(
-            ch_fasta,
+            ch_chunked_fasta,
             rfam
         )
         ch_versions = ch_versions.mix(INFERNAL_CMSEARCH.out.versions.first())
 
+        // This is an extension of this SWF for this particular pipeline.
+        // For performance and speed purposes, we chunk the FASTA with the contigs.
+        // To further parallelize this, it causes issues downstream; different
+        // chunks from cmsearch end in easlfecth, causing it to fail. So, we
+        // just join them after Infernal to make the code work and to keep it simple.
         CAT_CAT(
             INFERNAL_CMSEARCH.out.cmsearch_tbl.groupTuple()
         )
         cmsearch_ch = CAT_CAT.out.file_out
+
         ch_versions = ch_versions.mix(CAT_CAT.out.versions.first())
     }
     else if (mode == 'cmscan') {
        INFERNAL_CMSCAN(
-            ch_fasta,
+            ch_chunked_fasta,
             rfam
        )
        ch_versions = ch_versions.mix(INFERNAL_CMSCAN.out.versions.first())
@@ -60,8 +69,9 @@ workflow DETECT_RNA {
     )
     ch_versions = ch_versions.mix(CMSEARCHTBLOUTDEOVERLAP.out.versions.first())
 
-    ch_easel = ch_fasta
+    ch_easel = ch_nonchuncked_fasta
                 .join(CMSEARCHTBLOUTDEOVERLAP.out.cmsearch_tblout_deoverlapped)
+
     EASEL_ESLSFETCH(
         ch_easel
     )
