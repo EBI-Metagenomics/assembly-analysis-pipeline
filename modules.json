@@ -8,7 +8,8 @@
                     "antismash/antismashlite": {
                         "branch": "master",
                         "git_sha": "81880787133db07d9b4c1febd152c090eb8325dc",
-                        "installed_by": ["modules"]
+                        "installed_by": ["modules"],
+                        "patch": "modules/nf-core/antismash/antismashlite/antismash-antismashlite.diff"
                     },
                     "cat/cat": {
                         "branch": "master",
@@ -19,7 +20,8 @@
                     "hmmer/hmmsearch": {
                         "branch": "master",
                         "git_sha": "81880787133db07d9b4c1febd152c090eb8325dc",
-                        "installed_by": ["modules"]
+                        "installed_by": ["modules"],
+                        "patch": "modules/nf-core/hmmer/hmmsearch/hmmer-hmmsearch.diff"
                     },
                     "multiqc": {
                         "branch": "master",
@@ -36,6 +38,12 @@
                         "git_sha": "938e803109104e30773f76a7142442722498fef1",
                         "installed_by": ["modules"]
                     },
+                    "quast": {
+                        "branch": "master",
+                        "git_sha": "81880787133db07d9b4c1febd152c090eb8325dc",
+                        "installed_by": ["modules"],
+                        "patch": "modules/nf-core/quast/quast.diff"
+                    },
                     "seqkit/seq": {
                         "branch": "master",
                         "git_sha": "81880787133db07d9b4c1febd152c090eb8325dc",
@@ -46,11 +54,6 @@
                         "git_sha": "666652151335353eef2fcd58880bcef5bc2928e1",
                         "installed_by": ["modules"],
                         "patch": "modules/nf-core/seqkit/split2/seqkit-split2.diff"
-                    },
-                    "seqkit/stats": {
-                        "branch": "master",
-                        "git_sha": "666652151335353eef2fcd58880bcef5bc2928e1",
-                        "installed_by": ["modules"]
                     },
                     "tabix/bgzip": {
                         "branch": "master",
