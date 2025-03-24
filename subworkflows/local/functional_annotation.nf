@@ -205,9 +205,8 @@ workflow FUNCTIONAL_ANNOTATION {
     ch_versions = ch_versions.mix(KEGGPATHWAYSCOMPLETENESS.out.versions)
 
     DRAM_SUMMARY(
-        INTERPRO_SUMMARY.out.file,
-        DBCAN.out.file,
-        KEGG_ORTHOLOGS_SUMMARY.out.tsv
+        path_to_results_folder
+        //TODO: this needs to be the path to results containing all D/E/SRZs
     )
 
     emit:
