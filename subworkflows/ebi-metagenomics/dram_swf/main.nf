@@ -1,7 +1,7 @@
 include { DRAM                  } from '../../../modules/ebi-metagenomics/dram/distill/main'
 include { SUMMARISEFORDRAMINPUT } from '../../../modules/local/summarisefordraminput/main'
 
-workflow DRAM {
+workflow DRAM_SUMMARY {
 
     take:
     root_path     //
