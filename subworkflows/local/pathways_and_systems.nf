@@ -16,8 +16,14 @@ include { KEGGPATHWAYSCOMPLETENESS     } from '../../modules/ebi-metagenomics/ke
 workflow PATHWAYS_AND_SYSTEMS {
 
     take:
+    // fasta: contigs
+    // faa: CGC predictions faa
+    // gff: CGC predictions gff
+    // ips_ts: interpsocan concatenated tsv (all the IPS annotations)
     ch_contigs_and_predicted_proteins // tuple (meta, fasta, faa, gff, ips_tsv)
     ch_kegg_orthologs_summary_tsv     // tuple (meta, kos_summary_tsv)
+    // Chunked proteins, used in the functiona_annotation mostly, we need this for SanntiS
+    ch_protein_chunks                 // tuple (meta, faa_chunk)
 
     main:
 
@@ -53,20 +59,21 @@ workflow PATHWAYS_AND_SYSTEMS {
     )
     ch_versions = ch_versions.mix(SEQKIT_SPLIT2.out.versions)
 
-    /*************************************************************
-     * Rearrange the channel. We need to create a channel so that
-     * each chunk of the FASTA has the GFF and IPS TSV (these two are for the whole assembly).
-    /*************************************************************/
+    /*******************************************************************************************/
+    /* Rearrange the channel. We need to create a channel so that                              */
+    /* each chunk of the FASTA has the GFF and IPS TSV (these two are for the whole assembly). */
+    /*******************************************************************************************/
     def ch_chunked_assembly_fasta = SEQKIT_SPLIT2.out.assembly.transpose()
 
-    def bgc_channel = channel.empty()
     // Note: if I do "def bgc_channel = .. combine(...)"" I get this error:
     // def bgc_channel = ch_contigs_and_predicted_proteins.combine(ch_chunked_assembly_fasta, by: 0)
     // weird, that is why there if def ... = channel.empty() and then I assign it
-    bgc_channel = ch_contigs_and_predicted_proteins.combine(ch_chunked_assembly_fasta, by: 0)
+    def antismash_channel = channel.empty()
+    antismash_channel = ch_contigs_and_predicted_proteins.combine(ch_chunked_assembly_fasta, by: 0)
+        .map { meta, _all_contigs_fasta, _faa, gff, _ips_tsv, contigs_chunk -> [meta, contigs_chunk, gff] }
 
     ANTISMASH_ANTISMASHLITE(
-        bgc_channel.map { meta, _all_contigs_fasta, _faa, gff, _ips_tsv, contigs_chunk -> [meta, contigs_chunk, gff] },
+        antismash_channel,
         file(params.antismash_database, checkIfExists: true)
     )
     ch_versions = ch_versions.mix(ANTISMASH_ANTISMASHLITE.out.versions)
@@ -81,12 +88,22 @@ workflow PATHWAYS_AND_SYSTEMS {
     )
     ch_versions = ch_versions.mix(CONCATENATE_GFFS.out.versions)
 
-    // TODO: Chunk here too; it's taking a long time.
-    // This chunking is different. We could use the chunks from IPS, but we would need to do the matching by chunk or something similar.
-    // SANNTIS(
-    //     ch_contigs_and_predicted_proteins.map { meta, _fasta, faa, _gff, ips_tsv -> [meta, ips_tsv, [], faa]}
-    // )
-    // ch_versions = ch_versions.mix(SANNTIS.out.versions)
+    /*************************************************************************************/
+    /* Rearrange the channel. We need to create a channel so that                        */
+    /* each FAA chunk the IPS TSV (this is the concatenated IPS for the whole assembly). */
+    /* We feed in the whole IPS TSV to avoid having to chunk it and match it the protein */
+    /* chunks, this wastes some memory as SanntiS loads the whole TSV in memory but this */
+    /* should be problematic as the TSV is relativly small (<500MB)                      */
+    /*************************************************************************************/
+    def sanntis_channel = channel.empty()
+    // Note: same weirdness ass antismash_channel
+    sanntis_channel = ch_contigs_and_predicted_proteins.combine(ch_protein_chunks, by: 0)
+        .map { meta, _all_contigs_fasta, _faa, _gff, ips_tsv, faa_chunk -> [meta, ips_tsv, [], faa_chunk] }
+
+    SANNTIS(
+        sanntis_channel
+    )
+    ch_versions = ch_versions.mix(SANNTIS.out.versions)
 
     emit:
     versions = ch_versions

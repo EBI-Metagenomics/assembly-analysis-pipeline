@@ -29,6 +29,7 @@ include { DIAMOND_RHEACHEBI                                 } from '../../module
 workflow FUNCTIONAL_ANNOTATION {
     take:
     ch_predicted_proteins // tule (meta, faa, gff)
+    ch_protein_chunked // tuple (meta, faa_chunk)
 
     main:
 
@@ -37,20 +38,6 @@ workflow FUNCTIONAL_ANNOTATION {
     def ch_proteins_faa = ch_predicted_proteins.map { meta, faa, _gff -> [meta, faa] }
     def ch_proteins_gff = ch_predicted_proteins.map { meta, _faa, gff -> [meta, gff] }
 
-    /*********************/
-    /* PROTEINS CHUNKING */
-    /*********************/
-
-    // Chunk the fasta into files with at most >= params
-    SEQKIT_SPLIT2(
-        ch_proteins_faa,
-        params.proteins_chunksize,
-    )
-
-    ch_versions = ch_versions.mix(SEQKIT_SPLIT2.out.versions)
-
-    def ch_protein_splits = SEQKIT_SPLIT2.out.assembly.transpose()
-
     /*
      * InterProScan results are concatenated (TSV and GFF) and passed on to downstream tools:
      * - GO Slim subworkflow
@@ -58,7 +45,7 @@ workflow FUNCTIONAL_ANNOTATION {
      * The concatenated TSV is also used to extract the PFAM and InterPro summaries
     */
     INTERPROSCAN(
-        ch_protein_splits,
+        ch_protein_chunked,
         [file(params.interproscan_database, checkIfExists: true), params.interproscan_database_version],
     )
     ch_versions = ch_versions.mix(INTERPROSCAN.out.versions)
@@ -75,7 +62,7 @@ workflow FUNCTIONAL_ANNOTATION {
      * The concatenated TSV is also used to extract the PFAM and InterPro summaries
     */
     EGGNOGMAPPER_ORTHOLOGS(
-        ch_protein_splits,
+        ch_protein_chunked,
         [[], []],
         params.eggnog_data_dir,
         params.eggnog_database,
@@ -130,7 +117,6 @@ workflow FUNCTIONAL_ANNOTATION {
     )
     ch_versions = ch_versions.mix(TABIX_BGZIP_GOSLIM.out.versions)
 
-
     /*
      * Assign Rhea and CHEBI tags to the proteins.
      * This is a 2 step process
@@ -149,10 +135,7 @@ workflow FUNCTIONAL_ANNOTATION {
     )
     ch_versions = ch_versions.mix(TABIX_BGZIP_RHEADCHEBI.out.versions)
 
-    /*
-     * DBCan
-    */
-    ch_protein_splits.join( ch_proteins_gff ).multiMap { meta, faa, gff ->
+    ch_proteins_gff.combine(ch_protein_chunked, by: 0).multiMap { meta, gff, faa ->
         faa: [meta, faa]
         gff: [meta, gff]
     }.set {
@@ -183,7 +166,7 @@ workflow FUNCTIONAL_ANNOTATION {
      * These HMM models have been extended as described -> TODO: link to the mgnify_pipelines_reference_databases pipeline
     */
     HMMSEARCH_KOFAMS(
-        ch_protein_splits.map { meta, faa ->
+        ch_protein_chunked.map { meta, faa ->
             {
                 [meta, file(params.kofam_hmm_database, checkIfExists: true), faa, false, true, true] // boolean flags are: write alignment, tblout and domtbl
             }
@@ -213,7 +196,6 @@ workflow FUNCTIONAL_ANNOTATION {
         CONCATENATE_INTERPROSCAN_TSV.out.file_out
     )
     ch_versions = ch_versions.mix(INTERPRO_SUMMARY.out.versions)
-
 
     // TODO: review this one as I was using hmmscan before hand (the parser of tblout may be incorrect - query and source may be flipped!)
     KEGG_ORTHOLOGS_SUMMARY(

@@ -12,47 +12,31 @@ include { CONVERTCMSCANTOCMSEARCH     } from '../../../modules/ebi-metagenomics/
 include { CMSEARCHTBLOUTDEOVERLAP     } from '../../../modules/ebi-metagenomics/cmsearchtbloutdeoverlap/main'
 include { EASEL_ESLSFETCH             } from '../../../modules/ebi-metagenomics/easel/eslsfetch/main'
 
-// Extension to join the infernal_cmsearch tables as this pipeline chunks the contigs
-include { CAT_CAT                     } from '../../../modules/nf-core/cat/cat/main'
 
 workflow DETECT_RNA {
 
     take:
-    ch_fasta  // channel: [ val(meta), [ fasta_chunks... ], fasta ]
-    rfam      // folder: rfam for cmsearch/cmscan
-    claninfo  // file: claninfo for cmsearchtbloutdeoverlap
-    mode      // cmsearch/cmscan
+    ch_fasta     // channel: [ val(meta), [ fasta ] ]
+    rfam         // folder: rfam for cmsearch/cmscan
+    claninfo     // file: claninfo for cmsearchtbloutdeoverlap
+    mode         // cmsearch/cmscan
 
     main:
 
     ch_versions = Channel.empty()
     cmsearch_ch = Channel.empty()
 
-    ch_chunked_fasta = ch_fasta.map { meta, _fasta, chunks -> [meta, chunks] }.transpose()
-    ch_nonchuncked_fasta = ch_fasta.map { meta, fasta, _chunks -> [meta, fasta] }
-
     if ( mode == 'cmsearch' ) {
         INFERNAL_CMSEARCH(
-            ch_chunked_fasta,
+            ch_fasta,
             rfam
         )
         ch_versions = ch_versions.mix(INFERNAL_CMSEARCH.out.versions.first())
-
-        // This is an extension of this SWF for this particular pipeline.
-        // For performance and speed purposes, we chunk the FASTA with the contigs.
-        // To further parallelize this, it causes issues downstream; different
-        // chunks from cmsearch end in easlfecth, causing it to fail. So, we
-        // just join them after Infernal to make the code work and to keep it simple.
-        CAT_CAT(
-            INFERNAL_CMSEARCH.out.cmsearch_tbl.groupTuple()
-        )
-        cmsearch_ch = CAT_CAT.out.file_out
-
-        ch_versions = ch_versions.mix(CAT_CAT.out.versions.first())
+        cmsearch_ch = INFERNAL_CMSEARCH.out.cmsearch_tbl
     }
     else if (mode == 'cmscan') {
        INFERNAL_CMSCAN(
-            ch_chunked_fasta,
+            ch_fasta,
             rfam
        )
        ch_versions = ch_versions.mix(INFERNAL_CMSCAN.out.versions.first())
@@ -69,9 +53,8 @@ workflow DETECT_RNA {
     )
     ch_versions = ch_versions.mix(CMSEARCHTBLOUTDEOVERLAP.out.versions.first())
 
-    ch_easel = ch_nonchuncked_fasta
+    ch_easel = ch_fasta
                 .join(CMSEARCHTBLOUTDEOVERLAP.out.cmsearch_tblout_deoverlapped)
-
     EASEL_ESLSFETCH(
         ch_easel
     )
