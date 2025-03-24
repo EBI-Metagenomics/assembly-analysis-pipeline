@@ -4,8 +4,9 @@ include { CAT_CAT as CONCATENATE_CMSEARCH_DEOVERLAP } from '../../modules/nf-cor
 include { CAT_CAT as CONCATENATE_EASEL_FASTA        } from '../../modules/nf-core/cat/cat/main'
 
 /* EBI-METAGENOMICS */
-include { DETECT_RNA     } from '../../subworkflows/ebi-metagenomics/detect_rna/main'
-include { EXTRACTCOORDS  } from '../../modules/ebi-metagenomics/extractcoords/main'
+include { DETECT_RNA      } from '../../subworkflows/ebi-metagenomics/detect_rna/main'
+include { EASEL_ESLSFETCH } from '../../modules/ebi-metagenomics/easel/eslsfetch/main'
+include { EXTRACTCOORDS   } from '../../modules/ebi-metagenomics/extractcoords/main'
 
 workflow RNA_ANNOTATION {
 
@@ -36,14 +37,14 @@ workflow RNA_ANNOTATION {
     )
     ch_versions = ch_versions.mix(CONCATENATE_CMSEARCH_DEOVERLAP.out.versions.first())
 
-    CONCATENATE_EASEL_FASTA(
-        DETECT_RNA.out.easel_out.groupTuple()
+    EASEL_ESLSFETCH(
+        ch_contigs.join( CONCATENATE_CMSEARCH_DEOVERLAP.out.file_out )
     )
-    ch_versions = ch_versions.mix(CONCATENATE_EASEL_FASTA.out.versions.first())
+    ch_versions = ch_versions.mix(EASEL_ESLSFETCH.out.versions.first())
 
-    CONCATENATE_CMSEARCH_DEOVERLAP.out.file_out.join( CONCATENATE_EASEL_FASTA.out.file_out ).multiMap { meta, cmsearch_deoverlap_concatenated_out, easel_concatenated_fasta ->
+    CONCATENATE_CMSEARCH_DEOVERLAP.out.file_out.join( EASEL_ESLSFETCH.out.easel_coords ).multiMap { meta, cmsearch_deoverlap_concatenated_out, easel_matches_fasta ->
         cmsearch_deoverlap: [meta, cmsearch_deoverlap_concatenated_out]
-        easel_fasta: [meta, easel_concatenated_fasta]
+        easel_fasta: [meta, easel_matches_fasta]
     }.set {
         ch_extract_coordinates
     }

@@ -10,8 +10,8 @@ include { INFERNAL_CMSEARCH           } from '../../../modules/ebi-metagenomics/
 include { INFERNAL_CMSCAN             } from '../../../modules/ebi-metagenomics/infernal/cmscan/main'
 include { CONVERTCMSCANTOCMSEARCH     } from '../../../modules/ebi-metagenomics/convertcmscantocmsearch/main'
 include { CMSEARCHTBLOUTDEOVERLAP     } from '../../../modules/ebi-metagenomics/cmsearchtbloutdeoverlap/main'
+// Because we need this SWF to run on chunked contigs, we tool easel to the calling workflow instead
 include { EASEL_ESLSFETCH             } from '../../../modules/ebi-metagenomics/easel/eslsfetch/main'
-
 
 workflow DETECT_RNA {
 
@@ -53,16 +53,8 @@ workflow DETECT_RNA {
     )
     ch_versions = ch_versions.mix(CMSEARCHTBLOUTDEOVERLAP.out.versions.first())
 
-    ch_easel = ch_fasta
-                .join(CMSEARCHTBLOUTDEOVERLAP.out.cmsearch_tblout_deoverlapped)
-    EASEL_ESLSFETCH(
-        ch_easel
-    )
-    ch_versions = ch_versions.mix(EASEL_ESLSFETCH.out.versions.first())
-
     emit:
     cmsearch_deoverlap_out = CMSEARCHTBLOUTDEOVERLAP.out.cmsearch_tblout_deoverlapped   // channel: [ val(meta), [ deoverlapped ] ]
-    easel_out              = EASEL_ESLSFETCH.out.easel_coords                           // channel: [ val(meta), [ fasta ] ]
     versions               = ch_versions                                                // channel: [ versions.yml ]
 }
 
