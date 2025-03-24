@@ -90,12 +90,17 @@
                     "cmsearchtbloutdeoverlap": {
                         "branch": "main",
                         "git_sha": "696324c637a7e0cf06fe331faffee42e36826898",
-                        "installed_by": ["rrna_extraction"]
+                        "installed_by": ["detect_rna"]
                     },
                     "combinedgenecaller/merge": {
                         "branch": "main",
                         "git_sha": "b84a0c52b92eef58ba2aeb2d22ae45d5bc6ae294",
                         "installed_by": ["combined_gene_caller"]
+                    },
+                    "convertcmscantocmsearch": {
+                        "branch": "main",
+                        "git_sha": "937985d6147b25b74700f2eb6fc41ab4150ad7d4",
+                        "installed_by": ["detect_rna"]
                     },
                     "dbcan/dbcan": {
                         "branch": "main",
@@ -110,7 +115,7 @@
                     "easel/eslsfetch": {
                         "branch": "main",
                         "git_sha": "f1bf089cb679ca1e363aa81c99a512114402472c",
-                        "installed_by": ["rrna_extraction"]
+                        "installed_by": ["detect_rna"]
                     },
                     "eggnogmapper": {
                         "branch": "main",
@@ -119,8 +124,8 @@
                     },
                     "extractcoords": {
                         "branch": "main",
-                        "git_sha": "c249cf1afd1b7ceaacde6ba44fd9c919bf688c6d",
-                        "installed_by": ["rrna_extraction"]
+                        "git_sha": "33ea81307e5bf9772861d2a3cb1b4f4694a04db6",
+                        "installed_by": ["modules"]
                     },
                     "fraggenescanrs": {
                         "branch": "main",
@@ -137,10 +142,15 @@
                         "git_sha": "7c67b0652fb83c8239bd5bace72364f6676e3e39",
                         "installed_by": ["modules"]
                     },
+                    "infernal/cmscan": {
+                        "branch": "main",
+                        "git_sha": "e29278872287d0599819456a2194f763da64aeb8",
+                        "installed_by": ["detect_rna"]
+                    },
                     "infernal/cmsearch": {
                         "branch": "main",
                         "git_sha": "62e22fb1fd131d27ed043f305f317a0cf741b900",
-                        "installed_by": ["rrna_extraction"]
+                        "installed_by": ["detect_rna"]
                     },
                     "interproscan": {
                         "branch": "main",
@@ -192,14 +202,14 @@
                         "git_sha": "489db3d33a99055f04088080e9b65a9237286afa",
                         "installed_by": ["subworkflows"]
                     },
+                    "detect_rna": {
+                        "branch": "main",
+                        "git_sha": "937985d6147b25b74700f2eb6fc41ab4150ad7d4",
+                        "installed_by": ["subworkflows"]
+                    },
                     "goslim_swf": {
                         "branch": "main",
                         "git_sha": "200aad20884dac5d5913b668030cc44cc5d807f4",
-                        "installed_by": ["subworkflows"]
-                    },
-                    "rrna_extraction": {
-                        "branch": "main",
-                        "git_sha": "29fd1389152934e9ca5da16d4637fee44764d25d",
                         "installed_by": ["subworkflows"]
                     }
                 }

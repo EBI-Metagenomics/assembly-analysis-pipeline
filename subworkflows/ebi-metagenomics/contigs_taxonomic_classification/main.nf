@@ -8,6 +8,7 @@ include { KRONA_KTIMPORTTEXT                 } from '../../../modules/local/kron
 // TODO: this is an extension to generate a bgzip file (used on the website)
 include { TABIX_BGZIP as TABIX_BGZIP_KRONATXT } from '../../../modules/nf-core/tabix/bgzip/main'
 
+
 workflow CONTIGS_TAXONOMIC_CLASSIFICATION {
     take:
     contigs     // [ val(meta), path(assembly_fasta) ]
@@ -36,9 +37,9 @@ workflow CONTIGS_TAXONOMIC_CLASSIFICATION {
     catpack_input_ch = contigs
         .join( proteins )
         .join( DIAMOND_BLASTP.out.txt )
-        .multiMap { meta, contigs, proteins, diamond_txt ->
-            contigs: [meta, contigs]
-            proteins: [meta, proteins]
+        .multiMap { meta, contigs_fasta, proteins_faa, diamond_txt ->
+            contigs: [meta, contigs_fasta]
+            proteins: [meta, proteins_faa]
             diamond_txt: [meta, diamond_txt]
         }
 
