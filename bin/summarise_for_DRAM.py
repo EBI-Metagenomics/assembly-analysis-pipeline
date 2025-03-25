@@ -18,7 +18,7 @@ if __name__ == "__main__":
     args = parse_args(sys.argv[1:])
 
     analyses = glob.glob(os.path.join(args.input, "ERZ*"))
-    MGYAs = {}     # { MGYAs[accessions] = set(contigs) }
+    assemblies_annotations = {}     # { assemblies_annotations[accessions] = set(contigs) }
 
     for assembly_analysis_path in analyses:
 
@@ -30,112 +30,103 @@ if __name__ == "__main__":
         ips_annotations = os.path.join(assembly_analysis_path, "assembly", "assembly_interproscan.tsv")
         cazy_annotations = os.path.join(assembly_analysis_path, "assembly", "assembly_dbcan_overview.txt.gz")
 
-        current_MGYA = assembly_analysis_path.split('/')[-1]
-        MGYAs[current_MGYA] = []
+        assembly_accession = assembly_analysis_path.split('/')[-1]
+        assemblies_annotations[assembly_accession] = []
 
         # ----- CAZy ----- #
 
-        CAZys = {}      # { CAZys[contig] = CAZy }
+        cazys = {}      # { cazys[contig] = cazy }
 
         if os.path.exists(cazy_annotations):
             with gzip.open(cazy_annotations, 'rt') as f:
                 next(f)
                 for line in f:
-                    MGYA_contig, _, HMMER, dbCAN_sub, DIAMOND, _ = line.strip().split('\t')
-                    HMMER_list = [s.split('(')[0] for s in HMMER.split('+')]
-                    dbCAN_sub_list = [s.split('_')[0] for s in dbCAN_sub.split('+')]
-                    DIAMOND_list = [s.split('_')[0] for s in DIAMOND.split('+')]
+                    contig, _, hmmer, dbcan_sub, diamond, _ = line.strip().split('\t')
+                    hmmer_list = [s.split('(')[0] for s in hmmer.split('+')]         # format: GT9(116-281)+GT17(914-1160) ==> ['GT9', 'GT17']
+                    dbcan_sub_list = [s.split('_')[0] for s in dbcan_sub.split('+')] # format: GH23_e756+CBM50_e338 ==> ['GH23', 'CBM50']
+                    diamond_list = [s.split('_')[0] for s in diamond.split('+')]     # format: CBM50+GH23 ==> ['CBM50', 'GH23']
                     consensus = set()
-                    for hmmer in HMMER_list:
-                        if hmmer in dbCAN_sub_list or hmmer in DIAMOND_list:
-                            consensus.add(hmmer)
-                    for dbcan in dbCAN_sub_list:
-                        if dbcan in DIAMOND_list:
+                    for hmmer_acc in hmmer_list:
+                        if hmmer_acc in dbcan_sub_list or hmmer_acc in diamond_list:
+                            consensus.add(hmmer_acc)
+                    for dbcan in dbcan_sub_list:
+                        if dbcan in diamond_list:
                             consensus.add(dbcan)
-                    CAZys[MGYA_contig] = "; ".join(consensus)
-                    MGYAs[current_MGYA].append(MGYA_contig)
+                    cazys[contig] = "; ".join(consensus)
+                    assemblies_annotations[assembly_accession].append(contig)
 
-        # ----- KEGG ----- #
+        # ----- kegg ----- #
 
-        KEGGs = {}      # { KEGGs[contig] = KEGG }
-        KEGGs_description, contigs_KEGGs_description = {}, {}
+        keggs = {}      # { keggs[contig] = kegg }
+        keggs_description, contigs_keggs_description = {}, {}
 
         if os.path.exists(kegg_annotations) and os.path.exists(kegg_description):
             with gzip.open(kegg_annotations, 'rt') as f:
                 for line in f:
-                    KO, MGYA_contig = line.strip().split('\t')
-                    if MGYA_contig not in KEGGs:
-                        KEGGs[MGYA_contig] = []
-                    KEGGs[MGYA_contig].append(KO)
-                    MGYAs[current_MGYA].append(MGYA_contig)
+                    ko, contig = line.strip().split('\t')
+                    if contig not in keggs:
+                        keggs[contig] = []
+                    keggs[contig].append(ko)
+                    assemblies_annotations[assembly_accession].append(contig)
 
             with gzip.open(kegg_description, 'rt') as f:
                 for line in f:
-                    _, KO, KO_description = line.strip().split('\t')
-                    KEGGs_description[KO] = KO_description
+                    _, ko, ko_description = line.strip().split('\t')
+                    keggs_description[ko] = ko_description
 
-            for MGYA_contig in KEGGs:
+            for contig in keggs:
                 description_list = []
-                if isinstance(KEGGs[MGYA_contig], list):
-                    for annotation in KEGGs[MGYA_contig]:
-                        description_list.append(KEGGs_description[annotation])
-                    contigs_KEGGs_description[MGYA_contig] = "; ".join(description_list)
-                    KEGGs[MGYA_contig] = "; ".join(KEGGs[MGYA_contig])
+                if isinstance(keggs[contig], list):
+                    for annotation in keggs[contig]:
+                        description_list.append(keggs_description[annotation])
+                    contigs_keggs_description[contig] = "; ".join(description_list)
+                    keggs[contig] = "; ".join(keggs[contig])
 
         # ----- IPS ----- #
 
-        Pfams = {}      # { Pfams[contig] = Pfam }
+        pfams = {}      # { pfams[contig] = pfam }
 
         if os.path.exists(ips_annotations):
             with open(ips_annotations, 'r') as f:
                 for line in f:
-                    if "Pfam" in line:
+                    if "pfam" in line:
                         fields = line.strip().split('\t')
-                        MGYA_contig = fields[0]
-                        annID = fields[4]
-                        annDesc = fields[5]
-                        if MGYA_contig not in Pfams:
-                            Pfams[MGYA_contig] = []
-                        Pfams[MGYA_contig].append(annDesc + " [" + annID + ']')
+                        contig = fields[0]
+                        ann_id = fields[4]
+                        ann_desc = fields[5]
+                        if contig not in pfams:
+                            pfams[contig] = []
+                        pfams[contig].append(ann_desc + " [" + ann_id + ']')
 
-            for MGYA_contig in Pfams:
-                Pfams[MGYA_contig] = "; ".join(Pfams[MGYA_contig])
-                MGYAs[current_MGYA].append(MGYA_contig)
+            for contig in pfams:
+                pfams[contig] = "; ".join(pfams[contig])
+                assemblies_annotations[assembly_accession].append(contig)
 
         # ----- Assemble tsv table ----- #
 
         table_header = ["", "fasta", "scaffold", "gene_position", "kegg_id", "kegg_hit", "pfam_hits", "cazy_id"]
 
-        for MGYA in MGYAs:
+        for annotation in assemblies_annotations:
             functional_summary = []
-            all_contigs = MGYAs[MGYA]
+            all_contigs = assemblies_annotations[annotation]
             for contig in all_contigs:
                 contig_annotations = []
                 contig_annotations.extend([
                     contig,
-                    MGYA,                 # fasta
-                    MGYA + "_" + contig,  # scaffold
-                    contig                # gene_position
+                    annotation,                 # fasta
+                    annotation + "_" + contig,  # scaffold
+                    contig                      # gene_position
                 ])
-                try:
-                    contig_annotations.extend([
-                        KEGGs[contig],                    # kegg_id
-                        contigs_KEGGs_description[contig] # kegg_hit
-                    ])
-                except KeyError:
-                    contig_annotations.extend(["", ""])
-                try:
-                    contig_annotations.append(
-                        Pfams[contig] # pfam_hits
-                    )
-                except KeyError:
-                    contig_annotations.append("")
-                try:
-                    contig_annotations.append(
-                        CAZys[contig] # cazy_id
-                    )
-                except KeyError:
-                    contig_annotations.append("")
+                contig_annotations.extend([
+                    keggs.get(contig, ""),                    # kegg_id
+                    contigs_keggs_description.get(contig, "") # kegg_hit
+                ])
+                contig_annotations.append(
+                    pfams.get(contig, "") # pfam_hits
+                )
+                contig_annotations.append(
+                    cazys.get(contig, "") # cazy_id
+                )
 
                 functional_summary.append(contig_annotations)
 
