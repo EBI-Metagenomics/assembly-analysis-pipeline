@@ -22,7 +22,7 @@ include { INTERPRO_SUMMARY                        } from '../../modules/local/in
 include { HMMER_HMMSCAN as HMMSCAN_KOFAMS         } from '../../modules/local/hmmer/hmmscan/main'
 include { KEGG_ORTHOLOGS_SUMMARY                  } from '../../modules/local/kegg_orthologs_summary'
 include { KEGGPATHWAYSCOMPLETENESS                } from '../../modules/ebi-metagenomics/keggpathwayscompleteness/main'
-include { DRAM_SUMMARY                            } from '../../subworkflows/ebi-metagenomics/dram_swf/main'
+include { DRAM_SWF                                } from '../../subworkflows/ebi-metagenomics/dram_swf/main'
 
 
 workflow FUNCTIONAL_ANNOTATION {
@@ -204,7 +204,7 @@ workflow FUNCTIONAL_ANNOTATION {
     )
     ch_versions = ch_versions.mix(KEGGPATHWAYSCOMPLETENESS.out.versions)
 
-    DRAM_SUMMARY(
+    DRAM_SWF(
         INTERPRO_SUMMARY.out.file,
         DBCAN.out.file,
         KEGG_ORTHOLOGS_SUMMARY.out.tsv

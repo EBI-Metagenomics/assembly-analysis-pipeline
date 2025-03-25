@@ -9,6 +9,7 @@ def parse_args(argv):
     parser = argparse.ArgumentParser(formatter_class = argparse.ArgumentDefaultsHelpFormatter)
 
     parser.add_argument('-i', "--input", type=str, help="input folder")
+    parser.add_argument('-p', "--prefix", type=str, help="file prefix")
 
     args = parser.parse_args(argv)
 
@@ -30,6 +31,7 @@ if __name__ == "__main__":
         ips_annotations = os.path.join(assembly_analysis_path, "assembly", "assembly_interproscan.tsv")
         cazy_annotations = os.path.join(assembly_analysis_path, "assembly", "assembly_dbcan_overview.txt.gz")
 
+        # TODO: the way I gather assembly accessions and study accession depend on the meta inherited from above
         assembly_accession = assembly_analysis_path.split('/')[-1]
         assemblies_annotations[assembly_accession] = []
 
@@ -137,4 +139,4 @@ if __name__ == "__main__":
         except NameError:
             output_matrix = partial_matrix
 
-    output_matrix.to_csv("summary_for_DRAM.tsv", sep='\t', header=True, index=False)
+    output_matrix.to_csv(f"{args.prefix}_summary_for_DRAM.tsv", sep='\t', header=True, index=False)
