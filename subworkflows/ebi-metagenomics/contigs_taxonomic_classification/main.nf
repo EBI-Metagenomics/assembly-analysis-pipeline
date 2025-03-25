@@ -1,20 +1,14 @@
-include { DIAMOND_BLASTP                     } from '../../../modules/ebi-metagenomics/diamond/blastp/main'
-include { CATPACK_CONTIGS                    } from '../../../modules/ebi-metagenomics/catpack/contigs/main'
-/* Extension, this will be merge into nf-modules */
-include { CATPACK_ADDNAMES                   } from '../../../modules/local/catpack/addnames/main'
-include { KRONA_TXT_FROM_CAT_CLASSIFICATION  } from '../../../modules/local/krona_txt_from_cat_classification'
-include { KRONA_KTIMPORTTEXT                 } from '../../../modules/local/krona/ktimporttext/main'
-
-// TODO: this is an extension to generate a bgzip file (used on the website)
-include { TABIX_BGZIP as TABIX_BGZIP_KRONATXT } from '../../../modules/nf-core/tabix/bgzip/main'
-
+include { DIAMOND_BLASTP                                       } from '../../../modules/ebi-metagenomics/diamond/blastp/main'
+include { CATPACK_CONTIGS                                      } from '../../../modules/ebi-metagenomics/catpack/contigs/main'
+include { MGNIFYPIPELINESTOOLKIT_KRONATXTFROMCATCLASSIFICATION } from '../../../modules/ebi-metagenomics/mgnifypipelinestoolkit/kronatxtfromcatclassification/main'
+include { KRONA_KTIMPORTTEXT                                   } from '../../../modules/ebi-metagenomics/krona/ktimporttext/main'
 
 workflow CONTIGS_TAXONOMIC_CLASSIFICATION {
     take:
-    contigs     // [ val(meta), path(assembly_fasta) ]
-    proteins    // [ val(meta), path(proteins_fasta) ]
-    cat_db      // [ val(meta), path(catdb_folder)  ]
-    taxonomy_db // [ val(meta), path(cattax_folder) ]
+    ch_contigs     // [ val(meta), path(assembly_fasta) ]
+    ch_proteins    // [ val(meta), path(proteins_fasta) ]
+    cat_db        // [ val(meta), path(catdb_folder)  ]
+    taxonomy_db   // [ val(meta), path(cattax_folder) ]
 
     main:
 
@@ -27,19 +21,19 @@ workflow CONTIGS_TAXONOMIC_CLASSIFICATION {
     */
 
     DIAMOND_BLASTP(
-        proteins,
+        ch_proteins,
         [[id: "cat-db"], file("${cat_db[1]}/*.dmnd", checkIfExists: true)],
         6, // blast - txt
         []
     )
     ch_versions = ch_versions.mix(DIAMOND_BLASTP.out.versions.first())
 
-    catpack_input_ch = contigs
-        .join( proteins )
+    catpack_input_ch = ch_contigs
+        .join( ch_proteins )
         .join( DIAMOND_BLASTP.out.txt )
-        .multiMap { meta, contigs_fasta, proteins_faa, diamond_txt ->
-            contigs: [meta, contigs_fasta]
-            proteins: [meta, proteins_faa]
+        .multiMap { meta, contigs, proteins, diamond_txt ->
+            contigs: [meta, contigs]
+            proteins: [meta, proteins]
             diamond_txt: [meta, diamond_txt]
         }
 
@@ -52,24 +46,14 @@ workflow CONTIGS_TAXONOMIC_CLASSIFICATION {
     )
     ch_versions = ch_versions.mix(CATPACK_CONTIGS.out.versions.first())
 
-    CATPACK_ADDNAMES(
+    MGNIFYPIPELINESTOOLKIT_KRONATXTFROMCATCLASSIFICATION(
         CATPACK_CONTIGS.out.contig2classification,
         taxonomy_db
     )
-    ch_versions = ch_versions.mix(CATPACK_ADDNAMES.out.versions.first())
-
-    KRONA_TXT_FROM_CAT_CLASSIFICATION(
-        CATPACK_ADDNAMES.out.txt
-    )
-    ch_versions = ch_versions.mix(KRONA_TXT_FROM_CAT_CLASSIFICATION.out.versions.first())
-
-    TABIX_BGZIP_KRONATXT(
-        KRONA_TXT_FROM_CAT_CLASSIFICATION.out.krona_txt
-    )
-    ch_versions = ch_versions.mix(TABIX_BGZIP_KRONATXT.out.versions.first())
+    ch_versions = ch_versions.mix(MGNIFYPIPELINESTOOLKIT_KRONATXTFROMCATCLASSIFICATION.out.versions.first())
 
     KRONA_KTIMPORTTEXT(
-        KRONA_TXT_FROM_CAT_CLASSIFICATION.out.krona_txt
+        MGNIFYPIPELINESTOOLKIT_KRONATXTFROMCATCLASSIFICATION.out.krona_txt
     )
     ch_versions = ch_versions.mix(KRONA_KTIMPORTTEXT.out.versions.first())
 

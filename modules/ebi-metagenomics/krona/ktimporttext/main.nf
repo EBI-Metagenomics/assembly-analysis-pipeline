@@ -1,3 +1,7 @@
+// This krona/ktimporttext module is copied from the already-existing nf-core module (https://nf-co.re/modules/krona_ktimporttext, https://github.com/nf-core/modules/commit/8fc1d24c710ebe1d5de0f2447ec9439fd3d9d66a)
+// This is because there are not currently any nf-core ways of adding modules from more than one nf-core repo
+// One slight change compared to the original is I've added a stub to this module
+
 process KRONA_KTIMPORTTEXT {
     tag "$meta.id"
     label 'process_single'
@@ -33,7 +37,9 @@ process KRONA_KTIMPORTTEXT {
     """
 
     stub:
+    def args = task.ext.args ?: ''
     def prefix = task.ext.prefix ?: "${meta.id}"
+
     """
     touch ${prefix}.html
 

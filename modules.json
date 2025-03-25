@@ -166,6 +166,16 @@
                         "installed_by": ["modules"],
                         "patch": "modules/ebi-metagenomics/keggpathwayscompleteness/keggpathwayscompleteness.diff"
                     },
+                    "krona/ktimporttext": {
+                        "branch": "main",
+                        "git_sha": "172e93318ac2e2db5f9885b07ffb80443e67848a",
+                        "installed_by": ["contigs_taxonomic_classification"]
+                    },
+                    "mgnifypipelinestoolkit/kronatxtfromcatclassification": {
+                        "branch": "main",
+                        "git_sha": "82d827428b92dc3d818cd2a4538d53cb9b97095f",
+                        "installed_by": ["contigs_taxonomic_classification"]
+                    },
                     "mgnifypipelinestoolkit/rheachebiannotation": {
                         "branch": "main",
                         "git_sha": "7fbb802365177fd2a2f01ce5414c1c894357d95f",
@@ -202,7 +212,7 @@
                     },
                     "contigs_taxonomic_classification": {
                         "branch": "main",
-                        "git_sha": "489db3d33a99055f04088080e9b65a9237286afa",
+                        "git_sha": "82d827428b92dc3d818cd2a4538d53cb9b97095f",
                         "installed_by": ["subworkflows"]
                     },
                     "detect_rna": {
