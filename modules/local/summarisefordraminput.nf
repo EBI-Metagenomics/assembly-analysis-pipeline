@@ -22,8 +22,7 @@ process SUMMARISEFORDRAMINPUT {
     # - Kegg Orthologs IDs and description
     # It then produces a tsv table for dram distill to generate tabular and visual annotation summaries
 
-    python summarise_for_dram.py -i ${root_folder}
-    mv summary_for_DRAM.tsv ${prefix}_summary_for_DRAM.tsv
+    python summarise_for_dram.py -i ${root_folder} -p ${prefix}
 
     # what version should I output for python?
     """
