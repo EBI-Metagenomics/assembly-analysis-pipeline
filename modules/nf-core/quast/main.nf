@@ -43,10 +43,7 @@ process QUAST {
     """
 
     stub:
-    def args      = task.ext.args   ?: ''
     prefix        = task.ext.prefix ?: "${meta.id}"
-    def features  = gff             ? "--features $gff" : ''
-    def reference = fasta           ? "-r $fasta" : ''
 
     """
     mkdir -p $prefix
