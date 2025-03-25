@@ -7,7 +7,10 @@ process SUMMARISEFORDRAMINPUT {
         'community.wave.seqera.io/library/python:3.13.1--d00663700fcc8bcf' }"
 
     input:
-    tuple val(meta), path(root_folder)
+    tuple val(meta), path(ko_summaries)
+    tuple val(meta), path(ko_per_contigs)
+    tuple val(meta), path(interpro_summaries)
+    tuple val(meta), path(dbcan_overviews)
 
     output:
     tuple val(meta), path("${prefix}_dram_summary.tsv.gz"), emit: dram_summary
@@ -21,11 +24,16 @@ process SUMMARISEFORDRAMINPUT {
     """
     # For every assembly analysis, this script extracts:
     # - Columns X and Y from the interpro summary (namely, Pfam ID and description)
-    # - The best consensus from dbcan_overview.txt for CAZy families
+    # - A consensus from dbcan_overview.txt for CAZy families
     # - Kegg Orthologs IDs and description
     # It then produces a tsv table for dram distill to generate tabular and visual annotation summaries
 
-    python summarise_for_dram.py -i ${root_folder} -p ${prefix}
+    python summarise_for_dram.py \\
+    --prefix ${prefix}
+    --ko_summaries ${ko_summaries} \\
+    --ko_per_contigs ${ko_per_contigs} \\
+    --interpro_summaries ${interpro_summaries} \\
+    --dbcan_overviews ${dbcan_overviews} \\
 
     cat <<-END_VERSIONS > versions.yml
     "${task.process}":

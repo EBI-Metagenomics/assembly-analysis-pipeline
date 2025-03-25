@@ -8,7 +8,10 @@ import argparse
 def parse_args(argv):
     parser = argparse.ArgumentParser(formatter_class = argparse.ArgumentDefaultsHelpFormatter)
 
-    parser.add_argument('-i', "--input", type=str, help="input folder")
+    parser.add_argument('-s', "--ko_summaries", type=str, nargs='+', help="list of ko summaries")
+    parser.add_argument('-k', "--ko_per_contigs", type=str, nargs='+', help="list of ko annotations")
+    parser.add_argument('-i', "--interpro_summaries", type=str, nargs='+', help="list of interpro summaries")
+    parser.add_argument('-d', "--dbcan_overviews", type=str, nargs='+', help="list of dbcan overview files")
     parser.add_argument('-p', "--prefix", type=str, help="file prefix")
 
     args = parser.parse_args(argv)

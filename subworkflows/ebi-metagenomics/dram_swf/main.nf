@@ -4,14 +4,20 @@ include { SUMMARISEFORDRAMINPUT } from '../../../modules/local/summarisefordrami
 workflow DRAM_SWF {
 
     take:
-    root_path     //
+    tuple val(meta), path(ko_summaries)
+    tuple val(meta), path(ko_per_contigs)
+    tuple val(meta), path(interpro_summaries)
+    tuple val(meta), path(dbcan_overviews)
 
     main:
 
     ch_versions = Channel.empty()
 
     SUMMARISEFORDRAMINPUT (
-        root_path
+        ko_summaries,
+        ko_per_contigs,
+        interpro_summaries,
+        dbcan_overviews
     )
     ch_versions = ch_versions.mix(SUMMARISEFORDRAMINPUT.out.versions)
 

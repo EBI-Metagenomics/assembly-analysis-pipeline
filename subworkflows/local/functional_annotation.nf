@@ -204,13 +204,10 @@ workflow FUNCTIONAL_ANNOTATION {
     )
     ch_versions = ch_versions.mix(KEGGPATHWAYSCOMPLETENESS.out.versions)
 
-    DRAM_SWF(
-        INTERPRO_SUMMARY.out.file,
-        DBCAN.out.file,
-        KEGG_ORTHOLOGS_SUMMARY.out.tsv
-    )
-
     emit:
+    ko_summary_tsv    = KEGG_ORTHOLOGS_SUMMARY.out.ko_summary_tsv
+    ko_per_contig_tsv = KEGG_ORTHOLOGS_SUMMARY.out.ko_per_contig_tsv
+    dbcan_overview    = DBCAN.out.overview_output
     interproscan_tsv  = CONCATENATE_INTERPROSCAN_TSV.out.file_out
     interproscan_gff3 = CONCATENATE_INTERPROSCAN_GFFS.out.concatenated_gff
     versions          = ch_versions
