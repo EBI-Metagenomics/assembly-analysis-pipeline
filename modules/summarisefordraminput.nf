@@ -1,7 +1,10 @@
 process SUMMARISEFORDRAMINPUT {
-
     tag "$meta.id"
     label 'process_single'
+
+    container "${ workflow.containerEngine == 'singularity' && !task.ext.singularity_pull_docker_container ?
+        'oras://community.wave.seqera.io/library/python:3.13.1--9856f872fdeac74e':
+        'community.wave.seqera.io/library/python:3.13.1--d00663700fcc8bcf' }"
 
     input:
     tuple val(meta), path(root_folder)
@@ -22,15 +25,23 @@ process SUMMARISEFORDRAMINPUT {
     # - Kegg Orthologs IDs and description
     # It then produces a tsv table for dram distill to generate tabular and visual annotation summaries
 
-    python summarise_for_dram.py -i ${root_folder}
+    summarise_for_dram.py -i ${root_folder}
     mv summary_for_DRAM.tsv ${prefix}_summary_for_DRAM.tsv
 
-    # what version should I output for python?
+    cat <<-END_VERSIONS > versions.yml
+    "${task.process}":
+        python: \$(python --version 2>&1 | sed 's/Python //g')
+    END_VERSIONS
     """
 
     stub:
     prefix = task.ext.prefix ?: "${meta.id}"
     """
     touch ${prefix}_dram_summary.tsv
+
+    cat <<-END_VERSIONS > versions.yml
+    "${task.process}":
+        python: \$(python --version 2>&1 | sed 's/Python //g')
+    END_VERSIONS
     """
 }
