@@ -1,6 +1,6 @@
 /* NF-CORE */
 include { SEQKIT_SPLIT2                                   } from '../../modules/nf-core/seqkit/split2/main'
-include { CAT_CAT as CONCATENATE_EGGNOGMAPPER_ORTHOLOGOUS } from '../../modules/nf-core/cat/cat/main'
+include { CAT_CAT as CONCATENATE_EGGNOGMAPPER_ORTHOLOGS   } from '../../modules/nf-core/cat/cat/main'
 include { CAT_CAT as CONCATENATE_EGGNOGMAPPER_ANNOTATIONS } from '../../modules/nf-core/cat/cat/main'
 include { CAT_CAT as CONCATENATE_INTERPROSCAN_TSV         } from '../../modules/nf-core/cat/cat/main'
 include { CAT_CAT as CONCATENATE_DBCAN_OVERVIEW           } from '../../modules/nf-core/cat/cat/main'
@@ -12,12 +12,12 @@ include { TABIX_BGZIP as TABIX_BGZIP_RHEADCHEBI           } from '../../modules/
 
 /* EBI-METAGENOMICS */
 include { INTERPROSCAN                             } from '../../modules/ebi-metagenomics/interproscan/main'
-include { EGGNOGMAPPER as EGGNOGMAPPER_ORTHOLOGS   } from '../../modules/ebi-metagenomics/eggnogmapper/main'
-include { EGGNOGMAPPER as EGGNOGMAPPER_ANNOTATIONS } from '../../modules/ebi-metagenomics/eggnogmapper/main'
 include { DBCAN                                    } from '../../modules/ebi-metagenomics/dbcan/dbcan/main'
 include { GOSLIM_SWF                               } from '../../subworkflows/ebi-metagenomics/goslim_swf/main'
 
 /* LOCAL */
+include { EGGNOGMAPPER_ORTHOLOGS                            } from '../../modules/local/eggnogmapper_orthologs'
+include { EGGNOGMAPPER_ANNOTATIONS                          } from '../../modules/local/eggnogmapper_annotations'
 include { CONCATENATE_GFFS as CONCATENATE_INTERPROSCAN_GFFS } from '../../modules/local/concatenate_gffs'
 include { CONCATENATE_GFFS as CONCATENATE_DBCAN_GFFS        } from '../../modules/local/concatenate_gffs'
 include { PFAM_SUMMARY                                      } from '../../modules/local/pfam_summary'
@@ -64,7 +64,6 @@ workflow FUNCTIONAL_ANNOTATION {
     */
     EGGNOGMAPPER_ORTHOLOGS(
         ch_protein_chunked,
-        [[], []],
         params.eggnog_data_dir,
         params.eggnog_database,
         params.eggnog_diamond_database,
@@ -72,18 +71,15 @@ workflow FUNCTIONAL_ANNOTATION {
     ch_versions = ch_versions.mix(EGGNOGMAPPER_ORTHOLOGS.out.versions.first())
 
     EGGNOGMAPPER_ANNOTATIONS(
-        [[], []],
         EGGNOGMAPPER_ORTHOLOGS.out.orthologs,
         params.eggnog_data_dir,
-        [],
-        []
     )
     ch_versions = ch_versions.mix(EGGNOGMAPPER_ANNOTATIONS.out.versions.first())
 
-    CONCATENATE_EGGNOGMAPPER_ORTHOLOGOUS(
+    CONCATENATE_EGGNOGMAPPER_ORTHOLOGS(
         EGGNOGMAPPER_ORTHOLOGS.out.orthologs.groupTuple()
     )
-    ch_versions = ch_versions.mix(CONCATENATE_EGGNOGMAPPER_ORTHOLOGOUS.out.versions.first())
+    ch_versions = ch_versions.mix(CONCATENATE_EGGNOGMAPPER_ORTHOLOGS.out.versions.first())
 
     CONCATENATE_EGGNOGMAPPER_ANNOTATIONS(
         EGGNOGMAPPER_ANNOTATIONS.out.annotations.groupTuple()
@@ -163,7 +159,7 @@ workflow FUNCTIONAL_ANNOTATION {
     ch_versions = ch_versions.mix(CONCATENATE_DBCAN_OVERVIEW.out.versions)
 
     /*
-     * KEGG Orthologous annotation. This step uses hmmscan to annotation the sequences aginst the kofam HMM models.
+     * KEGG orthologs annotation. This step uses hmmscan to annotation the sequences aginst the kofam HMM models.
      * These HMM models have been extended as described -> TODO: link to the mgnify_pipelines_reference_databases pipeline
     */
     HMMSEARCH_KOFAMS(

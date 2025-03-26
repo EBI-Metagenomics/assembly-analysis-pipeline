@@ -1,21 +1,21 @@
 process KEGG_ORTHOLOGS_SUMMARY {
 
-    tag "$meta.id"
+    tag "${meta.id}"
     label 'process_single'
 
-    container "${ workflow.containerEngine == 'singularity' && !task.ext.singularity_pull_docker_container ?
-        'oras://community.wave.seqera.io/library/csvtk_tabix_pip_biopython:e6e033af2a05a562':
-        'community.wave.seqera.io/library/csvtk_tabix_pip_biopython:7eabdb397e7420a3' }"
+    container "${workflow.containerEngine == 'singularity' && !task.ext.singularity_pull_docker_container
+        ? 'oras://community.wave.seqera.io/library/csvtk_tabix_pip_biopython:e6e033af2a05a562'
+        : 'community.wave.seqera.io/library/csvtk_tabix_pip_biopython:7eabdb397e7420a3'}"
 
     input:
     tuple val(meta), path(hmmscan_concatenated_tblout)
 
     output:
-    tuple val(meta), path("${prefix}_ko_summary.tsv.gz"),        emit: ko_summary_tsv
-    tuple val(meta), path("${prefix}_ko_summary.tsv.gz.gzi"),    emit: ko_summary_tsv_gzi
-    tuple val(meta), path("${prefix}_ko_per_contig.tsv.gz"),     emit: ko_per_contig_tsv
+    tuple val(meta), path("${prefix}_ko_summary.tsv.gz"), emit: ko_summary_tsv
+    tuple val(meta), path("${prefix}_ko_summary.tsv.gz.gzi"), emit: ko_summary_tsv_gzi
+    tuple val(meta), path("${prefix}_ko_per_contig.tsv.gz"), emit: ko_per_contig_tsv
     tuple val(meta), path("${prefix}_ko_per_contig.tsv.gz.gzi"), emit: ko_per_contig_tsb_gzi
-    path "versions.yml",                                         emit: versions
+    path "versions.yml", emit: versions
 
     when:
     task.ext.when == null || task.ext.when
@@ -42,10 +42,10 @@ process KEGG_ORTHOLOGS_SUMMARY {
     hmmscan_tblout_to_tsv.py ${hmmscan_concatenated_tblout} | \\
     tee \\
         >(csvtk cut --num-cpus ${task.cpus} --tabs --no-header-row --fields 1,3 | \\
-          csvtk freq --num-cpus ${task.cpus} --tabs --no-header-row --fields 1,2 --reverse --sort-by-freq | \\
-          csvtk add-header --num-cpus ${task.cpus} --tabs --no-header-row --names ko,description,count | \\
-          csvtk cut --num-cpus ${task.cpus} --tabs --fields count,ko,description | \\
-          bgzip --stdout -@${task.cpus} --index --index-name ${prefix}_ko_summary.tsv.gz.gzi > ${prefix}_ko_summary.tsv.gz
+            csvtk freq --num-cpus ${task.cpus} --tabs --no-header-row --fields 1,2 --reverse --sort-by-freq | \\
+            csvtk add-header --num-cpus ${task.cpus} --tabs --no-header-row --names ko,description,count | \\
+            csvtk cut --num-cpus ${task.cpus} --tabs --fields count,ko,description | \\
+            bgzip --stdout -@${task.cpus} --index --index-name ${prefix}_ko_summary.tsv.gz.gzi > ${prefix}_ko_summary.tsv.gz
         ) | \\
         csvtk cut --num-cpus ${task.cpus} --tabs --no-header-row --fields 1,2 | \\
         csvtk add-header --num-cpus ${task.cpus} --tabs --no-header-row --names ko,contig_id | \\

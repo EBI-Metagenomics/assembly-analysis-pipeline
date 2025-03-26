@@ -8,78 +8,58 @@
                     "antismash/antismashlite": {
                         "branch": "master",
                         "git_sha": "81880787133db07d9b4c1febd152c090eb8325dc",
-                        "installed_by": [
-                            "modules"
-                        ],
+                        "installed_by": ["modules"],
                         "patch": "modules/nf-core/antismash/antismashlite/antismash-antismashlite.diff"
                     },
                     "cat/cat": {
                         "branch": "master",
                         "git_sha": "666652151335353eef2fcd58880bcef5bc2928e1",
-                        "installed_by": [
-                            "modules"
-                        ],
+                        "installed_by": ["modules"],
                         "patch": "modules/nf-core/cat/cat/cat-cat.diff"
                     },
                     "hmmer/hmmsearch": {
                         "branch": "master",
                         "git_sha": "81880787133db07d9b4c1febd152c090eb8325dc",
-                        "installed_by": [
-                            "modules"
-                        ],
+                        "installed_by": ["modules"],
                         "patch": "modules/nf-core/hmmer/hmmsearch/hmmer-hmmsearch.diff"
                     },
                     "multiqc": {
                         "branch": "master",
                         "git_sha": "cf17ca47590cc578dfb47db1c2a44ef86f89976d",
-                        "installed_by": [
-                            "modules"
-                        ],
+                        "installed_by": ["modules"],
                         "patch": "modules/nf-core/multiqc/multiqc.diff"
                     },
                     "pigz/uncompress": {
                         "branch": "master",
                         "git_sha": "c70357ea249a541df53dd5b479b3c32b0c26c4d2",
-                        "installed_by": [
-                            "modules"
-                        ]
+                        "installed_by": ["modules"]
                     },
                     "pyrodigal": {
                         "branch": "master",
                         "git_sha": "938e803109104e30773f76a7142442722498fef1",
-                        "installed_by": [
-                            "modules"
-                        ]
+                        "installed_by": ["modules"]
                     },
                     "quast": {
                         "branch": "master",
                         "git_sha": "81880787133db07d9b4c1febd152c090eb8325dc",
-                        "installed_by": [
-                            "modules"
-                        ],
+                        "installed_by": ["modules"],
                         "patch": "modules/nf-core/quast/quast.diff"
                     },
                     "seqkit/seq": {
                         "branch": "master",
                         "git_sha": "81880787133db07d9b4c1febd152c090eb8325dc",
-                        "installed_by": [
-                            "modules"
-                        ]
+                        "installed_by": ["modules"]
                     },
                     "seqkit/split2": {
                         "branch": "master",
                         "git_sha": "666652151335353eef2fcd58880bcef5bc2928e1",
-                        "installed_by": [
-                            "modules"
-                        ],
+                        "installed_by": ["modules"],
                         "patch": "modules/nf-core/seqkit/split2/seqkit-split2.diff"
                     },
                     "tabix/bgzip": {
                         "branch": "master",
                         "git_sha": "69fdb99a8affa55adfda16966aa4568e103dc1b6",
-                        "installed_by": [
-                            "modules"
-                        ]
+                        "installed_by": ["modules"]
                     }
                 }
             },
@@ -88,23 +68,17 @@
                     "utils_nextflow_pipeline": {
                         "branch": "master",
                         "git_sha": "c2b22d85f30a706a3073387f30380704fcae013b",
-                        "installed_by": [
-                            "subworkflows"
-                        ]
+                        "installed_by": ["subworkflows"]
                     },
                     "utils_nfcore_pipeline": {
                         "branch": "master",
                         "git_sha": "51ae5406a030d4da1e49e4dab49756844fdd6c7a",
-                        "installed_by": [
-                            "subworkflows"
-                        ]
+                        "installed_by": ["subworkflows"]
                     },
                     "utils_nfschema_plugin": {
                         "branch": "master",
                         "git_sha": "2fd2cd6d0e7b273747f32e465fdc6bcc3ae0814e",
-                        "installed_by": [
-                            "subworkflows"
-                        ]
+                        "installed_by": ["subworkflows"]
                     }
                 }
             }
@@ -115,164 +89,113 @@
                     "catpack/contigs": {
                         "branch": "main",
                         "git_sha": "b08ed4ae81778706db8c5be504bfd8dd2817a121",
-                        "installed_by": [
-                            "contigs_taxonomic_classification"
-                        ]
+                        "installed_by": ["contigs_taxonomic_classification"]
                     },
                     "cmsearchtbloutdeoverlap": {
                         "branch": "main",
                         "git_sha": "696324c637a7e0cf06fe331faffee42e36826898",
-                        "installed_by": [
-                            "detect_rna"
-                        ]
+                        "installed_by": ["detect_rna"]
                     },
                     "combinedgenecaller/merge": {
                         "branch": "main",
                         "git_sha": "b84a0c52b92eef58ba2aeb2d22ae45d5bc6ae294",
-                        "installed_by": [
-                            "combined_gene_caller"
-                        ]
+                        "installed_by": ["combined_gene_caller"]
                     },
                     "convertcmscantocmsearch": {
                         "branch": "main",
                         "git_sha": "937985d6147b25b74700f2eb6fc41ab4150ad7d4",
-                        "installed_by": [
-                            "detect_rna"
-                        ]
+                        "installed_by": ["detect_rna"]
                     },
                     "dbcan/dbcan": {
                         "branch": "main",
                         "git_sha": "2f2f837279b44825254ea736b12ea4797b350d0a",
-                        "installed_by": [
-                            "modules"
-                        ]
+                        "installed_by": ["modules"]
                     },
                     "diamond/blastp": {
                         "branch": "main",
                         "git_sha": "f85a33e88680924f76aaccb3c120983ff4134747",
-                        "installed_by": [
-                            "contigs_taxonomic_classification"
-                        ]
+                        "installed_by": ["contigs_taxonomic_classification"]
                     },
                     "easel/eslsfetch": {
                         "branch": "main",
                         "git_sha": "f1bf089cb679ca1e363aa81c99a512114402472c",
-                        "installed_by": [
-                            "detect_rna"
-                        ]
-                    },
-                    "eggnogmapper": {
-                        "branch": "main",
-                        "git_sha": "90d26eb24748f4b7d7d54798bac65f265a9d7f58",
-                        "installed_by": [
-                            "modules"
-                        ]
+                        "installed_by": ["detect_rna"]
                     },
                     "extractcoords": {
                         "branch": "main",
                         "git_sha": "33ea81307e5bf9772861d2a3cb1b4f4694a04db6",
-                        "installed_by": [
-                            "modules"
-                        ]
+                        "installed_by": ["modules"]
                     },
                     "fraggenescanrs": {
                         "branch": "main",
                         "git_sha": "67fa3c30f1488ebacb1f1a1304cc1c8b43e92e3d",
-                        "installed_by": [
-                            "combined_gene_caller"
-                        ]
+                        "installed_by": ["combined_gene_caller"]
                     },
                     "generategaf": {
                         "branch": "main",
                         "git_sha": "31e6276eef26fec7160c53a575b6e27b7ff842a5",
-                        "installed_by": [
-                            "goslim_swf"
-                        ]
+                        "installed_by": ["goslim_swf"]
                     },
                     "genomeproperties": {
                         "branch": "main",
                         "git_sha": "7c67b0652fb83c8239bd5bace72364f6676e3e39",
-                        "installed_by": [
-                            "modules"
-                        ]
+                        "installed_by": ["modules"]
                     },
                     "infernal/cmscan": {
                         "branch": "main",
                         "git_sha": "e29278872287d0599819456a2194f763da64aeb8",
-                        "installed_by": [
-                            "detect_rna"
-                        ]
+                        "installed_by": ["detect_rna"]
                     },
                     "infernal/cmsearch": {
                         "branch": "main",
                         "git_sha": "62e22fb1fd131d27ed043f305f317a0cf741b900",
-                        "installed_by": [
-                            "detect_rna"
-                        ]
+                        "installed_by": ["detect_rna"]
                     },
                     "interproscan": {
                         "branch": "main",
                         "git_sha": "75bee0dac2cb4b978fb62a8e8b8aab491507bb04",
-                        "installed_by": [
-                            "modules"
-                        ]
+                        "installed_by": ["modules"]
                     },
                     "keggpathwayscompleteness": {
                         "branch": "main",
                         "git_sha": "badc62913e6a5102f9c628a2b07baff39938d220",
-                        "installed_by": [
-                            "modules"
-                        ],
+                        "installed_by": ["modules"],
                         "patch": "modules/ebi-metagenomics/keggpathwayscompleteness/keggpathwayscompleteness.diff"
                     },
                     "krona/ktimporttext": {
                         "branch": "main",
                         "git_sha": "172e93318ac2e2db5f9885b07ffb80443e67848a",
-                        "installed_by": [
-                            "contigs_taxonomic_classification"
-                        ]
+                        "installed_by": ["contigs_taxonomic_classification"]
                     },
                     "mgnifypipelinestoolkit/kronatxtfromcatclassification": {
                         "branch": "main",
                         "git_sha": "82d827428b92dc3d818cd2a4538d53cb9b97095f",
-                        "installed_by": [
-                            "contigs_taxonomic_classification"
-                        ]
+                        "installed_by": ["contigs_taxonomic_classification"]
                     },
                     "mgnifypipelinestoolkit/rheachebiannotation": {
                         "branch": "main",
                         "git_sha": "7fbb802365177fd2a2f01ce5414c1c894357d95f",
-                        "installed_by": [
-                            "modules"
-                        ]
+                        "installed_by": ["modules"]
                     },
                     "owltools": {
                         "branch": "main",
                         "git_sha": "fb9a33114fe9083dc5b203fc4608825a9c51fdf6",
-                        "installed_by": [
-                            "goslim_swf"
-                        ]
+                        "installed_by": ["goslim_swf"]
                     },
                     "pyrodigal": {
                         "branch": "main",
                         "git_sha": "62a62db0834d95722de5a155778d70074b211dd6",
-                        "installed_by": [
-                            "combined_gene_caller"
-                        ]
+                        "installed_by": ["combined_gene_caller"]
                     },
                     "sanntis": {
                         "branch": "main",
                         "git_sha": "0d489b1617f2015cd99eea7f9369491723eb9260",
-                        "installed_by": [
-                            "modules"
-                        ]
+                        "installed_by": ["modules"]
                     },
                     "summarisegoslims": {
                         "branch": "main",
                         "git_sha": "200aad20884dac5d5913b668030cc44cc5d807f4",
-                        "installed_by": [
-                            "goslim_swf"
-                        ]
+                        "installed_by": ["goslim_swf"]
                     }
                 }
             },
@@ -281,30 +204,22 @@
                     "combined_gene_caller": {
                         "branch": "main",
                         "git_sha": "b84a0c52b92eef58ba2aeb2d22ae45d5bc6ae294",
-                        "installed_by": [
-                            "subworkflows"
-                        ]
+                        "installed_by": ["subworkflows"]
                     },
                     "contigs_taxonomic_classification": {
                         "branch": "main",
                         "git_sha": "82d827428b92dc3d818cd2a4538d53cb9b97095f",
-                        "installed_by": [
-                            "subworkflows"
-                        ]
+                        "installed_by": ["subworkflows"]
                     },
                     "detect_rna": {
                         "branch": "main",
                         "git_sha": "937985d6147b25b74700f2eb6fc41ab4150ad7d4",
-                        "installed_by": [
-                            "subworkflows"
-                        ]
+                        "installed_by": ["subworkflows"]
                     },
                     "goslim_swf": {
                         "branch": "main",
                         "git_sha": "200aad20884dac5d5913b668030cc44cc5d807f4",
-                        "installed_by": [
-                            "subworkflows"
-                        ]
+                        "installed_by": ["subworkflows"]
                     }
                 }
             }

@@ -13,33 +13,33 @@ include { methodsDescriptionText             } from '../subworkflows/local/utils
 
 /*
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-   NF-CORE MODULES and SUBWORKFLOWS
+    NF-CORE MODULES and SUBWORKFLOWS
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 */
-include { SEQKIT_SPLIT2                     } from '../modules/nf-core/seqkit/split2/main'
-include { PIGZ_UNCOMPRESS as PIGZ_CONTIGS   } from '../modules/nf-core/pigz/uncompress/main'
-include { PIGZ_UNCOMPRESS as PIGZ_PROTEINS  } from '../modules/nf-core/pigz/uncompress/main'
+include { SEQKIT_SPLIT2                      } from '../modules/nf-core/seqkit/split2/main'
+include { PIGZ_UNCOMPRESS as PIGZ_CONTIGS    } from '../modules/nf-core/pigz/uncompress/main'
+include { PIGZ_UNCOMPRESS as PIGZ_PROTEINS   } from '../modules/nf-core/pigz/uncompress/main'
 
 /*
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-   EBI-METAGENOMICS MODULES and SUBWORKFLOWS
+    EBI-METAGENOMICS MODULES and SUBWORKFLOWS
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 */
-include { ASSEMBLY_QC                       } from '../subworkflows/local/assembly_qc'
-include { COMBINED_GENE_CALLER              } from '../subworkflows/ebi-metagenomics/combined_gene_caller/main'
-include { CONTIGS_TAXONOMIC_CLASSIFICATION  } from '../subworkflows/ebi-metagenomics/contigs_taxonomic_classification/main'
+include { ASSEMBLY_QC                        } from '../subworkflows/local/assembly_qc'
+include { COMBINED_GENE_CALLER               } from '../subworkflows/ebi-metagenomics/combined_gene_caller/main'
+include { CONTIGS_TAXONOMIC_CLASSIFICATION   } from '../subworkflows/ebi-metagenomics/contigs_taxonomic_classification/main'
 
 /*
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-   LOCAL MODULES and SUBWORKFLOWS
+    LOCAL MODULES and SUBWORKFLOWS
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 */
 
-include { RENAME_CONTIGS         } from '../modules/local/rename_contigs'
-include { RNA_ANNOTATION         } from '../subworkflows/local/rna_annotation'
-include { FUNCTIONAL_ANNOTATION  } from '../subworkflows/local/functional_annotation'
-include { DRAM_SWF               } from '../subworkflows/ebi-metagenomics/dram_swf'
-include { PATHWAYS_AND_SYSTEMS   } from '../subworkflows/local/pathways_and_systems'
+include { RENAME_CONTIGS                     } from '../modules/local/rename_contigs'
+include { RNA_ANNOTATION                     } from '../subworkflows/local/rna_annotation'
+include { FUNCTIONAL_ANNOTATION              } from '../subworkflows/local/functional_annotation'
+include { DRAM_SWF                           } from '../subworkflows/ebi-metagenomics/dram_swf'
+include { PATHWAYS_AND_SYSTEMS               } from '../subworkflows/local/pathways_and_systems'
 
 /*
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -88,17 +88,20 @@ workflow ASSEMBLY_ANALYSIS_PIPELINE {
     * Protein prediction with the combined-gene-caller, and masking the rRNAs genes
     */
     // We need to sync the sequences and the rRNA outputs //
-    ASSEMBLY_QC.out.assembly_filtered.join(RNA_ANNOTATION.out.ssu_lsu_coords).multiMap { meta, assembly_fasta, ssu_lsu_coords ->
-        assembly: [meta, assembly_fasta]
-        ssu_lsu_coords: [meta, ssu_lsu_coords]
-    }.set {
-        ch_cgc
-    }
+    ASSEMBLY_QC.out.assembly_filtered
+        .join(RNA_ANNOTATION.out.ssu_lsu_coords)
+        .multiMap { meta, assembly_fasta, ssu_lsu_coords ->
+            assembly: [meta, assembly_fasta]
+            ssu_lsu_coords: [meta, ssu_lsu_coords]
+        }
+        .set {
+            ch_cgc
+        }
 
     // TODO: handle LR - FGS flip parameter //
     COMBINED_GENE_CALLER(
         ch_cgc.assembly,
-        ch_cgc.ssu_lsu_coords // used to mask the rRNA genes in the assembly
+        ch_cgc.ssu_lsu_coords,
     )
     ch_versions = ch_versions.mix(COMBINED_GENE_CALLER.out.versions)
 
@@ -112,7 +115,7 @@ workflow ASSEMBLY_ANALYSIS_PIPELINE {
         PIGZ_CONTIGS(ASSEMBLY_QC.out.assembly_filtered).file,
         PIGZ_PROTEINS(COMBINED_GENE_CALLER.out.faa).file,
         [[id: "cat_diamond_db"], file(params.cat_diamond_database, checkIfExists: true)],
-        [[id: "cat_taxonomy_db"], file(params.cat_taxonomy_database, checkIfExists: true)]
+        [[id: "cat_taxonomy_db"], file(params.cat_taxonomy_database, checkIfExists: true)],
     )
     ch_versions = ch_versions.mix(CONTIGS_TAXONOMIC_CLASSIFICATION.out.versions)
 
@@ -133,8 +136,8 @@ workflow ASSEMBLY_ANALYSIS_PIPELINE {
     * Annotation of the proteins.
     */
     FUNCTIONAL_ANNOTATION(
-        COMBINED_GENE_CALLER.out.faa.join( COMBINED_GENE_CALLER.out.gff ),
-        ch_protein_chunks
+        COMBINED_GENE_CALLER.out.faa.join(COMBINED_GENE_CALLER.out.gff),
+        ch_protein_chunks,
     )
     ch_versions = ch_versions.mix(FUNCTIONAL_ANNOTATION.out.versions)
 
@@ -163,7 +166,7 @@ workflow ASSEMBLY_ANALYSIS_PIPELINE {
             FUNCTIONAL_ANNOTATION.out.interproscan_tsv
         ),
         FUNCTIONAL_ANNOTATION.out.kegg_orthologs_summary_tsv,
-        ch_protein_chunks
+        ch_protein_chunks,
     )
     ch_versions = ch_versions.mix(PATHWAYS_AND_SYSTEMS.out.versions)
 
@@ -244,5 +247,5 @@ workflow ASSEMBLY_ANALYSIS_PIPELINE {
 
     emit:
     multiqc_report = MULTIQC_PER_SAMPLESHEET.out.report.toList() // channel: /path/to/multiqc_report.html
-    versions       = ch_versions                                // channel: [ path(versions.yml) ]
+    versions       = ch_versions // channel: [ path(versions.yml) ]
 }
