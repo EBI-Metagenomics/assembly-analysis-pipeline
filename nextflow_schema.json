@@ -208,13 +208,13 @@
                 },
                 "cat_diamond_database": {
                     "type": "string",
-                    "format": "file-path",
+                    "format": "directory-path",
                     "description": "Directory containing the CAT database produced with catpack/prepare.",
                     "help": "The folder must contain DIAMOND db *.dmnd, *.fastaid2LCAtaxid, *.taxids_with_multiple_offspring."
                 },
                 "cat_taxonomy_database": {
                     "type": "string",
-                    "format": "file-path",
+                    "format": "directory-path",
                     "description": "Directory containing the tax/ folder of the CAT database produced with catpack/prepare.",
                     "help": "The folder must contain names.dmp and nodes.dmp"
                 },
