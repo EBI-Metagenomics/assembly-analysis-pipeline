@@ -16,10 +16,100 @@
 
 import sys
 import os
-import pandas as pd
-import glob
-import gzip
 import argparse
+import pandas as pd
+import gzip
+import csv
+
+def get_accession(file_name):
+    return file_name.split('_')[0]
+
+def extract_kegg_annotations(kegg_anns, kegg_descs):
+    keggs, keggs_descriptions, contigs_keggs_descriptions = {}, {}, {}
+
+    global assemblies_annotations
+
+    for kegg_annotation in kegg_anns:
+        analysis_accession = get_accession(kegg_annotation)
+        assemblies_annotations[analysis_accession] = []
+        with gzip.open(kegg_annotation, 'rt') as f:
+            csv_reader = csv.reader(f, delimiter='\t')
+            next(csv_reader)
+            for ko, contig in csv_reader:
+                if contig not in keggs:
+                    keggs[contig] = []
+                keggs[contig].append(ko)
+                assemblies_annotations[analysis_accession].append(contig)
+
+    for kegg_description in kegg_descs:
+        analysis_accession = get_accession(kegg_annotation)
+        with gzip.open(kegg_description, 'rt') as f:
+            csv_reader = csv.reader(f, delimiter='\t')
+            for _, ko, ko_description in csv_reader:
+                keggs_descriptions[ko] = ko_description
+
+    for contig in keggs:
+        description_list = []
+        if isinstance(keggs[contig], list):
+            for annotation in keggs[contig]:
+                description_list.append(keggs_descriptions[annotation])
+            contigs_keggs_descriptions[contig] = "; ".join(description_list)
+            keggs[contig] = "; ".join(keggs[contig])
+
+    return keggs, contigs_keggs_descriptions
+
+def extract_cazy_families(cazy_files):
+    cazys = {}
+
+    global assemblies_annotations
+
+    for cazy_annotation in cazy_files:
+        analysis_accession = get_accession(cazy_annotation)
+        assemblies_annotations[analysis_accession] = []
+        with gzip.open(cazy_annotation, 'rt') as f:
+            csv_reader = csv.reader(f, delimiter='\t')
+            next(csv_reader)
+            for contig, _, hmmer, dbcan_sub, diamond, _ in csv_reader:
+                hmmer_list = [s.split('(')[0] for s in hmmer.split('+')]         # format: GT9(116-281)+GT17(914-1160) ==> ['GT9', 'GT17']
+                dbcan_sub_list = [s.split('_')[0] for s in dbcan_sub.split('+')] # format: GH23_e756+CBM50_e338 ==> ['GH23', 'CBM50']
+                diamond_list = [s.split('_')[0] for s in diamond.split('+')]     # format: CBM50+GH23 ==> ['CBM50', 'GH23']
+                consensus = set()
+                for hmmer_acc in hmmer_list:
+                    if hmmer_acc in dbcan_sub_list or hmmer_acc in diamond_list:
+                        consensus.add(hmmer_acc)
+                for dbcan in dbcan_sub_list:
+                    if dbcan in diamond_list:
+                        consensus.add(dbcan)
+                cazys[contig] = "; ".join(consensus)
+                assemblies_annotations[analysis_accession].append(contig)
+
+    return cazys
+
+def extract_pfam_annotations(ips_files):
+    pfams = {}
+
+    global assemblies_annotations
+
+    for ips_annotation in ips_files:
+        analysis_accession = get_accession(ips_annotation)
+        assemblies_annotations[analysis_accession] = []
+        with open(ips_annotation, 'r') as f: # convert to gzip once the file is compressed
+            csv_reader = csv.reader(f, delimiter='\t')
+            for line in csv_reader:
+                if "MobiDBLite" in line:
+                    contig = line[0]
+                    ann_id = line[4]
+                    ann_desc = line[5]
+                    if contig not in pfams:
+                        pfams[contig] = []
+                    pfams[contig].append(ann_desc + " [" + ann_id + ']')
+
+        for contig in pfams:
+            if isinstance(pfams[contig], list):
+                pfams[contig] = "; ".join(pfams[contig])
+                assemblies_annotations[analysis_accession].append(contig)
+
+    return pfams
 
 def parse_args(argv):
     parser = argparse.ArgumentParser(formatter_class = argparse.ArgumentDefaultsHelpFormatter)
@@ -37,129 +127,59 @@ def parse_args(argv):
 if __name__ == "__main__":
     args = parse_args(sys.argv[1:])
 
-    analyses = glob.glob(os.path.join(args.input, "ERZ*"))
     assemblies_annotations = {}     # { assemblies_annotations[accessions] = set(contigs) }
 
-    for assembly_analysis_path in analyses:
+    kegg_annotations = args.ko_per_contigs
+    kegg_descriptions = args.ko_summaries
+    ips_annotations = args.interpro_summaries
+    cazy_annotations = args.dbcan_overviews
 
-        # ----- Functional annotation files ----- #
+    # ----- CAZy ----- #
 
-        kegg_annotations = os.path.join(assembly_analysis_path, "assembly", "assembly_ko_per_contig.tsv.gz")
-        kegg_description = os.path.join(assembly_analysis_path, "assembly", "assembly_ko_summary.tsv.gz")
+    cazys = extract_cazy_families(cazy_annotations) # { cazys[contig] = cazy }
+    
+    # ----- kegg ----- #
 
-        ips_annotations = os.path.join(assembly_analysis_path, "assembly", "assembly_interproscan.tsv")
-        cazy_annotations = os.path.join(assembly_analysis_path, "assembly", "assembly_dbcan_overview.txt.gz")
+    keggs = extract_kegg_annotations(kegg_annotations, kegg_descriptions) # { keggs[contig] = kegg }
+    keggs, contigs_keggs_description = extract_kegg_annotations(kegg_annotations, kegg_descriptions) # { keggs[contig] = kegg }
 
-        # TODO: the way I gather assembly accessions and study accession depend on the meta inherited from above
-        assembly_accession = assembly_analysis_path.split('/')[-1]
-        assemblies_annotations[assembly_accession] = []
+    # ----- IPS ----- #
 
-        # ----- CAZy ----- #
+    pfams = extract_pfam_annotations(ips_annotations)   # { pfams[contig] = pfam }
 
-        cazys = {}      # { cazys[contig] = cazy }
+    # ----- Assemble tsv table ----- #
 
-        if os.path.exists(cazy_annotations):
-            with gzip.open(cazy_annotations, 'rt') as f:
-                csv_reader = csv.reader(f, delimiter='\t')
-                next(csv_reader)
-                for line in csv_reader:
-                    contig, _, hmmer, dbcan_sub, diamond, _ = line.strip().split('\t')
-                    hmmer_list = [s.split('(')[0] for s in hmmer.split('+')]         # format: GT9(116-281)+GT17(914-1160) ==> ['GT9', 'GT17']
-                    dbcan_sub_list = [s.split('_')[0] for s in dbcan_sub.split('+')] # format: GH23_e756+CBM50_e338 ==> ['GH23', 'CBM50']
-                    diamond_list = [s.split('_')[0] for s in diamond.split('+')]     # format: CBM50+GH23 ==> ['CBM50', 'GH23']
-                    consensus = set()
-                    for hmmer_acc in hmmer_list:
-                        if hmmer_acc in dbcan_sub_list or hmmer_acc in diamond_list:
-                            consensus.add(hmmer_acc)
-                    for dbcan in dbcan_sub_list:
-                        if dbcan in diamond_list:
-                            consensus.add(dbcan)
-                    cazys[contig] = "; ".join(consensus)
-                    assemblies_annotations[assembly_accession].append(contig)
+    table_header = ["", "fasta", "scaffold", "gene_position", "kegg_id", "kegg_hit", "pfam_hits", "cazy_id"]
 
-        # ----- kegg ----- #
+    for annotation in assemblies_annotations:
+        functional_summary = []
+        all_contigs = assemblies_annotations[annotation]
+        for contig in all_contigs:
+            contig_annotations = []
+            contig_annotations.extend([
+                contig,
+                annotation,                 # fasta
+                annotation + "_" + contig,  # scaffold
+                contig                      # gene_position
+            ])
+            contig_annotations.extend([
+                keggs.get(contig, ""),                    # kegg_id
+                contigs_keggs_description.get(contig, "") # kegg_hit
+            ])
+            contig_annotations.append(
+                pfams.get(contig, "") # pfam_hits
+            )
+            contig_annotations.append(
+                cazys.get(contig, "") # cazy_id
+            )
 
-        keggs = {}      # { keggs[contig] = kegg }
-        keggs_description, contigs_keggs_description = {}, {}
+            functional_summary.append(contig_annotations)
 
-        if os.path.exists(kegg_annotations) and os.path.exists(kegg_description):
-            with gzip.open(kegg_annotations, 'rt') as f:
-                csv_reader = csv.reader(f, delimiter='\t')
-                for line in csv_reader:
-                    ko, contig = line.strip().split('\t')
-                    if contig not in keggs:
-                        keggs[contig] = []
-                    keggs[contig].append(ko)
-                    assemblies_annotations[assembly_accession].append(contig)
+    partial_matrix = pd.DataFrame(functional_summary, index=all_contigs, columns=table_header)
 
-            with gzip.open(kegg_description, 'rt') as f:
-                csv_reader = csv.reader(f, delimiter='\t')
-                for line in csv_reader:
-                    _, ko, ko_description = line.strip().split('\t')
-                    keggs_description[ko] = ko_description
-
-            for contig in keggs:
-                description_list = []
-                if isinstance(keggs[contig], list):
-                    for annotation in keggs[contig]:
-                        description_list.append(keggs_description[annotation])
-                    contigs_keggs_description[contig] = "; ".join(description_list)
-                    keggs[contig] = "; ".join(keggs[contig])
-
-        # ----- IPS ----- #
-
-        pfams = {}      # { pfams[contig] = pfam }
-
-        if os.path.exists(ips_annotations):
-            with open(ips_annotations, 'r') as f: # convert to gzip once the file is compressed
-                csv_reader = csv.reader(f, delimiter='\t')
-                for line in csv_reader:
-                    if "pfam" in line:
-                        fields = line.strip().split('\t')
-                        contig = fields[0]
-                        ann_id = fields[4]
-                        ann_desc = fields[5]
-                        if contig not in pfams:
-                            pfams[contig] = []
-                        pfams[contig].append(ann_desc + " [" + ann_id + ']')
-
-            for contig in pfams:
-                pfams[contig] = "; ".join(pfams[contig])
-                assemblies_annotations[assembly_accession].append(contig)
-
-        # ----- Assemble tsv table ----- #
-
-        table_header = ["", "fasta", "scaffold", "gene_position", "kegg_id", "kegg_hit", "pfam_hits", "cazy_id"]
-
-        for annotation in assemblies_annotations:
-            functional_summary = []
-            all_contigs = assemblies_annotations[annotation]
-            for contig in all_contigs:
-                contig_annotations = []
-                contig_annotations.extend([
-                    contig,
-                    annotation,                 # fasta
-                    annotation + "_" + contig,  # scaffold
-                    contig                      # gene_position
-                ])
-                contig_annotations.extend([
-                    keggs.get(contig, ""),                    # kegg_id
-                    contigs_keggs_description.get(contig, "") # kegg_hit
-                ])
-                contig_annotations.append(
-                    pfams.get(contig, "") # pfam_hits
-                )
-                contig_annotations.append(
-                    cazys.get(contig, "") # cazy_id
-                )
-
-                functional_summary.append(contig_annotations)
-
-        partial_matrix = pd.DataFrame(functional_summary, index=all_contigs, columns=table_header)
-
-        try:
-            output_matrix = pd.concat([output_matrix, partial_matrix], ignore_index=True)
-        except NameError:
-            output_matrix = partial_matrix
+    try:
+        output_matrix = pd.concat([output_matrix, partial_matrix], ignore_index=True)
+    except NameError:
+        output_matrix = partial_matrix
 
     output_matrix.to_csv(f"{args.prefix}_summary_for_DRAM.tsv", sep='\t', header=True, index=False)
