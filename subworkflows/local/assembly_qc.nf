@@ -1,9 +1,8 @@
 /* LOCAL */
-include { FILTER_ASSEMBLY                   } from '../../modules/local/filter_assembly'
+include { FILTER_ASSEMBLY } from '../../modules/local/filter_assembly'
 
 /* NF-CORE */
-include { SEQKIT_STATS as PRE_FILTER_STATS  } from '../../modules/nf-core/seqkit/stats/main'
-include { SEQKIT_STATS as POST_FILTER_STATS } from '../../modules/nf-core/seqkit/stats/main'
+include { QUAST           } from '../../modules/nf-core/quast/main'
 
 
 workflow ASSEMBLY_QC {
@@ -14,14 +13,7 @@ workflow ASSEMBLY_QC {
 
     ch_versions = Channel.empty()
 
-    // Pre filtering stats //
-    PRE_FILTER_STATS(
-        ch_assembly
-    )
-
     // TODO: add the decontamination module
-
-    ch_versions = ch_versions.mix(PRE_FILTER_STATS.out.versions)
 
     /*
     * Filter sequences based on specified criteria:
@@ -34,14 +26,14 @@ workflow ASSEMBLY_QC {
 
     ch_versions = ch_versions.mix(FILTER_ASSEMBLY.out.versions)
 
-    // Post filter stats //
-    POST_FILTER_STATS(
-        FILTER_ASSEMBLY.out.fasta
+    QUAST(
+        ch_assembly.mix( FILTER_ASSEMBLY.out.fasta ).groupTuple()
     )
 
     ch_versions = ch_versions.mix(FILTER_ASSEMBLY.out.versions)
 
     emit:
     assembly_filtered = FILTER_ASSEMBLY.out.fasta
+    quast_report_tsv  = QUAST.out.tsv
     versions          = ch_versions
 }

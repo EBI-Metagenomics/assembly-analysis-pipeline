@@ -5,9 +5,8 @@ process ANTISMASH_ANTISMASHLITE {
     container 'quay.io/microbiome-informatics/antismash:7.1.0.1_2'
 
     input:
-    tuple val(meta), path(sequence_input)
+    tuple val(meta), path(sequence_input), path(gff)
     path databases
-    path gff
 
     output:
     tuple val(meta), path("${prefix}/clusterblast/*_c*.txt"), optional: true, emit: clusterblast_file

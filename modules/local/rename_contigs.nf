@@ -8,12 +8,11 @@ process RENAME_CONTIGS {
 
     input:
     tuple val(meta), path(fasta)
-    val(sequence_prefix)
 
     output:
-    tuple val(meta), path('*.fasta.gz') , emit: renamed_fasta
-    tuple val(meta), path('*.csv')      , emit: mapping_csv
-    path "versions.yml"                 , emit: versions
+    tuple val(meta), path('*.fasta') , emit: renamed_fasta
+    tuple val(meta), path('*.csv')   , emit: mapping_csv
+    path "versions.yml"              , emit: versions
 
     when:
     task.ext.when == null || task.ext.when
@@ -21,9 +20,9 @@ process RENAME_CONTIGS {
     script:
     def prefix = task.ext.prefix ?: "${meta.id}"
     """
-    rename_contigs.py --prefix ${sequence_prefix} \\
+    rename_contigs.py --prefix ${meta.id}_ \\
     --input ${fasta} \\
-    --output ${prefix}_renamed.fasta.gz \\
+    --output ${prefix}_renamed.fasta \\
     --mapping ${prefix}_mapping.csv
 
     cat <<-END_VERSIONS > versions.yml

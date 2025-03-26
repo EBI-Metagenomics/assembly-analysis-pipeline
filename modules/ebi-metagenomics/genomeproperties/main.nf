@@ -10,10 +10,10 @@ process GENOMEPROPERTIES {
     tuple val(meta), path(ips)
 
     output:
-    tuple val(meta), path("*.txt") , emit: summary
-    tuple val(meta), path("*.json"), emit: json
-    tuple val(meta), path("*.tsv") , emit: tsv
-    path "versions.yml"            , emit: versions
+    tuple val(meta), path("*.txt.gz") , emit: summary
+    tuple val(meta), path("*.json.gz"), emit: json
+    tuple val(meta), path("*.tsv.gz") , emit: tsv
+    path "versions.yml"               , emit: versions
 
     when:
     task.ext.when == null || task.ext.when
@@ -34,6 +34,8 @@ process GENOMEPROPERTIES {
     mv JSON_${prefix} ${prefix}_gp.json
     mv SUMMARY_FILE_${prefix} ${prefix}_gp.txt
     mv TABLE_${prefix} ${prefix}_gp.tsv
+
+    gzip ${prefix}_gp.{json,txt,tsv}
 
     cat <<-END_VERSIONS > versions.yml
     "${task.process}":

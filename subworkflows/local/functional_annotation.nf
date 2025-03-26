@@ -1,33 +1,36 @@
 /* NF-CORE */
 include { SEQKIT_SPLIT2                                   } from '../../modules/nf-core/seqkit/split2/main'
-include { DIAMOND_RHEACHEBI                               } from '../../modules/local/diamond_rheachebi'
 include { CAT_CAT as CONCATENATE_EGGNOGMAPPER_ORTHOLOGOUS } from '../../modules/nf-core/cat/cat/main'
 include { CAT_CAT as CONCATENATE_EGGNOGMAPPER_ANNOTATIONS } from '../../modules/nf-core/cat/cat/main'
 include { CAT_CAT as CONCATENATE_INTERPROSCAN_TSV         } from '../../modules/nf-core/cat/cat/main'
-include { CAT_CAT as CONCATENATE_HMMSARCH_TBLOUT          } from '../../modules/nf-core/cat/cat/main'
+include { CAT_CAT as CONCATENATE_DBCAN_OVERVIEW           } from '../../modules/nf-core/cat/cat/main'
+include { CAT_CAT as CONCATENATE_HMMSEARCH_TBLOUT         } from '../../modules/nf-core/cat/cat/main'
+// TODO: this is temporal to create a bgzip and index for the goslim summaries
+include { TABIX_BGZIP as TABIX_BGZIP_GO                   } from '../../modules/nf-core/tabix/bgzip/main'
+include { TABIX_BGZIP as TABIX_BGZIP_GOSLIM               } from '../../modules/nf-core/tabix/bgzip/main'
+include { TABIX_BGZIP as TABIX_BGZIP_RHEADCHEBI           } from '../../modules/nf-core/tabix/bgzip/main'
 
 /* EBI-METAGENOMICS */
 include { INTERPROSCAN                             } from '../../modules/ebi-metagenomics/interproscan/main'
 include { EGGNOGMAPPER as EGGNOGMAPPER_ORTHOLOGS   } from '../../modules/ebi-metagenomics/eggnogmapper/main'
 include { EGGNOGMAPPER as EGGNOGMAPPER_ANNOTATIONS } from '../../modules/ebi-metagenomics/eggnogmapper/main'
-include { GENOMEPROPERTIES                         } from '../../modules/ebi-metagenomics/genomeproperties/main'
 include { DBCAN                                    } from '../../modules/ebi-metagenomics/dbcan/dbcan/main'
-
 include { GOSLIM_SWF                               } from '../../subworkflows/ebi-metagenomics/goslim_swf/main'
 
 /* LOCAL */
-include { CONCATENATE_INTERPROSCAN_GFFS           } from '../../modules/local/concatenate_interproscan_gffs'
-include { PFAM_SUMMARY                            } from '../../modules/local/pfam_summary'
-include { INTERPRO_SUMMARY                        } from '../../modules/local/interpro_summary'
-include { HMMER_HMMSCAN as HMMSCAN_KOFAMS         } from '../../modules/local/hmmer/hmmscan/main'
-include { KEGG_ORTHOLOGS_SUMMARY                  } from '../../modules/local/kegg_orthologs_summary'
-include { KEGGPATHWAYSCOMPLETENESS                } from '../../modules/ebi-metagenomics/keggpathwayscompleteness/main'
-include { DRAM_SWF                                } from '../../subworkflows/ebi-metagenomics/dram_swf/main'
-
+include { CONCATENATE_GFFS as CONCATENATE_INTERPROSCAN_GFFS } from '../../modules/local/concatenate_gffs'
+include { CONCATENATE_GFFS as CONCATENATE_DBCAN_GFFS        } from '../../modules/local/concatenate_gffs'
+include { PFAM_SUMMARY                                      } from '../../modules/local/pfam_summary'
+include { INTERPRO_SUMMARY                                  } from '../../modules/local/interpro_summary'
+include { HMMER_HMMSEARCH as HMMSEARCH_KOFAMS               } from '../../modules/nf-core/hmmer/hmmsearch/main'
+include { KEGG_ORTHOLOGS_SUMMARY                            } from '../../modules/local/kegg_orthologs_summary'
+include { DIAMOND_RHEACHEBI                                 } from '../../modules/local/diamond_rheachebi'
+include { DRAM_SWF                                          } from '../../subworkflows/ebi-metagenomics/dram_swf/main'
 
 workflow FUNCTIONAL_ANNOTATION {
     take:
     ch_predicted_proteins // tule (meta, faa, gff)
+    ch_protein_chunked // tuple (meta, faa_chunk)
 
     main:
 
@@ -36,16 +39,6 @@ workflow FUNCTIONAL_ANNOTATION {
     def ch_proteins_faa = ch_predicted_proteins.map { meta, faa, _gff -> [meta, faa] }
     def ch_proteins_gff = ch_predicted_proteins.map { meta, _faa, gff -> [meta, gff] }
 
-    // Chunk the fasta into files with at most >= params
-    SEQKIT_SPLIT2(
-        ch_proteins_faa,
-        params.proteins_chunksize,
-    )
-
-    ch_versions = ch_versions.mix(SEQKIT_SPLIT2.out.versions)
-
-    def ch_protein_splits = SEQKIT_SPLIT2.out.assembly.transpose()
-
     /*
      * InterProScan results are concatenated (TSV and GFF) and passed on to downstream tools:
      * - GO Slim subworkflow
@@ -53,7 +46,7 @@ workflow FUNCTIONAL_ANNOTATION {
      * The concatenated TSV is also used to extract the PFAM and InterPro summaries
     */
     INTERPROSCAN(
-        ch_protein_splits,
+        ch_protein_chunked,
         [file(params.interproscan_database, checkIfExists: true), params.interproscan_database_version],
     )
     ch_versions = ch_versions.mix(INTERPROSCAN.out.versions)
@@ -70,7 +63,7 @@ workflow FUNCTIONAL_ANNOTATION {
      * The concatenated TSV is also used to extract the PFAM and InterPro summaries
     */
     EGGNOGMAPPER_ORTHOLOGS(
-        ch_protein_splits,
+        ch_protein_chunked,
         [[], []],
         params.eggnog_data_dir,
         params.eggnog_database,
@@ -92,7 +85,6 @@ workflow FUNCTIONAL_ANNOTATION {
     )
     ch_versions = ch_versions.mix(CONCATENATE_EGGNOGMAPPER_ORTHOLOGOUS.out.versions.first())
 
-
     CONCATENATE_EGGNOGMAPPER_ANNOTATIONS(
         EGGNOGMAPPER_ANNOTATIONS.out.annotations.groupTuple()
     )
@@ -102,11 +94,6 @@ workflow FUNCTIONAL_ANNOTATION {
         INTERPROSCAN.out.gff3.groupTuple()
     )
     ch_versions = ch_versions.mix(CONCATENATE_INTERPROSCAN_GFFS.out.versions)
-
-    GENOMEPROPERTIES(
-        CONCATENATE_INTERPROSCAN_TSV.out.file_out
-    )
-    ch_versions = ch_versions.mix(GENOMEPROPERTIES.out.versions)
 
     /*
      * Get GO term and GO-slim term counts out of an InterProScan .tsv output file
@@ -118,8 +105,18 @@ workflow FUNCTIONAL_ANNOTATION {
         file(params.goslim_ids, checkIfExists: true),
         file(params.go_banding, checkIfExists: true),
     )
-
     ch_versions = ch_versions.mix(GOSLIM_SWF.out.versions)
+
+    // TODO: remove this once GOSLIM_SWF produces bgzip/index tsvs
+    TABIX_BGZIP_GO(
+        GOSLIM_SWF.out.go_summary
+    )
+    ch_versions = ch_versions.mix(TABIX_BGZIP_GO.out.versions)
+
+    TABIX_BGZIP_GOSLIM(
+        GOSLIM_SWF.out.goslim_summary
+    )
+    ch_versions = ch_versions.mix(TABIX_BGZIP_GOSLIM.out.versions)
 
     /*
      * Assign Rhea and CHEBI tags to the proteins.
@@ -132,11 +129,14 @@ workflow FUNCTIONAL_ANNOTATION {
         file(params.uniref90rhea_diamond_database, checkIfExists: true),
         file(params.rheachebi_mapping_tsv, checkIfExists: true)
     )
+    ch_versions = ch_versions.mix(DIAMOND_RHEACHEBI.out.versions)
 
-    /*
-     * DBCan - CAZymes
-    */
-    ch_proteins_faa.join( ch_proteins_gff ).multiMap { meta, faa, gff ->
+    TABIX_BGZIP_RHEADCHEBI(
+        DIAMOND_RHEACHEBI.out.rhea2proteins_tsv
+    )
+    ch_versions = ch_versions.mix(TABIX_BGZIP_RHEADCHEBI.out.versions)
+
+    ch_proteins_gff.combine(ch_protein_chunked, by: 0).multiMap { meta, gff, faa ->
         faa: [meta, faa]
         gff: [meta, gff]
     }.set {
@@ -151,64 +151,64 @@ workflow FUNCTIONAL_ANNOTATION {
     )
     ch_versions = ch_versions.mix(DBCAN.out.versions)
 
+    CONCATENATE_DBCAN_GFFS(
+        DBCAN.out.cgc_gff.groupTuple()
+    )
+    ch_versions = ch_versions.mix(CONCATENATE_DBCAN_GFFS.out.versions)
+
+    // TODO: the header is repeated here
+    CONCATENATE_DBCAN_OVERVIEW(
+        DBCAN.out.overview_output.groupTuple()
+    )
+    ch_versions = ch_versions.mix(CONCATENATE_DBCAN_OVERVIEW.out.versions)
+
     /*
      * KEGG Orthologous annotation. This step uses hmmscan to annotation the sequences aginst the kofam HMM models.
      * These HMM models have been extended as described -> TODO: link to the mgnify_pipelines_reference_databases pipeline
     */
-    // TODO: check the split size in v5 - it's taking a long time ATM (the longest on my tests)
-    HMMSCAN_KOFAMS(
-        ch_protein_splits.map { meta, faa ->
+    HMMSEARCH_KOFAMS(
+        ch_protein_chunked.map { meta, faa ->
             {
-                [meta, file("${params.kofam_hmm_database}/*.hmm*", checkIfExists: true), faa, true, true] // boolean flags are: write tblout and domtbl
+                [meta, file(params.kofam_hmm_database, checkIfExists: true), faa, false, true, true] // boolean flags are: write alignment, tblout and domtbl
             }
         }
     )
-    ch_versions = ch_versions.mix(HMMSCAN_KOFAMS.out.versions)
+    ch_versions = ch_versions.mix(HMMSEARCH_KOFAMS.out.versions)
 
     /*
     * We concatenate the tblout together, this file is not valid as it has the comments too (the ones that start with #)
     * but because the pipeline processes this file subsequently in this pipeline, this doesn't matter
     */
-    CONCATENATE_HMMSARCH_TBLOUT(
-        HMMSCAN_KOFAMS.out.target_summary.groupTuple()
+    CONCATENATE_HMMSEARCH_TBLOUT(
+        HMMSEARCH_KOFAMS.out.target_summary.groupTuple()
     )
-    ch_versions = ch_versions.mix(CONCATENATE_HMMSARCH_TBLOUT.out.versions)
+    ch_versions = ch_versions.mix(CONCATENATE_HMMSEARCH_TBLOUT.out.versions)
 
     //************************************************//
     //                    Summaries                   //
     //***********************************************//
 
-    /*
-     * Process the interproscan TSV and extract the Pfam entries counts
-    */
     PFAM_SUMMARY(
         CONCATENATE_INTERPROSCAN_TSV.out.file_out
     )
     ch_versions = ch_versions.mix(PFAM_SUMMARY.out.versions)
 
-    /*
-     * Process the interproscan TSV and extract the InterProScan counts
-    */
     INTERPRO_SUMMARY(
         CONCATENATE_INTERPROSCAN_TSV.out.file_out
     )
     ch_versions = ch_versions.mix(INTERPRO_SUMMARY.out.versions)
 
+    // TODO: review this one as I was using hmmscan before hand (the parser of tblout may be incorrect - query and source may be flipped!)
     KEGG_ORTHOLOGS_SUMMARY(
-        CONCATENATE_HMMSARCH_TBLOUT.out.file_out
+        CONCATENATE_HMMSEARCH_TBLOUT.out.file_out
     )
     ch_versions = ch_versions.mix(KEGG_ORTHOLOGS_SUMMARY.out.versions)
 
-    KEGGPATHWAYSCOMPLETENESS(
-        KEGG_ORTHOLOGS_SUMMARY.out.ko_per_contig_tsv
-    )
-    ch_versions = ch_versions.mix(KEGGPATHWAYSCOMPLETENESS.out.versions)
-
     emit:
-    ko_summary_tsv    = KEGG_ORTHOLOGS_SUMMARY.out.ko_summary_tsv
-    ko_per_contig_tsv = KEGG_ORTHOLOGS_SUMMARY.out.ko_per_contig_tsv
-    dbcan_overview    = DBCAN.out.overview_output
-    interproscan_tsv  = CONCATENATE_INTERPROSCAN_TSV.out.file_out
-    interproscan_gff3 = CONCATENATE_INTERPROSCAN_GFFS.out.concatenated_gff
-    versions          = ch_versions
+    dbcan_overview                 = DBCAN.out.overview_output
+    interproscan_tsv               = CONCATENATE_INTERPROSCAN_TSV.out.file_out
+    interproscan_gff3              = CONCATENATE_INTERPROSCAN_GFFS.out.concatenated_gff
+    kegg_orthologs_summary_tsv     = KEGG_ORTHOLOGS_SUMMARY.out.ko_per_contig_tsv
+    kegg_orthologs_description_tsv = KEGG_ORTHOLOGS_SUMMARY.out.ko_summary_tsv
+    versions                       = ch_versions
 }

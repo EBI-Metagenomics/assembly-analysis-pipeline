@@ -15,8 +15,8 @@ process SUMMARISEGOSLIMS {
     path go_banding
 
     output:
-    tuple val(meta), path("*_summary.csv"), emit: go_summary
-    tuple val(meta), path("*_slim.csv")   , emit: goslim_summary
+    tuple val(meta), path("*_summary.tsv"), emit: go_summary
+    tuple val(meta), path("*_slim.tsv")   , emit: goslim_summary
     path "versions.yml"                   , emit: versions
 
     when:
@@ -25,15 +25,13 @@ process SUMMARISEGOSLIMS {
     script:
     def prefix = task.ext.prefix ?: "${meta.id}"
     """
-    summarise_goslims \\
+    # This is a modified version that generates a TSV which is not all quoted and it's sorted
+    summarise_goslims.py \\
         -go ${go_obo} \\
         -gb ${go_banding} \\
         -i ${ips} \\
         -gaf ${gaf} \\
         -o ${prefix}_summary
-
-    mv ${prefix}_summary ${prefix}_summary.csv
-    mv ${prefix}_summary_slim ${prefix}_summary_slim.csv
 
     cat <<-END_VERSIONS > versions.yml
     "${task.process}":
@@ -44,8 +42,8 @@ process SUMMARISEGOSLIMS {
     stub:
     def prefix = task.ext.prefix ?: "${meta.id}"
     """
-    touch ${prefix}_summary.csv
-    touch ${prefix}_summary_slim.csv
+    touch ${prefix}_summary.tsv
+    touch ${prefix}_summary_slim.tsv
 
     cat <<-END_VERSIONS > versions.yml
     "${task.process}":

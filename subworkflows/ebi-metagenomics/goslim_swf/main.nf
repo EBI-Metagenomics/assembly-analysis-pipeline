@@ -19,14 +19,14 @@ workflow GOSLIM_SWF {
     GENERATEGAF( ch_ips )
     ch_versions = ch_versions.mix(GENERATEGAF.out.versions.first())
 
-    OWLTOOLS ( 
+    OWLTOOLS (
         GENERATEGAF.out.gaf,
         go_obo,
         goslim_ids
     )
     ch_versions = ch_versions.mix(OWLTOOLS.out.versions.first())
 
-    SUMMARISEGOSLIMS (
+    SUMMARISEGOSLIMS(
         ch_ips,
         OWLTOOLS.out.gaf,
         go_obo,

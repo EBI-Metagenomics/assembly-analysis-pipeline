@@ -1,2 +1,2 @@
 sample,assembly_fasta
-test_assembly,https://github.com/EBI-Metagenomics/assembly-analysis-pipeline/raw/refs/heads/dev/tests/assembly.fasta
+ERZ12345,https://github.com/EBI-Metagenomics/assembly-analysis-pipeline/raw/refs/heads/dev/tests/assembly.fasta.gz

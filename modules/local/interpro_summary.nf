@@ -12,9 +12,9 @@ process INTERPRO_SUMMARY {
 
     // The gzi are optional, it's possible that the summaries are empty and in that case the .gzi are not created
     output:
-    tuple val(meta), path("${prefix}_intepro_summary.tsv.gz"),     emit: interpro_summary
-    tuple val(meta), path("${prefix}_intepro_summary.tsv.gz.gzi"), emit: interpro_summary_gzi
-    path "versions.yml",                                           emit: versions
+    tuple val(meta), path("${prefix}_interpro_summary.tsv.gz"),     emit: interpro_summary
+    tuple val(meta), path("${prefix}_interpro_summary.tsv.gz.gzi"), emit: interpro_summary_gzi
+    path "versions.yml",                                            emit: versions
 
     when:
     task.ext.when == null || task.ext.when
@@ -37,7 +37,7 @@ process INTERPRO_SUMMARY {
     csvtk freq --tabs --no-header-row --fields 1,2 --reverse --sort-by-freq | \\
     csvtk add-header --tabs --no-header-row --names interpro_accession,description,count | \\
     csvtk cut --tabs --fields count,interpro_accession,description | \\
-    bgzip --stdout -@${task.cpus} --index --index-name ${prefix}_intepro_summary.tsv.gz.gzi > ${prefix}_intepro_summary.tsv.gz
+    bgzip --stdout -@${task.cpus} --index --index-name ${prefix}_interpro_summary.tsv.gz.gzi > ${prefix}_interpro_summary.tsv.gz
 
     cat <<-END_VERSIONS > versions.yml
     "${task.process}":
@@ -49,7 +49,7 @@ process INTERPRO_SUMMARY {
     stub:
     prefix = task.ext.prefix ?: "${meta.id}"
     """
-    touch ${prefix}_intepro_summary.tsv
+    touch ${prefix}_interpro_summary.tsv
     cat <<-END_VERSIONS > versions.yml
     "${task.process}":
         csvtk: \$(echo \$( csvtk version | sed -e "s/csvtk v//g" ))

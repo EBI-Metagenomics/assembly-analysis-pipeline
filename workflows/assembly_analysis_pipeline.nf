@@ -3,27 +3,29 @@
     IMPORT MODULES / SUBWORKFLOWS / FUNCTIONS
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 */
-include { MULTIQC                 } from '../modules/nf-core/multiqc/main'
-include { paramsSummaryMap        } from 'plugin/nf-schema'
-include { paramsSummaryMultiqc    } from '../subworkflows/nf-core/utils_nfcore_pipeline'
-include { softwareVersionsToYAML  } from '../subworkflows/nf-core/utils_nfcore_pipeline'
-include { methodsDescriptionText  } from '../subworkflows/local/utils_nfcore_assembly_analysis_pipeline_pipeline'
+
+include { MULTIQC as MULTIQC_PER_ASSEMBLY    } from '../modules/nf-core/multiqc/main'
+include { MULTIQC as MULTIQC_PER_SAMPLESHEET } from '../modules/nf-core/multiqc/main'
+include { paramsSummaryMap                   } from 'plugin/nf-schema'
+include { paramsSummaryMultiqc               } from '../subworkflows/nf-core/utils_nfcore_pipeline'
+include { softwareVersionsToYAML             } from '../subworkflows/nf-core/utils_nfcore_pipeline'
+include { methodsDescriptionText             } from '../subworkflows/local/utils_nfcore_assembly_analysis_pipeline_pipeline'
 
 /*
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
    NF-CORE MODULES and SUBWORKFLOWS
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 */
-include { PIGZ_UNCOMPRESS as PIGZ_CONTIGS  } from '../modules/nf-core/pigz/uncompress/main'
-include { PIGZ_UNCOMPRESS as PIGZ_PROTEINS } from '../modules/nf-core/pigz/uncompress/main'
-include { ASSEMBLY_QC                      } from '../subworkflows/local/assembly_qc'
+include { SEQKIT_SPLIT2                     } from '../modules/nf-core/seqkit/split2/main'
+include { PIGZ_UNCOMPRESS as PIGZ_CONTIGS   } from '../modules/nf-core/pigz/uncompress/main'
+include { PIGZ_UNCOMPRESS as PIGZ_PROTEINS  } from '../modules/nf-core/pigz/uncompress/main'
 
 /*
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
    EBI-METAGENOMICS MODULES and SUBWORKFLOWS
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 */
-include { RRNA_EXTRACTION                   } from '../subworkflows/ebi-metagenomics/rrna_extraction/main'
+include { ASSEMBLY_QC                       } from '../subworkflows/local/assembly_qc'
 include { COMBINED_GENE_CALLER              } from '../subworkflows/ebi-metagenomics/combined_gene_caller/main'
 include { CONTIGS_TAXONOMIC_CLASSIFICATION  } from '../subworkflows/ebi-metagenomics/contigs_taxonomic_classification/main'
 
@@ -33,9 +35,10 @@ include { CONTIGS_TAXONOMIC_CLASSIFICATION  } from '../subworkflows/ebi-metageno
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 */
 
-include { FUNCTIONAL_ANNOTATION } from '../subworkflows/local/functional_annotation'
-include { BGC_ANNOTATION        } from '../subworkflows/local/bgc_annotation'
-include { RENAME_CONTIGS        } from '../modules/local/rename_contigs.nf'
+include { RENAME_CONTIGS         } from '../modules/local/rename_contigs'
+include { RNA_ANNOTATION         } from '../subworkflows/local/rna_annotation'
+include { FUNCTIONAL_ANNOTATION  } from '../subworkflows/local/functional_annotation'
+include { PATHWAYS_AND_SYSTEMS   } from '../subworkflows/local/pathways_and_systems'
 
 /*
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -57,8 +60,7 @@ workflow ASSEMBLY_ANALYSIS_PIPELINE {
      * there n is just an autoincrement
     */
     RENAME_CONTIGS(
-        ch_assembly,
-        "MGYA" // The contig prefix
+        ch_assembly
     )
 
     /*
@@ -73,22 +75,19 @@ workflow ASSEMBLY_ANALYSIS_PIPELINE {
     ch_versions = ch_versions.mix(ASSEMBLY_QC.out.versions)
 
     /*
-     * rRNAs
+     * Run the RNA detection subworklow
     */
-    RRNA_EXTRACTION(
-        ch_assembly,
-        file(params.rrnas_rfam_covariance_model, checkIfExists: true),
-        file(params.rrnas_rfam_claninfo, checkIfExists: true)
+    RNA_ANNOTATION(
+        ASSEMBLY_QC.out.assembly_filtered
     )
-    ch_versions = ch_versions.mix(RRNA_EXTRACTION.out.versions)
 
     /*
     * Protein prediction with the combined-gene-caller, and masking the rRNAs genes
     */
     // We need to sync the sequences and the rRNA outputs //
-    ASSEMBLY_QC.out.assembly_filtered.join(RRNA_EXTRACTION.out.cmsearch_deoverlap_out).multiMap { meta, assembly_fasta, cmsearch_deoverlap_out ->
+    ASSEMBLY_QC.out.assembly_filtered.join(RNA_ANNOTATION.out.ssu_lsu_coords).multiMap { meta, assembly_fasta, ssu_lsu_coords ->
         assembly: [meta, assembly_fasta]
-        cmsearch_deoverlap: [meta, cmsearch_deoverlap_out]
+        ssu_lsu_coords: [meta, ssu_lsu_coords]
     }.set {
         ch_cgc
     }
@@ -96,13 +95,16 @@ workflow ASSEMBLY_ANALYSIS_PIPELINE {
     // TODO: handle LR - FGS flip parameter //
     COMBINED_GENE_CALLER(
         ch_cgc.assembly,
-        ch_cgc.cmsearch_deoverlap // used to mask the rRNA genes in the assembly
+        ch_cgc.ssu_lsu_coords // used to mask the rRNA genes in the assembly
     )
     ch_versions = ch_versions.mix(COMBINED_GENE_CALLER.out.versions)
 
     /*
      * Taxonomic classification of the contigs with CATPACK
+     * This outside of the taxonomical_annotation suboworkflow because it has a dependency with the
+     * CGC predicted proteins
     */
+    // TOOD: handle gzip files in this subworkflow instead of uncompress this files
     CONTIGS_TAXONOMIC_CLASSIFICATION(
         PIGZ_CONTIGS(ASSEMBLY_QC.out.assembly_filtered).file,
         PIGZ_PROTEINS(COMBINED_GENE_CALLER.out.faa).file,
@@ -111,12 +113,25 @@ workflow ASSEMBLY_ANALYSIS_PIPELINE {
     )
     ch_versions = ch_versions.mix(CONTIGS_TAXONOMIC_CLASSIFICATION.out.versions)
 
+    /*********************/
+    /* PROTEINS CHUNKING */
+    /*********************/
+
+    // Chunk the fasta into files with at most >= params
+    SEQKIT_SPLIT2(
+        COMBINED_GENE_CALLER.out.faa,
+        params.proteins_chunksize,
+    )
+    ch_versions = ch_versions.mix(SEQKIT_SPLIT2.out.versions)
+
+    def ch_protein_chunks = SEQKIT_SPLIT2.out.assembly.transpose()
+
     /*
     * Annotation of the proteins.
-    * The pipeline has two main modules: the functional and biosynthetic gene clusters (BGC) annotations.
     */
     FUNCTIONAL_ANNOTATION(
-        COMBINED_GENE_CALLER.out.faa.join( COMBINED_GENE_CALLER.out.gff )
+        COMBINED_GENE_CALLER.out.faa.join( COMBINED_GENE_CALLER.out.gff ),
+        ch_protein_chunks
     )
     ch_versions = ch_versions.mix(FUNCTIONAL_ANNOTATION.out.versions)
 
@@ -134,20 +149,20 @@ workflow ASSEMBLY_ANALYSIS_PIPELINE {
     )
 
     /*
-    * BGC annotations
+    * Pathway and systems annotations
     */
-    // FIXME: there is an issue with the GFF - antiSMASH doesn't like the one we currently provide
-    // FIXME: enable SanntiS after - https://github.com/EBI-Metagenomics/nf-modules/pull/81
-    BGC_ANNOTATION(
+    PATHWAYS_AND_SYSTEMS(
         ASSEMBLY_QC.out.assembly_filtered.join(
             COMBINED_GENE_CALLER.out.faa
         ).join(
             COMBINED_GENE_CALLER.out.gff
         ).join(
             FUNCTIONAL_ANNOTATION.out.interproscan_tsv
-        )
+        ),
+        FUNCTIONAL_ANNOTATION.out.kegg_orthologs_summary_tsv,
+        ch_protein_chunks
     )
-    ch_versions = ch_versions.mix(BGC_ANNOTATION.out.versions)
+    ch_versions = ch_versions.mix(PATHWAYS_AND_SYSTEMS.out.versions)
 
     //
     // Collate and save software versions
@@ -155,12 +170,11 @@ workflow ASSEMBLY_ANALYSIS_PIPELINE {
     softwareVersionsToYAML(ch_versions)
         .collectFile(
             storeDir: "${params.outdir}/pipeline_info",
-            name: 'ASSEMBLY_ANALYSIS_PIPELINE_software_' + 'mqc_' + 'versions.yml',
+            name: 'assembly_analysis_pipeline_software_' + 'mqc_' + 'versions.yml',
             sort: true,
             newLine: true,
         )
         .set { ch_collated_versions }
-
 
     //
     // MODULE: MultiQC
@@ -174,7 +188,7 @@ workflow ASSEMBLY_ANALYSIS_PIPELINE {
         : Channel.empty()
     ch_multiqc_logo = params.multiqc_logo
         ? Channel.fromPath(params.multiqc_logo, checkIfExists: true)
-        : Channel.empty()
+        : Channel.fromPath("${projectDir}/assets/mgnify_wordmark_dark_on_light.png", checkIfExists: true)
 
     summary_params = paramsSummaryMap(
         workflow,
@@ -199,8 +213,25 @@ workflow ASSEMBLY_ANALYSIS_PIPELINE {
         )
     )
 
-    MULTIQC(
-        ch_multiqc_files.collect(),
+    /**************************************/
+    /* MultiQC report for the samplesheet */
+    /**************************************/
+
+    common_files = ch_multiqc_files.collect()
+
+    MULTIQC_PER_ASSEMBLY(
+        ASSEMBLY_QC.out.quast_report_tsv,
+        common_files,
+        ch_multiqc_config.toList(),
+        ch_multiqc_custom_config.toList(),
+        ch_multiqc_logo.toList(),
+        [],
+        [],
+    )
+
+    MULTIQC_PER_SAMPLESHEET(
+        ASSEMBLY_QC.out.quast_report_tsv.collect(),
+        common_files,
         ch_multiqc_config.toList(),
         ch_multiqc_custom_config.toList(),
         ch_multiqc_logo.toList(),
@@ -209,6 +240,6 @@ workflow ASSEMBLY_ANALYSIS_PIPELINE {
     )
 
     emit:
-    multiqc_report = MULTIQC.out.report.toList() // channel: /path/to/multiqc_report.html
-    versions       = ch_versions // channel: [ path(versions.yml) ]
+    multiqc_report = MULTIQC_PER_SAMPLESHEET.out.report.toList() // channel: /path/to/multiqc_report.html
+    versions       = ch_versions                                // channel: [ path(versions.yml) ]
 }
