@@ -1,4 +1,4 @@
-process SUMMARISEFORDRAMINPUT {
+process SUMMARISE_FOR_DRAM_INPUT {
     tag "$meta.id"
     label 'process_single'
 

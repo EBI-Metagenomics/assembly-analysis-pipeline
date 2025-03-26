@@ -38,6 +38,7 @@ include { CONTIGS_TAXONOMIC_CLASSIFICATION  } from '../subworkflows/ebi-metageno
 include { RENAME_CONTIGS         } from '../modules/local/rename_contigs'
 include { RNA_ANNOTATION         } from '../subworkflows/local/rna_annotation'
 include { FUNCTIONAL_ANNOTATION  } from '../subworkflows/local/functional_annotation'
+include { DRAM_SWF               } from '../subworkflows/ebi-metagenomics/dram_swf'
 include { PATHWAYS_AND_SYSTEMS   } from '../subworkflows/local/pathways_and_systems'
 
 /*
