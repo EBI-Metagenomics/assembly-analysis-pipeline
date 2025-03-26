@@ -10,8 +10,8 @@ process CONCATENATE_GFFS {
     tuple val(meta), path(gffs, name: "gffs/?.gff.gz")
 
     output:
-    tuple val(meta), path('*concatenated.gff') , emit: concatenated_gff
-    path "versions.yml"                        , emit: versions
+    tuple val(meta), path('*concatenated.gff.gz'), emit: concatenated_gff
+    path "versions.yml"                          , emit: versions
 
     when:
     task.ext.when == null || task.ext.when
@@ -21,7 +21,7 @@ process CONCATENATE_GFFS {
     """
     concatenate_gffs.py \\
     --gffs gffs/*.gff.gz  \\
-    --output ${prefix}_concatenated.gff
+    --output ${prefix}_concatenated.gff.gz
 
     cat <<-END_VERSIONS > versions.yml
     "${task.process}":

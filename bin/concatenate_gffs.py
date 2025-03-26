@@ -36,7 +36,7 @@ def concatenate_gff_files(gffs: List[str], output_file: str) -> None:
 
 def main():
     parser = argparse.ArgumentParser(
-        description="Concatenate GFF files into a TSV file."
+        description="Concatenate GFF files into a compressed TSV file."
     )
     parser.add_argument(
         "--gffs", nargs="+", help="List of input GFF files to concatenate"

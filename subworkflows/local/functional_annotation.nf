@@ -2,13 +2,15 @@
 include { SEQKIT_SPLIT2                                   } from '../../modules/nf-core/seqkit/split2/main'
 include { CAT_CAT as CONCATENATE_EGGNOGMAPPER_ORTHOLOGS   } from '../../modules/nf-core/cat/cat/main'
 include { CAT_CAT as CONCATENATE_EGGNOGMAPPER_ANNOTATIONS } from '../../modules/nf-core/cat/cat/main'
-include { CAT_CAT as CONCATENATE_INTERPROSCAN_TSV         } from '../../modules/nf-core/cat/cat/main'
-include { CAT_CAT as CONCATENATE_DBCAN_OVERVIEW           } from '../../modules/nf-core/cat/cat/main'
-include { CAT_CAT as CONCATENATE_HMMSEARCH_TBLOUT         } from '../../modules/nf-core/cat/cat/main'
+include { CAT_CAT      as CONCATENATE_HMMSEARCH_TBLOUT    } from '../../modules/nf-core/cat/cat/main'
+include { CSVTK_CONCAT as CONCATENATE_INTERPROSCAN_TSV    } from '../../modules/nf-core/csvtk/concat/main'
+include { CSVTK_CONCAT as CONCATENATE_DBCAN_OVERVIEW      } from '../../modules/nf-core/csvtk/concat/main'
+include { CSVTK_CONCAT as CONCATENATE_DBCAN_STANDARD_OUT  } from '../../modules/nf-core/csvtk/concat/main'
+include { CSVTK_CONCAT as CONCATENATE_DBCAN_SUBSTRATES    } from '../../modules/nf-core/csvtk/concat/main'
 // TODO: this is temporal to create a bgzip and index for the goslim summaries
 include { TABIX_BGZIP as TABIX_BGZIP_GO                   } from '../../modules/nf-core/tabix/bgzip/main'
 include { TABIX_BGZIP as TABIX_BGZIP_GOSLIM               } from '../../modules/nf-core/tabix/bgzip/main'
-include { TABIX_BGZIP as TABIX_BGZIP_RHEADCHEBI           } from '../../modules/nf-core/tabix/bgzip/main'
+include { TABIX_BGZIP as TABIX_BGZIP_RHEAANDCHEBI         } from '../../modules/nf-core/tabix/bgzip/main'
 
 /* EBI-METAGENOMICS */
 include { INTERPROSCAN                             } from '../../modules/ebi-metagenomics/interproscan/main'
@@ -52,7 +54,10 @@ workflow FUNCTIONAL_ANNOTATION {
     ch_versions = ch_versions.mix(INTERPROSCAN.out.versions)
 
     CONCATENATE_INTERPROSCAN_TSV(
-        INTERPROSCAN.out.tsv.groupTuple()
+        INTERPROSCAN.out.tsv.groupTuple(),
+        "tsv",
+        "tsv",
+        true // compress
     )
     ch_versions = ch_versions.mix(CONCATENATE_INTERPROSCAN_TSV.out.versions)
 
@@ -96,7 +101,7 @@ workflow FUNCTIONAL_ANNOTATION {
      * We ran GOSLIM once per assembly, hence the groupTuple (the IPS results are one per chunk )
     */
     GOSLIM_SWF(
-        CONCATENATE_INTERPROSCAN_TSV.out.file_out,
+        CONCATENATE_INTERPROSCAN_TSV.out.csv,
         file(params.go_obo, checkIfExists: true),
         file(params.goslim_ids, checkIfExists: true),
         file(params.go_banding, checkIfExists: true),
@@ -127,10 +132,10 @@ workflow FUNCTIONAL_ANNOTATION {
     )
     ch_versions = ch_versions.mix(DIAMOND_RHEACHEBI.out.versions)
 
-    TABIX_BGZIP_RHEADCHEBI(
+    TABIX_BGZIP_RHEAANDCHEBI(
         DIAMOND_RHEACHEBI.out.rhea2proteins_tsv
     )
-    ch_versions = ch_versions.mix(TABIX_BGZIP_RHEADCHEBI.out.versions)
+    ch_versions = ch_versions.mix(TABIX_BGZIP_RHEAANDCHEBI.out.versions)
 
     ch_proteins_gff.combine(ch_protein_chunked, by: 0).multiMap { meta, gff, faa ->
         faa: [meta, faa]
@@ -152,11 +157,29 @@ workflow FUNCTIONAL_ANNOTATION {
     )
     ch_versions = ch_versions.mix(CONCATENATE_DBCAN_GFFS.out.versions)
 
-    // TODO: the header is repeated here
     CONCATENATE_DBCAN_OVERVIEW(
-        DBCAN.out.overview_output.groupTuple()
+        DBCAN.out.overview_output.groupTuple(),
+        "tsv",
+        "tsv",
+        true // compress
     )
     ch_versions = ch_versions.mix(CONCATENATE_DBCAN_OVERVIEW.out.versions)
+
+    CONCATENATE_DBCAN_STANDARD_OUT(
+        DBCAN.out.cgc_standard_output.groupTuple(),
+        "tsv",
+        "tsv",
+        true // compress
+    )
+    ch_versions = ch_versions.mix(CONCATENATE_DBCAN_STANDARD_OUT.out.versions)
+
+    CONCATENATE_DBCAN_SUBSTRATES(
+        DBCAN.out.substrate_out.groupTuple(),
+        "tsv",
+        "tsv",
+        true // compress
+    )
+    ch_versions = ch_versions.mix(CONCATENATE_DBCAN_SUBSTRATES.out.versions)
 
     /*
      * KEGG orthologs annotation. This step uses hmmscan to annotation the sequences aginst the kofam HMM models.
@@ -185,12 +208,12 @@ workflow FUNCTIONAL_ANNOTATION {
     //***********************************************//
 
     PFAM_SUMMARY(
-        CONCATENATE_INTERPROSCAN_TSV.out.file_out
+        CONCATENATE_INTERPROSCAN_TSV.out.csv
     )
     ch_versions = ch_versions.mix(PFAM_SUMMARY.out.versions)
 
     INTERPRO_SUMMARY(
-        CONCATENATE_INTERPROSCAN_TSV.out.file_out
+        CONCATENATE_INTERPROSCAN_TSV.out.csv
     )
     ch_versions = ch_versions.mix(INTERPRO_SUMMARY.out.versions)
 
@@ -202,7 +225,7 @@ workflow FUNCTIONAL_ANNOTATION {
 
     emit:
     dbcan_overview                 = DBCAN.out.overview_output
-    interproscan_tsv               = CONCATENATE_INTERPROSCAN_TSV.out.file_out
+    interproscan_tsv               = CONCATENATE_INTERPROSCAN_TSV.out.csv
     interproscan_gff3              = CONCATENATE_INTERPROSCAN_GFFS.out.concatenated_gff
     kegg_orthologs_summary_tsv     = KEGG_ORTHOLOGS_SUMMARY.out.ko_per_contig_tsv
     kegg_orthologs_description_tsv = KEGG_ORTHOLOGS_SUMMARY.out.ko_summary_tsv

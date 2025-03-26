@@ -24,12 +24,13 @@ process SUMMARISEGOSLIMS {
 
     script:
     def prefix = task.ext.prefix ?: "${meta.id}"
+    def ips_uncompressed = ips.name.replace('.gz', '')
     """
-    # This is a modified version that generates a TSV which is not all quoted and it's sorted
+    gunzip -c -d ${ips} > ${ips_uncompressed}
     summarise_goslims.py \\
         -go ${go_obo} \\
         -gb ${go_banding} \\
-        -i ${ips} \\
+        -i ${ips_uncompressed} \\
         -gaf ${gaf} \\
         -o ${prefix}_summary
 

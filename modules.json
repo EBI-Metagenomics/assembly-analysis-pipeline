@@ -17,6 +17,11 @@
                         "installed_by": ["modules"],
                         "patch": "modules/nf-core/cat/cat/cat-cat.diff"
                     },
+                    "csvtk/concat": {
+                        "branch": "master",
+                        "git_sha": "fa92936611247ca647ddee970f94d83f1bcb0ffe",
+                        "installed_by": ["modules"]
+                    },
                     "hmmer/hmmsearch": {
                         "branch": "master",
                         "git_sha": "81880787133db07d9b4c1febd152c090eb8325dc",
@@ -115,6 +120,11 @@
                         "branch": "main",
                         "git_sha": "f85a33e88680924f76aaccb3c120983ff4134747",
                         "installed_by": ["contigs_taxonomic_classification"]
+                    },
+                    "dram/distill": {
+                        "branch": "main",
+                        "git_sha": "2ba3fbfba678c0c8e1e7537fa908b04575b5b916",
+                        "installed_by": ["modules"]
                     },
                     "easel/eslsfetch": {
                         "branch": "main",
