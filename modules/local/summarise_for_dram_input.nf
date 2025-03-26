@@ -13,8 +13,8 @@ process SUMMARISE_FOR_DRAM_INPUT {
     tuple val(meta), path(dbcan_overviews)
 
     output:
-    tuple val(meta), path("${prefix}_dram_summary.tsv.gz"), emit: dram_summary
-    path "versions.yml"                                   , emit: versions
+    tuple val(meta), path("${prefix}_summary_for_DRAM.tsv"), emit: dram_summary
+    path "versions.yml"                                    , emit: versions
 
     when:
     task.ext.when == null || task.ext.when
