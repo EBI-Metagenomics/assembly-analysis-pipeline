@@ -1,13 +1,13 @@
-include { DRAM                  } from '../../../modules/ebi-metagenomics/dram/distill/main'
-include { SUMMARISEFORDRAMINPUT } from '../../../modules/local/summarisefordraminput/main'
+include { DRAM_DISTILL             } from '../../../modules/ebi-metagenomics/dram/distill/main'
+include { SUMMARISE_FOR_DRAM_INPUT } from '../../../modules/local/summarise_for_dram_input'
 
 workflow DRAM_SWF {
 
     take:
-    tuple val(meta), path(ko_summaries)
-    tuple val(meta), path(ko_per_contigs)
-    tuple val(meta), path(interpro_summaries)
-    tuple val(meta), path(dbcan_overviews)
+    ko_summaries       // [meta, path(tsv)]
+    ko_per_contigs     // [meta, path(tsv)]
+    interpro_summaries // [meta, path(tsv)]
+    dbcan_overviews    // [meta, path(tsv)]
 
     main:
 
