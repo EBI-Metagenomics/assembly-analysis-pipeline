@@ -13,21 +13,22 @@ workflow DRAM_SWF {
 
     ch_versions = Channel.empty()
 
-    SUMMARISEFORDRAMINPUT (
+    SUMMARISE_FOR_DRAM_INPUT (
         ko_summaries,
         ko_per_contigs,
         interpro_summaries,
         dbcan_overviews
     )
-    ch_versions = ch_versions.mix(SUMMARISEFORDRAMINPUT.out.versions)
+    ch_versions = ch_versions.mix(SUMMARISE_FOR_DRAM_INPUT.out.versions)
 
-    DRAM(
-        SUMMARISEFORDRAMINPUT.out.tsv
+    DRAM_DISTILL(
+        SUMMARISE_FOR_DRAM_INPUT.out.dram_summary, 
+        params.dram_databases
     )
-    ch_versions = ch_versions.mix(DRAM.out.versions)
+    ch_versions = ch_versions.mix(DRAM_DISTILL.out.versions)
 
     emit:
-    dram_tsv  = DRAM.out.tsv	
-    dram_html = DRAM.out.html
+    dram_tsv  = DRAM_DISTILL.out.out_tsv
+    dram_html = DRAM_DISTILL.out.html
     versions  = ch_versions
 }
