@@ -63,6 +63,7 @@ workflow ASSEMBLY_ANALYSIS_PIPELINE {
     RENAME_CONTIGS(
         ch_assembly
     )
+    ch_versions = ch_versions.mix(RENAME_CONTIGS.out.versions)
 
     /*
     * The first step is to:
@@ -81,6 +82,7 @@ workflow ASSEMBLY_ANALYSIS_PIPELINE {
     RNA_ANNOTATION(
         ASSEMBLY_QC.out.assembly_filtered
     )
+    ch_versions = ch_versions.mix(RNA_ANNOTATION.out.versions)
 
     /*
     * Protein prediction with the combined-gene-caller, and masking the rRNAs genes
