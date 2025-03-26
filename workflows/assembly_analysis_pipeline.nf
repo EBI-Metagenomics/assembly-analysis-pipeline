@@ -148,11 +148,6 @@ workflow ASSEMBLY_ANALYSIS_PIPELINE {
     )
     ch_versions = ch_versions.mix(FUNCTIONAL_ANNOTATION.out.versions)
 
-    def ko_summaries = FUNCTIONAL_ANNOTATION.out.kegg_orthologs_summary_tsv
-    .map{
-        meta, files -> return [["id": meta.study], files]
-    }.groupTuple()
-
     def ko_per_contigs = FUNCTIONAL_ANNOTATION.out.kegg_orthologs_per_contig_tsv
     .map{
         meta, files -> return [["id": meta.study], files]
@@ -169,7 +164,6 @@ workflow ASSEMBLY_ANALYSIS_PIPELINE {
     }.groupTuple()
 
     DRAM_SWF(
-       ko_summaries,
        ko_per_contigs,
        interpro_summaries,
        dbcan_overview

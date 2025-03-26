@@ -4,7 +4,6 @@ include { SUMMARISE_FOR_DRAM_INPUT } from '../../../modules/local/summarise_for_
 workflow DRAM_SWF {
 
     take:
-    ko_summaries       // [meta, path(tsv)]
     ko_per_contigs     // [meta, path(tsv)]
     interpro_summaries // [meta, path(tsv)]
     dbcan_overviews    // [meta, path(tsv)]
@@ -14,7 +13,6 @@ workflow DRAM_SWF {
     ch_versions = Channel.empty()
 
     SUMMARISE_FOR_DRAM_INPUT (
-        ko_summaries,
         ko_per_contigs,
         interpro_summaries,
         dbcan_overviews

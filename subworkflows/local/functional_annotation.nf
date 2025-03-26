@@ -247,6 +247,5 @@ workflow FUNCTIONAL_ANNOTATION {
     interproscan_tsv               = CONCATENATE_INTERPROSCAN_TSV.out.file_out
     interproscan_gff3              = CONCATENATE_INTERPROSCAN_GFFS.out.concatenated_gff
     kegg_orthologs_per_contig_tsv  = KEGG_ORTHOLOGS_SUMMARY.out.ko_per_contig_tsv
-    kegg_orthologs_summary_tsv     = KEGG_ORTHOLOGS_SUMMARY.out.ko_summary_tsv
     versions                       = ch_versions
 }

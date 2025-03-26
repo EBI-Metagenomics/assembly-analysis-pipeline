@@ -24,8 +24,8 @@ import csv
 def get_accession(file_name):
     return file_name.split('_')[0]
 
-def extract_kegg_annotations(kegg_anns, kegg_descs):
-    keggs, keggs_descriptions, contigs_keggs_descriptions = {}, {}, {}
+def extract_kegg_annotations(kegg_anns):
+    keggs = {}
 
     global assemblies_annotations
 
@@ -41,22 +41,7 @@ def extract_kegg_annotations(kegg_anns, kegg_descs):
                 keggs[contig].append(ko)
                 assemblies_annotations[analysis_accession].append(contig)
 
-    for kegg_description in kegg_descs:
-        analysis_accession = get_accession(kegg_annotation)
-        with gzip.open(kegg_description, 'rt') as f:
-            csv_reader = csv.reader(f, delimiter='\t')
-            for _, ko, ko_description in csv_reader:
-                keggs_descriptions[ko] = ko_description
-
-    for contig in keggs:
-        description_list = []
-        if isinstance(keggs[contig], list):
-            for annotation in keggs[contig]:
-                description_list.append(keggs_descriptions[annotation])
-            contigs_keggs_descriptions[contig] = "; ".join(description_list)
-            keggs[contig] = "; ".join(keggs[contig])
-
-    return keggs, contigs_keggs_descriptions
+    return keggs
 
 def extract_cazy_families(cazy_files):
     cazys = {}
@@ -96,7 +81,7 @@ def extract_pfam_annotations(ips_files):
         with open(ips_annotation, 'r') as f: # convert to gzip once the file is compressed
             csv_reader = csv.reader(f, delimiter='\t')
             for line in csv_reader:
-                if "MobiDBLite" in line:
+                if "Pfam" in line:
                     contig = line[0]
                     ann_id = line[4]
                     ann_desc = line[5]
@@ -114,9 +99,8 @@ def extract_pfam_annotations(ips_files):
 def parse_args(argv):
     parser = argparse.ArgumentParser(formatter_class = argparse.ArgumentDefaultsHelpFormatter)
 
-    parser.add_argument('-s', "--ko_summaries", type=str, nargs='+', help="list of ko summaries")
-    parser.add_argument('-k', "--ko_per_contigs", type=str, nargs='+', help="list of ko annotations")
     parser.add_argument('-i', "--interpro_summaries", type=str, nargs='+', help="list of interpro summaries")
+    parser.add_argument('-k', "--ko_per_contigs", type=str, nargs='+', help="list of ko annotations")
     parser.add_argument('-d', "--dbcan_overviews", type=str, nargs='+', help="list of dbcan overview files")
     parser.add_argument('-p', "--prefix", type=str, help="file prefix")
 
@@ -130,7 +114,6 @@ if __name__ == "__main__":
     assemblies_annotations = {}     # { assemblies_annotations[accessions] = set(contigs) }
 
     kegg_annotations = args.ko_per_contigs
-    kegg_descriptions = args.ko_summaries
     ips_annotations = args.interpro_summaries
     cazy_annotations = args.dbcan_overviews
 
@@ -140,8 +123,7 @@ if __name__ == "__main__":
     
     # ----- kegg ----- #
 
-    keggs = extract_kegg_annotations(kegg_annotations, kegg_descriptions) # { keggs[contig] = kegg }
-    keggs, contigs_keggs_description = extract_kegg_annotations(kegg_annotations, kegg_descriptions) # { keggs[contig] = kegg }
+    keggs = extract_kegg_annotations(kegg_annotations) # { keggs[contig] = kegg }
 
     # ----- IPS ----- #
 
@@ -149,7 +131,7 @@ if __name__ == "__main__":
 
     # ----- Assemble tsv table ----- #
 
-    table_header = ["", "fasta", "scaffold", "gene_position", "kegg_id", "kegg_hit", "pfam_hits", "cazy_id"]
+    table_header = ["", "fasta", "scaffold", "gene_position", "kegg_id", "pfam_hits", "cazy_id"]
 
     for annotation in assemblies_annotations:
         functional_summary = []
@@ -163,8 +145,7 @@ if __name__ == "__main__":
                 contig                      # gene_position
             ])
             contig_annotations.extend([
-                keggs.get(contig, ""),                    # kegg_id
-                contigs_keggs_description.get(contig, "") # kegg_hit
+                keggs.get(contig, "") # kegg_id
             ])
             contig_annotations.append(
                 pfams.get(contig, "") # pfam_hits
