@@ -56,7 +56,7 @@
                 },
                 "bgc_min_contig_length": {
                     "type": "integer",
-                    "default": 100,
+                    "default": 1000,
                     "description": "Minimum length of a contig to be analyzed by the Biosynthetic Gene Cluster subworkflow.",
                     "fa_icon": "fas fa-weight"
                 }
@@ -73,6 +73,11 @@
                     "default": 10000000,
                     "description": "Number of amino acids each chunk should contain. The proteins are not truncated, and this is the maximum value a record can have per chunk.",
                     "fa_icon": "fas fa-weight"
+                },
+                "bgc_contigs_chunksize": {
+                    "type": "string",
+                    "default": "50M",
+                    "description": "Number of nucleotide base pairs each chunk should contain. The proteins are not truncated, and this is the maximum value a record can have per chunk."
                 }
             },
             "fa_icon": "fas fa-cut"
@@ -83,18 +88,6 @@
             "description": "Paths to the different reference databases needed for the pipeline",
             "default": "",
             "properties": {
-                "rrnas_rfam_covariance_model": {
-                    "type": "string",
-                    "format": "file-path",
-                    "fa_icon": "fas fa-database",
-                    "description": "Path to the Rfam rRNA covariance models file. This file is generated with https://github.com/EBI-Metagenomics/taxdb_generation_nf and is available in our team FTP."
-                },
-                "rrnas_rfam_claninfo": {
-                    "type": "string",
-                    "format": "file-path",
-                    "fa_icon": "fas fa-database",
-                    "description": "Path to the Rfam rRNA covariance models claninfo subset. This file is generated with https://github.com/EBI-Metagenomics/taxdb_generation_nf and is available in our team FTP."
-                },
                 "interproscan_database": {
                     "type": "string",
                     "format": "directory-path",
@@ -103,8 +96,8 @@
                 },
                 "interproscan_database_version": {
                     "type": "string",
-                    "default": "5.59_91",
-                    "description": "The EggNOG reference database version.",
+                    "default": "5.73-104.0",
+                    "description": "The version of the interproscan database.",
                     "fa_icon": "fas fa-code-branch"
                 },
                 "eggnog_database": {
@@ -141,12 +134,24 @@
                     "fa_icon": "fas fa-database",
                     "help_text": "Pre downloaded antiSMASH databases, TODO: https://nf-co.re/funcscan/usage#antismash-1 this docs."
                 },
+                "antismash_database_version": {
+                    "type": "string",
+                    "default": "7.1.0",
+                    "description": "The version of the antiSMASH database.",
+                    "fa_icon": "fas fa-database"
+                },
                 "uniref90rhea_diamond_database": {
                     "type": "string",
                     "format": "file-path",
                     "description": "This is a diamond database created from the Uniref90 ammended with Rhea and CHEMI annotations.",
                     "fa_icon": "fas fa-database",
                     "help_text": "Path to user-defined local Uniref90 + Rhea and CHEMI annotations diamond database file."
+                },
+                "uniref90rhea_diamond_database_version": {
+                    "type": "string",
+                    "default": "2025_01",
+                    "description": "The version of the UniRef90 used to generate the database.",
+                    "fa_icon": "fas fa-database"
                 },
                 "rheachebi_mapping_tsv": {
                     "type": "string",
@@ -182,6 +187,43 @@
                     "description": "Text file containing the GO terms and descriptions that make up the input GO-slim",
                     "fa_icon": "fas fa-database",
                     "help_text": "Path to the GO terms and descriptions, to make the GO-slim"
+                },
+                "rfam_cm": {
+                    "type": "string",
+                    "format": "file-path",
+                    "description": "Path to the Rfam covariance model file to use with cmsearch/cmscan.",
+                    "help": "This file contains the covariance model for RNA families from the Rfam database."
+                },
+                "rfam_claninfo": {
+                    "type": "string",
+                    "format": "file-path",
+                    "description": "Path to the Rfam clan information file.",
+                    "help": "This file provides information about the clans of RNA families in the Rfam database."
+                },
+                "rfam_version": {
+                    "type": "string",
+                    "format": "string",
+                    "description": "Version of the Rfam database being used.",
+                    "help": "Specify the version of the Rfam database to ensure compatibility with the models."
+                },
+                "cat_diamond_database": {
+                    "type": "string",
+                    "format": "file-path",
+                    "description": "Directory containing the CAT database produced with catpack/prepare.",
+                    "help": "The folder must contain DIAMOND db *.dmnd, *.fastaid2LCAtaxid, *.taxids_with_multiple_offspring."
+                },
+                "cat_taxonomy_database": {
+                    "type": "string",
+                    "format": "file-path",
+                    "description": "Directory containing the tax/ folder of the CAT database produced with catpack/prepare.",
+                    "help": "The folder must contain names.dmp and nodes.dmp"
+                },
+                "fraggenescanrs_train_model": {
+                    "type": "string",
+                    "default": "illumina_5",
+                    "format": "string",
+                    "description": "Training model for FragGeneScan.",
+                    "help": "Specify the training model to use for gene prediction. Default is 'illumina_5'."
                 }
             },
             "fa_icon": "fas fa-database"

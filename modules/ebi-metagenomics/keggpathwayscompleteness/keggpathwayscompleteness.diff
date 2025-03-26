@@ -4,7 +4,7 @@ Changes in component 'ebi-metagenomics/keggpathwayscompleteness'
 Changes in 'keggpathwayscompleteness/main.nf':
 --- modules/ebi-metagenomics/keggpathwayscompleteness/main.nf
 +++ modules/ebi-metagenomics/keggpathwayscompleteness/main.nf
-@@ -5,48 +5,66 @@
+@@ -5,48 +5,57 @@
  
      conda "${moduleDir}/environment.yml"
      container "${ workflow.containerEngine == 'singularity' && !task.ext.singularity_pull_docker_container ?
@@ -15,16 +15,14 @@ Changes in 'keggpathwayscompleteness/main.nf':
  
      input:
 -    tuple val(meta), path(filtered_tbl), path(ko_list)
-+    tuple val(meta), path(proteins_fasta), path(hmmscan_domtbl)
++    tuple val(meta), path(ko_contig_tsv)
  
      output:
 -    tuple val(meta), path("*_contigs.tsv") , emit: kegg_contigs
 -    tuple val(meta), path("*_pathways.tsv"), emit: kegg_pathways
 -    path "versions.yml"                    , emit: versions
-+    // TODO: this contig file is not generated for the example
-+    // tuple val(meta), path("*_contigs.tsv") , emit: kegg_contigs
-+    tuple val(meta), path("${prefix}/summary.kegg_pathways.tsv"), emit: kegg_pathways
-+    path "versions.yml"                                         , emit: versions
++    tuple val(meta), path("${prefix}_summary_kegg_pathways.tsv"), emit: kegg_pathways
++    path "versions.yml",                                          emit: versions
  
      when:
      task.ext.when == null || task.ext.when
@@ -34,36 +32,30 @@ Changes in 'keggpathwayscompleteness/main.nf':
 -    def prefix = task.ext.prefix ?: "${meta.id}"
 -    def kegg_input = ko_list ? "-l ${ko_list}" : "-i ${filtered_tbl}"
 +    prefix = task.ext.prefix ?: "${meta.id}"
-+    // Handle compressde files
-+    def is_proteins_fasta_compressed = proteins_fasta.name.endsWith(".gz")
-+    def is_hmmscan_domtbl_compresssed = hmmscan_domtbl.name.endsWith(".gz")
-+    def proteins_fasta_filename = proteins_fasta.name.replace(".gz", "")
-+    def hmmscan_domtbl_filename = hmmscan_domtbl.name.replace(".gz", "")
 +    """
-+    if [ "${is_proteins_fasta_compressed}" == "true" ]; then
-+        gzip -c -d ${proteins_fasta} > ${proteins_fasta_filename}
-+    fi
-+    if [ "${is_hmmscan_domtbl_compresssed}" == "true" ]; then
-+        gzip -c -d ${hmmscan_domtbl} > ${hmmscan_domtbl_filename}
-+    fi
++    # This is a custom script used to adjust the structure of the ko per contig tsv:
++    # From:
++    # ko      contig_id
++    # K07082  MGYA1767_1
++    # K09458  MGYA1767_1
++    # K02990  MGYA1767_1
++    # to ->
++    # MGYA1767_1    K07082  K09458  K02990
  
 -    if (ko_list && filtered_tbl){
 -        log.warn("Both \$ko_list and \$filtered_tbl were given as input types, will fall back to using \$ko_list i.e. ${ko_list}");
 -    }
 -    """
 -    give_pathways ${kegg_input} -o ${prefix}
-+    make_hmmer_table_tab_separated \\
-+        -i ${hmmscan_domtbl_filename} \\
-+        -o ${prefix}_kos.tsv
-+
-+    parse_hmmer_tab_separated_table -t hmmscan \\
-+        -i ${prefix}_kos.tsv \\
-+        -f ${proteins_fasta_filename} \\
-+        -o ${prefix}_per_contig_kos
++    aggregate_kos_per_contig.py \\
++        -i ${ko_contig_tsv} \\
++        -o ${prefix}_aggregated_kos_per_contig.tsv
 +
 +    give_completeness \\
-+        -i ${prefix}_per_contig_kos/${prefix}_kos.tsv_parsed \\
++        -i ${prefix}_aggregated_kos_per_contig.tsv \\
 +        -o ${prefix}
++
++    mv ${prefix}/summary.kegg_pathways.tsv ${prefix}_summary_kegg_pathways.tsv
  
      cat <<-END_VERSIONS > versions.yml
      "${task.process}":
@@ -78,8 +70,9 @@ Changes in 'keggpathwayscompleteness/main.nf':
 -
 +    prefix = task.ext.prefix ?: "${meta.id}"
      """
-     touch ${prefix}.kegg_contigs.tsv
-     touch ${prefix}.kegg_pathways.tsv
+-    touch ${prefix}.kegg_contigs.tsv
+-    touch ${prefix}.kegg_pathways.tsv
++    touch ${prefix}_summary_kegg_pathways.tsv
  
      cat <<-END_VERSIONS > versions.yml
      "${task.process}":

@@ -1,0 +1,29 @@
+Changes in component 'nf-core/csvtk/concat'
+'modules/nf-core/csvtk/concat/environment.yml' is unchanged
+'modules/nf-core/csvtk/concat/meta.yml' is unchanged
+Changes in 'csvtk/concat/main.nf':
+--- modules/nf-core/csvtk/concat/main.nf
++++ modules/nf-core/csvtk/concat/main.nf
+@@ -11,6 +11,7 @@
+     tuple val(meta), path(csv, name: 'inputs/csv*/*')
+     val in_format
+     val out_format
++    val compress
+ 
+     output:
+     tuple val(meta), path("${prefix}.${out_extension}"), emit: csv
+@@ -25,6 +26,9 @@
+     def delimiter = in_format == "tsv" ? "\t" : (in_format == "csv" ? "," : in_format)
+     def out_delimiter = out_format == "tsv" ? "\t" : (out_format == "csv" ? "," : out_format)
+     out_extension = out_format == "tsv" ? 'tsv' : 'csv'
++    if ( compress ) {
++        out_extension = "${out_extension}.gz"
++    }
+     """
+     csvtk \\
+         concat \\
+
+'modules/nf-core/csvtk/concat/tests/main.nf.test.snap' is unchanged
+'modules/nf-core/csvtk/concat/tests/tags.yml' is unchanged
+'modules/nf-core/csvtk/concat/tests/main.nf.test' is unchanged
+************************************************************

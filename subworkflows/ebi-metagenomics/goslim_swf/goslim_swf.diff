@@ -1,0 +1,27 @@
+Changes in component 'ebi-metagenomics/goslim_swf'
+'subworkflows/ebi-metagenomics/goslim_swf/meta.yml' is unchanged
+Changes in 'goslim_swf/main.nf':
+--- subworkflows/ebi-metagenomics/goslim_swf/main.nf
++++ subworkflows/ebi-metagenomics/goslim_swf/main.nf
+@@ -19,14 +19,14 @@
+     GENERATEGAF( ch_ips )
+     ch_versions = ch_versions.mix(GENERATEGAF.out.versions.first())
+ 
+-    OWLTOOLS ( 
++    OWLTOOLS (
+         GENERATEGAF.out.gaf,
+         go_obo,
+         goslim_ids
+     )
+     ch_versions = ch_versions.mix(OWLTOOLS.out.versions.first())
+ 
+-    SUMMARISEGOSLIMS (
++    SUMMARISEGOSLIMS(
+         ch_ips,
+         OWLTOOLS.out.gaf,
+         go_obo,
+
+'subworkflows/ebi-metagenomics/goslim_swf/tests/main.nf.test.snap' is unchanged
+'subworkflows/ebi-metagenomics/goslim_swf/tests/nextflow.config' is unchanged
+'subworkflows/ebi-metagenomics/goslim_swf/tests/main.nf.test' is unchanged
+************************************************************

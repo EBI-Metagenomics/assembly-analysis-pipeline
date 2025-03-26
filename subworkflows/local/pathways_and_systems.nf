@@ -3,6 +3,7 @@ include { SEQKIT_SEQ as SEQKIT_SEQ_BGC                        } from '../../modu
 include { SEQKIT_SPLIT2                                       } from '../../modules/nf-core/seqkit/split2/main'
 include { ANTISMASH_ANTISMASHLITE                             } from '../../modules/nf-core/antismash/antismashlite/main'
 include { TABIX_BGZIP as TABIX_BGZIP_KEGGPATHWAYSCOMPLETENESS } from '../../modules/nf-core/tabix/bgzip/main'
+
 /* EBI-METAGENOMICS */
 include { SANNTIS                      } from '../../modules/ebi-metagenomics/sanntis/main'
 include { GENOMEPROPERTIES             } from '../../modules/ebi-metagenomics/genomeproperties/main'

@@ -28,6 +28,17 @@ Changes in 'quast/main.nf':
          --threads $task.cpus \\
          $args \\
          ${consensus.join(' ')}
+@@ -49,10 +43,7 @@
+     """
+ 
+     stub:
+-    def args      = task.ext.args   ?: ''
+     prefix        = task.ext.prefix ?: "${meta.id}"
+-    def features  = gff             ? "--features $gff" : ''
+-    def reference = fasta           ? "-r $fasta" : ''
+ 
+     """
+     mkdir -p $prefix
 
 'modules/nf-core/quast/tests/main.nf.test.snap' is unchanged
 'modules/nf-core/quast/tests/tags.yml' is unchanged

@@ -1,0 +1,104 @@
+Changes in component 'ebi-metagenomics/interproscan'
+'modules/ebi-metagenomics/interproscan/meta.yml' is unchanged
+Changes in 'interproscan/main.nf':
+--- modules/ebi-metagenomics/interproscan/main.nf
++++ modules/ebi-metagenomics/interproscan/main.nf
+@@ -29,11 +29,18 @@
+     script:
+     def args = task.ext.args ?: ''
+     def prefix = task.ext.prefix ?: "${meta.id}"
++    def is_compressed = fasta.getExtension() == "gz"
++    def fasta_file_name = fasta.name.replace(".gz", "")
++
+     // -dp (disable precalculation) is on so no online dependency
+     """
++    if [ "$is_compressed" == "true" ]; then
++        gzip -c -d ${fasta} > ${fasta_file_name}
++    fi
++
+     interproscan.sh \\
+         -cpu $task.cpus \\
+-        -i $fasta \\
++        -i ${fasta_file_name} \\
+         -dp \\
+         ${args} \\
+         --output-file-base ${prefix}
+
+'modules/ebi-metagenomics/interproscan/tests/main.nf.test.snap' is unchanged
+'modules/ebi-metagenomics/interproscan/tests/tags.yml' is unchanged
+'modules/ebi-metagenomics/interproscan/tests/main.nf.test' is unchanged
+'modules/ebi-metagenomics/interproscan/tests/fixtures/test.fasta' was removed
+'modules/ebi-metagenomics/interproscan/tests/fixtures/interproscan_db/data/funfam/4.3.0/names.tsv' was removed
+'modules/ebi-metagenomics/interproscan/tests/fixtures/interproscan_db/data/funfam/4.3.0/models/4/10/75/10.hmm' was removed
+'modules/ebi-metagenomics/interproscan/tests/fixtures/interproscan_db/data/funfam/4.3.0/models/3/40/50/40.hmm' was removed
+'modules/ebi-metagenomics/interproscan/tests/fixtures/interproscan_db/data/funfam/4.3.0/models/3/40/50/1170.hmm' was removed
+'modules/ebi-metagenomics/interproscan/tests/fixtures/interproscan_db/data/prosite/2023_05/prosite_patterns.dat' was removed
+'modules/ebi-metagenomics/interproscan/tests/fixtures/interproscan_db/data/prosite/2023_05/prosite_profiles.dat' was removed
+'modules/ebi-metagenomics/interproscan/tests/fixtures/interproscan_db/data/prosite/2023_05/evaluator.dat' was removed
+'modules/ebi-metagenomics/interproscan/tests/fixtures/interproscan_db/data/prosite/2023_05/skip_flagged_profiles.txt' was removed
+'modules/ebi-metagenomics/interproscan/tests/fixtures/interproscan_db/data/prosite/2023_05/prosite_profiles/PS51732.prf' was removed
+'modules/ebi-metagenomics/interproscan/tests/fixtures/interproscan_db/data/prosite/2023_05/prosite_profiles/PS51390.prf' was removed
+'modules/ebi-metagenomics/interproscan/tests/fixtures/interproscan_db/data/cdd/3.21/db/Cdd_NCBI.aux' was removed
+'modules/ebi-metagenomics/interproscan/tests/fixtures/interproscan_db/data/cdd/3.21/db/Cdd_NCBI.pto' was removed
+'modules/ebi-metagenomics/interproscan/tests/fixtures/interproscan_db/data/cdd/3.21/db/Cdd_NCBI.pos' was removed
+'modules/ebi-metagenomics/interproscan/tests/fixtures/interproscan_db/data/cdd/3.21/db/Cdd_NCBI.psq' was removed
+'modules/ebi-metagenomics/interproscan/tests/fixtures/interproscan_db/data/cdd/3.21/data/cdtrack.txt' was removed
+'modules/ebi-metagenomics/interproscan/tests/fixtures/interproscan_db/data/cdd/3.21/data/bitscore_specific.txt' was removed
+'modules/ebi-metagenomics/interproscan/tests/fixtures/interproscan_db/data/cdd/3.21/data/cddannot.dat' was removed
+'modules/ebi-metagenomics/interproscan/tests/fixtures/interproscan_db/data/cdd/3.21/data/family_superfamily_links' was removed
+'modules/ebi-metagenomics/interproscan/tests/fixtures/interproscan_db/data/cdd/3.21/data/cddannot_generic.dat' was removed
+'modules/ebi-metagenomics/interproscan/tests/fixtures/interproscan_db/data/cdd/3.21/data/cddid.tbl' was removed
+'modules/ebi-metagenomics/interproscan/tests/fixtures/interproscan_db/data/phobius/1.01/phobius_install.txt' was removed
+'modules/ebi-metagenomics/interproscan/tests/fixtures/interproscan_db/data/pirsf/3.10/sf_hmm_all' was removed
+'modules/ebi-metagenomics/interproscan/tests/fixtures/interproscan_db/data/pirsf/3.10/pirsf.dat' was removed
+'modules/ebi-metagenomics/interproscan/tests/fixtures/interproscan_db/data/sfld/4/sfld.msa' was removed
+'modules/ebi-metagenomics/interproscan/tests/fixtures/interproscan_db/data/sfld/4/sfld.hmm' was removed
+'modules/ebi-metagenomics/interproscan/tests/fixtures/interproscan_db/data/sfld/4/sfld_sites.annot' was removed
+'modules/ebi-metagenomics/interproscan/tests/fixtures/interproscan_db/data/sfld/4/sfld_hierarchy_flat.txt' was removed
+'modules/ebi-metagenomics/interproscan/tests/fixtures/interproscan_db/data/pirsr/2023_05/sr_hmm_all' was removed
+'modules/ebi-metagenomics/interproscan/tests/fixtures/interproscan_db/data/pirsr/2023_05/sr_uru.json' was removed
+'modules/ebi-metagenomics/interproscan/tests/fixtures/interproscan_db/data/smart/9.0/smart.HMMs' was removed
+'modules/ebi-metagenomics/interproscan/tests/fixtures/interproscan_db/data/ncbifam/17.0/ncbifam.hmm' was removed
+'modules/ebi-metagenomics/interproscan/tests/fixtures/interproscan_db/data/prints/42.0/prints.kdat' was removed
+'modules/ebi-metagenomics/interproscan/tests/fixtures/interproscan_db/data/prints/42.0/FingerPRINTShierarchy.db' was removed
+'modules/ebi-metagenomics/interproscan/tests/fixtures/interproscan_db/data/prints/42.0/prints.pval' was removed
+'modules/ebi-metagenomics/interproscan/tests/fixtures/interproscan_db/data/gene3d/4.3.0/cath-family-names.txt' was removed
+'modules/ebi-metagenomics/interproscan/tests/fixtures/interproscan_db/data/gene3d/4.3.0/model_to_family_map.tsv' was removed
+'modules/ebi-metagenomics/interproscan/tests/fixtures/interproscan_db/data/gene3d/4.3.0/gene3d_main.hmm' was removed
+'modules/ebi-metagenomics/interproscan/tests/fixtures/interproscan_db/data/coils/2.2/new_coil.mat' was removed
+'modules/ebi-metagenomics/interproscan/tests/fixtures/interproscan_db/data/tigrfam/15.0/TIGRFAMs_HMM.LIB' was removed
+'modules/ebi-metagenomics/interproscan/tests/fixtures/interproscan_db/data/tigrfam/15.0/TIGRFAMs_15.0_HMM.LIB' was removed
+'modules/ebi-metagenomics/interproscan/tests/fixtures/interproscan_db/data/superfamily/1.75/dir.des.scop.txt_1.75' was removed
+'modules/ebi-metagenomics/interproscan/tests/fixtures/interproscan_db/data/superfamily/1.75/self_hits.tab' was removed
+'modules/ebi-metagenomics/interproscan/tests/fixtures/interproscan_db/data/superfamily/1.75/dir.cla.scop.txt_1.75' was removed
+'modules/ebi-metagenomics/interproscan/tests/fixtures/interproscan_db/data/superfamily/1.75/hmmlib_1.75' was removed
+'modules/ebi-metagenomics/interproscan/tests/fixtures/interproscan_db/data/superfamily/1.75/model.tab' was removed
+'modules/ebi-metagenomics/interproscan/tests/fixtures/interproscan_db/data/superfamily/1.75/pdbj95d' was removed
+'modules/ebi-metagenomics/interproscan/tests/fixtures/interproscan_db/data/pfam/37.2/pfam_a.dat' was removed
+'modules/ebi-metagenomics/interproscan/tests/fixtures/interproscan_db/data/pfam/37.2/pfam_a.hmm' was removed
+'modules/ebi-metagenomics/interproscan/tests/fixtures/interproscan_db/data/pfam/37.2/pfam_a.seed' was removed
+'modules/ebi-metagenomics/interproscan/tests/fixtures/interproscan_db/data/pfam/37.2/pfam_clans' was removed
+'modules/ebi-metagenomics/interproscan/tests/fixtures/interproscan_db/data/panther/19.0/names.tab' was removed
+'modules/ebi-metagenomics/interproscan/tests/fixtures/interproscan_db/data/panther/19.0/Tree_MSF/PTHR23076.bifurcate.newick' was removed
+'modules/ebi-metagenomics/interproscan/tests/fixtures/interproscan_db/data/panther/19.0/Tree_MSF/PTHR11707.AN.fasta' was removed
+'modules/ebi-metagenomics/interproscan/tests/fixtures/interproscan_db/data/panther/19.0/Tree_MSF/PTHR11589.bifurcate.newick' was removed
+'modules/ebi-metagenomics/interproscan/tests/fixtures/interproscan_db/data/panther/19.0/Tree_MSF/PTHR23076.AN.fasta' was removed
+'modules/ebi-metagenomics/interproscan/tests/fixtures/interproscan_db/data/panther/19.0/Tree_MSF/PTHR11707.newick' was removed
+'modules/ebi-metagenomics/interproscan/tests/fixtures/interproscan_db/data/panther/19.0/Tree_MSF/PTHR23076.newick' was removed
+'modules/ebi-metagenomics/interproscan/tests/fixtures/interproscan_db/data/panther/19.0/Tree_MSF/PTHR11707.bifurcate.newick' was removed
+'modules/ebi-metagenomics/interproscan/tests/fixtures/interproscan_db/data/panther/19.0/Tree_MSF/PTHR11589.AN.fasta' was removed
+'modules/ebi-metagenomics/interproscan/tests/fixtures/interproscan_db/data/panther/19.0/Tree_MSF/PTHR11589.tree' was removed
+'modules/ebi-metagenomics/interproscan/tests/fixtures/interproscan_db/data/panther/19.0/Tree_MSF/PTHR11707.tree' was removed
+'modules/ebi-metagenomics/interproscan/tests/fixtures/interproscan_db/data/panther/19.0/Tree_MSF/PTHR11589.newick' was removed
+'modules/ebi-metagenomics/interproscan/tests/fixtures/interproscan_db/data/panther/19.0/Tree_MSF/PTHR23076.tree' was removed
+'modules/ebi-metagenomics/interproscan/tests/fixtures/interproscan_db/data/panther/19.0/famhmm/binHmm' was removed
+'modules/ebi-metagenomics/interproscan/tests/fixtures/interproscan_db/data/panther/19.0/PAINT_Annotations/PTHR11589.json' was removed
+'modules/ebi-metagenomics/interproscan/tests/fixtures/interproscan_db/data/panther/19.0/PAINT_Annotations/PTHR11707.json' was removed
+'modules/ebi-metagenomics/interproscan/tests/fixtures/interproscan_db/data/panther/19.0/PAINT_Annotations/PTHR23076.json' was removed
+'modules/ebi-metagenomics/interproscan/tests/fixtures/interproscan_db/data/antifam/8.0/AntiFam.hmm' was removed
+'modules/ebi-metagenomics/interproscan/tests/fixtures/interproscan_db/data/hamap/2023_05/hamap.prf' was removed
+'modules/ebi-metagenomics/interproscan/tests/fixtures/interproscan_db/data/hamap/2023_05/hamap.hmm.lib' was removed
+'modules/ebi-metagenomics/interproscan/tests/fixtures/interproscan_db/data/hamap/2023_05/profiles/MF_01458.prf' was removed
+'modules/ebi-metagenomics/interproscan/tests/fixtures/interproscan_db/data/hamap/2023_05/profiles/MF_00457.prf' was removed
+'modules/ebi-metagenomics/interproscan/tests/fixtures/interproscan_db/data/tmhmm/2.0/tmhmm_install.txt' was removed
+************************************************************

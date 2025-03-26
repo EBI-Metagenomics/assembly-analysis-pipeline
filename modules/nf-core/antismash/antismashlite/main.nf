@@ -32,7 +32,7 @@ process ANTISMASH_ANTISMASHLITE {
 
     script:
     def args = task.ext.args ?: ''
-    prefix = task.ext.suffix ? "${meta.id}${task.ext.suffix}" : "${meta.id}"
+    prefix   = task.ext.prefix ?: "${meta.id}"
     
     def gff_flag = gff ? "--genefinding-gff3 ${gff.name.replace('.gz', '')}" : ""
     
