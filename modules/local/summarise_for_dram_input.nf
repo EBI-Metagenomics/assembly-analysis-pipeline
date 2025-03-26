@@ -3,8 +3,8 @@ process SUMMARISE_FOR_DRAM_INPUT {
     label 'process_single'
 
     container "${ workflow.containerEngine == 'singularity' && !task.ext.singularity_pull_docker_container ?
-        'oras://community.wave.seqera.io/library/python:3.13.1--9856f872fdeac74e':
-        'community.wave.seqera.io/library/python:3.13.1--d00663700fcc8bcf' }"
+        'depot.galaxyproject.org/singularity/pandas-2.2.1':
+        'biocontainers/pandas-2.2.1' }"
 
     input:
     tuple val(meta), path(ko_summaries)
@@ -28,12 +28,12 @@ process SUMMARISE_FOR_DRAM_INPUT {
     # - Kegg Orthologs IDs and description
     # It then produces a tsv table for dram distill to generate tabular and visual annotation summaries
 
-    python summarise_for_dram.py \\
-    --prefix ${prefix}
+    summarise_for_DRAM.py \\
+    --prefix ${prefix} \\
     --ko_summaries ${ko_summaries} \\
     --ko_per_contigs ${ko_per_contigs} \\
     --interpro_summaries ${interpro_summaries} \\
-    --dbcan_overviews ${dbcan_overviews} \\
+    --dbcan_overviews ${dbcan_overviews}
 
     cat <<-END_VERSIONS > versions.yml
     "${task.process}":
