@@ -7,7 +7,6 @@ process SUMMARISE_FOR_DRAM_INPUT {
         'biocontainers/pandas-2.2.1' }"
 
     input:
-    tuple val(meta), path(ko_summaries)
     tuple val(meta), path(ko_per_contigs)
     tuple val(meta), path(interpro_summaries)
     tuple val(meta), path(dbcan_overviews)
@@ -30,7 +29,6 @@ process SUMMARISE_FOR_DRAM_INPUT {
 
     summarise_for_DRAM.py \\
     --prefix ${prefix} \\
-    --ko_summaries ${ko_summaries} \\
     --ko_per_contigs ${ko_per_contigs} \\
     --interpro_summaries ${interpro_summaries} \\
     --dbcan_overviews ${dbcan_overviews}
