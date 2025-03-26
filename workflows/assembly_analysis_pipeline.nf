@@ -133,6 +133,19 @@ workflow ASSEMBLY_ANALYSIS_PIPELINE {
     )
     ch_versions = ch_versions.mix(FUNCTIONAL_ANNOTATION.out.versions)
 
+    // TODO: print each of the following ones to see how to handle meta, study, analyses
+    def ko_summaries = FUNCTIONAL_ANNOTATION.out.ko_summary_tsv.collect()
+    def ko_per_contigs = FUNCTIONAL_ANNOTATION.out.ko_per_contig_tsv.collect()
+    def interpro_summaries = FUNCTIONAL_ANNOTATION.out.interproscan_tsv.collect()
+    def dbcan_overviews = FUNCTIONAL_ANNOTATION.out.dbcan_overview.collect()
+
+    DRAM_SWF(
+        FUNCTIONAL_ANNOTATION.out.ko_summary_tsv.collect(),
+        FUNCTIONAL_ANNOTATION.out.ko_per_contig_tsv.collect(),
+        FUNCTIONAL_ANNOTATION.out.interproscan_tsv.collect(),
+        FUNCTIONAL_ANNOTATION.out.dbcan_overview.collect()
+    )
+
     /*
     * Pathway and systems annotations
     */

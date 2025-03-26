@@ -25,6 +25,7 @@ include { INTERPRO_SUMMARY                                  } from '../../module
 include { HMMER_HMMSEARCH as HMMSEARCH_KOFAMS               } from '../../modules/nf-core/hmmer/hmmsearch/main'
 include { KEGG_ORTHOLOGS_SUMMARY                            } from '../../modules/local/kegg_orthologs_summary'
 include { DIAMOND_RHEACHEBI                                 } from '../../modules/local/diamond_rheachebi'
+include { DRAM_SWF                                          } from '../../subworkflows/ebi-metagenomics/dram_swf/main'
 
 workflow FUNCTIONAL_ANNOTATION {
     take:
@@ -204,8 +205,10 @@ workflow FUNCTIONAL_ANNOTATION {
     ch_versions = ch_versions.mix(KEGG_ORTHOLOGS_SUMMARY.out.versions)
 
     emit:
-    interproscan_tsv            = CONCATENATE_INTERPROSCAN_TSV.out.file_out
-    interproscan_gff3           = CONCATENATE_INTERPROSCAN_GFFS.out.concatenated_gff
-    kegg_orthologs_summary_tsv  = KEGG_ORTHOLOGS_SUMMARY.out.ko_per_contig_tsv
-    versions                    = ch_versions
+    dbcan_overview                 = DBCAN.out.overview_output
+    interproscan_tsv               = CONCATENATE_INTERPROSCAN_TSV.out.file_out
+    interproscan_gff3              = CONCATENATE_INTERPROSCAN_GFFS.out.concatenated_gff
+    kegg_orthologs_summary_tsv     = KEGG_ORTHOLOGS_SUMMARY.out.ko_per_contig_tsv
+    kegg_orthologs_description_tsv = KEGG_ORTHOLOGS_SUMMARY.out.ko_summary_tsv
+    versions                       = ch_versions
 }
