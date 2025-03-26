@@ -136,18 +136,32 @@ workflow ASSEMBLY_ANALYSIS_PIPELINE {
     )
     ch_versions = ch_versions.mix(FUNCTIONAL_ANNOTATION.out.versions)
 
-    // TODO: print each of the following ones to see how to handle meta, study, analyses
-    //def ko_summaries = FUNCTIONAL_ANNOTATION.out.ko_summary_tsv.collect()
-    //def ko_per_contigs = FUNCTIONAL_ANNOTATION.out.ko_per_contig_tsv.collect()
-    //def interpro_summaries = FUNCTIONAL_ANNOTATION.out.interproscan_tsv.collect()
-    //def dbcan_overviews = FUNCTIONAL_ANNOTATION.out.dbcan_overview.collect()
+    def ko_summaries = FUNCTIONAL_ANNOTATION.out.kegg_orthologs_summary_tsv
+    .map{
+        meta, files -> return [["id": meta.study], files]
+    }.groupTuple()
 
-    //DRAM_SWF(
-    //    FUNCTIONAL_ANNOTATION.out.ko_summary_tsv.collect(),
-    //    FUNCTIONAL_ANNOTATION.out.ko_per_contig_tsv.collect(),
-    //    FUNCTIONAL_ANNOTATION.out.interproscan_tsv.collect(),
-    //    FUNCTIONAL_ANNOTATION.out.dbcan_overview.collect()
-    //)
+    def ko_per_contigs = FUNCTIONAL_ANNOTATION.out.kegg_orthologs_per_contig_tsv
+    .map{
+        meta, files -> return [["id": meta.study], files]
+    }.groupTuple()
+
+    def interpro_summaries = FUNCTIONAL_ANNOTATION.out.interproscan_tsv
+    .map{
+        meta, files -> return [["id": meta.study], files]
+    }.groupTuple()
+
+    def dbcan_overview = FUNCTIONAL_ANNOTATION.out.dbcan_overview
+    .map{
+        meta, files -> return [["id": meta.study], files]
+    }.groupTuple()
+
+    DRAM_SWF(
+       ko_summaries,
+       ko_per_contigs,
+       interpro_summaries,
+       dbcan_overview
+    )
 
     /*
     * Pathway and systems annotations
@@ -160,7 +174,7 @@ workflow ASSEMBLY_ANALYSIS_PIPELINE {
         ).join(
             FUNCTIONAL_ANNOTATION.out.interproscan_tsv
         ),
-        FUNCTIONAL_ANNOTATION.out.kegg_orthologs_summary_tsv,
+        FUNCTIONAL_ANNOTATION.out.kegg_orthologs_per_contig_tsv,
         ch_protein_chunks
     )
     ch_versions = ch_versions.mix(PATHWAYS_AND_SYSTEMS.out.versions)
