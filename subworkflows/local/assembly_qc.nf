@@ -34,5 +34,6 @@ workflow ASSEMBLY_QC {
 
     emit:
     assembly_filtered = FILTER_ASSEMBLY.out.fasta
+    quast_report_tsv  = QUAST.out.tsv
     versions          = ch_versions
 }

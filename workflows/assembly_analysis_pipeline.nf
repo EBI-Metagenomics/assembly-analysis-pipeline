@@ -3,11 +3,13 @@
     IMPORT MODULES / SUBWORKFLOWS / FUNCTIONS
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 */
-include { MULTIQC                 } from '../modules/nf-core/multiqc/main'
-include { paramsSummaryMap        } from 'plugin/nf-schema'
-include { paramsSummaryMultiqc    } from '../subworkflows/nf-core/utils_nfcore_pipeline'
-include { softwareVersionsToYAML  } from '../subworkflows/nf-core/utils_nfcore_pipeline'
-include { methodsDescriptionText  } from '../subworkflows/local/utils_nfcore_assembly_analysis_pipeline_pipeline'
+
+include { MULTIQC as MULTIQC_PER_ASSEMBLY    } from '../modules/nf-core/multiqc/main'
+include { MULTIQC as MULTIQC_PER_SAMPLESHEET } from '../modules/nf-core/multiqc/main'
+include { paramsSummaryMap                   } from 'plugin/nf-schema'
+include { paramsSummaryMultiqc               } from '../subworkflows/nf-core/utils_nfcore_pipeline'
+include { softwareVersionsToYAML             } from '../subworkflows/nf-core/utils_nfcore_pipeline'
+include { methodsDescriptionText             } from '../subworkflows/local/utils_nfcore_assembly_analysis_pipeline_pipeline'
 
 /*
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -168,7 +170,7 @@ workflow ASSEMBLY_ANALYSIS_PIPELINE {
     softwareVersionsToYAML(ch_versions)
         .collectFile(
             storeDir: "${params.outdir}/pipeline_info",
-            name: 'ASSEMBLY_ANALYSIS_PIPELINE_software_' + 'mqc_' + 'versions.yml',
+            name: 'assembly_analysis_pipeline_software_' + 'mqc_' + 'versions.yml',
             sort: true,
             newLine: true,
         )
@@ -186,7 +188,7 @@ workflow ASSEMBLY_ANALYSIS_PIPELINE {
         : Channel.empty()
     ch_multiqc_logo = params.multiqc_logo
         ? Channel.fromPath(params.multiqc_logo, checkIfExists: true)
-        : Channel.empty()
+        : Channel.fromPath("${projectDir}/assets/mgnify_wordmark_dark_on_light.png", checkIfExists: true)
 
     summary_params = paramsSummaryMap(
         workflow,
@@ -211,8 +213,25 @@ workflow ASSEMBLY_ANALYSIS_PIPELINE {
         )
     )
 
-    MULTIQC(
-        ch_multiqc_files.collect(),
+    /**************************************/
+    /* MultiQC report for the samplesheet */
+    /**************************************/
+
+    common_files = ch_multiqc_files.collect()
+
+    MULTIQC_PER_ASSEMBLY(
+        ASSEMBLY_QC.out.quast_report_tsv,
+        common_files,
+        ch_multiqc_config.toList(),
+        ch_multiqc_custom_config.toList(),
+        ch_multiqc_logo.toList(),
+        [],
+        [],
+    )
+
+    MULTIQC_PER_SAMPLESHEET(
+        ASSEMBLY_QC.out.quast_report_tsv.collect(),
+        common_files,
         ch_multiqc_config.toList(),
         ch_multiqc_custom_config.toList(),
         ch_multiqc_logo.toList(),
@@ -221,6 +240,6 @@ workflow ASSEMBLY_ANALYSIS_PIPELINE {
     )
 
     emit:
-    multiqc_report = MULTIQC.out.report.toList() // channel: /path/to/multiqc_report.html
-    versions       = ch_versions // channel: [ path(versions.yml) ]
+    multiqc_report = MULTIQC_PER_SAMPLESHEET.out.report.toList() // channel: /path/to/multiqc_report.html
+    versions       = ch_versions                                // channel: [ path(versions.yml) ]
 }
