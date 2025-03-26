@@ -23,7 +23,7 @@ workflow PATHWAYS_AND_SYSTEMS {
     // ips_ts: interpsocan concatenated tsv (all the IPS annotations)
     ch_contigs_and_predicted_proteins // tuple (meta, fasta, faa, gff, ips_tsv)
     ch_kegg_orthologs_summary_tsv     // tuple (meta, kos_summary_tsv)
-    // Chunked proteins, used in the functiona_annotation mostly, we need this for SanntiS
+    // Chunked proteins, used in the functional_annotation mostly, we need this for SanntiS
     ch_protein_chunks                 // tuple (meta, faa_chunk)
 
     main:
@@ -45,9 +45,9 @@ workflow PATHWAYS_AND_SYSTEMS {
     )
     ch_versions = ch_versions.mix(GENOMEPROPERTIES.out.versions)
 
-    /*************************************************************
-    * For BGC the pipeline uses a different min contig size
-    *************************************************************/
+    /*****************************************************************************************
+    * For Biosynthetic Gene Clusters (BGC), the pipeline uses a different minimum contig size.
+    ******************************************************************************************/
     SEQKIT_SEQ_BGC(
         ch_contigs_and_predicted_proteins.map {  meta, fasta, _faa, _gff, _ips_tsv -> [ meta, fasta ] }
     )

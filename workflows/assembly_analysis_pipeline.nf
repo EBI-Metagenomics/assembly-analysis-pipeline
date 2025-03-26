@@ -57,7 +57,7 @@ workflow ASSEMBLY_ANALYSIS_PIPELINE {
     ch_multiqc_files = Channel.empty()
 
     /*
-     * Rename the contigs using the prodivded prefix, seqs will be named >{prefix}_{n}
+     * Rename the contigs using the provided prefix, seqs will be named >{prefix}_{n}
      * there n is just an autoincrement
     */
     RENAME_CONTIGS(
