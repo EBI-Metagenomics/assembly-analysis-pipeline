@@ -60,8 +60,9 @@ if __name__ == "__main__":
 
         if os.path.exists(cazy_annotations):
             with gzip.open(cazy_annotations, 'rt') as f:
-                next(f)
-                for line in f:
+                csv_reader = csv.reader(f, delimiter='\t')
+                next(csv_reader)
+                for line in csv_reader:
                     contig, _, hmmer, dbcan_sub, diamond, _ = line.strip().split('\t')
                     hmmer_list = [s.split('(')[0] for s in hmmer.split('+')]         # format: GT9(116-281)+GT17(914-1160) ==> ['GT9', 'GT17']
                     dbcan_sub_list = [s.split('_')[0] for s in dbcan_sub.split('+')] # format: GH23_e756+CBM50_e338 ==> ['GH23', 'CBM50']
@@ -83,7 +84,8 @@ if __name__ == "__main__":
 
         if os.path.exists(kegg_annotations) and os.path.exists(kegg_description):
             with gzip.open(kegg_annotations, 'rt') as f:
-                for line in f:
+                csv_reader = csv.reader(f, delimiter='\t')
+                for line in csv_reader:
                     ko, contig = line.strip().split('\t')
                     if contig not in keggs:
                         keggs[contig] = []
@@ -91,7 +93,8 @@ if __name__ == "__main__":
                     assemblies_annotations[assembly_accession].append(contig)
 
             with gzip.open(kegg_description, 'rt') as f:
-                for line in f:
+                csv_reader = csv.reader(f, delimiter='\t')
+                for line in csv_reader:
                     _, ko, ko_description = line.strip().split('\t')
                     keggs_description[ko] = ko_description
 
@@ -108,8 +111,9 @@ if __name__ == "__main__":
         pfams = {}      # { pfams[contig] = pfam }
 
         if os.path.exists(ips_annotations):
-            with open(ips_annotations, 'r') as f:
-                for line in f:
+            with open(ips_annotations, 'r') as f: # convert to gzip once the file is compressed
+                csv_reader = csv.reader(f, delimiter='\t')
+                for line in csv_reader:
                     if "pfam" in line:
                         fields = line.strip().split('\t')
                         contig = fields[0]
