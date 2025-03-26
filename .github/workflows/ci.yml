@@ -33,7 +33,7 @@ jobs:
           - "docker"
           - "singularity"
         test_name:
-          - "test"
+          - "test_full"
         isMaster:
           - ${{ github.base_ref == 'master' }}
         # Exclude singularity on dev
