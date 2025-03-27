@@ -69,15 +69,15 @@ workflow FUNCTIONAL_ANNOTATION {
     */
     EGGNOGMAPPER_ORTHOLOGS(
         ch_protein_chunked,
-        params.eggnog_data_dir,
-        params.eggnog_database,
-        params.eggnog_diamond_database,
+        file(params.eggnog_data_dir, checkIfExists: true),
+        file(params.eggnog_database, checkIfExists: true),
+        file(params.eggnog_diamond_database, checkIfExists: true),
     )
     ch_versions = ch_versions.mix(EGGNOGMAPPER_ORTHOLOGS.out.versions.first())
 
     EGGNOGMAPPER_ANNOTATIONS(
         EGGNOGMAPPER_ORTHOLOGS.out.orthologs,
-        params.eggnog_data_dir,
+        file(params.eggnog_data_dir, checkIfExists: true),
     )
     ch_versions = ch_versions.mix(EGGNOGMAPPER_ANNOTATIONS.out.versions.first())
 

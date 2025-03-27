@@ -95,7 +95,8 @@
                     "catpack/contigs": {
                         "branch": "main",
                         "git_sha": "b08ed4ae81778706db8c5be504bfd8dd2817a121",
-                        "installed_by": ["contigs_taxonomic_classification"]
+                        "installed_by": ["contigs_taxonomic_classification"],
+                        "patch": "modules/ebi-metagenomics/catpack/contigs/catpack-contigs.diff"
                     },
                     "cmsearchtbloutdeoverlap": {
                         "branch": "main",

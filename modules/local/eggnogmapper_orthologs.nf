@@ -30,7 +30,6 @@ process EGGNOGMAPPER_ORTHOLOGS {
     def fasta_bool = fasta ? fasta.name : "no_fasta"
     def is_compressed = fasta_bool.endsWith(".gz")
     def fasta_name = fasta_bool.replace(".gz", "")
-    def fasta_input = fasta ? "-i ${fasta_name}" : ""
     """
     if [ "$is_compressed" == "true" ]; then
         gzip -c -d $fasta > $fasta_name
@@ -38,7 +37,7 @@ process EGGNOGMAPPER_ORTHOLOGS {
 
     emapper.py \\
         ${args} \\
-        ${fasta_input} \\
+        -i ${fasta_name} \\
         --database ${eggnog_db} \\
         --dmnd_db ${eggnog_diamond_db} \\
         ${dbmem} \\

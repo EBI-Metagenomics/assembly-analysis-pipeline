@@ -110,10 +110,18 @@ workflow ASSEMBLY_ANALYSIS_PIPELINE {
      * This outside of the taxonomical_annotation suboworkflow because it has a dependency with the
      * CGC predicted proteins
     */
-    // TOOD: handle gzip files in this subworkflow instead of uncompress this files
+    ASSEMBLY_QC.out.assembly_filtered
+        .join( COMBINED_GENE_CALLER.out.faa )
+        .multiMap { meta, contigs, faa ->
+            contigs: [meta, contigs]
+            proteins: [meta, faa]
+        }.set {
+            ch_contigs_taxonomic_classification
+        }
+
     CONTIGS_TAXONOMIC_CLASSIFICATION(
-        PIGZ_CONTIGS(ASSEMBLY_QC.out.assembly_filtered).file,
-        PIGZ_PROTEINS(COMBINED_GENE_CALLER.out.faa).file,
+        ch_contigs_taxonomic_classification.contigs,
+        ch_contigs_taxonomic_classification.proteins,
         [[id: "cat_diamond_db"], file(params.cat_diamond_database, checkIfExists: true)],
         [[id: "cat_taxonomy_db"], file(params.cat_taxonomy_database, checkIfExists: true)],
     )
