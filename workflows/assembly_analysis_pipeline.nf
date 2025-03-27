@@ -123,7 +123,7 @@ workflow ASSEMBLY_ANALYSIS_PIPELINE {
     /* PROTEINS CHUNKING */
     /*********************/
 
-    // Chunk the fasta into files with at most >= params
+    // Chunk the fasta into files with at most params.proteins_chunksize sequences
     SEQKIT_SPLIT2(
         COMBINED_GENE_CALLER.out.faa,
         params.proteins_chunksize,

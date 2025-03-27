@@ -17,7 +17,7 @@ workflow RNA_ANNOTATION {
 
     ch_versions = Channel.empty()
 
-    // Chunk the fasta into files with at most >= params
+    // Chunk the fasta into files with at most params.proteins_chunksize sequences
     SEQKIT_SPLIT2(
         ch_contigs,
         params.bgc_contigs_chunksize // Define a chunk size for this one
