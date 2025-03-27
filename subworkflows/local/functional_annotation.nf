@@ -2,8 +2,8 @@
 include { SEQKIT_SPLIT2                                   } from '../../modules/nf-core/seqkit/split2/main'
 include { CAT_CAT as CONCATENATE_EGGNOGMAPPER_ORTHOLOGS   } from '../../modules/nf-core/cat/cat/main'
 include { CAT_CAT as CONCATENATE_EGGNOGMAPPER_ANNOTATIONS } from '../../modules/nf-core/cat/cat/main'
-include { CAT_CAT      as CONCATENATE_HMMSEARCH_TBLOUT    } from '../../modules/nf-core/cat/cat/main'
-include { CSVTK_CONCAT as CONCATENATE_INTERPROSCAN_TSV    } from '../../modules/nf-core/csvtk/concat/main'
+include { CAT_CAT as CONCATENATE_HMMSEARCH_TBLOUT         } from '../../modules/nf-core/cat/cat/main'
+include { CAT_CAT as CONCATENATE_INTERPROSCAN_TSV         } from '../../modules/nf-core/cat/cat/main'
 include { CSVTK_CONCAT as CONCATENATE_DBCAN_HMM           } from '../../modules/nf-core/csvtk/concat/main'
 include { CSVTK_CONCAT as CONCATENATE_DBCAN_OVERVIEW      } from '../../modules/nf-core/csvtk/concat/main'
 include { CSVTK_CONCAT as CONCATENATE_DBCAN_STANDARD_OUT  } from '../../modules/nf-core/csvtk/concat/main'
@@ -54,11 +54,12 @@ workflow FUNCTIONAL_ANNOTATION {
     )
     ch_versions = ch_versions.mix(INTERPROSCAN.out.versions)
 
+    // For this one we use cat/cat as the TSV may have spaces that cause csvtk to complain
+    // The tsv is generated directly by InterProScan and for the summary we use csvtk fix-quotes
+    // So, I think it's safe to use cat/cat but we should revisit at some point
+    // TODO: check we should use csvtk fix-quotes on this one
     CONCATENATE_INTERPROSCAN_TSV(
         INTERPROSCAN.out.tsv.groupTuple(),
-        "tsv",
-        "tsv",
-        true // compress
     )
     ch_versions = ch_versions.mix(CONCATENATE_INTERPROSCAN_TSV.out.versions)
 
@@ -102,7 +103,7 @@ workflow FUNCTIONAL_ANNOTATION {
      * We ran GOSLIM once per assembly, hence the groupTuple (the IPS results are one per chunk )
     */
     GOSLIM_SWF(
-        CONCATENATE_INTERPROSCAN_TSV.out.csv,
+        CONCATENATE_INTERPROSCAN_TSV.out.file_out,
         file(params.go_obo, checkIfExists: true),
         file(params.goslim_ids, checkIfExists: true),
         file(params.go_banding, checkIfExists: true),
@@ -217,12 +218,12 @@ workflow FUNCTIONAL_ANNOTATION {
     //***********************************************//
 
     PFAM_SUMMARY(
-        CONCATENATE_INTERPROSCAN_TSV.out.csv
+        CONCATENATE_INTERPROSCAN_TSV.out.file_out
     )
     ch_versions = ch_versions.mix(PFAM_SUMMARY.out.versions)
 
     INTERPRO_SUMMARY(
-        CONCATENATE_INTERPROSCAN_TSV.out.csv
+        CONCATENATE_INTERPROSCAN_TSV.out.file_out
     )
     ch_versions = ch_versions.mix(INTERPRO_SUMMARY.out.versions)
 
@@ -234,7 +235,7 @@ workflow FUNCTIONAL_ANNOTATION {
 
     emit:
     dbcan_overview                 = DBCAN.out.overview_output
-    interproscan_tsv               = CONCATENATE_INTERPROSCAN_TSV.out.csv
+    interproscan_tsv               = CONCATENATE_INTERPROSCAN_TSV.out.file_out
     interproscan_gff3              = CONCATENATE_INTERPROSCAN_GFFS.out.concatenated_gff
     kegg_orthologs_summary_tsv     = KEGG_ORTHOLOGS_SUMMARY.out.ko_per_contig_tsv
     kegg_orthologs_description_tsv = KEGG_ORTHOLOGS_SUMMARY.out.ko_summary_tsv
