@@ -23,11 +23,13 @@ process EGGNOGMAPPER_ANNOTATIONS {
     def prefix = task.ext.prefix ?: "${meta.id}"
     def dbmem = task.memory.toMega() > 40000 ? '--dbmem' : ''
     """
+    # The --override option is used to prevent this process from failing on retries
     emapper.py \\
         ${args} \\
         --cpu ${task.cpus} ${dbmem} \\
         --data_dir ${eggnog_data_dir} \\
         --annotate_hits_table ${annotation_hit_table} \\
+        --override \\
         --output ${prefix}
 
     cat <<-END_VERSIONS > versions.yml
