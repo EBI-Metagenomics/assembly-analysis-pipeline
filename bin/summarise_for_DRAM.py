@@ -41,6 +41,10 @@ def extract_kegg_annotations(kegg_anns):
                 keggs[contig].append(ko)
                 assemblies_annotations[analysis_accession].append(contig)
 
+    for contig in keggs:
+        if isinstance(keggs[contig], list):
+            keggs[contig] = "; ".join(keggs[contig])
+
     return keggs
 
 def extract_cazy_families(cazy_files):
@@ -61,12 +65,15 @@ def extract_cazy_families(cazy_files):
                 consensus = set()
                 for hmmer_acc in hmmer_list:
                     if hmmer_acc in dbcan_sub_list or hmmer_acc in diamond_list:
-                        consensus.add(hmmer_acc)
+                        if not hmmer_acc == '-':
+                            consensus.add(hmmer_acc)
                 for dbcan in dbcan_sub_list:
                     if dbcan in diamond_list:
-                        consensus.add(dbcan)
-                cazys[contig] = "; ".join(consensus)
-                assemblies_annotations[analysis_accession].append(contig)
+                        if not dbcan == '-':
+                            consensus.add(dbcan)
+                if len(consensus) > 0:
+                    cazys[contig] = "; ".join(consensus)
+                    assemblies_annotations[analysis_accession].append(contig)
 
     return cazys
 
