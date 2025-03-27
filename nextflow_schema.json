@@ -82,6 +82,22 @@
             },
             "fa_icon": "fas fa-cut"
         },
+        "tools_settings": {
+            "title": "Settings for some of the tools of the pipeline",
+            "type": "object",
+            "description": "Settings meant to tweak some parameters of the tools used in the pipeline.",
+            "default": "",
+            "properties": {
+                "fraggenescanrs_train_model": {
+                    "type": "string",
+                    "default": "illumina_5",
+                    "format": "string",
+                    "description": "Training model for FragGeneScan.",
+                    "help": "Specify the training model to use for gene prediction. Default is 'illumina_5'."
+                }
+            },
+            "fa_icon": "fas fa-database"
+        },
         "reference_databases": {
             "title": "Reference databases for the pipeline",
             "type": "object",
@@ -111,15 +127,13 @@
                     "type": "string",
                     "format": "directory-path",
                     "fa_icon": "fas fa-database",
-                    "description": "TODO",
-                    "help_text": "TODO"
+                    "description": "Directory containing eggnog database files"
                 },
                 "eggnog_diamond_database": {
                     "type": "string",
                     "format": "file-path",
                     "fa_icon": "fas fa-database",
-                    "description": "TODO",
-                    "help_text": "TODO"
+                    "description": "The eggnog Diamond protein database file"
                 },
                 "eggnog_database_version": {
                     "type": "string",
@@ -127,18 +141,17 @@
                     "description": "The EggNOG reference database version.",
                     "fa_icon": "fas fa-code-branch"
                 },
-                "antismash_database": {
+                "dbcan_database": {
                     "type": "string",
                     "format": "directory-path",
-                    "description": "Path to user-defined local antiSMASH database.",
-                    "fa_icon": "fas fa-database",
-                    "help_text": "Pre downloaded antiSMASH databases, TODO: https://nf-co.re/funcscan/usage#antismash-1 this docs."
-                },
-                "antismash_database_version": {
-                    "type": "string",
-                    "default": "7.1.0",
-                    "description": "The version of the antiSMASH database.",
+                    "description": "The dbCAN reference database path.",
                     "fa_icon": "fas fa-database"
+                },
+                "dbcan_database_version": {
+                    "type": "string",
+                    "default": "4.1.4-V13",
+                    "description": "The dbCAN reference database version.",
+                    "fa_icon": "fas fa-code-branch"
                 },
                 "uniref90rhea_diamond_database": {
                     "type": "string",
@@ -218,12 +231,18 @@
                     "description": "Directory containing the tax/ folder of the CAT database produced with catpack/prepare.",
                     "help": "The folder must contain names.dmp and nodes.dmp"
                 },
-                "fraggenescanrs_train_model": {
+                "antismash_database": {
                     "type": "string",
-                    "default": "illumina_5",
-                    "format": "string",
-                    "description": "Training model for FragGeneScan.",
-                    "help": "Specify the training model to use for gene prediction. Default is 'illumina_5'."
+                    "format": "directory-path",
+                    "description": "Path to user-defined local antiSMASH database.",
+                    "fa_icon": "fas fa-database",
+                    "help_text": "Pre downloaded antiSMASH databases, TODO: https://nf-co.re/funcscan/usage#antismash-1 this docs."
+                },
+                "antismash_database_version": {
+                    "type": "string",
+                    "default": "7.1.0",
+                    "description": "The version of the antiSMASH database.",
+                    "fa_icon": "fas fa-database"
                 }
             },
             "fa_icon": "fas fa-database"

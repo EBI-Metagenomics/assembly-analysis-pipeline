@@ -4,6 +4,7 @@ include { CAT_CAT as CONCATENATE_EGGNOGMAPPER_ORTHOLOGS   } from '../../modules/
 include { CAT_CAT as CONCATENATE_EGGNOGMAPPER_ANNOTATIONS } from '../../modules/nf-core/cat/cat/main'
 include { CAT_CAT      as CONCATENATE_HMMSEARCH_TBLOUT    } from '../../modules/nf-core/cat/cat/main'
 include { CSVTK_CONCAT as CONCATENATE_INTERPROSCAN_TSV    } from '../../modules/nf-core/csvtk/concat/main'
+include { CSVTK_CONCAT as CONCATENATE_DBCAN_HMM           } from '../../modules/nf-core/csvtk/concat/main'
 include { CSVTK_CONCAT as CONCATENATE_DBCAN_OVERVIEW      } from '../../modules/nf-core/csvtk/concat/main'
 include { CSVTK_CONCAT as CONCATENATE_DBCAN_STANDARD_OUT  } from '../../modules/nf-core/csvtk/concat/main'
 include { CSVTK_CONCAT as CONCATENATE_DBCAN_SUBSTRATES    } from '../../modules/nf-core/csvtk/concat/main'
@@ -180,6 +181,14 @@ workflow FUNCTIONAL_ANNOTATION {
         true // compress
     )
     ch_versions = ch_versions.mix(CONCATENATE_DBCAN_SUBSTRATES.out.versions)
+
+    CONCATENATE_DBCAN_HMM(
+        DBCAN.out.dbsub_output.groupTuple(),
+        "tsv",
+        "tsv",
+        true // compress
+    )
+    ch_versions = ch_versions.mix(CONCATENATE_DBCAN_HMM.out.versions)
 
     /*
      * KEGG orthologs annotation. This step uses hmmscan to annotation the sequences aginst the kofam HMM models.
