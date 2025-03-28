@@ -1,0 +1,23 @@
+Changes in component 'ebi-metagenomics/generategaf'
+'modules/ebi-metagenomics/generategaf/environment.yml' is unchanged
+'modules/ebi-metagenomics/generategaf/meta.yml' is unchanged
+Changes in 'generategaf/main.nf':
+--- modules/ebi-metagenomics/generategaf/main.nf
++++ modules/ebi-metagenomics/generategaf/main.nf
+@@ -21,8 +21,10 @@
+     script:
+     def prefix = task.ext.prefix ?: "${meta.id}"
+     """
++    gunzip -c ${ips} > ${ips.name.replace(".gz", "")}
++
+     generate_gaf \\
+-        -i ${ips} \\
++        -i ${ips.name.replace(".gz", "")} \\
+         -o ${prefix} \\
+ 
+     cat <<-END_VERSIONS > versions.yml
+
+'modules/ebi-metagenomics/generategaf/tests/main.nf.test.snap' is unchanged
+'modules/ebi-metagenomics/generategaf/tests/ips_out.tsv' is unchanged
+'modules/ebi-metagenomics/generategaf/tests/main.nf.test' is unchanged
+************************************************************
