@@ -1,0 +1,39 @@
+nextflow_workflow {
+
+    name "Test Subworkflow RNA_ANNOTATION"
+    script "../main.nf"
+    workflow "RNA_ANNOTATION"
+    config "./nextflow.config"
+
+    tag "subworkflows"
+    tag "subworkflows_ebimetagenomics"
+    tag "subworkflows/rna_annotation"
+    tag "subworkflows/detect_rna"
+    tag "easel"
+    tag "easel/eslsfetch"
+    tag "extractcoords"
+
+    test("test_rna_annotation") {
+
+        when {
+            params {
+                rfam_cm               = "${moduleDir}/tests/rfam/*.cm"
+                rfam_claninfo         = "${moduleDir}/tests/ribo.claninfo"
+                bgc_contigs_chunksize = '50M'
+            }
+            workflow {
+                """
+                input[0] = Channel.of( [ [ id:'test', single_end:false ], // meta map
+                    file('/Users/sofia/mgnify/assembly-analysis-pipeline/subworkflows/local/rna_annotation/tests/test.fasta.gz', checkIfExists: true)
+                ] )
+                """
+            }
+        }
+        then {
+            assertAll(
+                { assert workflow.success},
+                { assert snapshot(workflow.out).match() }
+            )
+        }
+    }
+}

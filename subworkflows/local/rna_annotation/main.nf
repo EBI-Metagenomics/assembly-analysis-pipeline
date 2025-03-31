@@ -1,12 +1,12 @@
 /* NF-CORE */
-include { SEQKIT_SPLIT2                             } from '../../modules/nf-core/seqkit/split2/main'
-include { CAT_CAT as CONCATENATE_CMSEARCH_DEOVERLAP } from '../../modules/nf-core/cat/cat/main'
-include { CAT_CAT as CONCATENATE_EASEL_FASTA        } from '../../modules/nf-core/cat/cat/main'
+include { SEQKIT_SPLIT2                             } from '../../../modules/nf-core/seqkit/split2/main'
+include { CAT_CAT as CONCATENATE_CMSEARCH_DEOVERLAP } from '../../../modules/nf-core/cat/cat/main'
+include { CAT_CAT as CONCATENATE_EASEL_FASTA        } from '../../../modules/nf-core/cat/cat/main'
 
 /* EBI-METAGENOMICS */
-include { DETECT_RNA      } from '../../subworkflows/ebi-metagenomics/detect_rna/main'
-include { EASEL_ESLSFETCH } from '../../modules/ebi-metagenomics/easel/eslsfetch/main'
-include { EXTRACTCOORDS   } from '../../modules/ebi-metagenomics/extractcoords/main'
+include { DETECT_RNA      } from '../../../subworkflows/ebi-metagenomics/detect_rna/main'
+include { EASEL_ESLSFETCH } from '../../../modules/ebi-metagenomics/easel/eslsfetch/main'
+include { EXTRACTCOORDS   } from '../../../modules/ebi-metagenomics/extractcoords/main'
 
 workflow RNA_ANNOTATION {
 

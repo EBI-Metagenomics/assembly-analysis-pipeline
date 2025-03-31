@@ -1,0 +1,89 @@
+{
+    "test_rna_annotation": {
+        "content": [
+            {
+                "0": [
+                    [
+                        {
+                            "id": "test",
+                            "single_end": false
+                        },
+                        "test_concat_SSU_LSU_coords.txt:md5,2ff422ba8581127bc95262d9751dbcba"
+                    ]
+                ],
+                "1": [
+                    [
+                        {
+                            "id": "test",
+                            "single_end": false
+                        },
+                        "test_SSU.fasta:md5,fb23f13526672a300845b767dbc5fd44"
+                    ]
+                ],
+                "2": [
+                    
+                ],
+                "3": [
+                    [
+                        {
+                            "id": "test",
+                            "single_end": false
+                        },
+                        "test_cmsearch_deoverlap:md5,2ff422ba8581127bc95262d9751dbcba"
+                    ]
+                ],
+                "4": [
+                    "versions.yml:md5,20bff06ff2925cb1cb36ffbc16f712af",
+                    "versions.yml:md5,3e0a8e43b9e83c321a0f944fa5418671",
+                    "versions.yml:md5,9eb6b1edf419058844d2df2d1ce6b7b0",
+                    "versions.yml:md5,d0acc051be8469d439aa17ba08746157",
+                    "versions.yml:md5,d1e5e607889e65c335888aa8dd29a933",
+                    "versions.yml:md5,dd49da6d84e60ba329e54acae04d4595"
+                ],
+                "all_rna_coords": [
+                    [
+                        {
+                            "id": "test",
+                            "single_end": false
+                        },
+                        "test_cmsearch_deoverlap:md5,2ff422ba8581127bc95262d9751dbcba"
+                    ]
+                ],
+                "lsu_fasta": [
+                    
+                ],
+                "ssu_fasta": [
+                    [
+                        {
+                            "id": "test",
+                            "single_end": false
+                        },
+                        "test_SSU.fasta:md5,fb23f13526672a300845b767dbc5fd44"
+                    ]
+                ],
+                "ssu_lsu_coords": [
+                    [
+                        {
+                            "id": "test",
+                            "single_end": false
+                        },
+                        "test_concat_SSU_LSU_coords.txt:md5,2ff422ba8581127bc95262d9751dbcba"
+                    ]
+                ],
+                "versions": [
+                    "versions.yml:md5,20bff06ff2925cb1cb36ffbc16f712af",
+                    "versions.yml:md5,3e0a8e43b9e83c321a0f944fa5418671",
+                    "versions.yml:md5,9eb6b1edf419058844d2df2d1ce6b7b0",
+                    "versions.yml:md5,d0acc051be8469d439aa17ba08746157",
+                    "versions.yml:md5,d1e5e607889e65c335888aa8dd29a933",
+                    "versions.yml:md5,dd49da6d84e60ba329e54acae04d4595"
+                ]
+            }
+        ],
+        "meta": {
+            "nf-test": "0.9.0",
+            "nextflow": "24.10.4"
+        },
+        "timestamp": "2025-03-31T16:19:38.08461"
+    }
+}
