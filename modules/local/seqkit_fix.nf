@@ -1,4 +1,4 @@
-process CONCATENATE_DBCAN_HMMOUT {
+process SEQKIT_FIX {
     tag "$meta.id"
     label 'process_low'
 
@@ -7,10 +7,10 @@ process CONCATENATE_DBCAN_HMMOUT {
         'biocontainers/csvtk:0.31.0--h9ee0642_0' }"
 
     input:
-    tuple val(meta), path(tsv, name: 'inputs/tsv*/*')
+    tuple val(meta), path(tsv)
 
     output:
-    tuple val(meta), path("${prefix}.tsv.gz"), emit: concatenated_tsv
+    tuple val(meta), path("${prefix}.tsv.gz"), emit: fixed_tsv
     path "versions.yml"                      , emit: versions
 
     when:
@@ -19,17 +19,7 @@ process CONCATENATE_DBCAN_HMMOUT {
     script:
     prefix = task.ext.prefix ?: "${meta.id}"
     """
-    # The TSV file contains an extra column that appears to be a repeated header.
-    # To address this, we first use the `csvtk FIX` command, which adds an empty column
-    # to the existing TSV structure. After that, we utilize the `csvtk cat` command
-    # to concatenate the modified TSV files, ensuring the output is correctly formatted.
-
-    csvtk fix --tabs inputs/tsv*/** | \\
-    csvtk \\
-        concat \\
-        --num-cpus $task.cpus \\
-        --tabs \\
-        --out-file ${prefix}.tsv.gz
+    csvtk fix --tabs ${tsv} > ${prefix}.tsv.gz
 
     cat <<-END_VERSIONS > versions.yml
     "${task.process}":

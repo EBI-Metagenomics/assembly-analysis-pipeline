@@ -7,7 +7,7 @@ include { CAT_CAT as CONCATENATE_INTERPROSCAN_TSV         } from '../../modules/
 include { CSVTK_CONCAT as CONCATENATE_DBCAN_OVERVIEW      } from '../../modules/nf-core/csvtk/concat/main'
 include { CSVTK_CONCAT as CONCATENATE_DBCAN_STANDARD_OUT  } from '../../modules/nf-core/csvtk/concat/main'
 include { CSVTK_CONCAT as CONCATENATE_DBCAN_SUBSTRATES    } from '../../modules/nf-core/csvtk/concat/main'
-// TODO: this is temporal to create a bgzip and index for the goslim summaries
+include { CSVTK_CONCAT as CONCATENATE_DBCAN_HMMOUT        } from '../../modules/nf-core/csvtk/concat/main'
 include { TABIX_BGZIP as TABIX_BGZIP_GO                   } from '../../modules/nf-core/tabix/bgzip/main'
 include { TABIX_BGZIP as TABIX_BGZIP_GOSLIM               } from '../../modules/nf-core/tabix/bgzip/main'
 include { TABIX_BGZIP as TABIX_BGZIP_RHEAANDCHEBI         } from '../../modules/nf-core/tabix/bgzip/main'
@@ -20,6 +20,7 @@ include { GOSLIM_SWF                               } from '../../subworkflows/eb
 /* LOCAL */
 include { EGGNOGMAPPER_ORTHOLOGS                            } from '../../modules/local/eggnogmapper_orthologs'
 include { EGGNOGMAPPER_ANNOTATIONS                          } from '../../modules/local/eggnogmapper_annotations'
+include { SEQKIT_FIX                                        } from '../../modules/local/seqkit_fix'
 include { CONCATENATE_GFFS as CONCATENATE_INTERPROSCAN_GFFS } from '../../modules/local/concatenate_gffs'
 include { CONCATENATE_GFFS as CONCATENATE_DBCAN_GFFS        } from '../../modules/local/concatenate_gffs'
 include { PFAM_SUMMARY                                      } from '../../modules/local/pfam_summary'
@@ -28,7 +29,6 @@ include { HMMER_HMMSEARCH as HMMSEARCH_KOFAMS               } from '../../module
 include { KEGG_ORTHOLOGS_SUMMARY                            } from '../../modules/local/kegg_orthologs_summary'
 include { DIAMOND_RHEACHEBI                                 } from '../../modules/local/diamond_rheachebi'
 include { DRAM_SWF                                          } from '../../subworkflows/ebi-metagenomics/dram_swf/main'
-include { CONCATENATE_DBCAN_HMMOUT                          } from '../../modules/local/concatenate_dbcan_hmmout'
 
 workflow FUNCTIONAL_ANNOTATION {
     take:
@@ -183,8 +183,18 @@ workflow FUNCTIONAL_ANNOTATION {
     )
     ch_versions = ch_versions.mix(CONCATENATE_DBCAN_SUBSTRATES.out.versions)
 
+    // TODO: the dbsub_output is a valid TSV, it contains an extra column with no header
+    // it looks like this extra column is a duplicated "Coverage". In order to concatenate the
+    // tsv with csvtk (which ensures consistency) we run csvtk fix first to adjust the tsvs
+    SEQKIT_FIX(DBCAN.out.dbsub_output)
+
+    ch_versions = ch_versions.mix(SEQKIT_FIX.out.versions.first())
+
     CONCATENATE_DBCAN_HMMOUT(
-        DBCAN.out.dbsub_output.groupTuple()
+        SEQKIT_FIX.out.fixed_tsv.groupTuple(),
+        "tsv",
+        "tsv",
+        true // compress
     )
     ch_versions = ch_versions.mix(CONCATENATE_DBCAN_HMMOUT.out.versions)
 
