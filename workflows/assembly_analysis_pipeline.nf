@@ -89,10 +89,10 @@ workflow ASSEMBLY_ANALYSIS_PIPELINE {
     */
     // We need to sync the sequences and the rRNA outputs //
     ASSEMBLY_QC.out.assembly_filtered
-        .join(RNA_ANNOTATION.out.ssu_lsu_coords)
-        .multiMap { meta, assembly_fasta, ssu_lsu_coords ->
+        .join(RNA_ANNOTATION.out.all_rna_coords)
+        .multiMap { meta, assembly_fasta, rna_coords ->
             assembly: [meta, assembly_fasta]
-            ssu_lsu_coords: [meta, ssu_lsu_coords]
+            rna_coords: [meta, rna_coords]
         }
         .set {
             ch_cgc
@@ -101,7 +101,7 @@ workflow ASSEMBLY_ANALYSIS_PIPELINE {
     // TODO: handle LR - FGS flip parameter //
     COMBINED_GENE_CALLER(
         ch_cgc.assembly,
-        ch_cgc.ssu_lsu_coords,
+        ch_cgc.rna_coords,
     )
     ch_versions = ch_versions.mix(COMBINED_GENE_CALLER.out.versions)
 
