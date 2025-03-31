@@ -98,7 +98,6 @@ workflow ASSEMBLY_ANALYSIS_PIPELINE {
             ch_cgc
         }
 
-    // TODO: handle LR - FGS flip parameter //
     COMBINED_GENE_CALLER(
         ch_cgc.assembly,
         ch_cgc.ssu_lsu_coords,

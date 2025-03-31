@@ -38,7 +38,6 @@ process DBCAN {
     def args = task.ext.args ?: ''
     prefix = task.ext.prefix ?: "${meta.id}"
     """
-    # TODO: post the gunzips to the nf module
     gunzip ${fasta}
     gunzip ${gff}
 

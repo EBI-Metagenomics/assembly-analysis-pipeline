@@ -116,7 +116,8 @@
                     "dbcan/dbcan": {
                         "branch": "main",
                         "git_sha": "2f2f837279b44825254ea736b12ea4797b350d0a",
-                        "installed_by": ["modules"]
+                        "installed_by": ["modules"],
+                        "patch": "modules/ebi-metagenomics/dbcan/dbcan/dbcan-dbcan.diff"
                     },
                     "diamond/blastp": {
                         "branch": "main",

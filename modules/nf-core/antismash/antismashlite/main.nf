@@ -48,7 +48,6 @@ process ANTISMASH_ANTISMASHLITE {
         gzip -c -d ${sequence_input} > ${sequence_file}
     fi
 
-    # TODO: handle this as the fasta file
     gunzip -c -d ${gff} > ${gff.name.replace('.gz', '')}
 
     antismash \\

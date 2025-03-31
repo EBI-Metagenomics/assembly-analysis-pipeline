@@ -56,7 +56,6 @@ workflow RNA_ANNOTATION {
     ch_versions = ch_versions.mix(EXTRACTCOORDS.out.versions.first())
 
     emit:
-    // TODO: are these valid for the CGC? or they have to the cmsearch_deoverlap (for rRNA) only?
     ssu_lsu_coords     = EXTRACTCOORDS.out.concat_ssu_lsu_coords
     ssu_fasta          = EXTRACTCOORDS.out.ssu_fasta
     lsu_fasta          = EXTRACTCOORDS.out.lsu_fasta

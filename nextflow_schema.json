@@ -88,6 +88,13 @@
             "description": "Settings meant to tweak some parameters of the tools used in the pipeline.",
             "default": "",
             "properties": {
+                "cgc_merge_priority": {
+                    "type": "string",
+                    "default": "Pyrodigal_FragGeneScanRS",
+                    "enum": ["Pyrodigal_FragGeneScanRS", "FragGeneScanRS_Pyrodigal"],
+                    "description": "Training model for FragGeneScan.",
+                    "help": "The gene caller merge priority for the combined gene caller"
+                },
                 "fraggenescanrs_train_model": {
                     "type": "string",
                     "default": "illumina_5",
@@ -217,7 +224,8 @@
                     "type": "string",
                     "format": "string",
                     "description": "Version of the Rfam database being used.",
-                    "help": "Specify the version of the Rfam database to ensure compatibility with the models."
+                    "help": "Specify the version of the Rfam database to ensure compatibility with the models.",
+                    "default": "15"
                 },
                 "cat_diamond_database": {
                     "type": "string",
@@ -395,6 +403,9 @@
         },
         {
             "$ref": "#/$defs/nucleotide_and_protein_fasta_file_chunking_options"
+        },
+        {
+            "$ref": "#/$defs/tools_settings"
         },
         {
             "$ref": "#/$defs/reference_databases"
