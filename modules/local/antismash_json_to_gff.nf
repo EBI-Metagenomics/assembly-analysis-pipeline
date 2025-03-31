@@ -1,6 +1,6 @@
 process ANTISMASH_JSON_TO_GFF {
     tag "${meta.id}"
-    label 'process_single'
+    label 'process_low'
 
     container "${ workflow.containerEngine == 'singularity' && !task.ext.singularity_pull_docker_container ?
         'https://depot.galaxyproject.org/singularity/mgnify-pipelines-toolkit:1.0.1--pyhdfd78af_0':

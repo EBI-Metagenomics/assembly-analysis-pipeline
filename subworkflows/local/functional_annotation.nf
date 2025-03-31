@@ -4,7 +4,6 @@ include { CAT_CAT as CONCATENATE_EGGNOGMAPPER_ORTHOLOGS   } from '../../modules/
 include { CAT_CAT as CONCATENATE_EGGNOGMAPPER_ANNOTATIONS } from '../../modules/nf-core/cat/cat/main'
 include { CAT_CAT as CONCATENATE_HMMSEARCH_TBLOUT         } from '../../modules/nf-core/cat/cat/main'
 include { CAT_CAT as CONCATENATE_INTERPROSCAN_TSV         } from '../../modules/nf-core/cat/cat/main'
-include { CSVTK_CONCAT as CONCATENATE_DBCAN_HMM           } from '../../modules/nf-core/csvtk/concat/main'
 include { CSVTK_CONCAT as CONCATENATE_DBCAN_OVERVIEW      } from '../../modules/nf-core/csvtk/concat/main'
 include { CSVTK_CONCAT as CONCATENATE_DBCAN_STANDARD_OUT  } from '../../modules/nf-core/csvtk/concat/main'
 include { CSVTK_CONCAT as CONCATENATE_DBCAN_SUBSTRATES    } from '../../modules/nf-core/csvtk/concat/main'
@@ -29,6 +28,7 @@ include { HMMER_HMMSEARCH as HMMSEARCH_KOFAMS               } from '../../module
 include { KEGG_ORTHOLOGS_SUMMARY                            } from '../../modules/local/kegg_orthologs_summary'
 include { DIAMOND_RHEACHEBI                                 } from '../../modules/local/diamond_rheachebi'
 include { DRAM_SWF                                          } from '../../subworkflows/ebi-metagenomics/dram_swf/main'
+include { CONCATENATE_DBCAN_HMMOUT                          } from '../../modules/local/concatenate_dbcan_hmmout'
 
 workflow FUNCTIONAL_ANNOTATION {
     take:
@@ -183,13 +183,10 @@ workflow FUNCTIONAL_ANNOTATION {
     )
     ch_versions = ch_versions.mix(CONCATENATE_DBCAN_SUBSTRATES.out.versions)
 
-    CONCATENATE_DBCAN_HMM(
-        DBCAN.out.dbsub_output.groupTuple(),
-        "tsv",
-        "tsv",
-        true // compress
+    CONCATENATE_DBCAN_HMMOUT(
+        DBCAN.out.dbsub_output.groupTuple()
     )
-    ch_versions = ch_versions.mix(CONCATENATE_DBCAN_HMM.out.versions)
+    ch_versions = ch_versions.mix(CONCATENATE_DBCAN_HMMOUT.out.versions)
 
     /*
      * KEGG orthologs annotation. This step uses hmmscan to annotation the sequences aginst the kofam HMM models.
