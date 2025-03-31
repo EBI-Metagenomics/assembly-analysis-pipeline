@@ -183,9 +183,11 @@ workflow FUNCTIONAL_ANNOTATION {
     )
     ch_versions = ch_versions.mix(CONCATENATE_DBCAN_SUBSTRATES.out.versions)
 
-    // TODO: the dbsub_output is a valid TSV, it contains an extra column with no header
-    // it looks like this extra column is a duplicated "Coverage". In order to concatenate the
-    // tsv with csvtk (which ensures consistency) we run csvtk fix first to adjust the tsvs
+    /*
+    * The dbsub_output is a valid TSV, it contains an extra column with no header
+    * it looks like this extra column is a duplicated "Coverage". In order to concatenate the
+    * tsv with csvtk (which ensures consistency) we run csvtk fix first to adjust the tsvs
+    */
     SEQKIT_FIX(DBCAN.out.dbsub_output)
 
     ch_versions = ch_versions.mix(SEQKIT_FIX.out.versions.first())
@@ -199,8 +201,8 @@ workflow FUNCTIONAL_ANNOTATION {
     ch_versions = ch_versions.mix(CONCATENATE_DBCAN_HMMOUT.out.versions)
 
     /*
-     * KEGG orthologs annotation. This step uses hmmscan to annotation the sequences aginst the kofam HMM models.
-     * These HMM models have been extended as described -> TODO: link to the mgnify_pipelines_reference_databases pipeline
+    * KEGG orthologs annotation. This step uses hmmscan to annotation the sequences aginst the kofam HMM models.
+    * These HMM models have been extended as described -> TODO: link to the mgnify_pipelines_reference_databases pipeline
     */
     HMMSEARCH_KOFAMS(
         ch_protein_chunked.map { meta, faa ->

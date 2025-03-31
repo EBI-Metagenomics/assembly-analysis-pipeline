@@ -110,23 +110,22 @@ workflow ASSEMBLY_ANALYSIS_PIPELINE {
      * This outside of the taxonomical_annotation suboworkflow because it has a dependency with the
      * CGC predicted proteins
     */
-    // There is a bug here that Sonya is fixing.
-    // ASSEMBLY_QC.out.assembly_filtered
-    //     .join( COMBINED_GENE_CALLER.out.faa )
-    //     .multiMap { meta, contigs, faa ->
-    //         contigs: [meta, contigs]
-    //         proteins: [meta, faa]
-    //     }.set {
-    //         ch_contigs_taxonomic_classification
-    //     }
+    ASSEMBLY_QC.out.assembly_filtered
+        .join( COMBINED_GENE_CALLER.out.faa )
+        .multiMap { meta, contigs, faa ->
+            contigs: [meta, contigs]
+            proteins: [meta, faa]
+        }.set {
+            ch_contigs_taxonomic_classification
+        }
 
-    // CONTIGS_TAXONOMIC_CLASSIFICATION(
-    //     ch_contigs_taxonomic_classification.contigs,
-    //     ch_contigs_taxonomic_classification.proteins,
-    //     [[id: "cat_diamond_db"], file(params.cat_diamond_database, checkIfExists: true)],
-    //     [[id: "cat_taxonomy_db"], file(params.cat_taxonomy_database, checkIfExists: true)],
-    // )
-    // ch_versions = ch_versions.mix(CONTIGS_TAXONOMIC_CLASSIFICATION.out.versions)
+    CONTIGS_TAXONOMIC_CLASSIFICATION(
+        ch_contigs_taxonomic_classification.contigs,
+        ch_contigs_taxonomic_classification.proteins,
+        [[id: "cat_diamond_db"], file(params.cat_diamond_database, checkIfExists: true)],
+        [[id: "cat_taxonomy_db"], file(params.cat_taxonomy_database, checkIfExists: true)],
+    )
+    ch_versions = ch_versions.mix(CONTIGS_TAXONOMIC_CLASSIFICATION.out.versions)
 
     /*********************/
     /* PROTEINS CHUNKING */

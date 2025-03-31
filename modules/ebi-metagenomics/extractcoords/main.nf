@@ -13,13 +13,13 @@ process EXTRACTCOORDS {
     tuple val(meta2), path(matched_seqs_with_coords)
 
     output:
-    tuple val(meta), path("sequence-categorisation/*SSU.fasta")        , optional: true, emit: ssu_fasta
-    tuple val(meta), path("sequence-categorisation/*LSU.fasta")        , optional: true, emit: lsu_fasta
-    tuple val(meta), path("sequence-categorisation/*5S.fasta")         , optional: true, emit: fiveS_fasta
-    tuple val(meta), path("sequence-categorisation/*5_8S.fasta")       , optional: true, emit: five_eightS_fasta
-    tuple val(meta), path("sequence-categorisation/*other_ncRNA.fasta"), optional: true, emit: ncrna_fasta
-    tuple val(meta), path("*concat_SSU_LSU_coords.txt")                , emit: concat_ssu_lsu_coords
-    path "versions.yml"                                                 , emit: versions
+    tuple val(meta), path("sequence-categorisation/*SSU.fasta.gz")        , optional: true, emit: ssu_fasta
+    tuple val(meta), path("sequence-categorisation/*LSU.fasta.gz")        , optional: true, emit: lsu_fasta
+    tuple val(meta), path("sequence-categorisation/*5S.fasta.gz")         , optional: true, emit: fiveS_fasta
+    tuple val(meta), path("sequence-categorisation/*5_8S.fasta.gz")       , optional: true, emit: five_eightS_fasta
+    tuple val(meta), path("sequence-categorisation/*other_ncRNA.fasta.gz"), optional: true, emit: ncrna_fasta
+    tuple val(meta), path("*concat_SSU_LSU_coords.txt")                   , emit: concat_ssu_lsu_coords
+    path "versions.yml"                                                   , emit: versions
 
     when:
     task.ext.when == null || task.ext.when
@@ -33,9 +33,11 @@ process EXTRACTCOORDS {
 
     cat SSU_coords LSU_coords > ${prefix}_concat_SSU_LSU_coords.txt
 
+    gzip sequence-categorisation/*.fasta
+
     cat <<-END_VERSIONS > versions.yml
     "${task.process}":
-        extractcoords: 0.1.2
+        mgnify-pipelines-toolkit: \$(get_mpt_version)
     END_VERSIONS
     """
 
@@ -46,7 +48,7 @@ process EXTRACTCOORDS {
 
     cat <<-END_VERSIONS > versions.yml
     "${task.process}":
-        extractcoords: 0.1.2
+        mgnify-pipelines-toolkit: \$(get_mpt_version)
     END_VERSIONS
     """
 }

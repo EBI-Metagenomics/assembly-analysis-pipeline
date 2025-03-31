@@ -136,7 +136,8 @@
                     "extractcoords": {
                         "branch": "main",
                         "git_sha": "33ea81307e5bf9772861d2a3cb1b4f4694a04db6",
-                        "installed_by": ["modules"]
+                        "installed_by": ["modules"],
+                        "patch": "modules/ebi-metagenomics/extractcoords/extractcoords.diff"
                     },
                     "fraggenescanrs": {
                         "branch": "main",
