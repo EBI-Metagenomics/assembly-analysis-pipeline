@@ -80,9 +80,9 @@ workflow PATHWAYS_AND_SYSTEMS {
     ch_versions = ch_versions.mix(ANTISMASH_ANTISMASHLITE.out.versions)
 
     ANTISMASH_JSON_TO_GFF(
-        ANTISMASH_ANTISMASHLITE.out.json_results.groupTuple()
+        ANTISMASH_ANTISMASHLITE.out.json_results
     )
-    ch_versions = ch_versions.mix(ANTISMASH_JSON_TO_GFF.out.versions)
+    ch_versions = ch_versions.mix(ANTISMASH_JSON_TO_GFF.out.versions.first())
 
     CONCATENATE_GFFS(
         ANTISMASH_JSON_TO_GFF.out.antismash_gff.groupTuple()
