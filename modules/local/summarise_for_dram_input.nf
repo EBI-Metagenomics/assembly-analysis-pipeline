@@ -7,12 +7,10 @@ process SUMMARISE_FOR_DRAM_INPUT {
         'biocontainers/pandas-2.2.1' }"
 
     input:
-    tuple val(meta), path(ko_per_contigs)
-    tuple val(meta), path(interpro_summaries)
-    tuple val(meta), path(dbcan_overviews)
+    tuple val(meta), path(ko_per_contigs), path(interpro_summaries), path(dbcan_overviews)
 
     output:
-    tuple val(meta), path("${prefix}_summary_for_DRAM.tsv"), emit: dram_summary
+    tuple val(meta), path("${prefix}_summary_for_dram.tsv"), emit: dram_summary
     path "versions.yml"                                    , emit: versions
 
     when:
@@ -27,15 +25,16 @@ process SUMMARISE_FOR_DRAM_INPUT {
     # - Kegg Orthologs IDs and description
     # It then produces a tsv table for dram distill to generate tabular and visual annotation summaries
 
-    summarise_for_DRAM.py \\
-    --prefix ${prefix} \\
-    --ko_per_contigs ${ko_per_contigs} \\
-    --interpro_summaries ${interpro_summaries} \\
-    --dbcan_overviews ${dbcan_overviews}
+    summarise_for_dram.py \\
+        --prefix ${prefix} \\
+        --ko_per_contigs ${ko_per_contigs} \\
+        --interpro_summaries ${interpro_summaries} \\
+        --dbcan_overviews ${dbcan_overviews}
 
     cat <<-END_VERSIONS > versions.yml
     "${task.process}":
         python: \$(python --version 2>&1 | sed 's/Python //g')
+        pandas
     END_VERSIONS
     """
 
