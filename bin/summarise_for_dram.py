@@ -30,7 +30,7 @@ def get_contig_id(fasta_header: str) -> str:
     """
     # TODO: add some validation here
     assembly, contig_id, *_ = fasta_header.split("_")
-    return f"${assembly}_{contig_id}"
+    return f"{assembly}_{contig_id}"
 
 
 def extract_kegg_orthologs_annotations(kegg_summary_tsv: Path) -> dict:
@@ -89,19 +89,31 @@ def extract_pfam_annotations(interproscan_summary_tsv: Path) -> dict:
     with gzip.open(interproscan_summary_tsv, "rt") as file_handler:
         csv_reader = csv.reader(file_handler, delimiter="\t")
         for line in csv_reader:
-            protein_id, _, _, analysis, signature_accession, signature_description, *_ = (
-                line
-            )
+            # [
+            #   'ERZ12345_4_1',
+            #   _,
+            #   _,
+            #   'Pfam',
+            #   'PF12574',
+            #   '120 KDa Rickettsia surface antigen',
+            #   ...
+            (
+                protein_id,
+                _,
+                _,
+                analysis,
+                signature_accession,
+                signature_description,
+                *_
+            ) = line
             contig = get_contig_id(protein_id)
-            if analysis == "Pfam":
+            if analysis.strip() == "Pfam":
                 pfams[contig].append(f"{signature_description} [{signature_accession}]")
 
     # There are no pfams per contig that are lists, right?
     for contig in pfams:
         if isinstance(pfams[contig], list):
             pfams[contig] = "; ".join(pfams[contig])
-
-    print(pfams.items())
 
     return pfams
 
@@ -172,7 +184,7 @@ if __name__ == "__main__":
             if line.startswith(">"):
                 # the assembly as this point needs to have been renamed
                 # So the contigs are named <prefix>_<incremental id>.. the prefix is
-                # usually the assembly ERZ accession
+                # usually the assembly ERZ accession
                 assembly, contig_id = line.strip().replace(">", "").split("_")
                 contigs.add(f"{assembly}_{contig_id}")
 
@@ -183,7 +195,7 @@ if __name__ == "__main__":
         contig_annotations.extend(
             [
                 contig,
-                args.prefix,  # assembly
+                args.prefix,  # assembly
                 args.prefix + "_" + contig,  # scaffold
                 contig,  # gene_position
             ]
