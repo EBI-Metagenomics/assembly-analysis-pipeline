@@ -13,12 +13,6 @@
                 "errorMessage": "Sample name must be provided and cannot contain spaces",
                 "meta": ["id"]
             },
-            "study": {
-                "type": "string",
-                "pattern": "^\\S+$",
-                "errorMessage": "Study accession must be provided and cannot contain spaces",
-                "meta": ["study"]
-            },
             "assembly_fasta": {
                 "type": "string",
                 "format": "file-path",

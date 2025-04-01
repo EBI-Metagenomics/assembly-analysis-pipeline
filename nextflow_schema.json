@@ -187,6 +187,13 @@
                     "fa_icon": "fas fa-database",
                     "help_text": "TODO"
                 },
+                "ko_list_txt": {
+                    "type": "string",
+                    "format": "file-path",
+                    "description": "KEGG Orthologs list, this is the TSV that you can obtain from ftp://ftp.genome.jp/pub/db/kofam/ko_list.gz",
+                    "fa_icon": "fas fa-database",
+                    "help_text": "This file is used to get the descriptions from the KO entries in this pipeline summary files."
+                },
                 "go_obo": {
                     "type": "string",
                     "format": "file-path",
@@ -250,6 +257,19 @@
                     "type": "string",
                     "default": "7.1.0",
                     "description": "The version of the antiSMASH database.",
+                    "fa_icon": "fas fa-database"
+                },
+                "dram_databases": {
+                    "type": "string",
+                    "format": "directory-path",
+                    "description": "Path to user-defined local DRAM databases folder.",
+                    "fa_icon": "fas fa-database",
+                    "help_text": "DRAM version 1.3 databases, these are required to run the distill module"
+                },
+                "dram_databases_version": {
+                    "type": "string",
+                    "default": "1.3.0",
+                    "description": "The version of the DRAM databases.",
                     "fa_icon": "fas fa-database"
                 }
             },

@@ -38,7 +38,6 @@ include { CONTIGS_TAXONOMIC_CLASSIFICATION   } from '../subworkflows/ebi-metagen
 include { RENAME_CONTIGS                     } from '../modules/local/rename_contigs'
 include { RNA_ANNOTATION                     } from '../subworkflows/local/rna_annotation'
 include { FUNCTIONAL_ANNOTATION              } from '../subworkflows/local/functional_annotation'
-include { DRAM_SWF                           } from '../subworkflows/ebi-metagenomics/dram_swf'
 include { PATHWAYS_AND_SYSTEMS               } from '../subworkflows/local/pathways_and_systems'
 
 /*
@@ -143,36 +142,17 @@ workflow ASSEMBLY_ANALYSIS_PIPELINE {
     * Annotation of the proteins.
     */
     FUNCTIONAL_ANNOTATION(
+        ASSEMBLY_QC.out.assembly_filtered,
         COMBINED_GENE_CALLER.out.faa.join(COMBINED_GENE_CALLER.out.gff),
         ch_protein_chunks,
     )
     ch_versions = ch_versions.mix(FUNCTIONAL_ANNOTATION.out.versions)
 
-    def ko_per_contigs = FUNCTIONAL_ANNOTATION.out.kegg_orthologs_per_contig_tsv
-    .map{
-        meta, files -> return [["id": meta.study], files]
-    }.groupTuple()
-
-    def interpro_summaries = FUNCTIONAL_ANNOTATION.out.interproscan_tsv
-    .map{
-        meta, files -> return [["id": meta.study], files]
-    }.groupTuple()
-
-    def dbcan_overview = FUNCTIONAL_ANNOTATION.out.dbcan_overview
-    .map{
-        meta, files -> return [["id": meta.study], files]
-    }.groupTuple()
-
-    DRAM_SWF(
-       ko_per_contigs,
-       interpro_summaries,
-       dbcan_overview
-    )
-
     /*
     * Pathway and systems annotations
     */
     PATHWAYS_AND_SYSTEMS(
+        ch_protein_chunks,
         ASSEMBLY_QC.out.assembly_filtered.join(
             COMBINED_GENE_CALLER.out.faa
         ).join(
@@ -180,8 +160,8 @@ workflow ASSEMBLY_ANALYSIS_PIPELINE {
         ).join(
             FUNCTIONAL_ANNOTATION.out.interproscan_tsv
         ),
-        FUNCTIONAL_ANNOTATION.out.kegg_orthologs_summary_tsv,
-        ch_protein_chunks,
+        FUNCTIONAL_ANNOTATION.out.kegg_orthologs_per_contig_tsv,
+        FUNCTIONAL_ANNOTATION.out.dbcan_overview
     )
     ch_versions = ch_versions.mix(PATHWAYS_AND_SYSTEMS.out.versions)
 
@@ -251,7 +231,7 @@ workflow ASSEMBLY_ANALYSIS_PIPELINE {
     )
 
     MULTIQC_PER_SAMPLESHEET(
-        ASSEMBLY_QC.out.quast_report_tsv.collect(),
+        ASSEMBLY_QC.out.quast_report_tsv.map { _meta, files -> files }.collect().map { files -> [[id:"samplesheet"], files] },
         common_files,
         ch_multiqc_config.toList(),
         ch_multiqc_custom_config.toList(),

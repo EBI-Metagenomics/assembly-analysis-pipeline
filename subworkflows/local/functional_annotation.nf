@@ -28,12 +28,12 @@ include { INTERPRO_SUMMARY                                  } from '../../module
 include { HMMER_HMMSEARCH as HMMSEARCH_KOFAMS               } from '../../modules/nf-core/hmmer/hmmsearch/main'
 include { KEGG_ORTHOLOGS_SUMMARY                            } from '../../modules/local/kegg_orthologs_summary'
 include { DIAMOND_RHEACHEBI                                 } from '../../modules/local/diamond_rheachebi'
-include { DRAM_SWF                                          } from '../../subworkflows/ebi-metagenomics/dram_swf/main'
 
 workflow FUNCTIONAL_ANNOTATION {
     take:
+    ch_contigs            // tuple (meta, contigs_fasta)
     ch_predicted_proteins // tule (meta, faa, gff)
-    ch_protein_chunked // tuple (meta, faa_chunk)
+    ch_protein_chunked    // tuple (meta, faa_chunk)
 
     main:
 
@@ -236,9 +236,9 @@ workflow FUNCTIONAL_ANNOTATION {
     )
     ch_versions = ch_versions.mix(INTERPRO_SUMMARY.out.versions)
 
-    // TODO: review this one as I was using hmmscan before hand (the parser of tblout may be incorrect - query and source may be flipped!)
     KEGG_ORTHOLOGS_SUMMARY(
-        CONCATENATE_HMMSEARCH_TBLOUT.out.file_out
+        CONCATENATE_HMMSEARCH_TBLOUT.out.file_out,
+        file(params.ko_list_txt, checkIfExists: true)
     )
     ch_versions = ch_versions.mix(KEGG_ORTHOLOGS_SUMMARY.out.versions)
 

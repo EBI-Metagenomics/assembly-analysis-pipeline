@@ -3,11 +3,11 @@ process SUMMARISE_FOR_DRAM_INPUT {
     label 'process_single'
 
     container "${ workflow.containerEngine == 'singularity' && !task.ext.singularity_pull_docker_container ?
-        'depot.galaxyproject.org/singularity/pandas-2.2.1':
-        'biocontainers/pandas-2.2.1' }"
+        'oras://community.wave.seqera.io/library/pandas:2.2.3--e136a7b7218cc69c':
+        'community.wave.seqera.io/library/pandas:2.2.3--9b034ee33172d809' }"
 
     input:
-    tuple val(meta), path(ko_per_contigs), path(interpro_summaries), path(dbcan_overviews)
+    tuple val(meta), path(fasta), path(ko_per_contigs_tsv), path(interproscan_tsv), path(dbcan_overview)
 
     output:
     tuple val(meta), path("${prefix}_summary_for_dram.tsv"), emit: dram_summary
@@ -27,14 +27,14 @@ process SUMMARISE_FOR_DRAM_INPUT {
 
     summarise_for_dram.py \\
         --prefix ${prefix} \\
-        --ko_per_contigs ${ko_per_contigs} \\
-        --interpro_summaries ${interpro_summaries} \\
-        --dbcan_overviews ${dbcan_overviews}
+        --fasta ${fasta} \\
+        --ko-per-contig ${ko_per_contigs_tsv} \\
+        --interproscan ${interproscan_tsv} \\
+        --dbcan-overview ${dbcan_overview}
 
     cat <<-END_VERSIONS > versions.yml
     "${task.process}":
         python: \$(python --version 2>&1 | sed 's/Python //g')
-        pandas
     END_VERSIONS
     """
 

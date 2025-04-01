@@ -1,8 +1,9 @@
 /* NF-CORE */
-include { SEQKIT_SEQ as SEQKIT_SEQ_BGC                        } from '../../modules/nf-core/seqkit/seq/main'
-include { SEQKIT_SPLIT2                                       } from '../../modules/nf-core/seqkit/split2/main'
-include { ANTISMASH_ANTISMASHLITE                             } from '../../modules/nf-core/antismash/antismashlite/main'
-include { TABIX_BGZIP as TABIX_BGZIP_KEGGPATHWAYSCOMPLETENESS } from '../../modules/nf-core/tabix/bgzip/main'
+include { SEQKIT_SEQ as SEQKIT_SEQ_BGC                                   } from '../../modules/nf-core/seqkit/seq/main'
+include { SEQKIT_SPLIT2                                                  } from '../../modules/nf-core/seqkit/split2/main'
+include { ANTISMASH_ANTISMASHLITE                                        } from '../../modules/nf-core/antismash/antismashlite/main'
+include { TABIX_BGZIP as TABIX_BGZIP_KEGGPATHWAYSCOMPLETENESS            } from '../../modules/nf-core/tabix/bgzip/main'
+include { TABIX_BGZIP as TABIX_BGZIP_KEGGPATHWAYSCOMPLETENESS_PER_CONTIG } from '../../modules/nf-core/tabix/bgzip/main'
 
 /* EBI-METAGENOMICS */
 include { SANNTIS                      } from '../../modules/ebi-metagenomics/sanntis/main'
@@ -12,26 +13,31 @@ include { GENOMEPROPERTIES             } from '../../modules/ebi-metagenomics/ge
 include { ANTISMASH_JSON_TO_GFF        } from '../../modules/local/antismash_json_to_gff'
 include { CONCATENATE_GFFS             } from '../../modules/local/concatenate_gffs'
 include { KEGGPATHWAYSCOMPLETENESS     } from '../../modules/ebi-metagenomics/keggpathwayscompleteness/main'
-
+include { DRAM_DISTILL_SWF             } from '../../subworkflows/local/dram_distill_swf'
 
 workflow PATHWAYS_AND_SYSTEMS {
 
     take:
+    // Chunked proteins, used in the functional_annotation mostly, we need this for SanntiS
+    ch_protein_chunks                 // tuple (meta, faa_chunk)
+
     // fasta: contigs
     // faa: CGC predictions faa
     // gff: CGC predictions gff
     // ips_ts: interpsocan concatenated tsv (all the IPS annotations)
     ch_contigs_and_predicted_proteins // tuple (meta, fasta, faa, gff, ips_tsv)
-    ch_kegg_orthologs_summary_tsv     // tuple (meta, kos_summary_tsv)
-    // Chunked proteins, used in the functional_annotation mostly, we need this for SanntiS
-    ch_protein_chunks                 // tuple (meta, faa_chunk)
+
+    // KO per contig (not aggregated)
+    kegg_orthologs_per_contig_tsv     // tuple (meta, kos_per_contig_tsv)
+    // DBCan overview
+    ch_dbcan_overview                 // tuple (meta, dbcan_overview_tsv)
 
     main:
 
     ch_versions = Channel.empty()
 
     KEGGPATHWAYSCOMPLETENESS(
-        ch_kegg_orthologs_summary_tsv
+        kegg_orthologs_per_contig_tsv
     )
     ch_versions = ch_versions.mix(KEGGPATHWAYSCOMPLETENESS.out.versions)
 
@@ -39,6 +45,11 @@ workflow PATHWAYS_AND_SYSTEMS {
         KEGGPATHWAYSCOMPLETENESS.out.kegg_pathways
     )
     ch_versions = ch_versions.mix(TABIX_BGZIP_KEGGPATHWAYSCOMPLETENESS.out.versions)
+
+    TABIX_BGZIP_KEGGPATHWAYSCOMPLETENESS_PER_CONTIG(
+        KEGGPATHWAYSCOMPLETENESS.out.kegg_pathways_per_contig
+    )
+    ch_versions = ch_versions.mix(TABIX_BGZIP_KEGGPATHWAYSCOMPLETENESS_PER_CONTIG.out.versions)
 
     GENOMEPROPERTIES(
         ch_contigs_and_predicted_proteins.map { meta, _fasta, _faa, _gff, interpro_tsv -> [meta, interpro_tsv] }
@@ -105,6 +116,17 @@ workflow PATHWAYS_AND_SYSTEMS {
         sanntis_channel
     )
     ch_versions = ch_versions.mix(SANNTIS.out.versions)
+
+    /*
+    * DRAM distill - per assembly and for the whole samplesheet
+    */
+    DRAM_DISTILL_SWF(
+        ch_contigs_and_predicted_proteins.map {  meta, fasta, _faa, _gff, _ips_tsv -> [ meta, fasta ] },
+        kegg_orthologs_per_contig_tsv,
+        ch_contigs_and_predicted_proteins.map {  meta, _fasta, _faa, _gff, ips_tsv -> [ meta, ips_tsv ] },
+        ch_dbcan_overview
+    )
+    ch_versions = ch_versions.mix(DRAM_DISTILL_SWF.out.versions)
 
     emit:
     versions = ch_versions

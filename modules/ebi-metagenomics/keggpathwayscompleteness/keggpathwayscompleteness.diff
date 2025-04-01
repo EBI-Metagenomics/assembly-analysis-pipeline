@@ -4,7 +4,7 @@ Changes in component 'ebi-metagenomics/keggpathwayscompleteness'
 Changes in 'keggpathwayscompleteness/main.nf':
 --- modules/ebi-metagenomics/keggpathwayscompleteness/main.nf
 +++ modules/ebi-metagenomics/keggpathwayscompleteness/main.nf
-@@ -5,48 +5,57 @@
+@@ -5,48 +5,59 @@
  
      conda "${moduleDir}/environment.yml"
      container "${ workflow.containerEngine == 'singularity' && !task.ext.singularity_pull_docker_container ?
@@ -21,14 +21,15 @@ Changes in 'keggpathwayscompleteness/main.nf':
 -    tuple val(meta), path("*_contigs.tsv") , emit: kegg_contigs
 -    tuple val(meta), path("*_pathways.tsv"), emit: kegg_pathways
 -    path "versions.yml"                    , emit: versions
-+    tuple val(meta), path("${prefix}_summary_kegg_pathways.tsv"), emit: kegg_pathways
-+    path "versions.yml",                                          emit: versions
++    tuple val(meta), path("${prefix}_summary_kegg_pathways.tsv"),             emit: kegg_pathways
++    tuple val(meta), path("${prefix}_summary_kegg_pathways_per_contigs.tsv"), emit: kegg_pathways_per_contig
++    path "versions.yml",                                                      emit: versions
  
      when:
      task.ext.when == null || task.ext.when
  
      script:
-     def args = task.ext.args ?: ''
+-    def args = task.ext.args ?: ''
 -    def prefix = task.ext.prefix ?: "${meta.id}"
 -    def kegg_input = ko_list ? "-l ${ko_list}" : "-i ${filtered_tbl}"
 +    prefix = task.ext.prefix ?: "${meta.id}"
@@ -53,9 +54,11 @@ Changes in 'keggpathwayscompleteness/main.nf':
 +
 +    give_completeness \\
 +        -i ${prefix}_aggregated_kos_per_contig.tsv \\
++        --add-per-contig \\
 +        -o ${prefix}
 +
 +    mv ${prefix}/summary.kegg_pathways.tsv ${prefix}_summary_kegg_pathways.tsv
++    mv ${prefix}/summary.kegg_contigs.tsv ${prefix}_summary_kegg_pathways_per_contigs.tsv 
  
      cat <<-END_VERSIONS > versions.yml
      "${task.process}":
@@ -65,7 +68,7 @@ Changes in 'keggpathwayscompleteness/main.nf':
      """
  
      stub:
-     def args = task.ext.args ?: ''
+-    def args = task.ext.args ?: ''
 -    def prefix = task.ext.prefix ?: "${meta.id}"
 -
 +    prefix = task.ext.prefix ?: "${meta.id}"
@@ -73,6 +76,7 @@ Changes in 'keggpathwayscompleteness/main.nf':
 -    touch ${prefix}.kegg_contigs.tsv
 -    touch ${prefix}.kegg_pathways.tsv
 +    touch ${prefix}_summary_kegg_pathways.tsv
++    touch ${prefix}_summary_kegg_pathways_per_contigs.tsv
  
      cat <<-END_VERSIONS > versions.yml
      "${task.process}":

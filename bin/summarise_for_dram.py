@@ -18,13 +18,24 @@ import argparse
 import pandas as pd
 import gzip
 import csv
-import Path
+from pathlib import Path
 from collections import defaultdict
+import functools
+
+
+@functools.cache
+def get_contig_id(fasta_header: str) -> str:
+    """Proteins annotated with this pipeline have the following format:
+    <assembly>_<contig_id>_<protein_id>
+    """
+    # TODO: add some validation here
+    assembly, contig_id, *_ = fasta_header.split("_")
+    return f"${assembly}_{contig_id}"
 
 
 def extract_kegg_orthologs_annotations(kegg_summary_tsv: Path) -> dict:
     """Extract and gather the KO annotations per contig"""
-    keggs = defaultdict(list())
+    keggs = defaultdict(list)
     with gzip.open(kegg_summary_tsv, "rt") as f:
         csv_reader = csv.reader(f, delimiter="\t")
         next(csv_reader)
@@ -41,12 +52,13 @@ def extract_kegg_orthologs_annotations(kegg_summary_tsv: Path) -> dict:
 
 def extract_cazy_families_from_dbcan(dbcan_overview_tsv: Path) -> dict:
     """Extract and gather the CAZy families per contig from the run_DBCan overview file"""
-    cazys = defaultdict(list())
+    cazys = defaultdict(list)
 
     with gzip.open(dbcan_overview_tsv, "rt") as f:
         csv_reader = csv.reader(f, delimiter="\t")
         next(csv_reader)
-        for contig, _, hmmer, dbcan_sub, diamond, _ in csv_reader:
+        for protein_id, _, hmmer, dbcan_sub, diamond, _ in csv_reader:
+            contig = get_contig_id(protein_id)
             hmmer_list = [
                 s.split("(")[0] for s in hmmer.split("+")
             ]  # format: GT9(116-281)+GT17(914-1160) ==> ['GT9', 'GT17']
@@ -73,13 +85,14 @@ def extract_cazy_families_from_dbcan(dbcan_overview_tsv: Path) -> dict:
 
 
 def extract_pfam_annotations(interproscan_summary_tsv: Path) -> dict:
-    pfams = defaultdict
-    with gzip.open() as file_handler:
+    pfams = defaultdict(list)
+    with gzip.open(interproscan_summary_tsv, "rt") as file_handler:
         csv_reader = csv.reader(file_handler, delimiter="\t")
         for line in csv_reader:
-            contig, _, _, analysis, signature_accession, signature_description, *_ = (
+            protein_id, _, _, analysis, signature_accession, signature_description, *_ = (
                 line
             )
+            contig = get_contig_id(protein_id)
             if analysis == "Pfam":
                 pfams[contig].append(f"{signature_description} [{signature_accession}]")
 
@@ -87,6 +100,8 @@ def extract_pfam_annotations(interproscan_summary_tsv: Path) -> dict:
     for contig in pfams:
         if isinstance(pfams[contig], list):
             pfams[contig] = "; ".join(pfams[contig])
+
+    print(pfams.items())
 
     return pfams
 
@@ -99,7 +114,7 @@ if __name__ == "__main__":
         "-f",
         "--fasta",
         type=str,
-        help="The fasta file with the contigs used for the analysis.",
+        help="The faa with the proteins of the assembly.",
     )
     parser.add_argument(
         "-i",
@@ -120,15 +135,13 @@ if __name__ == "__main__":
 
     assemblies_annotations = {}  # { assemblies_annotations[accessions] = set(contigs) }
 
-    kegg_annotations = args.ko_per_contigs
-    ips_annotations = args.interpro_summaries
-    cazy_annotations = args.dbcan_overviews
+    kegg_annotations = args.ko_per_contig
+    ips_annotations = args.interproscan
+    dbcan_overview = args.dbcan_overview
 
     # ----- CAZy ----- #
 
-    cazys = extract_cazy_families_from_dbcan(
-        cazy_annotations
-    )  # { cazys[contig] = cazy }
+    cazys = extract_cazy_families_from_dbcan(dbcan_overview)  # { cazys[contig] = cazy }
 
     # ----- KEGG ----- #
 
@@ -154,10 +167,14 @@ if __name__ == "__main__":
 
     # Collect the contig names
     contigs = set()
-    with open(args.fasta) as fasta_file:
+    with gzip.open(args.fasta, "rt") as fasta_file:
         for line in fasta_file:
             if line.startswith(">"):
-                contigs.add(line.strip().replace(">", ""))
+                # the assembly as this point needs to have been renamed
+                # So the contigs are named <prefix>_<incremental id>.. the prefix is
+                # usually the assembly ERZ accession
+                assembly, contig_id = line.strip().replace(">", "").split("_")
+                contigs.add(f"{assembly}_{contig_id}")
 
     functional_summary = []
 
@@ -166,8 +183,8 @@ if __name__ == "__main__":
         contig_annotations.extend(
             [
                 contig,
-                args.fasta,
-                args.fasta + "_" + contig,  # scaffold
+                args.prefix,  # assembly
+                args.prefix + "_" + contig,  # scaffold
                 contig,  # gene_position
             ]
         )
@@ -185,9 +202,7 @@ if __name__ == "__main__":
 
         functional_summary.append(contig_annotations)
 
-    partial_matrix = pd.DataFrame(
-        functional_summary, index=contigs, columns=TABLE_HEADER
-    )
+    partial_matrix = pd.DataFrame(functional_summary, columns=TABLE_HEADER)
 
     try:
         output_matrix = pd.concat([output_matrix, partial_matrix], ignore_index=True)
