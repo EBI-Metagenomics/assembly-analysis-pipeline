@@ -222,5 +222,5 @@ if __name__ == "__main__":
         output_matrix = partial_matrix
 
     output_matrix.to_csv(
-        f"{args.prefix}_summary_for_DRAM.tsv", sep="\t", header=True, index=False
+        f"{args.prefix}_summary_for_dram.tsv", sep="\t", header=True, index=False
     )
