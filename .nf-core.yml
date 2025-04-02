@@ -16,6 +16,7 @@ lint:
     - docs/README.md
     - assets/email_template.html
     - assets/sendmail_template.txt
+    - LICENSE
   nextflow_config:
     - manifest.name
     - manifest.homePage
