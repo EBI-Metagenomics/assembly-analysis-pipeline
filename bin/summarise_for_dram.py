@@ -33,20 +33,17 @@ def get_contig_id(fasta_header: str) -> str:
     return f"{assembly}_{contig_id}"
 
 
-def extract_kegg_orthologs_annotations(kegg_summary_tsv: Path) -> dict:
+def extract_kegg_orthologs_annotations(aggregated_kos_per_contig: Path) -> dict:
     """Extract and gather the KO annotations per contig"""
-    keggs = defaultdict(list)
-    with gzip.open(kegg_summary_tsv, "rt") as f:
+    keggs = {}
+    with gzip.open(aggregated_kos_per_contig, "rt") as f:
         csv_reader = csv.reader(f, delimiter="\t")
         next(csv_reader)
-        for ko, contig in csv_reader:
-            keggs[contig].append(ko)
-
-    # There are no KOs per contig that are lists, right?
-    for contig in keggs:
-        if isinstance(keggs[contig], list):
-            keggs[contig] = "; ".join(keggs[contig])
-
+        # Example
+        # contig_id       ko
+        # ERZ1049444_314477_1     K00083  K17818  K22132  K13980
+        for contig_id, ko_list in csv_reader:
+            keggs[contig_id] = "; ".join( ko_list.strip().split(" ") )
     return keggs
 
 
@@ -110,10 +107,8 @@ def extract_pfam_annotations(interproscan_summary_tsv: Path) -> dict:
             if analysis.strip() == "Pfam":
                 pfams[contig].append(f"{signature_description} [{signature_accession}]")
 
-    # There are no pfams per contig that are lists, right?
     for contig in pfams:
-        if isinstance(pfams[contig], list):
-            pfams[contig] = "; ".join(pfams[contig])
+        pfams[contig] = "; ".join(pfams[contig])
 
     return pfams
 
@@ -147,7 +142,7 @@ if __name__ == "__main__":
 
     assemblies_annotations = {}  # { assemblies_annotations[accessions] = set(contigs) }
 
-    kegg_annotations = args.ko_per_contig
+    aggregated_kos_per_contig = args.ko_per_contig
     ips_annotations = args.interproscan
     dbcan_overview = args.dbcan_overview
 
@@ -158,7 +153,7 @@ if __name__ == "__main__":
     # ----- KEGG ----- #
 
     keggs = extract_kegg_orthologs_annotations(
-        kegg_annotations
+        aggregated_kos_per_contig
     )  # { keggs[contig] = kegg }
 
     # ----- IPS ----- #

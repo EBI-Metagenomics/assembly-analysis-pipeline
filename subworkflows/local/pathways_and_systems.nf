@@ -122,7 +122,7 @@ workflow PATHWAYS_AND_SYSTEMS {
     */
     DRAM_DISTILL_SWF(
         ch_contigs_and_predicted_proteins.map {  meta, _fasta, faa, _gff, _ips_tsv -> [ meta, faa ] },
-        kegg_orthologs_per_contig_tsv,
+        KEGGPATHWAYSCOMPLETENESS.out.kos_aggregated_by_contig, // This is the aggregated ko per contig file
         ch_contigs_and_predicted_proteins.map {  meta, _fasta, _faa, _gff, ips_tsv -> [ meta, ips_tsv ] },
         ch_dbcan_overview
     )

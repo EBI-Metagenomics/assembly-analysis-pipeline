@@ -50,7 +50,7 @@ process KEGG_ORTHOLOGS_SUMMARY {
     # Configure csvtk to use tabs
     export CSVTK_T=true
 
-    hmmsearch_tblout_to_tsv.py ${hmmsearch_concatenated_tblout} | csvtk replace --no-header-row --fields 2 --pattern '^([A-Za-z]*[1-9]*_\\d+).*\$' --replacement '\$1' | \\
+    hmmsearch_tblout_to_tsv.py ${hmmsearch_concatenated_tblout} | csvtk replace --no-header-row --fields 2 --pattern '^([A-Za-z0-9]+_[0-9]+).*\$' --replacement '\$1' | \\
     tee \\
         >(csvtk cut --num-cpus ${task.cpus} --no-header-row --fields 1 | \\
             csvtk add-header --num-cpus ${task.cpus} --no-header-row --names ko | \\
