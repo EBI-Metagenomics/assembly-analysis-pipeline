@@ -22,7 +22,7 @@ process SUMMARISE_FOR_DRAM_INPUT {
     # For every assembly analysis, this script extracts:
     # - Columns X and Y from the interpro summary (namely, Pfam ID and description)
     # - A consensus from dbcan_overview.txt for CAZy families
-    # - Kegg Orthologs IDs and description
+    # - Kegg Orthologs IDs
     # It then produces a tsv table for dram distill to generate tabular and visual annotation summaries
 
     summarise_for_dram.py \\
