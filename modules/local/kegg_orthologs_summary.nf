@@ -8,7 +8,7 @@ process KEGG_ORTHOLOGS_SUMMARY {
         : 'community.wave.seqera.io/library/csvtk_tabix_pip_biopython:7eabdb397e7420a3'}"
 
     input:
-    tuple val(meta), path(hmmscan_concatenated_tblout)
+    tuple val(meta), path(hmmsearch_concatenated_tblout)
     path(ko_list_txt)
 
     output:
@@ -24,10 +24,10 @@ process KEGG_ORTHOLOGS_SUMMARY {
     script:
     prefix = task.ext.prefix ?: "${meta.id}"
     """
-    # This mini-pipeline executes a series of steps to process the hmmscan output:
-    # 1. Decompresses the hmmscan_concatenated_tblout file using bgzip, which is beneficial for streaming on the website.
+    # This mini-pipeline executes a series of steps to process the hmmsearch output:
+    # 1. Decompresses the hmmsearch_concatenated_tblout file using bgzip, which is beneficial for streaming on the website.
     # 2. Extracts the contig ID from the protein ID format (e.g., transforms ERZxxx_1_2 to ERZxxx_1), including those from FGS.
-    # 3. Executes the hmmscan_tblout_to_tsv.py script to convert the hmmscan output to TSV format and pipes the result for further processing.
+    # 3. Executes the hmmsearch_tblout_to_tsv.py script to convert the hmmsearch output to TSV format and pipes the result for further processing.
     # 4. Uses the `tee` command to split the output into two distinct streams:
     #    - Stream 1:
     #      - Extracts the first (KO ID) and third (KO description) fields.
@@ -50,7 +50,7 @@ process KEGG_ORTHOLOGS_SUMMARY {
     # Configure csvtk to use tabs
     export CSVTK_T=true
 
-    hmmscan_tblout_to_tsv.py ${hmmscan_concatenated_tblout} | csvtk replace --no-header-row --fields 2 --pattern '^([A-Za-z]*[1-9]*_\\d+).*\$' --replacement '\$1' | \\
+    hmmsearch_tblout_to_tsv.py ${hmmsearch_concatenated_tblout} | csvtk replace --no-header-row --fields 2 --pattern '^([A-Za-z]*[1-9]*_\\d+).*\$' --replacement '\$1' | \\
     tee \\
         >(csvtk cut --num-cpus ${task.cpus} --no-header-row --fields 1 | \\
             csvtk add-header --num-cpus ${task.cpus} --no-header-row --names ko | \\
@@ -87,7 +87,7 @@ process KEGG_ORTHOLOGS_SUMMARY {
     }
 
     # Check if the input file has lines and if the output files are not empty
-    if check_gz_file_lines "${hmmscan_concatenated_tblout}"; then
+    if check_gz_file_lines "${hmmsearch_concatenated_tblout}"; then
         # If the input file has lines, check the output files
         if ! check_gz_file_lines "${prefix}_ko_summary.tsv.gz" || ! check_gz_file_lines "${prefix}_ko_per_contig.tsv.gz"; then
             echo "Error: One or more output files do not have at least 2 lines."

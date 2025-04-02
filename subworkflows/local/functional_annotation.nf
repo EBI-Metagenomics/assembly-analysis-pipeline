@@ -201,7 +201,7 @@ workflow FUNCTIONAL_ANNOTATION {
     ch_versions = ch_versions.mix(CONCATENATE_DBCAN_HMMOUT.out.versions)
 
     /*
-    * KEGG orthologs annotation. This step uses hmmscan to annotation the sequences aginst the kofam HMM models.
+    * KEGG orthologs annotation. This step uses hmmsearch to annotation the sequences aginst the kofam HMM models.
     * These HMM models have been extended as described -> TODO: link to the mgnify_pipelines_reference_databases pipeline
     */
     HMMSEARCH_KOFAMS(

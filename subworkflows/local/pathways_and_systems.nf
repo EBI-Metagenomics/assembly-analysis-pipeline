@@ -10,10 +10,10 @@ include { SANNTIS                      } from '../../modules/ebi-metagenomics/sa
 include { GENOMEPROPERTIES             } from '../../modules/ebi-metagenomics/genomeproperties/main'
 
 /* LOCAL */
-include { ANTISMASH_JSON_TO_GFF        } from '../../modules/local/antismash_json_to_gff'
-include { CONCATENATE_GFFS             } from '../../modules/local/concatenate_gffs'
-include { KEGGPATHWAYSCOMPLETENESS     } from '../../modules/ebi-metagenomics/keggpathwayscompleteness/main'
-include { DRAM_DISTILL_SWF             } from '../../subworkflows/local/dram_distill_swf'
+include { ANTISMASH_JSON_TO_GFF                          } from '../../modules/local/antismash_json_to_gff'
+include { CONCATENATE_GFFS as CONCATENATE_ANTISMASH_GFFS } from '../../modules/local/concatenate_gffs'
+include { KEGGPATHWAYSCOMPLETENESS                       } from '../../modules/ebi-metagenomics/keggpathwayscompleteness/main'
+include { DRAM_DISTILL_SWF                               } from '../../subworkflows/local/dram_distill_swf'
 
 workflow PATHWAYS_AND_SYSTEMS {
 
@@ -95,10 +95,10 @@ workflow PATHWAYS_AND_SYSTEMS {
     )
     ch_versions = ch_versions.mix(ANTISMASH_JSON_TO_GFF.out.versions.first())
 
-    CONCATENATE_GFFS(
+    CONCATENATE_ANTISMASH_GFFS(
         ANTISMASH_JSON_TO_GFF.out.antismash_gff.groupTuple()
     )
-    ch_versions = ch_versions.mix(CONCATENATE_GFFS.out.versions)
+    ch_versions = ch_versions.mix(CONCATENATE_ANTISMASH_GFFS.out.versions)
 
     /*************************************************************************************/
     /* Rearrange the channel. We need to create a channel so that                        */
@@ -121,7 +121,7 @@ workflow PATHWAYS_AND_SYSTEMS {
     * DRAM distill - per assembly and for the whole samplesheet
     */
     DRAM_DISTILL_SWF(
-        ch_contigs_and_predicted_proteins.map {  meta, fasta, _faa, _gff, _ips_tsv -> [ meta, fasta ] },
+        ch_contigs_and_predicted_proteins.map {  meta, _fasta, faa, _gff, _ips_tsv -> [ meta, faa ] },
         kegg_orthologs_per_contig_tsv,
         ch_contigs_and_predicted_proteins.map {  meta, _fasta, _faa, _gff, ips_tsv -> [ meta, ips_tsv ] },
         ch_dbcan_overview

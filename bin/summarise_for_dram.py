@@ -177,15 +177,15 @@ if __name__ == "__main__":
         "cazy_id",
     ]
 
-    # Collect the contig names
+    # Collect the contig names from the proteins
     contigs = set()
     with gzip.open(args.fasta, "rt") as fasta_file:
         for line in fasta_file:
             if line.startswith(">"):
-                # the assembly as this point needs to have been renamed
+                # The proteins have the <prefix>_<id>_[pyrodigal,fgsrs] at this point
                 # So the contigs are named <prefix>_<incremental id>.. the prefix is
                 # usually the assembly ERZ accession
-                assembly, contig_id = line.strip().replace(">", "").split("_")
+                assembly, contig_id, *_ = line.strip().replace(">", "").split("_")
                 contigs.add(f"{assembly}_{contig_id}")
 
     functional_summary = []
