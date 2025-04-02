@@ -25,18 +25,26 @@ process KEGG_ORTHOLOGS_SUMMARY {
     prefix = task.ext.prefix ?: "${meta.id}"
     """
     # This mini-pipeline executes a series of steps to process the hmmsearch output:
-    # 1. Decompresses the hmmsearch_concatenated_tblout file using bgzip, which is beneficial for streaming on the website.
-    # 2. Extracts the contig ID from the protein ID format (e.g., transforms ERZxxx_1_2 to ERZxxx_1), including those from FGS.
-    # 3. Executes the hmmsearch_tblout_to_tsv.py script to convert the hmmsearch output to TSV format and pipes the result for further processing.
-    # 4. Uses the `tee` command to split the output into two distinct streams:
+    # 1. Parses the hmmsearch_concatenated_tblout using biopython - reading from the stdin into the stdout (less IO)
+    # 2. Extracts the contig ID from the protein ID format (e.g., transforms ERZxxx_1_2 to ERZxxx_1), including those from FGS. The proteins are used against the KOFams HMMs
+    # 3. Uses the `tee` command to split the output into two distinct streams:
     #    - Stream 1:
-    #      - Extracts the first (KO ID) and third (KO description) fields.
-    #      - Computes the frequency of each unique KO ID.
-    #      - Adds appropriate header names and reorders the fields.
-    #      - Saves the processed data to a file named ${prefix}_ko_summary.tsv.
+    #      - Keeps the KO from the hmmer hits
+    #      - Joins the KO with the description using the ko_list file (this files is part of the KO database)
+    #      - It cuts the KO and the definiton from the joined file, the definiton is what we use for the description
+    #      - It removes the header of the file now (we need to this to avoid a duplicated header when running freq)
+    #      - Computes the frequency of each unique KO ID / Description (we do this to keep it simple - it should be only by KO ID but the KO ID + Desc is also unique).
+    #        The file is also sorted by frequency
+    #      - Adds appropriate header names and reorders the fields, we need a count column that has the frequency count
+    #      - We swap the columns, the count has to be the last
+    #      - Compresses the file with bgzipa and creates an index for it.
+    #        The processed data ends in ${prefix}_ko_summary.tsv.gz and ${prefix}_ko_summary.tsv.gz.gzi
     #    - Stream 2:
     #      - Extracts the first (KO ID) and second (contig ID) fields.
-    #      - Saves this data to a file named ${prefix}_ko_per_contig.tsv, which will be used in subsequent steps of the pipeline.
+    #      - Adds the keader
+    #      - Compresses the file with bgzipa and creates an index for it.
+    #        The processed data ends in ${prefix}_ko_per_contig.tsv.gz and ${prefix}_ko_per_contig.tsv.gz.gzi
+    #
     # Both output TSV files are compressed using bgzip, and an index is created for each.
     # The compressed files are compatible with gz format, and the index facilitates access on the website.
 
