@@ -40,10 +40,10 @@ def extract_kegg_orthologs_annotations(aggregated_kos_per_contig: Path) -> dict:
         csv_reader = csv.reader(f, delimiter="\t")
         next(csv_reader)
         # Example
-        # contig_id       ko
-        # ERZ1049444_314477_1     K00083  K17818  K22132  K13980
+        # contig_id       ko
+        # ERZ1049444_314477_1     K00083  K17818  K22132  K13980
         for contig_id, ko_list in csv_reader:
-            keggs[contig_id] = "; ".join( ko_list.strip().split(" ") )
+            keggs[contig_id] = "; ".join(ko_list.strip().split(" "))
     return keggs
 
 
@@ -101,7 +101,7 @@ def extract_pfam_annotations(interproscan_summary_tsv: Path) -> dict:
                 analysis,
                 signature_accession,
                 signature_description,
-                *_
+                *_,
             ) = line
             contig = get_contig_id(protein_id)
             if analysis.strip() == "Pfam":
@@ -195,17 +195,9 @@ if __name__ == "__main__":
                 contig,  # gene_position
             ]
         )
-        contig_annotations.extend(
-            [
-                keggs.get(contig, "")  # kegg_id
-            ]
-        )
-        contig_annotations.append(
-            pfams.get(contig, "")  # pfam_hits
-        )
-        contig_annotations.append(
-            cazys.get(contig, "")  # cazy_id
-        )
+        contig_annotations.append(keggs.get(contig, ""))
+        contig_annotations.append(pfams.get(contig, ""))
+        contig_annotations.append(cazys.get(contig, ""))
 
         functional_summary.append(contig_annotations)
 
