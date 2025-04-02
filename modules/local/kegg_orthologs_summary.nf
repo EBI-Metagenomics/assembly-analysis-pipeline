@@ -37,7 +37,7 @@ process KEGG_ORTHOLOGS_SUMMARY {
     #        The file is also sorted by frequency
     #      - Adds appropriate header names and reorders the fields, we need a count column that has the frequency count
     #      - We swap the columns, the count has to be the last
-    #      - Compresses the file with bgzipa and creates an index for it.
+    #      - Compresses the file with bgzip and creates an index for it.
     #        The processed data ends in ${prefix}_ko_summary.tsv.gz and ${prefix}_ko_summary.tsv.gz.gzi
     #    - Stream 2:
     #      - Extracts the first (KO ID) and second (contig ID) fields.
