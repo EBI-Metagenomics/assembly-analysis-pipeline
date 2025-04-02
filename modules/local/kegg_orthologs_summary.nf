@@ -34,7 +34,7 @@ process KEGG_ORTHOLOGS_SUMMARY {
     #      - It cuts the KO and the definiton from the joined file, the definiton is what we use for the description
     #      - It removes the header of the file now (we need to this to avoid a duplicated header when running freq)
     #      - Computes the frequency of each unique KO ID / Description (we do this to keep it simple - it should be only by KO ID but the KO ID + Desc is also unique).
-    #        The file is also sorted by frequency
+    #        The file is also sorted from most frequent to least
     #      - Adds appropriate header names and reorders the fields, we need a count column that has the frequency count
     #      - We swap the columns, the count has to be the last
     #      - Compresses the file with bgzip and creates an index for it.
