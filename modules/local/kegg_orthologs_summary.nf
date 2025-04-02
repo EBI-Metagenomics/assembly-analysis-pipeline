@@ -41,7 +41,7 @@ process KEGG_ORTHOLOGS_SUMMARY {
     #        The processed data ends in ${prefix}_ko_summary.tsv.gz and ${prefix}_ko_summary.tsv.gz.gzi
     #    - Stream 2:
     #      - Extracts the first (KO ID) and second (contig ID) fields.
-    #      - Adds the keader
+    #      - Adds the header
     #      - Compresses the file with bgzipa and creates an index for it.
     #        The processed data ends in ${prefix}_ko_per_contig.tsv.gz and ${prefix}_ko_per_contig.tsv.gz.gzi
     #
