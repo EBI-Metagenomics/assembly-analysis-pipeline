@@ -28,12 +28,12 @@ include { INTERPRO_SUMMARY                                  } from '../../module
 include { HMMER_HMMSEARCH as HMMSEARCH_KOFAMS               } from '../../modules/nf-core/hmmer/hmmsearch/main'
 include { KEGG_ORTHOLOGS_SUMMARY                            } from '../../modules/local/kegg_orthologs_summary'
 include { DIAMOND_RHEACHEBI                                 } from '../../modules/local/diamond_rheachebi'
-include { DRAM_SWF                                          } from '../../subworkflows/ebi-metagenomics/dram_swf/main'
 
 workflow FUNCTIONAL_ANNOTATION {
     take:
+    ch_contigs            // tuple (meta, contigs_fasta)
     ch_predicted_proteins // tule (meta, faa, gff)
-    ch_protein_chunked // tuple (meta, faa_chunk)
+    ch_protein_chunked    // tuple (meta, faa_chunk)
 
     main:
 
@@ -201,7 +201,7 @@ workflow FUNCTIONAL_ANNOTATION {
     ch_versions = ch_versions.mix(CONCATENATE_DBCAN_HMMOUT.out.versions)
 
     /*
-    * KEGG orthologs annotation. This step uses hmmscan to annotation the sequences aginst the kofam HMM models.
+    * KEGG orthologs annotation. This step uses hmmsearch to annotation the sequences aginst the kofam HMM models.
     * These HMM models have been extended as described -> TODO: link to the mgnify_pipelines_reference_databases pipeline
     */
     HMMSEARCH_KOFAMS(
@@ -236,9 +236,9 @@ workflow FUNCTIONAL_ANNOTATION {
     )
     ch_versions = ch_versions.mix(INTERPRO_SUMMARY.out.versions)
 
-    // TODO: review this one as I was using hmmscan before hand (the parser of tblout may be incorrect - query and source may be flipped!)
     KEGG_ORTHOLOGS_SUMMARY(
-        CONCATENATE_HMMSEARCH_TBLOUT.out.file_out
+        CONCATENATE_HMMSEARCH_TBLOUT.out.file_out,
+        file(params.ko_list_txt, checkIfExists: true)
     )
     ch_versions = ch_versions.mix(KEGG_ORTHOLOGS_SUMMARY.out.versions)
 
@@ -246,7 +246,6 @@ workflow FUNCTIONAL_ANNOTATION {
     dbcan_overview                 = DBCAN.out.overview_output
     interproscan_tsv               = CONCATENATE_INTERPROSCAN_TSV.out.file_out
     interproscan_gff3              = CONCATENATE_INTERPROSCAN_GFFS.out.concatenated_gff
-    kegg_orthologs_summary_tsv     = KEGG_ORTHOLOGS_SUMMARY.out.ko_per_contig_tsv
-    kegg_orthologs_description_tsv = KEGG_ORTHOLOGS_SUMMARY.out.ko_summary_tsv
+    kegg_orthologs_per_contig_tsv  = KEGG_ORTHOLOGS_SUMMARY.out.ko_per_contig_tsv
     versions                       = ch_versions
 }

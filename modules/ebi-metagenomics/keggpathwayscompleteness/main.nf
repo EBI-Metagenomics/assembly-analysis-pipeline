@@ -12,14 +12,15 @@ process KEGGPATHWAYSCOMPLETENESS {
     tuple val(meta), path(ko_contig_tsv)
 
     output:
-    tuple val(meta), path("${prefix}_summary_kegg_pathways.tsv"), emit: kegg_pathways
-    path "versions.yml",                                          emit: versions
+    tuple val(meta), path("${prefix}_summary_kegg_pathways.tsv"),             emit: kegg_pathways
+    tuple val(meta), path("${prefix}_summary_kegg_pathways_per_contigs.tsv"), emit: kegg_pathways_per_contig
+    tuple val(meta), path("${prefix}_aggregated_kos_per_contig.tsv.gz"),      emit: kos_aggregated_by_contig
+    path "versions.yml",                                                      emit: versions
 
     when:
     task.ext.when == null || task.ext.when
 
     script:
-    def args = task.ext.args ?: ''
     prefix = task.ext.prefix ?: "${meta.id}"
     """
     # This is a custom script used to adjust the structure of the ko per contig tsv:
@@ -37,9 +38,14 @@ process KEGGPATHWAYSCOMPLETENESS {
 
     give_completeness \\
         -i ${prefix}_aggregated_kos_per_contig.tsv \\
+        --add-per-contig \\
         -o ${prefix}
 
+    # TODO should we gzip all the files?
     mv ${prefix}/summary.kegg_pathways.tsv ${prefix}_summary_kegg_pathways.tsv
+    mv ${prefix}/summary.kegg_contigs.tsv ${prefix}_summary_kegg_pathways_per_contigs.tsv
+
+    gzip ${prefix}_aggregated_kos_per_contig.tsv
 
     cat <<-END_VERSIONS > versions.yml
     "${task.process}":
@@ -48,10 +54,10 @@ process KEGGPATHWAYSCOMPLETENESS {
     """
 
     stub:
-    def args = task.ext.args ?: ''
     prefix = task.ext.prefix ?: "${meta.id}"
     """
     touch ${prefix}_summary_kegg_pathways.tsv
+    touch ${prefix}_summary_kegg_pathways_per_contigs.tsv
 
     cat <<-END_VERSIONS > versions.yml
     "${task.process}":

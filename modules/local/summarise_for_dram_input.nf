@@ -3,18 +3,15 @@ process SUMMARISE_FOR_DRAM_INPUT {
     label 'process_single'
 
     container "${ workflow.containerEngine == 'singularity' && !task.ext.singularity_pull_docker_container ?
-        'oras://community.wave.seqera.io/library/python:3.13.1--9856f872fdeac74e':
-        'community.wave.seqera.io/library/python:3.13.1--d00663700fcc8bcf' }"
+        'oras://community.wave.seqera.io/library/pandas:2.2.3--e136a7b7218cc69c':
+        'community.wave.seqera.io/library/pandas:2.2.3--9b034ee33172d809' }"
 
     input:
-    tuple val(meta), path(ko_summaries)
-    tuple val(meta), path(ko_per_contigs)
-    tuple val(meta), path(interpro_summaries)
-    tuple val(meta), path(dbcan_overviews)
+    tuple val(meta), path(fasta), path(ko_per_contigs_tsv), path(interproscan_tsv), path(dbcan_overview)
 
     output:
-    tuple val(meta), path("${prefix}_dram_summary.tsv.gz"), emit: dram_summary
-    path "versions.yml"                                   , emit: versions
+    tuple val(meta), path("${prefix}_summary_for_dram.tsv"), emit: dram_summary
+    path "versions.yml"                                    , emit: versions
 
     when:
     task.ext.when == null || task.ext.when
@@ -25,15 +22,15 @@ process SUMMARISE_FOR_DRAM_INPUT {
     # For every assembly analysis, this script extracts:
     # - Columns X and Y from the interpro summary (namely, Pfam ID and description)
     # - A consensus from dbcan_overview.txt for CAZy families
-    # - Kegg Orthologs IDs and description
+    # - Kegg Orthologs IDs
     # It then produces a tsv table for dram distill to generate tabular and visual annotation summaries
 
-    python summarise_for_dram.py \\
-    --prefix ${prefix}
-    --ko_summaries ${ko_summaries} \\
-    --ko_per_contigs ${ko_per_contigs} \\
-    --interpro_summaries ${interpro_summaries} \\
-    --dbcan_overviews ${dbcan_overviews} \\
+    summarise_for_dram.py \\
+        --prefix ${prefix} \\
+        --fasta ${fasta} \\
+        --ko-per-contig ${ko_per_contigs_tsv} \\
+        --interproscan ${interproscan_tsv} \\
+        --dbcan-overview ${dbcan_overview}
 
     cat <<-END_VERSIONS > versions.yml
     "${task.process}":
