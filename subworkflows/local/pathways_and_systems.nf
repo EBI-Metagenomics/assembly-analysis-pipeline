@@ -12,6 +12,7 @@ include { GENOMEPROPERTIES             } from '../../modules/ebi-metagenomics/ge
 /* LOCAL */
 include { ANTISMASH_JSON_TO_GFF                          } from '../../modules/local/antismash_json_to_gff'
 include { CONCATENATE_GFFS as CONCATENATE_ANTISMASH_GFFS } from '../../modules/local/concatenate_gffs'
+include { CONCATENATE_GFFS as CONCATENATE_SANNTIS_GFFS   } from '../../modules/local/concatenate_gffs'
 include { KEGGPATHWAYSCOMPLETENESS                       } from '../../modules/ebi-metagenomics/keggpathwayscompleteness/main'
 include { DRAM_DISTILL_SWF                               } from '../../subworkflows/local/dram_distill_swf'
 
@@ -124,6 +125,11 @@ workflow PATHWAYS_AND_SYSTEMS {
         sanntis_channel
     )
     ch_versions = ch_versions.mix(SANNTIS.out.versions)
+
+    CONCATENATE_SANNTIS_GFFS(
+        SANNTIS.out.gff.groupTuple()
+    )
+    ch_versions = ch_versions.mix(CONCATENATE_SANNTIS_GFFS.out.versions)
 
     /*
     * DRAM distill - per assembly and for the whole samplesheet
