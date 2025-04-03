@@ -160,6 +160,9 @@ workflow ASSEMBLY_ANALYSIS_PIPELINE {
         ).join(
             FUNCTIONAL_ANNOTATION.out.interproscan_tsv
         ),
+        // DRAM //
+        COMBINED_GENE_CALLER.out.faa,
+        FUNCTIONAL_ANNOTATION.out.interproscan_tsv,
         FUNCTIONAL_ANNOTATION.out.kegg_orthologs_per_contig_tsv,
         FUNCTIONAL_ANNOTATION.out.dbcan_overview
     )

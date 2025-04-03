@@ -42,8 +42,9 @@ def extract_kegg_orthologs_annotations(aggregated_kos_per_contig: Path) -> dict:
         # Example
         # contig_id       ko
         # ERZ1049444_314477_1     K00083  K17818  K22132  K13980
-        for contig_id, ko_list in csv_reader:
-            keggs[contig_id] = "; ".join(ko_list.strip().split(" "))
+        for row in csv_reader:
+            contig_id, *kos = row
+            keggs[contig_id] = "; ".join(kos)
     return keggs
 
 

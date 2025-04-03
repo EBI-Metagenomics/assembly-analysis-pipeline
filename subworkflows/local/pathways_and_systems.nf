@@ -19,7 +19,7 @@ workflow PATHWAYS_AND_SYSTEMS {
 
     take:
     // Chunked proteins, used in the functional_annotation mostly, we need this for SanntiS
-    ch_protein_chunks                 // tuple (meta, faa_chunk)
+    ch_protein_chunks // tuple (meta, faa_chunk)
 
     // fasta: contigs
     // faa: CGC predictions faa
@@ -27,9 +27,17 @@ workflow PATHWAYS_AND_SYSTEMS {
     // ips_ts: interpsocan concatenated tsv (all the IPS annotations)
     ch_contigs_and_predicted_proteins // tuple (meta, fasta, faa, gff, ips_tsv)
 
-    // KO per contig (not aggregated)
-    kegg_orthologs_per_contig_tsv     // tuple (meta, kos_per_contig_tsv)
-    // DBCan overview
+
+    // Non-chunked proteins
+    ch_proteins       // tuple (meta, faa)
+
+    // InterProScan concatenated TSV
+    ch_interproscan_tsv
+
+    // KO per contig aggregated - single file per assembly
+    ch_kegg_orthologs_per_contig_tsv     // tuple (meta, kos_per_contig_tsv)
+
+    // DBCan concatenated overview
     ch_dbcan_overview                 // tuple (meta, dbcan_overview_tsv)
 
     main:
@@ -37,7 +45,7 @@ workflow PATHWAYS_AND_SYSTEMS {
     ch_versions = Channel.empty()
 
     KEGGPATHWAYSCOMPLETENESS(
-        kegg_orthologs_per_contig_tsv
+        ch_kegg_orthologs_per_contig_tsv
     )
     ch_versions = ch_versions.mix(KEGGPATHWAYSCOMPLETENESS.out.versions)
 
@@ -121,9 +129,9 @@ workflow PATHWAYS_AND_SYSTEMS {
     * DRAM distill - per assembly and for the whole samplesheet
     */
     DRAM_DISTILL_SWF(
-        ch_contigs_and_predicted_proteins.map {  meta, _fasta, faa, _gff, _ips_tsv -> [ meta, faa ] },
+        ch_proteins,
         KEGGPATHWAYSCOMPLETENESS.out.kos_aggregated_by_contig, // This is the aggregated ko per contig file
-        ch_contigs_and_predicted_proteins.map {  meta, _fasta, _faa, _gff, ips_tsv -> [ meta, ips_tsv ] },
+        ch_interproscan_tsv,
         ch_dbcan_overview
     )
     ch_versions = ch_versions.mix(DRAM_DISTILL_SWF.out.versions)

@@ -5,6 +5,8 @@ include { SUMMARISE_FOR_DRAM_INPUT                     } from '../../modules/loc
 workflow DRAM_DISTILL_SWF {
 
     take:
+    // These should be the concatenated files - one per assembly //
+
     ch_proteins          // tuple [meta, path(proteins_fasta)]
     ko_per_contigs_tsv   // tuple [meta, path(tsv)]
     interproscan_tsv     // tuple [meta, path(tsv)]
@@ -15,7 +17,7 @@ workflow DRAM_DISTILL_SWF {
     ch_versions = Channel.empty()
 
     SUMMARISE_FOR_DRAM_INPUT(
-        ch_proteins.join( ko_per_contigs_tsv ).join( interproscan_tsv ).join( dbcan_overview ),
+        ch_proteins.join( ko_per_contigs_tsv ).join( interproscan_tsv ).join( dbcan_overview )
     )
     ch_versions = ch_versions.mix(SUMMARISE_FOR_DRAM_INPUT.out.versions)
 

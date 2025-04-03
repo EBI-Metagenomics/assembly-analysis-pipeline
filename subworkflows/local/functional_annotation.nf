@@ -243,7 +243,7 @@ workflow FUNCTIONAL_ANNOTATION {
     ch_versions = ch_versions.mix(KEGG_ORTHOLOGS_SUMMARY.out.versions)
 
     emit:
-    dbcan_overview                 = DBCAN.out.overview_output
+    dbcan_overview                 = CONCATENATE_DBCAN_OVERVIEW.out.csv
     interproscan_tsv               = CONCATENATE_INTERPROSCAN_TSV.out.file_out
     interproscan_gff3              = CONCATENATE_INTERPROSCAN_GFFS.out.concatenated_gff
     kegg_orthologs_per_contig_tsv  = KEGG_ORTHOLOGS_SUMMARY.out.ko_per_contig_tsv
