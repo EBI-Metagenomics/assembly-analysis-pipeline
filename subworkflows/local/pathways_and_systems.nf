@@ -17,7 +17,7 @@ include { CONCATENATE_GFFS as CONCATENATE_SANNTIS_GFFS   } from '../../modules/l
 include { KEGGPATHWAYSCOMPLETENESS                       } from '../../modules/ebi-metagenomics/keggpathwayscompleteness/main'
 include { ANTISMASH_SUMMARY                              } from '../../modules/local/antismash_summary'
 include { SANNTIS_SUMMARY                                } from '../../modules/local/sanntis_summary'
->>>>>>> bc81e9a (summary bgcs)
+
 include { DRAM_DISTILL_SWF                               } from '../../subworkflows/local/dram_distill_swf'
 
 workflow PATHWAYS_AND_SYSTEMS {
