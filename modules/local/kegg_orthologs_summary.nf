@@ -62,7 +62,7 @@ process KEGG_ORTHOLOGS_SUMMARY {
     tee \\
         >(csvtk cut --num-cpus ${task.cpus} --no-header-row --fields 1 | \\
             csvtk add-header --num-cpus ${task.cpus} --no-header-row --names ko | \\
-            csvtk join --num-cpus ${task.cpus} --fields "ko;knum" - ${ko_list_txt} | \\
+            csvtk join --lazy-quotes --num-cpus ${task.cpus} --fields "ko;knum" - ${ko_list_txt} | \\
             csvtk cut --num-cpus ${task.cpus} --fields "ko,definition" | \\
             csvtk del-header --num-cpus ${task.cpus} | \\
             csvtk freq --num-cpus ${task.cpus} --no-header-row --fields 1,2 --reverse --sort-by-freq | \\
