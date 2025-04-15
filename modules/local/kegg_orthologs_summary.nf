@@ -67,7 +67,6 @@ process KEGG_ORTHOLOGS_SUMMARY {
             csvtk del-header --num-cpus ${task.cpus} | \\
             csvtk freq --num-cpus ${task.cpus} --no-header-row --fields 1,2 --reverse --sort-by-freq | \\
             csvtk add-header --num-cpus ${task.cpus} --no-header-row --names ko,description,count | \\
-            csvtk cut --num-cpus ${task.cpus} --fields count,ko,description | \\
             bgzip --stdout -@${task.cpus} --index --index-name ${prefix}_ko_summary.tsv.gz.gzi > ${prefix}_ko_summary.tsv.gz
         ) | \\
         csvtk cut --num-cpus ${task.cpus} --no-header-row --fields 1,2 | \\

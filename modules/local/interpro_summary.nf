@@ -28,7 +28,6 @@ process INTERPRO_SUMMARY {
     # . Extracts the 12th InterPro annotations - accession (e.g. IPR002093) and 13th InterPro annotations - description (e.g. BRCA2 repeat)
     # . Counts the frequency of the IPS accessions (we use accession and description because we need the description too)
     # . Adds headers ('interpro_accession', 'description' and 'count') the TSV.
-    # . Inverts the columns - we need count to the be first
     # . The TSV is compressed with bgzip (which is fully compatible with gzip), the index is (.gzi) used on the website.
 
     csvtk fix-quotes --tabs --no-header-row ${interproscan_tsv} | \\
@@ -36,7 +35,6 @@ process INTERPRO_SUMMARY {
     csvtk cut --tabs --no-header-row --fields 12,13 | \\
     csvtk freq --tabs --no-header-row --fields 1,2 --reverse --sort-by-freq | \\
     csvtk add-header --tabs --no-header-row --names interpro_accession,description,count | \\
-    csvtk cut --tabs --fields count,interpro_accession,description | \\
     bgzip --stdout -@${task.cpus} --index --index-name ${prefix}_interpro_summary.tsv.gz.gzi > ${prefix}_interpro_summary.tsv.gz
 
     cat <<-END_VERSIONS > versions.yml
