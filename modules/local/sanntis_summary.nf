@@ -3,8 +3,8 @@ process SANNTIS_SUMMARY {
     label 'process_low'
 
     container "${ workflow.containerEngine == 'singularity' && !task.ext.singularity_pull_docker_container ?
-        'https://depot.galaxyproject.org/singularity/mgnify-pipelines-toolkit:1.0.5':
-        'biocontainers/mgnify-pipelines-toolkit:1.0.5' }"
+        "https://depot.galaxyproject.org/singularity/mgnify-pipelines-toolkit:${params.mpt_version}":
+        "biocontainers/mgnify-pipelines-toolkit:${params.mpt_version}" }"
 
     input:
     tuple val(meta), path(sanntis_gff)
