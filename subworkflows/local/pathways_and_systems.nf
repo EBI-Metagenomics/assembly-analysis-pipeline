@@ -8,12 +8,16 @@ include { TABIX_BGZIP as TABIX_BGZIP_KEGGPATHWAYSCOMPLETENESS_PER_CONTIG } from 
 /* EBI-METAGENOMICS */
 include { SANNTIS                      } from '../../modules/ebi-metagenomics/sanntis/main'
 include { GENOMEPROPERTIES             } from '../../modules/ebi-metagenomics/genomeproperties/main'
+include { KEGGPATHWAYSCOMPLETENESS     } from '../../modules/ebi-metagenomics/keggpathwayscompleteness/main'
 
 /* LOCAL */
 include { ANTISMASH_JSON_TO_GFF                          } from '../../modules/local/antismash_json_to_gff'
 include { CONCATENATE_GFFS as CONCATENATE_ANTISMASH_GFFS } from '../../modules/local/concatenate_gffs'
 include { CONCATENATE_GFFS as CONCATENATE_SANNTIS_GFFS   } from '../../modules/local/concatenate_gffs'
 include { KEGGPATHWAYSCOMPLETENESS                       } from '../../modules/ebi-metagenomics/keggpathwayscompleteness/main'
+include { ANTISMASH_SUMMARY                              } from '../../modules/local/antismash_summary'
+include { SANNTIS_SUMMARY                                } from '../../modules/local/sanntis_summary'
+
 include { DRAM_DISTILL_SWF                               } from '../../subworkflows/local/dram_distill_swf'
 
 workflow PATHWAYS_AND_SYSTEMS {
@@ -109,6 +113,9 @@ workflow PATHWAYS_AND_SYSTEMS {
     )
     ch_versions = ch_versions.mix(CONCATENATE_ANTISMASH_GFFS.out.versions)
 
+    ANTISMASH_SUMMARY(CONCATENATE_ANTISMASH_GFFS.out.concatenated_gff)
+    ch_versions = ch_versions.mix(ANTISMASH_SUMMARY.out.versions)
+
     /*************************************************************************************/
     /* Rearrange the channel. We need to create a channel so that                        */
     /* each FAA chunk the IPS TSV (this is the concatenated IPS for the whole assembly). */
@@ -126,10 +133,16 @@ workflow PATHWAYS_AND_SYSTEMS {
     )
     ch_versions = ch_versions.mix(SANNTIS.out.versions)
 
+
     CONCATENATE_SANNTIS_GFFS(
         SANNTIS.out.gff.groupTuple()
     )
     ch_versions = ch_versions.mix(CONCATENATE_SANNTIS_GFFS.out.versions)
+
+
+    SANNTIS_SUMMARY(CONCATENATE_SANNTIS_GFFS.out.concatenated_gff)
+    ch_versions = ch_versions.mix(SANNTIS_SUMMARY.out.versions)
+
 
     /*
     * DRAM distill - per assembly and for the whole samplesheet
