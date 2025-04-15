@@ -113,8 +113,10 @@ workflow PATHWAYS_AND_SYSTEMS {
     )
     ch_versions = ch_versions.mix(CONCATENATE_ANTISMASH_GFFS.out.versions)
 
-    ANTISMASH_SUMMARY(CONCATENATE_ANTISMASH_GFFS.out.concatenated_gff)
-    ch_versions = ch_versions.mix(ANTISMASH_SUMMARY.out.versions)
+    // TODO: cat gbk and json (?)
+
+    //ANTISMASH_SUMMARY(CONCATENATE_ANTISMASH_GFFS.out.concatenated_gff)
+    //ch_versions = ch_versions.mix(ANTISMASH_SUMMARY.out.versions)
 
     /*************************************************************************************/
     /* Rearrange the channel. We need to create a channel so that                        */
@@ -140,8 +142,8 @@ workflow PATHWAYS_AND_SYSTEMS {
     ch_versions = ch_versions.mix(CONCATENATE_SANNTIS_GFFS.out.versions)
 
 
-    SANNTIS_SUMMARY(CONCATENATE_SANNTIS_GFFS.out.concatenated_gff)
-    ch_versions = ch_versions.mix(SANNTIS_SUMMARY.out.versions)
+    //SANNTIS_SUMMARY(CONCATENATE_SANNTIS_GFFS.out.concatenated_gff)
+    //ch_versions = ch_versions.mix(SANNTIS_SUMMARY.out.versions)
 
 
     /*
