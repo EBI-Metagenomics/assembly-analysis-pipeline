@@ -101,6 +101,13 @@
                     "format": "string",
                     "description": "Training model for FragGeneScan.",
                     "help": "Specify the training model to use for gene prediction. Default is 'illumina_5'."
+                },
+                "mpt_version": {
+                    "type": "string",
+                    "default": "1.0.4--pyhdfd78af_0",
+                    "format": "string",
+                    "description": "General version of mgnify-pipeline-toolkit",
+                    "help": "Keeps all mpt tools updated and synced to chosen release."
                 }
             },
             "fa_icon": "fas fa-database"
