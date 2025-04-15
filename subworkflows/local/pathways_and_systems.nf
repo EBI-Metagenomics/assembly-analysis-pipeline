@@ -14,7 +14,6 @@ include { KEGGPATHWAYSCOMPLETENESS     } from '../../modules/ebi-metagenomics/ke
 include { ANTISMASH_JSON_TO_GFF                          } from '../../modules/local/antismash_json_to_gff'
 include { CONCATENATE_GFFS as CONCATENATE_ANTISMASH_GFFS } from '../../modules/local/concatenate_gffs'
 include { CONCATENATE_GFFS as CONCATENATE_SANNTIS_GFFS   } from '../../modules/local/concatenate_gffs'
-include { KEGGPATHWAYSCOMPLETENESS                       } from '../../modules/ebi-metagenomics/keggpathwayscompleteness/main'
 include { ANTISMASH_SUMMARY                              } from '../../modules/local/antismash_summary'
 include { SANNTIS_SUMMARY                                } from '../../modules/local/sanntis_summary'
 
