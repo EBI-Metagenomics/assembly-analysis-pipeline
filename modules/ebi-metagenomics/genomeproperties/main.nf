@@ -22,11 +22,16 @@ process GENOMEPROPERTIES {
     def args = task.ext.args ?: ''
     def prefix = task.ext.prefix ?: "${meta.id}"
     def gp_version = "2.0" // No way to get the version from the tool directly so have to hardcode
+    def is_compressed = ips.getExtension() == "gz"
+    def ips_name = ips.name.replace(".gz", "")
 
     """
+    if [ "$is_compressed" == "true" ]; then
+        gzip -c -d $ips > $ips_name
+    fi
     assign_genome_properties.pl \\
         ${args} \\
-        -matches ${ips} \\
+        -matches ${ips_name} \\
         -gpdir /opt/genome-properties/flatfiles/ \\
         -gpff genomeProperties.txt \\
         -name ${prefix}
