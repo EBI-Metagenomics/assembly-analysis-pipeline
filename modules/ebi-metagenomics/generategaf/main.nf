@@ -5,8 +5,8 @@ process GENERATEGAF {
 
     conda "${moduleDir}/environment.yml"
     container "${ workflow.containerEngine == 'singularity' && !task.ext.singularity_pull_docker_container ?
-        'https://depot.galaxyproject.org/singularity/mgnify-pipelines-toolkit:${params.mpt_version}':
-        'biocontainers/mgnify-pipelines-toolkit:${params.mpt_version}' }"
+        "https://depot.galaxyproject.org/singularity/mgnify-pipelines-toolkit:${params.mpt_version}":
+        "biocontainers/mgnify-pipelines-toolkit:${params.mpt_version}" }"
 
     input:
     tuple val(meta), path(ips)
