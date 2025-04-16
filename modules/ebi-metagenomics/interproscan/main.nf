@@ -5,29 +5,11 @@ process INTERPROSCAN {
     container 'microbiome-informatics/interproscan:5.73-104.0'
 
     containerOptions {
-        def dataPath = "${interproscan_db}/data"
-        def licensedPath = "${interproscan_db}/licensed"
-        def containerArgs = []
-
         if (workflow.containerEngine == 'singularity') {
-            containerArgs << "--bind ${dataPath}:/opt/interproscan/data"
-
-            if (new File(licensedPath).exists()) {
-                containerArgs << "--bind ${licensedPath}:/opt/interproscan/licensed"
-            }
-
+            return "--bind ${interproscan_db}:/opt/interproscan/data"
         } else {
-            def workData = "${task.workDir}/${dataPath}"
-            def workLicensed = "${task.workDir}/${licensedPath}"
-
-            containerArgs << "-v ${workData}:/opt/interproscan/data"
-
-            if (new File(workLicensed).exists()) {
-                containerArgs << "-v ${workLicensed}:/opt/interproscan/licensed"
-            }
+            return "-v ${task.workDir}/${interproscan_db}:/opt/interproscan/data"
         }
-
-        return containerArgs.join(' ')
     }
 
     input:
