@@ -244,8 +244,10 @@ workflow FUNCTIONAL_ANNOTATION {
 
     emit:
     dbcan_overview                 = CONCATENATE_DBCAN_OVERVIEW.out.csv
+    dbcan_hmm                      = CONCATENATE_DBCAN_HMMOUT.out.csv
     interproscan_tsv               = CONCATENATE_INTERPROSCAN_TSV.out.file_out
     interproscan_gff3              = CONCATENATE_INTERPROSCAN_GFFS.out.concatenated_gff
+    eggnog_annotations             = CONCATENATE_EGGNOGMAPPER_ANNOTATIONS.out.file_out
     kegg_orthologs_per_contig_tsv  = KEGG_ORTHOLOGS_SUMMARY.out.ko_per_contig_tsv
     versions                       = ch_versions
 }

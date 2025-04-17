@@ -36,6 +36,7 @@ include { CONTIGS_TAXONOMIC_CLASSIFICATION   } from '../subworkflows/ebi-metagen
 */
 
 include { RENAME_CONTIGS                     } from '../modules/local/rename_contigs'
+include { GFF_SUMMARY                        } from '../modules/local/gff_summary'
 include { RNA_ANNOTATION                     } from '../subworkflows/local/rna_annotation'
 include { FUNCTIONAL_ANNOTATION              } from '../subworkflows/local/functional_annotation'
 include { PATHWAYS_AND_SYSTEMS               } from '../subworkflows/local/pathways_and_systems'
@@ -167,6 +168,23 @@ workflow ASSEMBLY_ANALYSIS_PIPELINE {
         FUNCTIONAL_ANNOTATION.out.dbcan_overview
     )
     ch_versions = ch_versions.mix(PATHWAYS_AND_SYSTEMS.out.versions)
+
+    // Generate giant GFF summary file //
+    GFF_SUMMARY(COMBINED_GENE_CALLER.out.gff.join(
+        FUNCTIONAL_ANNOTATION.out.interproscan_tsv
+        ).join(
+            FUNCTIONAL_ANNOTATION.out.eggnog_annotations
+        ).join(
+            FUNCTIONAL_ANNOTATION.out.dbcan_overview
+        ).join(
+            FUNCTIONAL_ANNOTATION.out.dbcan_hmm
+        ).join(
+            PATHWAYS_AND_SYSTEMS.out.sanntis_gff
+        ).join(
+            PATHWAYS_AND_SYSTEMS.out.antismash_gff
+        )
+    )
+    ch_versions = ch_versions.mix(GFF_SUMMARY.out.versions)
 
     //
     // Collate and save software versions

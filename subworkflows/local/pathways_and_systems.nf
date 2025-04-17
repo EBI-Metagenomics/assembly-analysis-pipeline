@@ -158,4 +158,6 @@ workflow PATHWAYS_AND_SYSTEMS {
 
     emit:
     versions = ch_versions
+    sanntis_gff = CONCATENATE_SANNTIS_GFFS.out.concatenated_gff
+    antismash_gff = CONCATENATE_ANTISMASH_GFFS.out.concatenated_gff
 }
