@@ -87,7 +87,7 @@ workflow FUNCTIONAL_ANNOTATION {
         EGGNOGMAPPER_ORTHOLOGS.out.orthologs.groupTuple()
     )
     ch_versions = ch_versions.mix(CONCATENATE_EGGNOGMAPPER_ORTHOLOGS.out.versions.first())
-    EGGNOGMAPPER_ANNOTATIONS.out.annotations.groupTuple().view()
+
     CONCATENATE_EGGNOGMAPPER_ANNOTATIONS(
         EGGNOGMAPPER_ANNOTATIONS.out.annotations.groupTuple()
     )
