@@ -2,7 +2,7 @@ process GFF_SUMMARY {
     tag "${meta.id}"
     label 'process_low'
 
-    container "community.wave.seqera.io/library/pip_mgnify-pipelines-toolkit:d2692cfb6ad25030"
+    container "community.wave.seqera.io/library/pip_mgnify-pipelines-toolkit:2764846cec7da9cf"
 
     input:
     tuple val(meta), path(cds), path(ips), path(eggnog), path(dbcan_overview), path(dbcan_hmm), path(sanntis), path(antismash)
