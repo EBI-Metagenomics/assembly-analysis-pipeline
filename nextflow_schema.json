@@ -129,6 +129,11 @@
                     "description": "The version of the interproscan database.",
                     "fa_icon": "fas fa-code-branch"
                 },
+                "interpro_licensed_software": {
+                    "type": "boolean",
+                    "description": "Enables the use of licensed software in InterProScan. Set to true if the required licensed software is in the licensed database folder, https://interproscan-docs.readthedocs.io/en/v5/HowToRun.html#included-analyses.",
+                    "fa_icon": "fas fa-file-contract"
+                },
                 "eggnog_database": {
                     "type": "string",
                     "format": "file-path",

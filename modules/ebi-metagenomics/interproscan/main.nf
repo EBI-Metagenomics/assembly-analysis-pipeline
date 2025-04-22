@@ -5,26 +5,16 @@ process INTERPROSCAN {
     container 'microbiome-informatics/interproscan:5.73-104.0'
 
     containerOptions {
-        def dataPath = "${interproscan_db}/data"
-        def licensedPath = "${interproscan_db}/licensed"
         def containerArgs = []
+        def mountArg = (workflow.containerEngine == 'singularity') ? "--bind" : "--volume"
 
-        if (workflow.containerEngine == 'singularity') {
-            containerArgs << "--bind ${dataPath}:/opt/interproscan/data"
+        containerArgs << "${mountArg} ${task.workDir}/${interproscan_db}/data:/opt/interproscan/data"
 
-            if (new File(licensedPath).exists()) {
-                containerArgs << "--bind ${licensedPath}:/opt/interproscan/licensed"
-            }
-
-        } else {
-            def workData = "${task.workDir}/${dataPath}"
-            def workLicensed = "${task.workDir}/${licensedPath}"
-
-            containerArgs << "-v ${workData}:/opt/interproscan/data"
-
-            if (new File(workLicensed).exists()) {
-                containerArgs << "-v ${workLicensed}:/opt/interproscan/licensed"
-            }
+        if ( params.interpro_licensed_software ) {
+            def licensedSoftwarePath = "${task.workDir}/${interproscan_db}/licensed"
+            containerArgs << "${mountArg} ${licensedSoftwarePath}:/opt/interproscan/licensed"
+            // This override is needed otherwise it fails because this path seems to be hardcoded in the container
+            containerArgs << "${mountArg} ${licensedSoftwarePath}/signalp:/usr/opt/www/pub/CBS/services/SignalP-4.1/signalp-4.1"
         }
 
         return containerArgs.join(' ')
