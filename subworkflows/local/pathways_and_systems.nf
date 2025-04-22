@@ -4,6 +4,7 @@ include { SEQKIT_SPLIT2                                                  } from 
 include { ANTISMASH_ANTISMASHLITE                                        } from '../../modules/nf-core/antismash/antismashlite/main'
 include { TABIX_BGZIP as TABIX_BGZIP_KEGGPATHWAYSCOMPLETENESS            } from '../../modules/nf-core/tabix/bgzip/main'
 include { TABIX_BGZIP as TABIX_BGZIP_KEGGPATHWAYSCOMPLETENESS_PER_CONTIG } from '../../modules/nf-core/tabix/bgzip/main'
+include { CAT_CAT as CONCATENATE_ANTISMASH_GBK                           } from '../../modules/nf-core/cat/cat/main'
 
 /* EBI-METAGENOMICS */
 include { SANNTIS                      } from '../../modules/ebi-metagenomics/sanntis/main'
@@ -112,10 +113,17 @@ workflow PATHWAYS_AND_SYSTEMS {
     )
     ch_versions = ch_versions.mix(CONCATENATE_ANTISMASH_GFFS.out.versions)
 
-    // TODO: cat gbk and json (?)
+    CONCATENATE_ANTISMASH_GBK(
+        ANTISMASH_ANTISMASHLITE.out.gbk_input.groupTuple()
+    )
+    ch_versions = ch_versions.mix(CONCATENATE_ANTISMASH_GBK.out.versions)
 
-    //ANTISMASH_SUMMARY(CONCATENATE_ANTISMASH_GFFS.out.concatenated_gff)
-    //ch_versions = ch_versions.mix(ANTISMASH_SUMMARY.out.versions)
+    // TODO: cat json (?)
+
+    ANTISMASH_SUMMARY(
+        CONCATENATE_ANTISMASH_GFFS.out.concatenated_gff
+    )
+    ch_versions = ch_versions.mix(ANTISMASH_SUMMARY.out.versions)
 
     /*************************************************************************************/
     /* Rearrange the channel. We need to create a channel so that                        */
@@ -141,8 +149,10 @@ workflow PATHWAYS_AND_SYSTEMS {
     ch_versions = ch_versions.mix(CONCATENATE_SANNTIS_GFFS.out.versions)
 
 
-    //SANNTIS_SUMMARY(CONCATENATE_SANNTIS_GFFS.out.concatenated_gff)
-    //ch_versions = ch_versions.mix(SANNTIS_SUMMARY.out.versions)
+    SANNTIS_SUMMARY(
+        CONCATENATE_SANNTIS_GFFS.out.concatenated_gff
+    )
+    ch_versions = ch_versions.mix(SANNTIS_SUMMARY.out.versions)
 
 
     /*
