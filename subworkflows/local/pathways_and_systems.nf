@@ -112,10 +112,11 @@ workflow PATHWAYS_AND_SYSTEMS {
         ANTISMASH_JSON_TO_GFF.out.antismash_gff.groupTuple()
     )
     ch_versions = ch_versions.mix(CONCATENATE_ANTISMASH_GFFS.out.versions)
-
+    ANTISMASH_ANTISMASHLITE.out.gbk_input.groupTuple().view()
     CONCATENATE_ANTISMASH_GBK(
         ANTISMASH_ANTISMASHLITE.out.gbk_input.groupTuple()
     )
+
     ch_versions = ch_versions.mix(CONCATENATE_ANTISMASH_GBK.out.versions)
 
     // TODO: cat json (?)
