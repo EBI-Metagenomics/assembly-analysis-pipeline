@@ -12,7 +12,7 @@ process ANTISMASH_SUMMARY {
     tuple val(meta), path(antismash_gff)
 
     output:
-    tuple val(meta), path("*.summary.tsv"), emit: antismash_summary
+    tuple val(meta), path("*_summary.tsv"), emit: antismash_summary
     path "versions.yml"                   , emit: versions
 
     script:
