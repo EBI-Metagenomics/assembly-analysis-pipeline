@@ -17,7 +17,7 @@ process ANTISMASH_SUMMARY {
 
     script:
     """
-    summarise_antismash_bgcs
+    summarise_antismash_bgcs \\
         --antismash-gff ${antismash_gff} \\
         --output ${antismash_gff.simpleName}_summary.tsv
 

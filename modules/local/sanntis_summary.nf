@@ -16,7 +16,7 @@ process SANNTIS_SUMMARY {
 
     script:
     """
-    summarise_sanntis_bgcs
+    summarise_sanntis_bgcs \\
         --sanntis-gff ${sanntis_gff} \\
         --output ${sanntis_gff.simpleName}_summary.tsv
 
