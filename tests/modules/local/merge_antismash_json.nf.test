@@ -9,9 +9,10 @@ nextflow_process {
         when {
             process {
                 """
-                input[0] = [
-                    [test: "test"], [path("fixtures/antismash_jsons/1.json"), path("fixtures/antismash_jsons/2.json")]
-                ]
+                json1 = file("fixtures/antismash_jsons/1.json")
+                json2 = file("fixtures/antismash_jsons/2.json")
+                meta = [id: "test"]
+                input = Channel.of([meta, [json1, json2]])
                 """
             }
         }

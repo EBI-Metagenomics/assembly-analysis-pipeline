@@ -12,7 +12,7 @@ process KEGGPATHWAYSCOMPLETENESS {
     tuple val(meta), path(ko_contig_tsv)
 
     output:
-    tuple val(meta), path("${prefix}_kegg_modules.tsv"),                      emit: kegg_pathways
+    tuple val(meta), path("${prefix}_kegg_modules_summary.tsv"),                      emit: kegg_pathways
     tuple val(meta), path("${prefix}_kegg_modules_per_contigs.tsv"),          emit: kegg_pathways_per_contig
     tuple val(meta), path("${prefix}_aggregated_kos_per_contig.tsv.gz"),      emit: kos_aggregated_by_contig
     path "versions.yml",                                                      emit: versions
@@ -42,7 +42,7 @@ process KEGGPATHWAYSCOMPLETENESS {
         -o ${prefix}
 
     # TODO should we gzip all the files?
-    mv ${prefix}/summary.kegg_pathways.tsv ${prefix}_kegg_modules.tsv
+    mv ${prefix}/summary.kegg_pathways.tsv ${prefix}_kegg_modules_summary.tsv
     mv ${prefix}/summary.kegg_contigs.tsv ${prefix}_kegg_modules_per_contigs.tsv
 
     gzip ${prefix}_aggregated_kos_per_contig.tsv
