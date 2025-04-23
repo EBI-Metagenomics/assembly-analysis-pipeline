@@ -1,6 +1,6 @@
 process MERGE_ANTISMASH_JSON {
     label 'process_medium'
-    container 'ghcr.io/jqlang/jq:1.7.1'
+    container 'community.wave.seqera.io/library/jq:1.5--c7925a380686afaf'
 
     input:
     tuple val(meta), path(jsons)
@@ -31,7 +31,7 @@ process MERGE_ANTISMASH_JSON {
           records: (.records + (\$item.records // []))
         }
       )
-    ' \$json_files > ${prefix}_merged.json
+    ' ${jsons} > ${prefix}_merged.json
 
     cat <<-END_VERSIONS > versions.yml
     "${task.process}":

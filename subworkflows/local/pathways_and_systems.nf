@@ -17,6 +17,7 @@ include { CONCATENATE_GFFS as CONCATENATE_ANTISMASH_GFFS } from '../../modules/l
 include { CONCATENATE_GFFS as CONCATENATE_SANNTIS_GFFS   } from '../../modules/local/concatenate_gffs'
 include { ANTISMASH_SUMMARY                              } from '../../modules/local/antismash_summary'
 include { SANNTIS_SUMMARY                                } from '../../modules/local/sanntis_summary'
+include { MERGE_ANTISMASH_JSON                           } from '../../modules/local/merge_antismash_json'
 
 include { DRAM_DISTILL_SWF                               } from '../../subworkflows/local/dram_distill_swf'
 
@@ -116,10 +117,12 @@ workflow PATHWAYS_AND_SYSTEMS {
     CONCATENATE_ANTISMASH_GBK(
         ANTISMASH_ANTISMASHLITE.out.gbk_input.groupTuple()
     )
-
     ch_versions = ch_versions.mix(CONCATENATE_ANTISMASH_GBK.out.versions)
 
-    // TODO: cat json (?)
+    MERGE_ANTISMASH_JSON(
+        ANTISMASH_ANTISMASHLITE.out.json_results.groupTuple()
+    )
+    ch_versions = ch_versions.mix(MERGE_ANTISMASH_JSON.out.versions)
 
     ANTISMASH_SUMMARY(
         CONCATENATE_ANTISMASH_GFFS.out.concatenated_gff
