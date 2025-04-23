@@ -11,14 +11,16 @@ process SANNTIS_SUMMARY {
     tuple val(meta), path(sanntis_gff)
 
     output:
-    tuple val(meta), path("*_summary.tsv"), emit: sanntis_summary
-    path "versions.yml"                   , emit: versions
+    tuple val(meta), path("*_summary.tsv.gz"), emit: sanntis_summary
+    path "versions.yml"                      , emit: versions
 
     script:
     """
     summarise_sanntis_bgcs \\
         --sanntis-gff ${sanntis_gff} \\
         --output ${sanntis_gff.simpleName}_summary.tsv
+
+    gzip ${sanntis_gff.simpleName}_summary.tsv
 
     cat <<-END_VERSIONS > versions.yml
     "${task.process}":
@@ -28,7 +30,7 @@ process SANNTIS_SUMMARY {
 
     stub:
     """
-    touch ${sanntis_gff.simpleName}_summary.tsv
+    touch ${sanntis_gff.simpleName}_summary.tsv.gz
 
     cat <<-END_VERSIONS > versions.yml
     "${task.process}":

@@ -12,14 +12,16 @@ process ANTISMASH_SUMMARY {
     tuple val(meta), path(antismash_gff)
 
     output:
-    tuple val(meta), path("*_summary.tsv"), emit: antismash_summary
-    path "versions.yml"                   , emit: versions
+    tuple val(meta), path("*_summary.tsv.gz"), emit: antismash_summary
+    path "versions.yml"                      , emit: versions
 
     script:
     """
     summarise_antismash_bgcs \\
         --antismash-gff ${antismash_gff} \\
         --output ${antismash_gff.simpleName}_summary.tsv
+
+    gzip ${antismash_gff.simpleName}_summary.tsv
 
     cat <<-END_VERSIONS > versions.yml
     "${task.process}":
@@ -29,7 +31,7 @@ process ANTISMASH_SUMMARY {
 
     stub:
     """
-    touch ${antismash_gff.simpleName}_summary.tsv
+    touch ${antismash_gff.simpleName}_summary.tsv.gz
 
     cat <<-END_VERSIONS > versions.yml
     "${task.process}":
