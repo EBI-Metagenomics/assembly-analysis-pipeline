@@ -8,8 +8,8 @@ process GFF_SUMMARY {
     tuple val(meta), path(cds), path(ips), path(eggnog), path(dbcan_overview), path(dbcan_hmm), path(sanntis), path(antismash)
 
     output:
-    tuple val(meta), path("*.gff"), emit: gff_summary
-    path "versions.yml"           , emit: versions
+    tuple val(meta), path("*.gff.gz"), emit: gff_summary
+    path "versions.yml"              , emit: versions
 
     script:
     """
@@ -29,6 +29,8 @@ process GFF_SUMMARY {
         --dbcan-cazys ${meta.id}_dbcan_cazys.gff \\
         -o ${meta.id}_annotation_summary.gff
 
+    gzip ${meta.id}_annotation_summary.gff
+
     cat <<-END_VERSIONS > versions.yml
     "${task.process}":
         mgnify-pipelines-toolkit: \$(get_mpt_version)
@@ -37,7 +39,7 @@ process GFF_SUMMARY {
 
     stub:
     """
-    touch ${meta.id}_annotation_summary.gff
+    touch ${meta.id}_annotation_summary.gff.gz
 
     cat <<-END_VERSIONS > versions.yml
     "${task.process}":
