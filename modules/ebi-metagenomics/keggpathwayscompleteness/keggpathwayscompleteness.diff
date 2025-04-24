@@ -1,10 +1,7 @@
-Changes in component 'ebi-metagenomics/keggpathwayscompleteness'
-'modules/ebi-metagenomics/keggpathwayscompleteness/environment.yml' is unchanged
-'modules/ebi-metagenomics/keggpathwayscompleteness/meta.yml' is unchanged
-Changes in 'keggpathwayscompleteness/main.nf':
+Changes in module 'ebi-metagenomics/keggpathwayscompleteness'
 --- modules/ebi-metagenomics/keggpathwayscompleteness/main.nf
 +++ modules/ebi-metagenomics/keggpathwayscompleteness/main.nf
-@@ -5,48 +5,59 @@
+@@ -5,48 +5,64 @@
  
      conda "${moduleDir}/environment.yml"
      container "${ workflow.containerEngine == 'singularity' && !task.ext.singularity_pull_docker_container ?
@@ -21,8 +18,9 @@ Changes in 'keggpathwayscompleteness/main.nf':
 -    tuple val(meta), path("*_contigs.tsv") , emit: kegg_contigs
 -    tuple val(meta), path("*_pathways.tsv"), emit: kegg_pathways
 -    path "versions.yml"                    , emit: versions
-+    tuple val(meta), path("${prefix}_summary_kegg_pathways.tsv"),             emit: kegg_pathways
-+    tuple val(meta), path("${prefix}_summary_kegg_pathways_per_contigs.tsv"), emit: kegg_pathways_per_contig
++    tuple val(meta), path("${prefix}_kegg_modules_summary.tsv"),                      emit: kegg_pathways
++    tuple val(meta), path("${prefix}_kegg_modules_per_contigs.tsv"),          emit: kegg_pathways_per_contig
++    tuple val(meta), path("${prefix}_aggregated_kos_per_contig.tsv.gz"),      emit: kos_aggregated_by_contig
 +    path "versions.yml",                                                      emit: versions
  
      when:
@@ -57,8 +55,11 @@ Changes in 'keggpathwayscompleteness/main.nf':
 +        --add-per-contig \\
 +        -o ${prefix}
 +
-+    mv ${prefix}/summary.kegg_pathways.tsv ${prefix}_summary_kegg_pathways.tsv
-+    mv ${prefix}/summary.kegg_contigs.tsv ${prefix}_summary_kegg_pathways_per_contigs.tsv 
++    # TODO should we gzip all the files?
++    mv ${prefix}/summary.kegg_pathways.tsv ${prefix}_kegg_modules_summary.tsv
++    mv ${prefix}/summary.kegg_contigs.tsv ${prefix}_kegg_modules_per_contigs.tsv
++
++    gzip ${prefix}_aggregated_kos_per_contig.tsv
  
      cat <<-END_VERSIONS > versions.yml
      "${task.process}":
@@ -75,8 +76,9 @@ Changes in 'keggpathwayscompleteness/main.nf':
      """
 -    touch ${prefix}.kegg_contigs.tsv
 -    touch ${prefix}.kegg_pathways.tsv
-+    touch ${prefix}_summary_kegg_pathways.tsv
-+    touch ${prefix}_summary_kegg_pathways_per_contigs.tsv
++    touch ${prefix}_kegg_modules.tsv
++    touch ${prefix}_kegg_modules_per_contigs.tsv
++    touch ${prefix}_aggregated_kos_per_contig.tsv.gz
  
      cat <<-END_VERSIONS > versions.yml
      "${task.process}":
@@ -86,9 +88,4 @@ Changes in 'keggpathwayscompleteness/main.nf':
      """
  }
 
-'modules/ebi-metagenomics/keggpathwayscompleteness/tests/main.nf.test.snap' is unchanged
-'modules/ebi-metagenomics/keggpathwayscompleteness/tests/tags.yml' is unchanged
-'modules/ebi-metagenomics/keggpathwayscompleteness/tests/main.nf.test' is unchanged
-'modules/ebi-metagenomics/keggpathwayscompleteness/tests/fixtures/test_kos.txt' is unchanged
-'modules/ebi-metagenomics/keggpathwayscompleteness/tests/fixtures/test_filtered.tbl' is unchanged
 ************************************************************

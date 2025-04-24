@@ -1,9 +1,17 @@
-Changes in component 'ebi-metagenomics/generategaf'
-'modules/ebi-metagenomics/generategaf/environment.yml' is unchanged
-'modules/ebi-metagenomics/generategaf/meta.yml' is unchanged
-Changes in 'generategaf/main.nf':
+Changes in module 'ebi-metagenomics/generategaf'
 --- modules/ebi-metagenomics/generategaf/main.nf
 +++ modules/ebi-metagenomics/generategaf/main.nf
+@@ -5,8 +5,8 @@
+ 
+     conda "${moduleDir}/environment.yml"
+     container "${ workflow.containerEngine == 'singularity' && !task.ext.singularity_pull_docker_container ?
+-        'https://depot.galaxyproject.org/singularity/mgnify-pipelines-toolkit:0.2.0--pyhdfd78af_0':
+-        'biocontainers/mgnify-pipelines-toolkit:0.2.0--pyhdfd78af_0' }"
++        "https://depot.galaxyproject.org/singularity/mgnify-pipelines-toolkit:${params.mpt_version}":
++        "biocontainers/mgnify-pipelines-toolkit:${params.mpt_version}" }"
+ 
+     input:
+     tuple val(meta), path(ips)
 @@ -21,8 +21,10 @@
      script:
      def prefix = task.ext.prefix ?: "${meta.id}"
@@ -17,7 +25,4 @@ Changes in 'generategaf/main.nf':
  
      cat <<-END_VERSIONS > versions.yml
 
-'modules/ebi-metagenomics/generategaf/tests/main.nf.test.snap' is unchanged
-'modules/ebi-metagenomics/generategaf/tests/ips_out.tsv' is unchanged
-'modules/ebi-metagenomics/generategaf/tests/main.nf.test' is unchanged
 ************************************************************

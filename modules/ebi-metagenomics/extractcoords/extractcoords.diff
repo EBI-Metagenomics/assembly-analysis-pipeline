@@ -1,10 +1,17 @@
-Changes in component 'ebi-metagenomics/extractcoords'
-'modules/ebi-metagenomics/extractcoords/environment.yml' is unchanged
-'modules/ebi-metagenomics/extractcoords/meta.yml' is unchanged
-Changes in 'extractcoords/main.nf':
+Changes in module 'ebi-metagenomics/extractcoords'
 --- modules/ebi-metagenomics/extractcoords/main.nf
 +++ modules/ebi-metagenomics/extractcoords/main.nf
-@@ -13,13 +13,13 @@
+@@ -5,21 +5,21 @@
+ 
+     conda "${moduleDir}/environment.yml"
+     container "${ workflow.containerEngine == 'singularity' && !task.ext.singularity_pull_docker_container ?
+-        'https://depot.galaxyproject.org/singularity/mgnify-pipelines-toolkit:1.0.1--pyhdfd78af_0':
+-        'biocontainers/mgnify-pipelines-toolkit:1.0.1--pyhdfd78af_0' }"
++        "https://depot.galaxyproject.org/singularity/mgnify-pipelines-toolkit:${params.mpt_version}":
++        "biocontainers/mgnify-pipelines-toolkit:${params.mpt_version}" }"
+ 
+     input:
+     tuple val(meta), path(easel_coords_fasta)
      tuple val(meta2), path(matched_seqs_with_coords)
  
      output:
@@ -48,9 +55,4 @@ Changes in 'extractcoords/main.nf':
      """
  }
 
-'modules/ebi-metagenomics/extractcoords/tests/test_matched_seqs_with_coords.txt' is unchanged
-'modules/ebi-metagenomics/extractcoords/tests/main.nf.test.snap' is unchanged
-'modules/ebi-metagenomics/extractcoords/tests/tags.yml' is unchanged
-'modules/ebi-metagenomics/extractcoords/tests/main.nf.test' is unchanged
-'modules/ebi-metagenomics/extractcoords/tests/test.fasta' is unchanged
 ************************************************************
