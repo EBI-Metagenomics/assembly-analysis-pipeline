@@ -1,5 +1,6 @@
 process MERGE_ANTISMASH_JSON {
     label 'process_medium'
+    tag "$meta.id"
     container 'community.wave.seqera.io/library/jq:1.5--c7925a380686afaf'
 
     input:
