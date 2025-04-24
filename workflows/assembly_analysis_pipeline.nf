@@ -170,22 +170,21 @@ workflow ASSEMBLY_ANALYSIS_PIPELINE {
     ch_versions = ch_versions.mix(PATHWAYS_AND_SYSTEMS.out.versions)
 
     // Generate giant GFF summary file //
-    // TODO: change new version of toolkit
-    //GFF_SUMMARY(COMBINED_GENE_CALLER.out.gff.join(
-    //    FUNCTIONAL_ANNOTATION.out.interproscan_tsv
-    //    ).join(
-    //        FUNCTIONAL_ANNOTATION.out.eggnog_annotations
-    //    ).join(
-    //        FUNCTIONAL_ANNOTATION.out.dbcan_overview
-    //    ).join(
-    //        FUNCTIONAL_ANNOTATION.out.dbcan_hmm
-    //    ).join(
-    //        PATHWAYS_AND_SYSTEMS.out.sanntis_gff
-    //    ).join(
-    //        PATHWAYS_AND_SYSTEMS.out.antismash_gff
-    //    )
-    //)
-    //ch_versions = ch_versions.mix(GFF_SUMMARY.out.versions)
+    GFF_SUMMARY(COMBINED_GENE_CALLER.out.gff.join(
+        FUNCTIONAL_ANNOTATION.out.interproscan_tsv
+        ).join(
+            FUNCTIONAL_ANNOTATION.out.eggnog_annotations
+        ).join(
+            FUNCTIONAL_ANNOTATION.out.dbcan_overview
+        ).join(
+            FUNCTIONAL_ANNOTATION.out.dbcan_hmm
+        ).join(
+            PATHWAYS_AND_SYSTEMS.out.sanntis_gff
+        ).join(
+            PATHWAYS_AND_SYSTEMS.out.antismash_gff
+        )
+    )
+    ch_versions = ch_versions.mix(GFF_SUMMARY.out.versions)
 
     //
     // Collate and save software versions
