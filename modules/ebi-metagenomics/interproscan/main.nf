@@ -5,11 +5,19 @@ process INTERPROSCAN {
     container 'microbiome-informatics/interproscan:5.73-104.0'
 
     containerOptions {
-        if (workflow.containerEngine == 'singularity') {
-            return "--bind ${interproscan_db}:/opt/interproscan/data"
-        } else {
-            return "-v ${task.workDir}/${interproscan_db}:/opt/interproscan/data"
+        def containerArgs = []
+        def mountArg = (workflow.containerEngine == 'singularity') ? "--bind" : "--volume"
+
+        containerArgs << "${mountArg} ${task.workDir}/${interproscan_db}/data:/opt/interproscan/data"
+
+        if ( params.interpro_licensed_software ) {
+            def licensedSoftwarePath = "${task.workDir}/${interproscan_db}/licensed"
+            containerArgs << "${mountArg} ${licensedSoftwarePath}:/opt/interproscan/licensed"
+            // This override is needed otherwise it fails because this path seems to be hardcoded in the container
+            containerArgs << "${mountArg} ${licensedSoftwarePath}/signalp:/usr/opt/www/pub/CBS/services/SignalP-4.1/signalp-4.1"
         }
+
+        return containerArgs.join(' ')
     }
 
     input:
