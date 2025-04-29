@@ -2,17 +2,16 @@ process SANNTIS_SUMMARY {
     tag "${meta.id}"
     label 'process_low'
 
-    //container "${ workflow.containerEngine == 'singularity' && !task.ext.singularity_pull_docker_container ?
-    //    "https://depot.galaxyproject.org/singularity/mgnify-pipelines-toolkit:${params.mpt_version}":
-    //    "biocontainers/mgnify-pipelines-toolkit:${params.mpt_version}" }"
-    container "community.wave.seqera.io/library/pip_mgnify-pipelines-toolkit:2764846cec7da9cf"
+    container "${workflow.containerEngine == 'singularity' && !task.ext.singularity_pull_docker_container
+        ? "https://depot.galaxyproject.org/singularity/mgnify-pipelines-toolkit:${params.mpt_version}"
+        : "biocontainers/mgnify-pipelines-toolkit:${params.mpt_version}"}"
 
     input:
     tuple val(meta), path(sanntis_gff)
 
     output:
     tuple val(meta), path("*_summary.tsv.gz"), emit: sanntis_summary
-    path "versions.yml"                      , emit: versions
+    path "versions.yml",                       emit: versions
 
     script:
     """

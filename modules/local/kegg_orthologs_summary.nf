@@ -15,7 +15,7 @@ process KEGG_ORTHOLOGS_SUMMARY {
     tuple val(meta), path("${prefix}_ko_summary.tsv.gz"),        emit: ko_summary_tsv
     tuple val(meta), path("${prefix}_ko_summary.tsv.gz.gzi"),    emit: ko_summary_tsv_gzi
     tuple val(meta), path("${prefix}_ko_per_contig.tsv.gz"),     emit: ko_per_contig_tsv
-    tuple val(meta), path("${prefix}_ko_per_contig.tsv.gz.gzi"), emit: ko_per_contig_tsb_gzi
+    tuple val(meta), path("${prefix}_ko_per_contig.tsv.gz.gzi"), emit: ko_per_contig_tsv_gzi
     path "versions.yml",                                         emit: versions
 
     when:

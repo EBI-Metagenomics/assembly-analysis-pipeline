@@ -261,6 +261,22 @@ workflow ASSEMBLY_ANALYSIS_PIPELINE {
         [],
     )
 
+    /***********************/
+    /* Per assembly report */
+    /***********************/
+
+    // This needs to be extended with assemblies that don't have annotations,
+    // specifically those without IPS annotations or BGC. We need to retrieve
+    // examples of these assemblies from the current backlog database.
+
+    GFF_SUMMARY.out.gff_summary
+        .map { meta, __ ->
+            {
+                return "${meta.id},success"
+            }
+        }
+        .collectFile(name: "analysed_assemblies.csv", storeDir: "${params.outdir}", newLine: true, cache: false)
+
     emit:
     multiqc_report = MULTIQC_PER_SAMPLESHEET.out.report.toList() // channel: /path/to/multiqc_report.html
     versions       = ch_versions // channel: [ path(versions.yml) ]

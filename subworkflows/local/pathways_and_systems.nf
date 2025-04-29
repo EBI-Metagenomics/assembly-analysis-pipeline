@@ -146,18 +146,15 @@ workflow PATHWAYS_AND_SYSTEMS {
     )
     ch_versions = ch_versions.mix(SANNTIS.out.versions)
 
-
     CONCATENATE_SANNTIS_GFFS(
         SANNTIS.out.gff.groupTuple()
     )
     ch_versions = ch_versions.mix(CONCATENATE_SANNTIS_GFFS.out.versions)
 
-
     SANNTIS_SUMMARY(
         CONCATENATE_SANNTIS_GFFS.out.concatenated_gff
     )
     ch_versions = ch_versions.mix(SANNTIS_SUMMARY.out.versions)
-
 
     /*
     * DRAM distill - per assembly and for the whole samplesheet
