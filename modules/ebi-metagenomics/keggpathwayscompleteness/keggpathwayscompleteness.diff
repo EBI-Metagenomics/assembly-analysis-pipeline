@@ -1,4 +1,7 @@
-Changes in module 'ebi-metagenomics/keggpathwayscompleteness'
+Changes in component 'ebi-metagenomics/keggpathwayscompleteness'
+'modules/ebi-metagenomics/keggpathwayscompleteness/environment.yml' is unchanged
+'modules/ebi-metagenomics/keggpathwayscompleteness/meta.yml' is unchanged
+Changes in 'keggpathwayscompleteness/main.nf':
 --- modules/ebi-metagenomics/keggpathwayscompleteness/main.nf
 +++ modules/ebi-metagenomics/keggpathwayscompleteness/main.nf
 @@ -5,48 +5,64 @@
@@ -18,7 +21,7 @@ Changes in module 'ebi-metagenomics/keggpathwayscompleteness'
 -    tuple val(meta), path("*_contigs.tsv") , emit: kegg_contigs
 -    tuple val(meta), path("*_pathways.tsv"), emit: kegg_pathways
 -    path "versions.yml"                    , emit: versions
-+    tuple val(meta), path("${prefix}_kegg_modules_summary.tsv"),                      emit: kegg_pathways
++    tuple val(meta), path("${prefix}_kegg_modules_summary.tsv"),              emit: kegg_pathways
 +    tuple val(meta), path("${prefix}_kegg_modules_per_contigs.tsv"),          emit: kegg_pathways_per_contig
 +    tuple val(meta), path("${prefix}_aggregated_kos_per_contig.tsv.gz"),      emit: kos_aggregated_by_contig
 +    path "versions.yml",                                                      emit: versions
@@ -76,7 +79,7 @@ Changes in module 'ebi-metagenomics/keggpathwayscompleteness'
      """
 -    touch ${prefix}.kegg_contigs.tsv
 -    touch ${prefix}.kegg_pathways.tsv
-+    touch ${prefix}_kegg_modules.tsv
++    touch ${prefix}_kegg_modules_summary.tsv
 +    touch ${prefix}_kegg_modules_per_contigs.tsv
 +    touch ${prefix}_aggregated_kos_per_contig.tsv.gz
  
@@ -88,4 +91,9 @@ Changes in module 'ebi-metagenomics/keggpathwayscompleteness'
      """
  }
 
+'modules/ebi-metagenomics/keggpathwayscompleteness/tests/main.nf.test.snap' is unchanged
+'modules/ebi-metagenomics/keggpathwayscompleteness/tests/tags.yml' is unchanged
+'modules/ebi-metagenomics/keggpathwayscompleteness/tests/main.nf.test' is unchanged
+'modules/ebi-metagenomics/keggpathwayscompleteness/tests/fixtures/test_kos.txt' is unchanged
+'modules/ebi-metagenomics/keggpathwayscompleteness/tests/fixtures/test_filtered.tbl' is unchanged
 ************************************************************

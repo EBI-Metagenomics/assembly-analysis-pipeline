@@ -56,7 +56,7 @@ process KEGGPATHWAYSCOMPLETENESS {
     stub:
     prefix = task.ext.prefix ?: "${meta.id}"
     """
-    touch ${prefix}_kegg_modules.tsv
+    touch ${prefix}_kegg_modules_summary.tsv
     touch ${prefix}_kegg_modules_per_contigs.tsv
     touch ${prefix}_aggregated_kos_per_contig.tsv.gz
 

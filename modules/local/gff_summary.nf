@@ -17,7 +17,7 @@ process GFF_SUMMARY {
         -hmm ${dbcan_hmm} \\
         -ov ${dbcan_overview} \\
         -g ${cds} \\
-        -v 4.1.4 \\
+        -v ${params.dbcan_database_version} \\
         -o ${meta.id}_dbcan_cazys.gff
 
     gff_toolkit \\
