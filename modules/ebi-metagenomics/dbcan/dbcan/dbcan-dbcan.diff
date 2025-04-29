@@ -1,0 +1,45 @@
+Changes in component 'ebi-metagenomics/dbcan/dbcan'
+'modules/ebi-metagenomics/dbcan/dbcan/environment.yml' is unchanged
+'modules/ebi-metagenomics/dbcan/dbcan/meta.yml' is unchanged
+Changes in 'dbcan/dbcan/main.nf':
+--- modules/ebi-metagenomics/dbcan/dbcan/main.nf
++++ modules/ebi-metagenomics/dbcan/dbcan/main.nf
+@@ -38,6 +38,9 @@
+     def args = task.ext.args ?: ''
+     prefix = task.ext.prefix ?: "${meta.id}"
+     """
++    gunzip ${fasta}
++    gunzip ${gff}
++
+     run_dbcan \\
+         --dia_cpu ${task.cpus} \\
+         --hmm_cpu ${task.cpus} \\
+@@ -46,7 +49,7 @@
+         --db_dir dbcan_db \\
+         --out_dir results \\
+         ${args} \\
+-        ${fasta} \\
++        ${fasta.name.replace(".gz", "")} \\
+         ${mode}
+ 
+     # Bulk rename of the results, dbcan has a prefix parameter but it breaks when (for example) using --clusters and/or --cgc_substrate
+
+'modules/ebi-metagenomics/dbcan/dbcan/tests/main.nf.test.snap' is unchanged
+'modules/ebi-metagenomics/dbcan/dbcan/tests/nextflow.config' is unchanged
+'modules/ebi-metagenomics/dbcan/dbcan/tests/main.nf.test' is unchanged
+'modules/ebi-metagenomics/dbcan/dbcan/tests/dbcan_test_db/ecoliK12MG1655_test.gff' is unchanged
+'modules/ebi-metagenomics/dbcan/dbcan/tests/dbcan_test_db/dbCAN_sub.hmm' is unchanged
+'modules/ebi-metagenomics/dbcan/dbcan/tests/dbcan_test_db/fam-substrate-mapping.tsv' is unchanged
+'modules/ebi-metagenomics/dbcan/dbcan/tests/dbcan_test_db/PUL.faa' is unchanged
+'modules/ebi-metagenomics/dbcan/dbcan/tests/dbcan_test_db/PUL.faa.psq' is unchanged
+'modules/ebi-metagenomics/dbcan/dbcan/tests/dbcan_test_db/dbCAN.txt' is unchanged
+'modules/ebi-metagenomics/dbcan/dbcan/tests/dbcan_test_db/stp.hmm' is unchanged
+'modules/ebi-metagenomics/dbcan/dbcan/tests/dbcan_test_db/ecoliK12MG1655_test.faa' is unchanged
+'modules/ebi-metagenomics/dbcan/dbcan/tests/dbcan_test_db/tcdb.fa' is unchanged
+'modules/ebi-metagenomics/dbcan/dbcan/tests/dbcan_test_db/PUL.faa.pto' is unchanged
+'modules/ebi-metagenomics/dbcan/dbcan/tests/dbcan_test_db/PUL.faa.pot' is unchanged
+'modules/ebi-metagenomics/dbcan/dbcan/tests/dbcan_test_db/tf-1.hmm' is unchanged
+'modules/ebi-metagenomics/dbcan/dbcan/tests/dbcan_test_db/CAZyDB.fa' is unchanged
+'modules/ebi-metagenomics/dbcan/dbcan/tests/dbcan_test_db/tf-2.hmm' is unchanged
+'modules/ebi-metagenomics/dbcan/dbcan/tests/dbcan_test_db/dbCAN-PUL/PUL0111.out/cgc.gff' is unchanged
+************************************************************

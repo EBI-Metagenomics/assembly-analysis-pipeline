@@ -1,0 +1,65 @@
+nextflow_process {
+
+    name "Test Process COMBINEDGENECALLER_MERGE"
+    script "../main.nf"
+    process "COMBINEDGENECALLER_MERGE"
+
+    tag "modules"
+    tag "modules_ebimetagenomics"
+    tag "combinedgenecaller"
+    tag "combinedgenecaller/merge"
+
+    test("combinedgenecaller merge without a maskfile") {
+
+        when {
+            process {
+                """
+                input[0] = [
+                    [ id:'test', single_end:false ],
+                    file(params.mgnify_pipelines_toolkit_testdata + '/combined_gene_caller_merge/input_pyrodigal.gff', checkIfExists: true),
+                    file(params.mgnify_pipelines_toolkit_testdata + '/combined_gene_caller_merge/input_pyrodigal.ffn', checkIfExists: true),
+                    file(params.mgnify_pipelines_toolkit_testdata + '/combined_gene_caller_merge/input_pyrodigal.faa', checkIfExists: true),
+                    file(params.mgnify_pipelines_toolkit_testdata + '/combined_gene_caller_merge/input_fgsrs.gff', checkIfExists: true),
+                    file(params.mgnify_pipelines_toolkit_testdata + '/combined_gene_caller_merge/input_fgsrs.ffn', checkIfExists: true),
+                    file(params.mgnify_pipelines_toolkit_testdata + '/combined_gene_caller_merge/input_fgsrs.faa', checkIfExists: true),
+                    []
+                ]
+                """
+            }
+        }
+
+        then {
+            assertAll(
+                { assert process.success },
+                { assert snapshot(process.out).match() }
+            )
+        }
+    }
+
+    test("combinedgenecaller merge with a maskfile") {
+
+        when {
+            process {
+                """
+                input[0] = [
+                    [ id:'test', single_end:false ], // meta map
+                    file(params.mgnify_pipelines_toolkit_testdata + '/combined_gene_caller_merge/input_pyrodigal.gff', checkIfExists: true),
+                    file(params.mgnify_pipelines_toolkit_testdata + '/combined_gene_caller_merge/input_pyrodigal.ffn', checkIfExists: true),
+                    file(params.mgnify_pipelines_toolkit_testdata + '/combined_gene_caller_merge/input_pyrodigal.faa', checkIfExists: true),
+                    file(params.mgnify_pipelines_toolkit_testdata + '/combined_gene_caller_merge/input_fgsrs.gff', checkIfExists: true),
+                    file(params.mgnify_pipelines_toolkit_testdata + '/combined_gene_caller_merge/input_fgsrs.ffn', checkIfExists: true),
+                    file(params.mgnify_pipelines_toolkit_testdata + '/combined_gene_caller_merge/input_fgsrs.faa', checkIfExists: true),
+                    file(params.mgnify_pipelines_toolkit_testdata + '/combined_gene_caller_merge/cmsearch.all.tblout.deoverlapped', checkIfExists: true),
+                ]
+                """
+            }
+        }
+
+        then {
+            assertAll(
+                { assert process.success },
+                { assert snapshot(process.out).match() }
+            )
+        }
+    }
+}

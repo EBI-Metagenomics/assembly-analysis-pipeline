@@ -1,0 +1,214 @@
+{
+    "keggpathwayscompleteness - warn because both inputs specified": {
+        "content": [
+            {
+                "0": [
+                    [
+                        {
+                            "id": "test",
+                            "single_end": false
+                        },
+                        "test.summary.kegg_contigs.tsv:md5,d18735f58cc8593bd7abc0270e1af891"
+                    ]
+                ],
+                "1": [
+                    [
+                        {
+                            "id": "test",
+                            "single_end": false
+                        },
+                        "test.summary.kegg_pathways.tsv:md5,e6538c3dd00b1ffb015780a90003f81d"
+                    ]
+                ],
+                "2": [
+                    "versions.yml:md5,fdc86d119def3d1ab9b14546eb3efe4a"
+                ],
+                "kegg_contigs": [
+                    [
+                        {
+                            "id": "test",
+                            "single_end": false
+                        },
+                        "test.summary.kegg_contigs.tsv:md5,d18735f58cc8593bd7abc0270e1af891"
+                    ]
+                ],
+                "kegg_pathways": [
+                    [
+                        {
+                            "id": "test",
+                            "single_end": false
+                        },
+                        "test.summary.kegg_pathways.tsv:md5,e6538c3dd00b1ffb015780a90003f81d"
+                    ]
+                ],
+                "versions": [
+                    "versions.yml:md5,fdc86d119def3d1ab9b14546eb3efe4a"
+                ]
+            }
+        ],
+        "meta": {
+            "nf-test": "0.8.4",
+            "nextflow": "23.04.3"
+        },
+        "timestamp": "2024-07-09T10:15:54.832804727"
+    },
+    "keggpathwayscompleteness - filtered_tbl": {
+        "content": [
+            {
+                "0": [
+                    [
+                        {
+                            "id": "test",
+                            "single_end": false
+                        },
+                        "test.summary.kegg_contigs.tsv:md5,a31fd7add583c5f29f39144d2009948f"
+                    ]
+                ],
+                "1": [
+                    [
+                        {
+                            "id": "test",
+                            "single_end": false
+                        },
+                        "test.summary.kegg_pathways.tsv:md5,44d303bdd75a8965ab6b519f8ab32db2"
+                    ]
+                ],
+                "2": [
+                    "versions.yml:md5,fdc86d119def3d1ab9b14546eb3efe4a"
+                ],
+                "kegg_contigs": [
+                    [
+                        {
+                            "id": "test",
+                            "single_end": false
+                        },
+                        "test.summary.kegg_contigs.tsv:md5,a31fd7add583c5f29f39144d2009948f"
+                    ]
+                ],
+                "kegg_pathways": [
+                    [
+                        {
+                            "id": "test",
+                            "single_end": false
+                        },
+                        "test.summary.kegg_pathways.tsv:md5,44d303bdd75a8965ab6b519f8ab32db2"
+                    ]
+                ],
+                "versions": [
+                    "versions.yml:md5,fdc86d119def3d1ab9b14546eb3efe4a"
+                ]
+            }
+        ],
+        "meta": {
+            "nf-test": "0.8.4",
+            "nextflow": "23.04.3"
+        },
+        "timestamp": "2024-07-09T09:44:04.378610297"
+    },
+    "keggpathwayscompleteness - stub": {
+        "content": [
+            {
+                "0": [
+                    [
+                        {
+                            "id": "test",
+                            "single_end": false
+                        },
+                        "test.kegg_contigs.tsv:md5,d41d8cd98f00b204e9800998ecf8427e"
+                    ]
+                ],
+                "1": [
+                    [
+                        {
+                            "id": "test",
+                            "single_end": false
+                        },
+                        "test.kegg_pathways.tsv:md5,d41d8cd98f00b204e9800998ecf8427e"
+                    ]
+                ],
+                "2": [
+                    "versions.yml:md5,fdc86d119def3d1ab9b14546eb3efe4a"
+                ],
+                "kegg_contigs": [
+                    [
+                        {
+                            "id": "test",
+                            "single_end": false
+                        },
+                        "test.kegg_contigs.tsv:md5,d41d8cd98f00b204e9800998ecf8427e"
+                    ]
+                ],
+                "kegg_pathways": [
+                    [
+                        {
+                            "id": "test",
+                            "single_end": false
+                        },
+                        "test.kegg_pathways.tsv:md5,d41d8cd98f00b204e9800998ecf8427e"
+                    ]
+                ],
+                "versions": [
+                    "versions.yml:md5,fdc86d119def3d1ab9b14546eb3efe4a"
+                ]
+            }
+        ],
+        "meta": {
+            "nf-test": "0.8.4",
+            "nextflow": "23.04.3"
+        },
+        "timestamp": "2024-07-09T09:25:11.02773529"
+    },
+    "keggpathwayscompleteness - KO list": {
+        "content": [
+            {
+                "0": [
+                    [
+                        {
+                            "id": "test",
+                            "single_end": false
+                        },
+                        "test.summary.kegg_contigs.tsv:md5,d18735f58cc8593bd7abc0270e1af891"
+                    ]
+                ],
+                "1": [
+                    [
+                        {
+                            "id": "test",
+                            "single_end": false
+                        },
+                        "test.summary.kegg_pathways.tsv:md5,e6538c3dd00b1ffb015780a90003f81d"
+                    ]
+                ],
+                "2": [
+                    "versions.yml:md5,fdc86d119def3d1ab9b14546eb3efe4a"
+                ],
+                "kegg_contigs": [
+                    [
+                        {
+                            "id": "test",
+                            "single_end": false
+                        },
+                        "test.summary.kegg_contigs.tsv:md5,d18735f58cc8593bd7abc0270e1af891"
+                    ]
+                ],
+                "kegg_pathways": [
+                    [
+                        {
+                            "id": "test",
+                            "single_end": false
+                        },
+                        "test.summary.kegg_pathways.tsv:md5,e6538c3dd00b1ffb015780a90003f81d"
+                    ]
+                ],
+                "versions": [
+                    "versions.yml:md5,fdc86d119def3d1ab9b14546eb3efe4a"
+                ]
+            }
+        ],
+        "meta": {
+            "nf-test": "0.8.4",
+            "nextflow": "23.04.3"
+        },
+        "timestamp": "2024-07-09T09:25:03.771670203"
+    }
+}

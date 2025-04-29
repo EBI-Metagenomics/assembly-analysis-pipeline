@@ -1,0 +1,29 @@
+Changes in component 'ebi-metagenomics/catpack/contigs'
+'modules/ebi-metagenomics/catpack/contigs/environment.yml' is unchanged
+'modules/ebi-metagenomics/catpack/contigs/meta.yml' is unchanged
+Changes in 'catpack/contigs/main.nf':
+--- modules/ebi-metagenomics/catpack/contigs/main.nf
++++ modules/ebi-metagenomics/catpack/contigs/main.nf
+@@ -29,12 +29,15 @@
+     script:
+     def args = task.ext.args ?: ''
+     def prefix = task.ext.prefix ?: "${meta.id}"
+-    def premade_proteins = proteins ? "--proteins_fasta ${proteins}" : ''
++    def premade_proteins = proteins ? "--proteins_fasta ${proteins.name.replace(".gz", "")}" : ''
+     def premade_table = diamond_table ? "--diamond_alignment ${diamond_table}" : ''
+     """
++    gunzip ${contigs}
++    gunzip ${proteins}
++
+     CAT_pack contigs \\
+         --nproc ${task.cpus} \\
+-        --contigs_fasta ${contigs} \\
++        --contigs_fasta ${contigs.name.replace(".gz", "")} \\
+         --database_folder ${database} \\
+         --taxonomy_folder ${taxonomy} \\
+         --out_prefix ${prefix} \\
+
+'modules/ebi-metagenomics/catpack/contigs/tests/main.nf.test.snap' is unchanged
+'modules/ebi-metagenomics/catpack/contigs/tests/nextflow.config' is unchanged
+'modules/ebi-metagenomics/catpack/contigs/tests/main.nf.test' is unchanged
+************************************************************

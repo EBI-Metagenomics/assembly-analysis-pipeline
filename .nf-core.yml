@@ -1,22 +1,22 @@
 repository_type: pipeline
 
-nf_core_version: 3.1.1
+nf_core_version: 3.2.0
+
+org_path: null
 
 lint:
   files_unchanged:
     - .prettierignore
-    - .prettierignore
-    - .prettierignore
-    - .prettierignore
     - CODE_OF_CONDUCT.md
-    - assets/nf-core-assembly-analysis-pipeline_logo_light.png
-    - docs/images/nf-core-assembly-analysis-pipeline_logo_light.png
-    - docs/images/nf-core-assembly-analysis-pipeline_logo_dark.png
+    - assets/ebi-metagenomics-assembly_analysis_pipeline_logo_light.png
     - .github/ISSUE_TEMPLATE/bug_report.yml
     - .github/CONTRIBUTING.md
     - .github/PULL_REQUEST_TEMPLATE.md
     - assets/email_template.txt
     - docs/README.md
+    - assets/email_template.html
+    - assets/sendmail_template.txt
+    - LICENSE
   nextflow_config:
     - manifest.name
     - manifest.homePage
@@ -27,6 +27,8 @@ lint:
   multiqc_config:
     - report_comment
   files_exist:
+    - .github/workflows/linting_comment.yml
+    - .github/workflows/branch.yml
     - conf/igenomes.config
     - conf/igenomes_ignored.config
     - CHANGELOG.md
@@ -40,10 +42,18 @@ lint:
     - .github/ISSUE_TEMPLATE/config.yml
     - .github/workflows/awstest.yml
     - .github/workflows/awsfulltest.yml
+  merge_markers:
+    - subworkflows/ebi-metagenomics/detect_rna/tests/rfam/test.cm.i1p
+    - subworkflows/ebi-metagenomics/detect_rna/tests/rfam/test.cm.i1m
+    - subworkflows/ebi-metagenomics/detect_rna/tests/rfam/test.cm.i1m
+  template_strings:
+    - subworkflows/ebi-metagenomics/detect_rna/tests/rfam/test.cm.i1p
+    - subworkflows/ebi-metagenomics/detect_rna/tests/rfam/test.cm.i1m
+    - subworkflows/ebi-metagenomics/detect_rna/tests/rfam/test.cm.i1m
 
 template:
   org: ebi-metagenomics
-  name: assembly-analysis-pipeline
+  name: assembly_analysis_pipeline
   description: MGnify's assembly analysis pipeline performs taxonomic classification,
     protein function prediction, and identifies metabolic pathways and biosynthetic
     gene clusters.

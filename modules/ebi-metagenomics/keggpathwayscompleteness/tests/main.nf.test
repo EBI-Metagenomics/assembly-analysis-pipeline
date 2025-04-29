@@ -1,0 +1,104 @@
+
+nextflow_process {
+
+    name "Test Process KEGGPATHWAYSCOMPLETENESS"
+    script "../main.nf"
+    process "KEGGPATHWAYSCOMPLETENESS"
+
+    tag "modules"
+    tag "modules_nfcore"
+    tag "keggpathwayscompleteness"
+
+    test("keggpathwayscompleteness - filtered_tbl") {
+
+        when {
+            process {
+                """                
+                input[0] = [
+                    [ id:'test', single_end:false ], // meta map
+                    file("${moduleDir}/tests/fixtures/test_filtered.tbl", checkIfExists: true),
+                    []
+                    ]
+                """
+            }
+        }
+
+        then {
+            assertAll(
+                { assert process.success },
+                { assert snapshot(process.out).match() }
+            )
+        }
+
+    }
+
+    test("keggpathwayscompleteness - KO list") {
+
+        when {
+            process {
+                """                
+                input[0] = [
+                    [ id:'test', single_end:false ], // meta map
+                    [],
+                    file("${moduleDir}/tests/fixtures/test_kos.txt", checkIfExists: true)
+                    ]
+                """
+            }
+        }
+
+        then {
+            assertAll(
+                { assert process.success },
+                { assert snapshot(process.out).match() }
+            )
+        }
+
+    }
+
+    test("keggpathwayscompleteness - warn because both inputs specified") {
+
+        when {
+            process {
+                """
+                input[0] = [
+                    [ id:'test', single_end:false ], // meta map
+                    file("${moduleDir}/tests/fixtures/test_filtered.tbl", checkIfExists: true),
+                    file("${moduleDir}/tests/fixtures/test_kos.txt", checkIfExists: true)
+                    ]
+                """
+            }
+        }
+
+        then {
+            assertAll(
+                { assert process.success },
+                { assert snapshot(process.out).match() }
+            )
+        }
+
+    }
+
+    test("keggpathwayscompleteness - stub") {
+
+        options "-stub"
+
+        when {
+            process {
+                """                
+                input[0] = [
+                    [ id:'test', single_end:false ], // meta map
+                    file("${moduleDir}/tests/fixtures/test_filtered.tbl", checkIfExists: true),
+                    []
+                    ]
+                """
+            }
+        }
+
+        then {
+            assertAll(
+                { assert process.success },
+                { assert snapshot(process.out).match() }
+            )
+        }
+    }
+}

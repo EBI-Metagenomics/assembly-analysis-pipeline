@@ -43,6 +43,250 @@
                 }
             }
         },
+        "contigs_filtering_thresholds": {
+            "title": "Contigs Filtering Thresholds",
+            "type": "object",
+            "description": "Set of threshold values used when filtering contigs.",
+            "properties": {
+                "min_contig_length": {
+                    "type": "integer",
+                    "default": 500,
+                    "description": "Minimum length of a contig; contigs shorter than this will not be considered by the pipeline.",
+                    "fa_icon": "fas fa-weight"
+                },
+                "bgc_min_contig_length": {
+                    "type": "integer",
+                    "default": 1000,
+                    "description": "Minimum length of a contig to be analyzed by the Biosynthetic Gene Cluster subworkflow.",
+                    "fa_icon": "fas fa-weight"
+                }
+            },
+            "fa_icon": "fas fa-cut"
+        },
+        "nucleotide_and_protein_fasta_file_chunking_options": {
+            "title": "Nucleotide and protein fasta file chunking options",
+            "type": "object",
+            "description": "Chunking input fasta files is used to parallelize the execution of some tools",
+            "properties": {
+                "proteins_chunksize": {
+                    "type": "integer",
+                    "default": 10000000,
+                    "description": "Number of amino acids each chunk should contain. The proteins are not truncated, and this is the maximum value a record can have per chunk.",
+                    "fa_icon": "fas fa-weight"
+                },
+                "bgc_contigs_chunksize": {
+                    "type": "string",
+                    "default": "50M",
+                    "description": "Number of nucleotide base pairs each chunk should contain. The proteins are not truncated, and this is the maximum value a record can have per chunk."
+                }
+            },
+            "fa_icon": "fas fa-cut"
+        },
+        "tools_settings": {
+            "title": "Settings for some of the tools of the pipeline",
+            "type": "object",
+            "description": "Settings meant to tweak some parameters of the tools used in the pipeline.",
+            "default": "",
+            "properties": {
+                "cgc_merge_priority": {
+                    "type": "string",
+                    "default": "Pyrodigal_FragGeneScanRS",
+                    "enum": ["Pyrodigal_FragGeneScanRS", "FragGeneScanRS_Pyrodigal"],
+                    "description": "Training model for FragGeneScan.",
+                    "help": "The gene caller merge priority for the combined gene caller"
+                },
+                "fraggenescanrs_train_model": {
+                    "type": "string",
+                    "default": "illumina_5",
+                    "format": "string",
+                    "description": "Training model for FragGeneScan.",
+                    "help": "Specify the training model to use for gene prediction. Default is 'illumina_5'."
+                },
+                "mpt_version": {
+                    "type": "string",
+                    "default": "1.0.8--pyhdfd78af_0",
+                    "description": "General version of mgnify-pipeline-toolkit",
+                    "help": "Keeps all mpt tools updated and synced to chosen release."
+                }
+            },
+            "fa_icon": "fas fa-database"
+        },
+        "reference_databases": {
+            "title": "Reference databases for the pipeline",
+            "type": "object",
+            "description": "Paths to the different reference databases needed for the pipeline",
+            "default": "",
+            "properties": {
+                "interproscan_database": {
+                    "type": "string",
+                    "format": "directory-path",
+                    "fa_icon": "fas fa-folder-open",
+                    "description": "Path to the interproscan database (untarred ftp://ftp.ebi.ac.uk/pub/software/unix/iprscan/5/${version_major}-${version_minor}/interproscan-${version_major}-${version_minor}-64-bit.tar.gz)"
+                },
+                "interproscan_database_version": {
+                    "type": "string",
+                    "default": "5.73-104.0",
+                    "description": "The version of the interproscan database.",
+                    "fa_icon": "fas fa-code-branch"
+                },
+                "interpro_licensed_software": {
+                    "type": "boolean",
+                    "default": false,
+                    "description": "Enables the use of licensed software in InterProScan. Set to true if the required licensed software is in the licensed database folder, https://interproscan-docs.readthedocs.io/en/v5/HowToRun.html#included-analyses.",
+                    "fa_icon": "fas fa-file-contract"
+                },
+                "eggnog_database": {
+                    "type": "string",
+                    "format": "file-path",
+                    "fa_icon": "fas fa-database",
+                    "description": "The EggNOG reference database folder, https://github.com/eggnogdb/eggnog-mapper/wiki/eggNOG-mapper-v2.1.5-to-v2.1.12#requirements",
+                    "help_text": "Set this variable to the path of the uncompressed tarball for the database."
+                },
+                "eggnog_data_dir": {
+                    "type": "string",
+                    "format": "directory-path",
+                    "fa_icon": "fas fa-database",
+                    "description": "Directory containing eggnog database files"
+                },
+                "eggnog_diamond_database": {
+                    "type": "string",
+                    "format": "file-path",
+                    "fa_icon": "fas fa-database",
+                    "description": "The eggnog Diamond protein database file"
+                },
+                "eggnog_database_version": {
+                    "type": "string",
+                    "default": "5.0.2",
+                    "description": "The EggNOG reference database version.",
+                    "fa_icon": "fas fa-code-branch"
+                },
+                "dbcan_database": {
+                    "type": "string",
+                    "format": "directory-path",
+                    "description": "The dbCAN reference database path.",
+                    "fa_icon": "fas fa-database"
+                },
+                "dbcan_database_version": {
+                    "type": "string",
+                    "default": "4.1.4-V13",
+                    "description": "The dbCAN reference database version.",
+                    "fa_icon": "fas fa-code-branch"
+                },
+                "uniref90rhea_diamond_database": {
+                    "type": "string",
+                    "format": "file-path",
+                    "description": "This is a diamond database created from the Uniref90 ammended with Rhea and CHEMI annotations.",
+                    "fa_icon": "fas fa-database",
+                    "help_text": "Path to user-defined local Uniref90 + Rhea and CHEMI annotations diamond database file."
+                },
+                "uniref90rhea_diamond_database_version": {
+                    "type": "string",
+                    "default": "2025_01",
+                    "description": "The version of the UniRef90 used to generate the database.",
+                    "fa_icon": "fas fa-database"
+                },
+                "rheachebi_mapping_tsv": {
+                    "type": "string",
+                    "format": "file-path",
+                    "description": "TODO",
+                    "fa_icon": "fas fa-database",
+                    "help_text": "TODO"
+                },
+                "kofam_hmm_database": {
+                    "type": "string",
+                    "format": "file-path",
+                    "description": "TODO",
+                    "fa_icon": "fas fa-database",
+                    "help_text": "TODO"
+                },
+                "ko_list_txt": {
+                    "type": "string",
+                    "format": "file-path",
+                    "description": "KEGG Orthologs list, this is the TSV that you can obtain from ftp://ftp.genome.jp/pub/db/kofam/ko_list.gz",
+                    "fa_icon": "fas fa-database",
+                    "help_text": "This file is used to get the descriptions from the KO entries in this pipeline summary files."
+                },
+                "go_obo": {
+                    "type": "string",
+                    "format": "file-path",
+                    "description": "Gene ontology .OBO file, for example go-basic. Can usually be downloaded here https://geneontology.org/docs/download-ontology/",
+                    "fa_icon": "fas fa-database",
+                    "help_text": "Path to the .obo file"
+                },
+                "goslim_ids": {
+                    "type": "string",
+                    "format": "file-path",
+                    "description": "Text file containing the GO terms that make up the input GO-slim",
+                    "fa_icon": "fas fa-database",
+                    "help_text": "Path to the GO terms txt file, to make the GO-slim"
+                },
+                "go_banding": {
+                    "type": "string",
+                    "format": "file-path",
+                    "description": "Text file containing the GO terms and descriptions that make up the input GO-slim",
+                    "fa_icon": "fas fa-database",
+                    "help_text": "Path to the GO terms and descriptions, to make the GO-slim"
+                },
+                "rfam_cm": {
+                    "type": "string",
+                    "format": "file-path",
+                    "description": "Path to the Rfam covariance model file to use with cmsearch/cmscan.",
+                    "help": "This file contains the covariance model for RNA families from the Rfam database."
+                },
+                "rfam_claninfo": {
+                    "type": "string",
+                    "format": "file-path",
+                    "description": "Path to the Rfam clan information file.",
+                    "help": "This file provides information about the clans of RNA families in the Rfam database."
+                },
+                "rfam_version": {
+                    "type": "string",
+                    "format": "string",
+                    "description": "Version of the Rfam database being used.",
+                    "help": "Specify the version of the Rfam database to ensure compatibility with the models.",
+                    "default": "15"
+                },
+                "cat_diamond_database": {
+                    "type": "string",
+                    "format": "directory-path",
+                    "description": "Directory containing the CAT database produced with catpack/prepare.",
+                    "help": "The folder must contain DIAMOND db *.dmnd, *.fastaid2LCAtaxid, *.taxids_with_multiple_offspring."
+                },
+                "cat_taxonomy_database": {
+                    "type": "string",
+                    "format": "directory-path",
+                    "description": "Directory containing the tax/ folder of the CAT database produced with catpack/prepare.",
+                    "help": "The folder must contain names.dmp and nodes.dmp"
+                },
+                "antismash_database": {
+                    "type": "string",
+                    "format": "directory-path",
+                    "description": "Path to user-defined local antiSMASH database.",
+                    "fa_icon": "fas fa-database",
+                    "help_text": "Pre downloaded antiSMASH databases, TODO: https://nf-co.re/funcscan/usage#antismash-1 this docs."
+                },
+                "antismash_database_version": {
+                    "type": "string",
+                    "default": "7.1.0",
+                    "description": "The version of the antiSMASH database.",
+                    "fa_icon": "fas fa-database"
+                },
+                "dram_databases": {
+                    "type": "string",
+                    "format": "directory-path",
+                    "description": "Path to user-defined local DRAM databases folder.",
+                    "fa_icon": "fas fa-database",
+                    "help_text": "DRAM version 1.3 databases, these are required to run the distill module"
+                },
+                "dram_databases_version": {
+                    "type": "string",
+                    "default": "1.3.0",
+                    "description": "The version of the DRAM databases.",
+                    "fa_icon": "fas fa-database"
+                }
+            },
+            "fa_icon": "fas fa-database"
+        },
         "institutional_config_options": {
             "title": "Institutional config options",
             "type": "object",
@@ -185,6 +429,18 @@
     "allOf": [
         {
             "$ref": "#/$defs/input_output_options"
+        },
+        {
+            "$ref": "#/$defs/contigs_filtering_thresholds"
+        },
+        {
+            "$ref": "#/$defs/nucleotide_and_protein_fasta_file_chunking_options"
+        },
+        {
+            "$ref": "#/$defs/tools_settings"
+        },
+        {
+            "$ref": "#/$defs/reference_databases"
         },
         {
             "$ref": "#/$defs/institutional_config_options"

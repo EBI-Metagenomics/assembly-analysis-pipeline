@@ -1,0 +1,28 @@
+Changes in module 'ebi-metagenomics/generategaf'
+--- modules/ebi-metagenomics/generategaf/main.nf
++++ modules/ebi-metagenomics/generategaf/main.nf
+@@ -5,8 +5,8 @@
+ 
+     conda "${moduleDir}/environment.yml"
+     container "${ workflow.containerEngine == 'singularity' && !task.ext.singularity_pull_docker_container ?
+-        'https://depot.galaxyproject.org/singularity/mgnify-pipelines-toolkit:0.2.0--pyhdfd78af_0':
+-        'biocontainers/mgnify-pipelines-toolkit:0.2.0--pyhdfd78af_0' }"
++        "https://depot.galaxyproject.org/singularity/mgnify-pipelines-toolkit:${params.mpt_version}":
++        "biocontainers/mgnify-pipelines-toolkit:${params.mpt_version}" }"
+ 
+     input:
+     tuple val(meta), path(ips)
+@@ -21,8 +21,10 @@
+     script:
+     def prefix = task.ext.prefix ?: "${meta.id}"
+     """
++    gunzip -c ${ips} > ${ips.name.replace(".gz", "")}
++
+     generate_gaf \\
+-        -i ${ips} \\
++        -i ${ips.name.replace(".gz", "")} \\
+         -o ${prefix} \\
+ 
+     cat <<-END_VERSIONS > versions.yml
+
+************************************************************

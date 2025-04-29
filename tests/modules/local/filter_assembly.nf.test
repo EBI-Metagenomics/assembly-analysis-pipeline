@@ -1,0 +1,33 @@
+nextflow_process {
+
+    name "Test Process FILTER_ASSEMBLY"
+    script "modules/local/filter_assembly.nf"
+    process "FILTER_ASSEMBLY"
+
+    test("Should only filter 2 out of the 3 contigs") {
+
+        when {
+
+            params {
+                min_contig_length = 250
+            }
+
+            process {
+                """
+                input[0] = [
+                    [test: "test"],
+                    file("${projectDir}/tests/modules/local/fixtures/contigs_to_clean.fasta", checkIfExists: true)
+                ]
+                """
+            }
+        }
+
+        then {
+            assert process.success
+            def contigs = path(process.out.fastx.get(0).get(1)).fasta
+            assert "5percent" in contigs
+            assert "10percent" in contigs
+            assert !("15percent" in contigs)
+        }
+    }
+}

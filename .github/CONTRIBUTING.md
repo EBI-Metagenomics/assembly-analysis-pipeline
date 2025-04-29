@@ -34,28 +34,6 @@ Typically, pull-requests are only fully reviewed when these tests are passing, t
 
 There are typically two types of tests that run:
 
-### Lint tests
-
-`nf-core` has a [set of guidelines](https://nf-co.re/developers/guidelines) which all pipelines must adhere to.
-To enforce these and ensure that all pipelines stay in sync, we have developed a helper tool which runs checks on the pipeline code. This is in the [nf-core/tools repository](https://github.com/nf-core/tools) and once installed can be run locally with the `nf-core pipelines lint <pipeline-directory>` command.
-
-If any failures or warnings are encountered, please follow the listed URL for more documentation.
-
-### Pipeline tests
-
-Each `nf-core` pipeline should be set up with a minimal set of test-data.
-`GitHub Actions` then runs the pipeline on this data to ensure that it exits successfully.
-If there are any failures then the automated tests fail.
-These tests are run both with the latest available version of `Nextflow` and also the minimum required version that is stated in the pipeline code.
-
-## Patch
-
-:warning: Only in the unlikely and regretful event of a release happening with a bug.
-
-- On your own fork, make a new branch `patch` based on `upstream/main` or `upstream/master`.
-- Fix the bug, and bump version (X.Y.Z+1).
-- Open a pull-request from `patch` to `main`/`master` with the changes.
-
 ## Pipeline contribution conventions
 
 To make the `ebi-metagenomics/assembly-analysis-pipeline` code and processing logic more understandable for new contributors and to ensure quality, we semi-standardise the way the code and other contributions are written.

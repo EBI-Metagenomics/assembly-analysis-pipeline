@@ -1,0 +1,104 @@
+Changes in component 'ebi-metagenomics/interproscan'
+'modules/ebi-metagenomics/interproscan/meta.yml' is unchanged
+Changes in 'interproscan/main.nf':
+--- modules/ebi-metagenomics/interproscan/main.nf
++++ modules/ebi-metagenomics/interproscan/main.nf
+@@ -29,11 +29,18 @@
+     script:
+     def args = task.ext.args ?: ''
+     def prefix = task.ext.prefix ?: "${meta.id}"
++    def is_compressed = fasta.getExtension() == "gz"
++    def fasta_file_name = fasta.name.replace(".gz", "")
++
+     // -dp (disable precalculation) is on so no online dependency
+     """
++    if [ "$is_compressed" == "true" ]; then
++        gzip -c -d ${fasta} > ${fasta_file_name}
++    fi
++
+     interproscan.sh \\
+         -cpu $task.cpus \\
+-        -i $fasta \\
++        -i ${fasta_file_name} \\
+         -dp \\
+         ${args} \\
+         --output-file-base ${prefix}
+
+'modules/ebi-metagenomics/interproscan/tests/main.nf.test.snap' is unchanged
+'modules/ebi-metagenomics/interproscan/tests/tags.yml' is unchanged
+'modules/ebi-metagenomics/interproscan/tests/main.nf.test' is unchanged
+'modules/ebi-metagenomics/interproscan/tests/fixtures/interproscan_db/data/funfam/4.3.0/names.tsv' is unchanged
+'modules/ebi-metagenomics/interproscan/tests/fixtures/interproscan_db/data/funfam/4.3.0/models/4/10/75/10.hmm' is unchanged
+'modules/ebi-metagenomics/interproscan/tests/fixtures/interproscan_db/data/funfam/4.3.0/models/3/40/50/40.hmm' is unchanged
+'modules/ebi-metagenomics/interproscan/tests/fixtures/interproscan_db/data/funfam/4.3.0/models/3/40/50/1170.hmm' is unchanged
+'modules/ebi-metagenomics/interproscan/tests/fixtures/interproscan_db/data/prosite/2023_05/prosite_patterns.dat' is unchanged
+'modules/ebi-metagenomics/interproscan/tests/fixtures/interproscan_db/data/prosite/2023_05/prosite_profiles.dat' is unchanged
+'modules/ebi-metagenomics/interproscan/tests/fixtures/interproscan_db/data/prosite/2023_05/evaluator.dat' is unchanged
+'modules/ebi-metagenomics/interproscan/tests/fixtures/interproscan_db/data/prosite/2023_05/skip_flagged_profiles.txt' is unchanged
+'modules/ebi-metagenomics/interproscan/tests/fixtures/interproscan_db/data/prosite/2023_05/prosite_profiles/PS51732.prf' is unchanged
+'modules/ebi-metagenomics/interproscan/tests/fixtures/interproscan_db/data/prosite/2023_05/prosite_profiles/PS51390.prf' is unchanged
+'modules/ebi-metagenomics/interproscan/tests/fixtures/interproscan_db/data/cdd/3.21/db/Cdd_NCBI.aux' is unchanged
+'modules/ebi-metagenomics/interproscan/tests/fixtures/interproscan_db/data/cdd/3.21/db/Cdd_NCBI.pto' is unchanged
+'modules/ebi-metagenomics/interproscan/tests/fixtures/interproscan_db/data/cdd/3.21/db/Cdd_NCBI.pos' is unchanged
+'modules/ebi-metagenomics/interproscan/tests/fixtures/interproscan_db/data/cdd/3.21/db/Cdd_NCBI.psq' is unchanged
+'modules/ebi-metagenomics/interproscan/tests/fixtures/interproscan_db/data/cdd/3.21/data/cdtrack.txt' is unchanged
+'modules/ebi-metagenomics/interproscan/tests/fixtures/interproscan_db/data/cdd/3.21/data/bitscore_specific.txt' is unchanged
+'modules/ebi-metagenomics/interproscan/tests/fixtures/interproscan_db/data/cdd/3.21/data/cddannot.dat' is unchanged
+'modules/ebi-metagenomics/interproscan/tests/fixtures/interproscan_db/data/cdd/3.21/data/family_superfamily_links' is unchanged
+'modules/ebi-metagenomics/interproscan/tests/fixtures/interproscan_db/data/cdd/3.21/data/cddannot_generic.dat' is unchanged
+'modules/ebi-metagenomics/interproscan/tests/fixtures/interproscan_db/data/cdd/3.21/data/cddid.tbl' is unchanged
+'modules/ebi-metagenomics/interproscan/tests/fixtures/interproscan_db/data/phobius/1.01/phobius_install.txt' is unchanged
+'modules/ebi-metagenomics/interproscan/tests/fixtures/interproscan_db/data/pirsf/3.10/sf_hmm_all' is unchanged
+'modules/ebi-metagenomics/interproscan/tests/fixtures/interproscan_db/data/pirsf/3.10/pirsf.dat' is unchanged
+'modules/ebi-metagenomics/interproscan/tests/fixtures/interproscan_db/data/sfld/4/sfld.msa' is unchanged
+'modules/ebi-metagenomics/interproscan/tests/fixtures/interproscan_db/data/sfld/4/sfld.hmm' is unchanged
+'modules/ebi-metagenomics/interproscan/tests/fixtures/interproscan_db/data/sfld/4/sfld_sites.annot' is unchanged
+'modules/ebi-metagenomics/interproscan/tests/fixtures/interproscan_db/data/sfld/4/sfld_hierarchy_flat.txt' is unchanged
+'modules/ebi-metagenomics/interproscan/tests/fixtures/interproscan_db/data/pirsr/2023_05/sr_hmm_all' is unchanged
+'modules/ebi-metagenomics/interproscan/tests/fixtures/interproscan_db/data/pirsr/2023_05/sr_uru.json' is unchanged
+'modules/ebi-metagenomics/interproscan/tests/fixtures/interproscan_db/data/smart/9.0/smart.HMMs' is unchanged
+'modules/ebi-metagenomics/interproscan/tests/fixtures/interproscan_db/data/ncbifam/17.0/ncbifam.hmm' is unchanged
+'modules/ebi-metagenomics/interproscan/tests/fixtures/interproscan_db/data/prints/42.0/prints.kdat' is unchanged
+'modules/ebi-metagenomics/interproscan/tests/fixtures/interproscan_db/data/prints/42.0/FingerPRINTShierarchy.db' is unchanged
+'modules/ebi-metagenomics/interproscan/tests/fixtures/interproscan_db/data/prints/42.0/prints.pval' is unchanged
+'modules/ebi-metagenomics/interproscan/tests/fixtures/interproscan_db/data/gene3d/4.3.0/cath-family-names.txt' is unchanged
+'modules/ebi-metagenomics/interproscan/tests/fixtures/interproscan_db/data/gene3d/4.3.0/model_to_family_map.tsv' is unchanged
+'modules/ebi-metagenomics/interproscan/tests/fixtures/interproscan_db/data/gene3d/4.3.0/gene3d_main.hmm' is unchanged
+'modules/ebi-metagenomics/interproscan/tests/fixtures/interproscan_db/data/coils/2.2/new_coil.mat' is unchanged
+'modules/ebi-metagenomics/interproscan/tests/fixtures/interproscan_db/data/tigrfam/15.0/TIGRFAMs_HMM.LIB' is unchanged
+'modules/ebi-metagenomics/interproscan/tests/fixtures/interproscan_db/data/tigrfam/15.0/TIGRFAMs_15.0_HMM.LIB' is unchanged
+'modules/ebi-metagenomics/interproscan/tests/fixtures/interproscan_db/data/superfamily/1.75/dir.des.scop.txt_1.75' is unchanged
+'modules/ebi-metagenomics/interproscan/tests/fixtures/interproscan_db/data/superfamily/1.75/self_hits.tab' is unchanged
+'modules/ebi-metagenomics/interproscan/tests/fixtures/interproscan_db/data/superfamily/1.75/dir.cla.scop.txt_1.75' is unchanged
+'modules/ebi-metagenomics/interproscan/tests/fixtures/interproscan_db/data/superfamily/1.75/hmmlib_1.75' is unchanged
+'modules/ebi-metagenomics/interproscan/tests/fixtures/interproscan_db/data/superfamily/1.75/model.tab' is unchanged
+'modules/ebi-metagenomics/interproscan/tests/fixtures/interproscan_db/data/superfamily/1.75/pdbj95d' is unchanged
+'modules/ebi-metagenomics/interproscan/tests/fixtures/interproscan_db/data/pfam/37.2/pfam_a.dat' is unchanged
+'modules/ebi-metagenomics/interproscan/tests/fixtures/interproscan_db/data/pfam/37.2/pfam_a.hmm' is unchanged
+'modules/ebi-metagenomics/interproscan/tests/fixtures/interproscan_db/data/pfam/37.2/pfam_a.seed' is unchanged
+'modules/ebi-metagenomics/interproscan/tests/fixtures/interproscan_db/data/pfam/37.2/pfam_clans' is unchanged
+'modules/ebi-metagenomics/interproscan/tests/fixtures/interproscan_db/data/panther/19.0/names.tab' is unchanged
+'modules/ebi-metagenomics/interproscan/tests/fixtures/interproscan_db/data/panther/19.0/Tree_MSF/PTHR23076.bifurcate.newick' is unchanged
+'modules/ebi-metagenomics/interproscan/tests/fixtures/interproscan_db/data/panther/19.0/Tree_MSF/PTHR11707.AN.fasta' is unchanged
+'modules/ebi-metagenomics/interproscan/tests/fixtures/interproscan_db/data/panther/19.0/Tree_MSF/PTHR11589.bifurcate.newick' is unchanged
+'modules/ebi-metagenomics/interproscan/tests/fixtures/interproscan_db/data/panther/19.0/Tree_MSF/PTHR23076.AN.fasta' is unchanged
+'modules/ebi-metagenomics/interproscan/tests/fixtures/interproscan_db/data/panther/19.0/Tree_MSF/PTHR11707.newick' is unchanged
+'modules/ebi-metagenomics/interproscan/tests/fixtures/interproscan_db/data/panther/19.0/Tree_MSF/PTHR23076.newick' is unchanged
+'modules/ebi-metagenomics/interproscan/tests/fixtures/interproscan_db/data/panther/19.0/Tree_MSF/PTHR11707.bifurcate.newick' is unchanged
+'modules/ebi-metagenomics/interproscan/tests/fixtures/interproscan_db/data/panther/19.0/Tree_MSF/PTHR11589.AN.fasta' is unchanged
+'modules/ebi-metagenomics/interproscan/tests/fixtures/interproscan_db/data/panther/19.0/Tree_MSF/PTHR11589.tree' is unchanged
+'modules/ebi-metagenomics/interproscan/tests/fixtures/interproscan_db/data/panther/19.0/Tree_MSF/PTHR11707.tree' is unchanged
+'modules/ebi-metagenomics/interproscan/tests/fixtures/interproscan_db/data/panther/19.0/Tree_MSF/PTHR11589.newick' is unchanged
+'modules/ebi-metagenomics/interproscan/tests/fixtures/interproscan_db/data/panther/19.0/Tree_MSF/PTHR23076.tree' is unchanged
+'modules/ebi-metagenomics/interproscan/tests/fixtures/interproscan_db/data/panther/19.0/famhmm/binHmm' is unchanged
+'modules/ebi-metagenomics/interproscan/tests/fixtures/interproscan_db/data/panther/19.0/PAINT_Annotations/PTHR11589.json' is unchanged
+'modules/ebi-metagenomics/interproscan/tests/fixtures/interproscan_db/data/panther/19.0/PAINT_Annotations/PTHR11707.json' is unchanged
+'modules/ebi-metagenomics/interproscan/tests/fixtures/interproscan_db/data/panther/19.0/PAINT_Annotations/PTHR23076.json' is unchanged
+'modules/ebi-metagenomics/interproscan/tests/fixtures/interproscan_db/data/antifam/8.0/AntiFam.hmm' is unchanged
+'modules/ebi-metagenomics/interproscan/tests/fixtures/interproscan_db/data/hamap/2023_05/hamap.prf' is unchanged
+'modules/ebi-metagenomics/interproscan/tests/fixtures/interproscan_db/data/hamap/2023_05/hamap.hmm.lib' is unchanged
+'modules/ebi-metagenomics/interproscan/tests/fixtures/interproscan_db/data/hamap/2023_05/profiles/MF_01458.prf' is unchanged
+'modules/ebi-metagenomics/interproscan/tests/fixtures/interproscan_db/data/hamap/2023_05/profiles/MF_00457.prf' is unchanged
+'modules/ebi-metagenomics/interproscan/tests/fixtures/interproscan_db/data/tmhmm/2.0/tmhmm_install.txt' is unchanged
+'modules/ebi-metagenomics/interproscan/tests/fixtures/test.fasta' was removed
+************************************************************
