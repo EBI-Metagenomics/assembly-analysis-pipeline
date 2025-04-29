@@ -2,22 +2,24 @@ process SANNTIS_SUMMARY {
     tag "${meta.id}"
     label 'process_low'
 
-    container "${ workflow.containerEngine == 'singularity' && !task.ext.singularity_pull_docker_container ?
-        'https://depot.galaxyproject.org/singularity/mgnify-pipelines-toolkit:1.0.5':
-        'biocontainers/mgnify-pipelines-toolkit:1.0.5' }"
+    container "${workflow.containerEngine == 'singularity' && !task.ext.singularity_pull_docker_container
+        ? "https://depot.galaxyproject.org/singularity/mgnify-pipelines-toolkit:${params.mpt_version}"
+        : "biocontainers/mgnify-pipelines-toolkit:${params.mpt_version}"}"
 
     input:
     tuple val(meta), path(sanntis_gff)
 
     output:
-    tuple val(meta), path("*_summary.tsv"), emit: sanntis_summary
-    path "versions.yml"                   , emit: versions
+    tuple val(meta), path("*_summary.tsv.gz"), emit: sanntis_summary
+    path "versions.yml",                       emit: versions
 
     script:
     """
-    summarise_sanntis_bgcs.py
+    summarise_sanntis_bgcs \\
         --sanntis-gff ${sanntis_gff} \\
         --output ${sanntis_gff.simpleName}_summary.tsv
+
+    gzip ${sanntis_gff.simpleName}_summary.tsv
 
     cat <<-END_VERSIONS > versions.yml
     "${task.process}":
@@ -27,7 +29,7 @@ process SANNTIS_SUMMARY {
 
     stub:
     """
-    touch ${sanntis_gff.simpleName}_summary.tsv
+    touch ${sanntis_gff.simpleName}_summary.tsv.gz
 
     cat <<-END_VERSIONS > versions.yml
     "${task.process}":

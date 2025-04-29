@@ -36,6 +36,7 @@ include { CONTIGS_TAXONOMIC_CLASSIFICATION   } from '../subworkflows/ebi-metagen
 */
 
 include { RENAME_CONTIGS                     } from '../modules/local/rename_contigs'
+include { GFF_SUMMARY                        } from '../modules/local/gff_summary'
 include { RNA_ANNOTATION                     } from '../subworkflows/local/rna_annotation'
 include { FUNCTIONAL_ANNOTATION              } from '../subworkflows/local/functional_annotation'
 include { PATHWAYS_AND_SYSTEMS               } from '../subworkflows/local/pathways_and_systems'
@@ -168,6 +169,23 @@ workflow ASSEMBLY_ANALYSIS_PIPELINE {
     )
     ch_versions = ch_versions.mix(PATHWAYS_AND_SYSTEMS.out.versions)
 
+    // Generate giant GFF summary file //
+    GFF_SUMMARY(COMBINED_GENE_CALLER.out.gff.join(
+        FUNCTIONAL_ANNOTATION.out.interproscan_tsv
+        ).join(
+            FUNCTIONAL_ANNOTATION.out.eggnog_annotations
+        ).join(
+            FUNCTIONAL_ANNOTATION.out.dbcan_overview
+        ).join(
+            FUNCTIONAL_ANNOTATION.out.dbcan_hmm
+        ).join(
+            PATHWAYS_AND_SYSTEMS.out.sanntis_gff
+        ).join(
+            PATHWAYS_AND_SYSTEMS.out.antismash_gff
+        )
+    )
+    ch_versions = ch_versions.mix(GFF_SUMMARY.out.versions)
+
     //
     // Collate and save software versions
     //
@@ -242,6 +260,22 @@ workflow ASSEMBLY_ANALYSIS_PIPELINE {
         [],
         [],
     )
+
+    /***********************/
+    /* Per assembly report */
+    /***********************/
+
+    // This needs to be extended with assemblies that don't have annotations,
+    // specifically those without IPS annotations or BGC. We need to retrieve
+    // examples of these assemblies from the current backlog database.
+
+    GFF_SUMMARY.out.gff_summary
+        .map { meta, __ ->
+            {
+                return "${meta.id},success"
+            }
+        }
+        .collectFile(name: "analysed_assemblies.csv", storeDir: "${params.outdir}", newLine: true, cache: false)
 
     emit:
     multiqc_report = MULTIQC_PER_SAMPLESHEET.out.report.toList() // channel: /path/to/multiqc_report.html

@@ -4,6 +4,7 @@ include { SEQKIT_SPLIT2                                                  } from 
 include { ANTISMASH_ANTISMASHLITE                                        } from '../../modules/nf-core/antismash/antismashlite/main'
 include { TABIX_BGZIP as TABIX_BGZIP_KEGGPATHWAYSCOMPLETENESS            } from '../../modules/nf-core/tabix/bgzip/main'
 include { TABIX_BGZIP as TABIX_BGZIP_KEGGPATHWAYSCOMPLETENESS_PER_CONTIG } from '../../modules/nf-core/tabix/bgzip/main'
+include { CAT_CAT as CONCATENATE_ANTISMASH_GBK                           } from '../../modules/nf-core/cat/cat/main'
 
 /* EBI-METAGENOMICS */
 include { SANNTIS                      } from '../../modules/ebi-metagenomics/sanntis/main'
@@ -14,9 +15,9 @@ include { KEGGPATHWAYSCOMPLETENESS     } from '../../modules/ebi-metagenomics/ke
 include { ANTISMASH_JSON_TO_GFF                          } from '../../modules/local/antismash_json_to_gff'
 include { CONCATENATE_GFFS as CONCATENATE_ANTISMASH_GFFS } from '../../modules/local/concatenate_gffs'
 include { CONCATENATE_GFFS as CONCATENATE_SANNTIS_GFFS   } from '../../modules/local/concatenate_gffs'
-include { KEGGPATHWAYSCOMPLETENESS                       } from '../../modules/ebi-metagenomics/keggpathwayscompleteness/main'
 include { ANTISMASH_SUMMARY                              } from '../../modules/local/antismash_summary'
 include { SANNTIS_SUMMARY                                } from '../../modules/local/sanntis_summary'
+include { MERGE_ANTISMASH_JSON                           } from '../../modules/local/merge_antismash_json'
 
 include { DRAM_DISTILL_SWF                               } from '../../subworkflows/local/dram_distill_swf'
 
@@ -113,7 +114,19 @@ workflow PATHWAYS_AND_SYSTEMS {
     )
     ch_versions = ch_versions.mix(CONCATENATE_ANTISMASH_GFFS.out.versions)
 
-    ANTISMASH_SUMMARY(CONCATENATE_ANTISMASH_GFFS.out.concatenated_gff)
+    CONCATENATE_ANTISMASH_GBK(
+        ANTISMASH_ANTISMASHLITE.out.gbk_input.groupTuple()
+    )
+    ch_versions = ch_versions.mix(CONCATENATE_ANTISMASH_GBK.out.versions)
+
+    MERGE_ANTISMASH_JSON(
+        ANTISMASH_ANTISMASHLITE.out.json_results.groupTuple()
+    )
+    ch_versions = ch_versions.mix(MERGE_ANTISMASH_JSON.out.versions)
+
+    ANTISMASH_SUMMARY(
+        CONCATENATE_ANTISMASH_GFFS.out.concatenated_gff
+    )
     ch_versions = ch_versions.mix(ANTISMASH_SUMMARY.out.versions)
 
     /*************************************************************************************/
@@ -133,16 +146,15 @@ workflow PATHWAYS_AND_SYSTEMS {
     )
     ch_versions = ch_versions.mix(SANNTIS.out.versions)
 
-
     CONCATENATE_SANNTIS_GFFS(
         SANNTIS.out.gff.groupTuple()
     )
     ch_versions = ch_versions.mix(CONCATENATE_SANNTIS_GFFS.out.versions)
 
-
-    SANNTIS_SUMMARY(CONCATENATE_SANNTIS_GFFS.out.concatenated_gff)
+    SANNTIS_SUMMARY(
+        CONCATENATE_SANNTIS_GFFS.out.concatenated_gff
+    )
     ch_versions = ch_versions.mix(SANNTIS_SUMMARY.out.versions)
-
 
     /*
     * DRAM distill - per assembly and for the whole samplesheet
@@ -157,4 +169,6 @@ workflow PATHWAYS_AND_SYSTEMS {
 
     emit:
     versions = ch_versions
+    sanntis_gff = CONCATENATE_SANNTIS_GFFS.out.concatenated_gff
+    antismash_gff = CONCATENATE_ANTISMASH_GFFS.out.concatenated_gff
 }

@@ -101,6 +101,12 @@
                     "format": "string",
                     "description": "Training model for FragGeneScan.",
                     "help": "Specify the training model to use for gene prediction. Default is 'illumina_5'."
+                },
+                "mpt_version": {
+                    "type": "string",
+                    "default": "1.0.8--pyhdfd78af_0",
+                    "description": "General version of mgnify-pipeline-toolkit",
+                    "help": "Keeps all mpt tools updated and synced to chosen release."
                 }
             },
             "fa_icon": "fas fa-database"
@@ -122,6 +128,12 @@
                     "default": "5.73-104.0",
                     "description": "The version of the interproscan database.",
                     "fa_icon": "fas fa-code-branch"
+                },
+                "interpro_licensed_software": {
+                    "type": "boolean",
+                    "default": false,
+                    "description": "Enables the use of licensed software in InterProScan. Set to true if the required licensed software is in the licensed database folder, https://interproscan-docs.readthedocs.io/en/v5/HowToRun.html#included-analyses.",
+                    "fa_icon": "fas fa-file-contract"
                 },
                 "eggnog_database": {
                     "type": "string",

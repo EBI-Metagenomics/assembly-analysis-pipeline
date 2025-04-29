@@ -1,7 +1,4 @@
-Changes in component 'nf-core/antismash/antismashlite'
-'modules/nf-core/antismash/antismashlite/environment.yml' is unchanged
-'modules/nf-core/antismash/antismashlite/meta.yml' is unchanged
-Changes in 'antismash/antismashlite/main.nf':
+Changes in module 'nf-core/antismash/antismashlite'
 --- modules/nf-core/antismash/antismashlite/main.nf
 +++ modules/nf-core/antismash/antismashlite/main.nf
 @@ -2,25 +2,11 @@
@@ -32,14 +29,25 @@ Changes in 'antismash/antismashlite/main.nf':
  
      output:
      tuple val(meta), path("${prefix}/clusterblast/*_c*.txt"), optional: true, emit: clusterblast_file
-@@ -46,12 +32,24 @@
+@@ -30,8 +16,8 @@
+     tuple val(meta), path("${prefix}/knownclusterblast/*_c*.txt"), optional: true, emit: knownclusterblast_txt
+     tuple val(meta), path("${prefix}/svg/clusterblast*.svg"), optional: true, emit: svg_files_clusterblast
+     tuple val(meta), path("${prefix}/svg/knownclusterblast*.svg"), optional: true, emit: svg_files_knownclusterblast
+-    tuple val(meta), path("${prefix}/*.gbk"), emit: gbk_input
+-    tuple val(meta), path("${prefix}/*.json"), emit: json_results
++    tuple val(meta), path("${prefix}/${prefix}.gbk"), emit: gbk_input
++    tuple val(meta), path("${prefix}/${prefix}.json"), emit: json_results
+     tuple val(meta), path("${prefix}/*.log"), emit: log
+     tuple val(meta), path("${prefix}/*.zip"), emit: zip
+     tuple val(meta), path("${prefix}/*region*.gbk"), optional: true, emit: gbk_results
+@@ -46,12 +32,23 @@
  
      script:
      def args = task.ext.args ?: ''
 -    prefix = task.ext.suffix ? "${meta.id}${task.ext.suffix}" : "${meta.id}"
 -    gff_flag = gff ? "--genefinding-gff3 ${gff}" : ""
 -
-+    prefix   = task.ext.prefix ?: "${meta.id}"
++    prefix   = task.ext.suffix ?: "${meta.id}"
 +    
 +    def gff_flag = gff ? "--genefinding-gff3 ${gff.name.replace('.gz', '')}" : ""
 +    
@@ -55,12 +63,11 @@ Changes in 'antismash/antismashlite/main.nf':
 +        gzip -c -d ${sequence_input} > ${sequence_file}
 +    fi
 +
-+    # TODO: handle this as the fasta file
 +    gunzip -c -d ${gff} > ${gff.name.replace('.gz', '')}
  
      antismash \\
          ${args} \\
-@@ -62,7 +60,7 @@
+@@ -62,7 +59,7 @@
          --genefinding-tool none \\
          --logfile ${prefix}/${prefix}.log \\
          --databases ${databases} \\
@@ -70,8 +77,4 @@ Changes in 'antismash/antismashlite/main.nf':
      cat <<-END_VERSIONS > versions.yml
      "${task.process}":
 
-'modules/nf-core/antismash/antismashlite/tests/main.nf.test.snap' is unchanged
-'modules/nf-core/antismash/antismashlite/tests/tags.yml' is unchanged
-'modules/nf-core/antismash/antismashlite/tests/nextflow.config' is unchanged
-'modules/nf-core/antismash/antismashlite/tests/main.nf.test' is unchanged
 ************************************************************

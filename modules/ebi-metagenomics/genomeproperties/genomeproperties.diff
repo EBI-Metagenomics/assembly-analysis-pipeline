@@ -1,0 +1,54 @@
+Changes in component 'ebi-metagenomics/genomeproperties'
+'modules/ebi-metagenomics/genomeproperties/meta.yml' is unchanged
+Changes in 'genomeproperties/main.nf':
+--- modules/ebi-metagenomics/genomeproperties/main.nf
++++ modules/ebi-metagenomics/genomeproperties/main.nf
+@@ -10,10 +10,10 @@
+     tuple val(meta), path(ips)
+ 
+     output:
+-    tuple val(meta), path("*.txt") , emit: summary
+-    tuple val(meta), path("*.json"), emit: json
+-    tuple val(meta), path("*.tsv") , emit: tsv
+-    path "versions.yml"            , emit: versions
++    tuple val(meta), path("*.txt.gz") , emit: summary
++    tuple val(meta), path("*.json.gz"), emit: json
++    tuple val(meta), path("*.tsv.gz") , emit: tsv
++    path "versions.yml"               , emit: versions
+ 
+     when:
+     task.ext.when == null || task.ext.when
+@@ -22,11 +22,16 @@
+     def args = task.ext.args ?: ''
+     def prefix = task.ext.prefix ?: "${meta.id}"
+     def gp_version = "2.0" // No way to get the version from the tool directly so have to hardcode
++    def is_compressed = ips.getExtension() == "gz"
++    def ips_name = ips.name.replace(".gz", "")
+ 
+     """
++    if [ "$is_compressed" == "true" ]; then
++        gzip -c -d $ips > $ips_name
++    fi
+     assign_genome_properties.pl \\
+         ${args} \\
+-        -matches ${ips} \\
++        -matches ${ips_name} \\
+         -gpdir /opt/genome-properties/flatfiles/ \\
+         -gpff genomeProperties.txt \\
+         -name ${prefix}
+@@ -34,6 +39,8 @@
+     mv JSON_${prefix} ${prefix}_gp.json
+     mv SUMMARY_FILE_${prefix} ${prefix}_gp.txt
+     mv TABLE_${prefix} ${prefix}_gp.tsv
++
++    gzip ${prefix}_gp.{json,txt,tsv}
+ 
+     cat <<-END_VERSIONS > versions.yml
+     "${task.process}":
+
+'modules/ebi-metagenomics/genomeproperties/tests/main.nf.test.snap' is unchanged
+'modules/ebi-metagenomics/genomeproperties/tests/tags.yml' is unchanged
+'modules/ebi-metagenomics/genomeproperties/tests/nextflow.config' is unchanged
+'modules/ebi-metagenomics/genomeproperties/tests/main.nf.test' is unchanged
+'modules/ebi-metagenomics/genomeproperties/tests/fixtures/test_ips.tsv' is unchanged
+************************************************************

@@ -3,7 +3,9 @@ process MGNIFYPIPELINESTOOLKIT_SUMMARISEGOSLIMS {
     tag "$meta.id"
     label 'process_single'
 
-    container 'microbiome-informatics/mgnify-pipelines-toolkit:1.0.4'
+    container "${ workflow.containerEngine == 'singularity' && !task.ext.singularity_pull_docker_container ?
+        "https://depot.galaxyproject.org/singularity/mgnify-pipelines-toolkit:${params.mpt_version}":
+        "biocontainers/mgnify-pipelines-toolkit:${params.mpt_version}" }"
 
     input:
     tuple val(meta), path(interproscan_tsv)

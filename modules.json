@@ -106,12 +106,14 @@
                     "combinedgenecaller/merge": {
                         "branch": "main",
                         "git_sha": "b84a0c52b92eef58ba2aeb2d22ae45d5bc6ae294",
-                        "installed_by": ["combined_gene_caller"]
+                        "installed_by": ["combined_gene_caller"],
+                        "patch": "modules/ebi-metagenomics/combinedgenecaller/merge/combinedgenecaller-merge.diff"
                     },
                     "convertcmscantocmsearch": {
                         "branch": "main",
                         "git_sha": "937985d6147b25b74700f2eb6fc41ab4150ad7d4",
-                        "installed_by": ["detect_rna"]
+                        "installed_by": ["detect_rna"],
+                        "patch": "modules/ebi-metagenomics/convertcmscantocmsearch/convertcmscantocmsearch.diff"
                     },
                     "dbcan/dbcan": {
                         "branch": "main",
@@ -154,7 +156,8 @@
                     "genomeproperties": {
                         "branch": "main",
                         "git_sha": "7c67b0652fb83c8239bd5bace72364f6676e3e39",
-                        "installed_by": ["modules"]
+                        "installed_by": ["modules"],
+                        "patch": "modules/ebi-metagenomics/genomeproperties/genomeproperties.diff"
                     },
                     "infernal/cmscan": {
                         "branch": "main",
@@ -186,17 +189,20 @@
                     "mgnifypipelinestoolkit/kronatxtfromcatclassification": {
                         "branch": "main",
                         "git_sha": "3fd8d9bea7a1a459af0c0472899e62f7f8e5a2e8",
-                        "installed_by": ["contigs_taxonomic_classification"]
+                        "installed_by": ["contigs_taxonomic_classification"],
+                        "patch": "modules/ebi-metagenomics/mgnifypipelinestoolkit/kronatxtfromcatclassification/mgnifypipelinestoolkit-kronatxtfromcatclassification.diff"
                     },
                     "mgnifypipelinestoolkit/rheachebiannotation": {
                         "branch": "main",
                         "git_sha": "7fbb802365177fd2a2f01ce5414c1c894357d95f",
-                        "installed_by": ["modules"]
+                        "installed_by": ["modules"],
+                        "patch": "modules/ebi-metagenomics/mgnifypipelinestoolkit/rheachebiannotation/mgnifypipelinestoolkit-rheachebiannotation.diff"
                     },
                     "mgnifypipelinestoolkit/summarisegoslims": {
                         "branch": "main",
                         "git_sha": "5b6cc0907498f48b2403346da520d08ec0a1d0c5",
-                        "installed_by": ["goslim_swf"]
+                        "installed_by": ["goslim_swf"],
+                        "patch": "modules/ebi-metagenomics/mgnifypipelinestoolkit/summarisegoslims/mgnifypipelinestoolkit-summarisegoslims.diff"
                     },
                     "owltools": {
                         "branch": "main",
