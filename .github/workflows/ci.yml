@@ -27,7 +27,7 @@ jobs:
     strategy:
       matrix:
         NXF_VER:
-          - "24.10.6"
+          - "24.04.3"
         profile:
           - "docker"
           - "singularity"
@@ -44,12 +44,9 @@ jobs:
         uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4
 
       - name: Install Nextflow
-        env:
-          NXF_VER: ${{ matrix.NXF_VER }}
-        run: |
-          wget https://github.com/nextflow-io/nextflow/releases/download/v${{ matrix.NXF_VER }}/nextflow-${{ matrix.NXF_VER }}-dist
-          chmod +x nextflow-${{ matrix.NXF_VER }}-dist
-          sudo mv nextflow-${{ matrix.NXF_VER }}-dist /usr/local/bin/nextflow
+        uses: nf-core/setup-nextflow@v2
+        with:
+          version: "${{ matrix.NXF_VER }}"
 
       - name: Set up Apptainer
         if: matrix.profile == 'singularity'
