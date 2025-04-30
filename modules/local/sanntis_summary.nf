@@ -10,16 +10,19 @@ process SANNTIS_SUMMARY {
     tuple val(meta), path(sanntis_gff)
 
     output:
-    tuple val(meta), path("*_summary.tsv.gz"), emit: sanntis_summary
+    tuple val(meta), path("*_summary.tsv.gz"), emit: sanntis_summary, optional: true
     path "versions.yml",                       emit: versions
 
     script:
     """
-    summarise_sanntis_bgcs \\
-        --sanntis-gff ${sanntis_gff} \\
-        --output ${sanntis_gff.simpleName}_summary.tsv
+    # SanntiS produces GFF with just the #gff header if no BGC were found
+    if [ "\$(zcat "${sanntis_gff}" | wc -l)" -gt 1 ]; then
+        summarise_sanntis_bgcs \\
+            --sanntis-gff ${sanntis_gff} \\
+            --output ${sanntis_gff.simpleName}_summary.tsv
 
-    gzip ${sanntis_gff.simpleName}_summary.tsv
+        gzip ${sanntis_gff.simpleName}_summary.tsv
+    fi
 
     cat <<-END_VERSIONS > versions.yml
     "${task.process}":

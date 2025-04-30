@@ -2,7 +2,9 @@ process GFF_SUMMARY {
     tag "${meta.id}"
     label 'process_low'
 
-    container "oras://community.wave.seqera.io/library/mgnify-pipelines-toolkit:1.0.7--2a7aa4ec83984ecc"
+    container "${ workflow.containerEngine == 'singularity' && !task.ext.singularity_pull_docker_container ?
+        "https://depot.galaxyproject.org/singularity/mgnify-pipelines-toolkit:${params.mpt_version}":
+        "biocontainers/mgnify-pipelines-toolkit:${params.mpt_version}" }"
 
     input:
     tuple val(meta), path(cds), path(ips), path(eggnog), path(dbcan_overview), path(dbcan_hmm), path(sanntis), path(antismash)
