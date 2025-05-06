@@ -21,14 +21,14 @@ As these results are per-assembly, most of the outputs use an assembly ID as a p
 
 ### qc
 
-The `qc` directory contains output files related to the quality control steps of the pipeline, from the contig length filtering by `seqkit`, to the quality assessment done by `QUAST`. The structure of the `qc` directory contains three output files and one output directory:
+The `qc` directory contains output files related to the quality control steps of the pipeline, from the contig length filtering by `seqkit`, to the quality assessment done by `QUAST`. The structure of the `qc` directory contains three output files and one output directory.
 
 ```bash
 ├── qc
-    ├── ERZ12345_filtered_contigs.fasta.gz
-    ├── ERZ12345.tsv
-    ├── multiqc_report.html
-    └── multiqc_data/
+│   ├── ERZ12345_filtered_contigs.fasta.gz
+│   ├── ERZ12345.tsv
+│   ├── multiqc_report.html
+│   └── multiqc_data/
 ├── cds
 ├── taxonomy
 ├── functional-annotation
@@ -50,9 +50,9 @@ The `cds` directory contains output files related to the combined gene caller su
 ```bash
 ├── qc
 ├── cds
-    ├── ERZ12345_predicted_orf.ffn.gz
-    ├── ERZ12345_predicted_cds.faa.gz
-    └── ERZ12345_predicted_cds.gff.gz
+│   ├── ERZ12345_predicted_orf.ffn.gz
+│   ├── ERZ12345_predicted_cds.faa.gz
+│   └── ERZ12345_predicted_cds.gff.gz
 ├── taxonomy
 ├── functional-annotation
 ├── pathways-and-systems
@@ -67,76 +67,98 @@ The `cds` directory contains output files related to the combined gene caller su
 
 ### taxonomy
 
-The `taxonomy` directory contains output files summarising the various taxonomic assignment results using tools like `MAPseq` and `Krona`. The pipeline uses four different reference databases to assign taxonomy, and the outputs in `taxonomy-summary` are split based on the different reference databases:
+The `taxonomy` directory contains output files summarising the various taxonomic assignment results using tools like `CAT_pack`, `cmsearch`, and `Krona`. There are four output files in this directory.
 
-- SILVA
-- PR2
-- UNITE
-- ITSoneDB
-
-However, there is added complexity in the output structure for two reasons:
-
-- SILVA is actually split into two output directories: SILVA-SSU and SILVA-LSU.
-- There are two kinds of taxonomic results for both SILVA-SSU and PR2: one for the hit matches and one for ASVs, with the latter being named as DADA2-SILVA and DADA2-PR2.
-
-#### Output files - hit matches
 ```bash
 ├── qc
-├── sequence-categorisation
-├── amplified-region-inference
-├── primer-identification
-├── asv
-└── taxonomy-summary
-    ├── SILVA-SSU
-    │   ├── ERR4334351.html
-    │   ├── ERR4334351_SILVA-SSU.mseq
-    │   ├── ERR4334351_SILVA-SSU.tsv
-    │   └── ERR4334351_SILVA-SSU.txt
-    ├── PR2
-    │   ├── ERR4334351.html
-    │   ├── ERR4334351_PR2.mseq
-    │   ├── ERR4334351_PR2.tsv
-    │   └── ERR4334351_PR2.txt
-    ├── UNITE
-    │   ├── ERR4334351.html
-    │   ├── ERR4334351_UNITE.mseq
-    │   ├── ERR4334351_UNITE.tsv
-    │   └── ERR4334351_UNITE.txt
-    └── ITSoneDB
-        ├── ERR4334351.html
-        ├── ERR4334351_ITSoneDB.mseq
-        ├── ERR4334351_ITSoneDB.tsv
-        └── ERR4334351_ITSoneDB.txt
+├── cds
+├── taxonomy
+│   ├── ERZ12345_contigs_taxonomy.tsv.gz
+│   ├── ERZ12345.krona.txt
+│   ├── ERZ12345.html
+│   └── ERZ12345_SSU.fasta.gz
+├── functional-annotation
+├── pathways-and-systems
+└── gff
 ```
 
-All of the different possible subdirectories have the same four files. Taking PR2 as an example:
-- **ERR4334351_PR2.mseq**: This `mseq` file contains the raw MAPseq output for every `infernal/cmsearch` match, i.e. each match's taxonomic assignment.
-- **ERR4334351_PR2.txt**: This `txt` file contains the Krona text input that is used to generate the Krona HTML file. It contains the distribution of the different taxonomic assignments.
-- **ERR4334351.html**: This `html` file contains the Krona HTML file that interactively displays the distribution of the different taxonomic assignments.
-- **ERR4334351_UNITE.tsv**: This `tsv` file contains the read count of every taxonomic assignment similar to the Krona txt file, but in a different easier-to-parse format.
+#### Output files
 
-#### Output files - ASVs
+- **ERZ12345_contigs_taxonomy.tsv.gz**: This `tsv` file contains the output from `CAT_pack` that describes taxonomy assignments to contigs in the assembly.
+- **ERZ12345.krona.txt**: This `txt` file contains the Krona text input that is used to generate the Krona HTML file. It contains the distribution of the different taxonomic assignments from the `CAT_pack` output.
+- **ERZ12345.html**: This `html` file contains the Krona HTML file that interactively displays the distribution of the different taxonomic assignments from `CAT_pack`.
+- **ERZ12345_SSU.fasta.gz**: This `fasta` file contains all of the matching sequences to a particular rRNA amplicon type from running `cmsearch` on the contigs, being in this case the SSU. As described previously, this file name would be different if a different amplicon was matched, e.g. the suffix could be `_LSU` if it were matching to the LSU model, and you could have multiple files depending on how many marker genes were detected.
+
+### functional-annotation
+
+The `functional-annotation` directory contains seven subdirectories of results, one for each functional annotation tool used in the pipeline. Specifically, the functional annotations in this directory are assigned on a per-protein basis, and range from tools like `InterProScan` to `dbCAN`.
+
 ```bash
 ├── qc
-├── sequence-categorisation
-├── amplified-region-inference
-├── primer-identification
-├── asv
-└── taxonomy-summary
-    ├── DADA2-SILVA
-    │   ├── ERR4334351_16S-V3-V4_DADA2-SILVA_asv_krona_counts.txt
-    │   ├── ERR4334351_16S-V3-V4.html
-    │   └── ERR4334351_DADA2-SILVA.mseq
-    └── DADA2-PR2
-        ├── ERR4334351_16S-V3-V4_DADA2-PR2_asv_krona_counts.txt
-        ├── ERR4334351_16S-V3-V4.html
-        └── ERR4334351_DADA2-PR2.mseq
+├── cds
+├── taxonomy
+├── functional-annotation
+│   ├── interpro
+│   │   ├── ERZ12345_interproscan.tsv.gz
+│   │   ├── ERZ12345_interpro_summary.tsv.gz
+│   │   └── ERZ12345_interpro_summary.tsv.gz.gzi
+│   ├── pfam
+│   │   ├── ERZ12345_pfam_summary.tsv.gz
+│   │   └── ERZ12345_pfam_summary.tsv.gz.gzi
+│   ├── go
+│   │   ├── ERZ12345_go_summary.tsv.gz
+│   │   ├── ERZ12345_go_summary.tsv.gz.gzi
+│   │   ├── ERZ12345_goslim_summary.tsv.gz
+│   │   └── ERZ12345_goslim_summary.tsv.gz.gzi
+│   ├── eggnog
+│   │   ├── ERZ12345_emapper_annotations.tsv.gz
+│   │   └── ERZ12345_emapper_seed_orthologs.tsv.gz
+│   ├── kegg
+│   │   ├── ERZ12345_ko_summary.tsv.gz
+│   │   └── ERZ12345_ko_summary.tsv.gz.gzi
+│   ├── rhea-reactions
+│   │   ├── ERZ12345_proteins2rhea.tsv.gz
+│   │   └── ERZ12345_proteins2rhea.tsv.gz.gzi
+│   └── dbcan
+│       ├── ERZ12345_dbcan_cgc.gff.gz
+│       ├── ERZ12345_dbcan_overview.tsv.gz
+│       ├── ERZ12345_dbcan_standard_out.tsv.gz
+│       ├── ERZ12345_dbcan_sub_hmm.tsv.gz
+│       └── ERZ12345_dbcan_substrates.tsv.gz
+├── pathways-and-systems
+└── gff
 ```
 
-The two different subdirectories have the same three categories of files, two of which are dynamic in naming. Using DADA2-PR2 as an example:
-- **ERR4334351_DADA2-PR2.mseq**: This contains the raw MAPseq output for every ASV, i.e. each ASV's taxonomic assignment. This file is not dynamic.
-- **ERR4334351_16S-V3-V4_DADA2-PR2_asv_krona_counts.txt**: This file contains the Krona text input that is used to generate the Krona HTML file for ASV results. This file is dynamic, as it will generate it on a per amplified region-basis. This means that in cases where there are two amplified regions, you will have three of these files - one for each reference database, and one for the concatenation of the two.
-- **ERR4334351_16S-V3-V4.html**: This file contains the Krona HTMl file that interactively displays the distribution of the different taxonomic assignments for ASV results. This file is dynamic in the exact same way as the Krona text input file, i.e. based on the inferred amplified region(s).
+#### Output files - interpro
+
+This subdirectory contains the output of running InterProScan on the proteins of the assembly.
+
+- **ERZ12345_interproscan.tsv.gz**: This `tsv` file contains the output of InterProScan, containing the different InterPro annotations assigned to the set of proteins in the assembly.
+- **ERZ12345_interpro_summary.tsv.gz**: This `tsv` file contains the summary counts of the different InterPro signatures that appear in the assembly.
+- **ERZ12345_interpro_summary.tsv.gz.gzi**: This file is an index for the InterPro count summary file.
+
+#### Output files - pfam
+
+This subdirectory contains the output of extracting the Pfam signatures from the InterProScan results.
+
+- **ERZ12345_pfam_summary.tsv.gz**: This `tsv` file contains the summary counts of the different Pfam signatures that appear in the assembly.
+- **ERZ12345_pfam_summary.tsv.gz.gzi**: This file is an index for the Pfam count summary file.
+
+#### Output files - go
+
+This subdirectory contains the output of extracting the Gene Ontology (GO) signatures from the InterProScan results. Also, the existing GO terms are summarised using the metagenomics GO-slim ([see here](https://geneontology.org/docs/go-subset-guide/)) for a more domain-specific and concise set of GO terms.
+
+- **ERZ12345_go_summary.tsv.gz**: This `tsv` file contains the summary counts of the different GO signatures that appear in the assembly.
+- **ERZ12345_go_summary.tsv.gz.gzi**: This file is an index for the GO count summary file.
+- **ERZ12345_goslim_summary.tsv.gz**: This `tsv` file contains the summary counts of the different GO-slim signatures that appear in the assembly.
+- **ERZ12345_goslim_summary.tsv.gz.gzi**: This file is an index for the GO-slim count summary file.
+
+#### Output files - eggnog
+
+This subdirectory contains the output of running `EggNOG-mapper` on the proteins of the assembly.
+
+- **ERZ12345_emapper_annotations.tsv.gz**: This `tsv` file contains the summary counts of the different Pfam signatures that appear in the assembly.
+- **ERZ12345_emapper_seed_orthologs.tsv.gz**: This file is an index for the Pfam count summary file.
 
 ## Per-study output files
 
@@ -145,6 +167,7 @@ The pipeline generated four different per-study output files that aggregate and 
 ### MultiQC
 
 The pipeline generates two [MultiQC](https://seqera.io/multiqc/) reports: one per-study (`study_multiqc_report.html`), and one per-run (`qc/${id}_multiqc_report.html`). These reports aggregate a few QC statistics from some of the tools run by the pipeline, including:
+
 - fastp
 - cutadapt
 - DADA2 (as a custom report)
@@ -162,12 +185,12 @@ SRRLIBSTRATFAIL,libstrat_fail
 
 The different exclusion messages are:
 
-| Exclusion message 	|                                                                                         Description                                                                                        	|
-|:-----------------:	|:------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------:	|
-| `seqfu_fail`        	| Run had an error after running `seqfu check`. Check the log file in `qc/${id}_seqfu.tsv` for the exact reason                                                                             	|
-| `sfxhd_fail`        	| Run had an error related to the suffix of the file `_1/_2` not matching the headers inside the fastq file. Check the log file in `qc/${id}_suffix_header_err.json` for the reads at fault 	|
-| `libstrat_fail`     	| Run was predicted to likely not be of AMPLICON sequencing based on base-conservation patterns at the beginning of reads                                                                   	|
-| `no_reads`          	| Run had no reads left after running `fastp`                                                                                                                                               	|
+| Exclusion message |                                                                                        Description                                                                                        |
+| :---------------: | :---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------: |
+|   `seqfu_fail`    |                                       Run had an error after running `seqfu check`. Check the log file in `qc/${id}_seqfu.tsv` for the exact reason                                       |
+|   `sfxhd_fail`    | Run had an error related to the suffix of the file `_1/_2` not matching the headers inside the fastq file. Check the log file in `qc/${id}_suffix_header_err.json` for the reads at fault |
+|  `libstrat_fail`  |                                  Run was predicted to likely not be of AMPLICON sequencing based on base-conservation patterns at the beginning of reads                                  |
+|    `no_reads`     |                                                                        Run had no reads left after running `fastp`                                                                        |
 
 ### QC passed runs
 
@@ -190,44 +213,44 @@ The pipeline performs inferrence of primer presence and sequence using [PIMENTO]
 
 ```json
 [
-    {
-        "id": "SRR17062740",
-        "primers": [
-            {
-                "name": "F_auto",
-                "region": "V4",
-                "strand": "fwd",
-                "sequence": "ATTCCAGCTCCAATAG",
-                "identification_strategy": "auto"
-            },
-            {
-                "name": "R_auto",
-                "region": "V4",
-                "strand": "rev",
-                "sequence": "GACTACGATGGTATNTAATC",
-                "identification_strategy": "auto"
-            }
-        ]
-    },
-    {
-        "id": "ERR4334351",
-        "primers": [
-            {
-                "name": "341F",
-                "region": "V3",
-                "strand": "fwd",
-                "sequence": "CCTACGGGNGGCWGCAG",
-                "identification_strategy": "std"
-            },
-            {
-                "name": "805R",
-                "region": "V4",
-                "strand": "rev",
-                "sequence": "GACTACHVGGGTATCTAATCC",
-                "identification_strategy": "std"
-            }
-        ]
-    }
+  {
+    "id": "SRR17062740",
+    "primers": [
+      {
+        "name": "F_auto",
+        "region": "V4",
+        "strand": "fwd",
+        "sequence": "ATTCCAGCTCCAATAG",
+        "identification_strategy": "auto"
+      },
+      {
+        "name": "R_auto",
+        "region": "V4",
+        "strand": "rev",
+        "sequence": "GACTACGATGGTATNTAATC",
+        "identification_strategy": "auto"
+      }
+    ]
+  },
+  {
+    "id": "ERR4334351",
+    "primers": [
+      {
+        "name": "341F",
+        "region": "V3",
+        "strand": "fwd",
+        "sequence": "CCTACGGGNGGCWGCAG",
+        "identification_strategy": "std"
+      },
+      {
+        "name": "805R",
+        "region": "V4",
+        "strand": "rev",
+        "sequence": "GACTACHVGGGTATCTAATCC",
+        "identification_strategy": "std"
+      }
+    ]
+  }
 ]
 ```
 
@@ -235,4 +258,3 @@ The value of the `identification_strategy` key can either be:
 
 - `std` - Meaning the primer was matched to one of the standard library primers (more reliable)
 - `auto` - Meaning the primer was automatically predicted (less reliable)
-
