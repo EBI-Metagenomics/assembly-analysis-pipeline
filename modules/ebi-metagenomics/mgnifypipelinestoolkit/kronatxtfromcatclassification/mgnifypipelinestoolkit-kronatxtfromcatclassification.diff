@@ -1,4 +1,6 @@
-Changes in module 'ebi-metagenomics/mgnifypipelinestoolkit/kronatxtfromcatclassification'
+Changes in component 'ebi-metagenomics/mgnifypipelinestoolkit/kronatxtfromcatclassification'
+'modules/ebi-metagenomics/mgnifypipelinestoolkit/kronatxtfromcatclassification/meta.yml' is unchanged
+Changes in 'mgnifypipelinestoolkit/kronatxtfromcatclassification/main.nf':
 --- modules/ebi-metagenomics/mgnifypipelinestoolkit/kronatxtfromcatclassification/main.nf
 +++ modules/ebi-metagenomics/mgnifypipelinestoolkit/kronatxtfromcatclassification/main.nf
 @@ -2,7 +2,9 @@
@@ -12,5 +14,22 @@ Changes in module 'ebi-metagenomics/mgnifypipelinestoolkit/kronatxtfromcatclassi
  
      input:
      tuple val(meta), path(cat_output)
+@@ -17,8 +19,10 @@
+ 
+     script:
+     """
++    gunzip ${cat_output}
++
+     krona_txt_from_cat_classification \\
+-        --input ${cat_output} \\
++        --input ${cat_output.name.replace(".gz", "")} \\
+         --output ${meta.id}.krona.txt \\
+         --names_dmp ${taxonomy}/names.dmp \\
+         --nodes_dmp ${taxonomy}/nodes.dmp
 
+'modules/ebi-metagenomics/mgnifypipelinestoolkit/kronatxtfromcatclassification/tests/main.nf.test.snap' is unchanged
+'modules/ebi-metagenomics/mgnifypipelinestoolkit/kronatxtfromcatclassification/tests/main.nf.test' is unchanged
+'modules/ebi-metagenomics/mgnifypipelinestoolkit/kronatxtfromcatclassification/tests/data/cat.tsv' is unchanged
+'modules/ebi-metagenomics/mgnifypipelinestoolkit/kronatxtfromcatclassification/tests/data/tax/names.dmp' is unchanged
+'modules/ebi-metagenomics/mgnifypipelinestoolkit/kronatxtfromcatclassification/tests/data/tax/nodes.dmp' is unchanged
 ************************************************************

@@ -19,8 +19,10 @@ process MGNIFYPIPELINESTOOLKIT_KRONATXTFROMCATCLASSIFICATION {
 
     script:
     """
+    gunzip ${cat_output}
+
     krona_txt_from_cat_classification \\
-        --input ${cat_output} \\
+        --input ${cat_output.name.replace(".gz", "")} \\
         --output ${meta.id}.krona.txt \\
         --names_dmp ${taxonomy}/names.dmp \\
         --nodes_dmp ${taxonomy}/nodes.dmp
