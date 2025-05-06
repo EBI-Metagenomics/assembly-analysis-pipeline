@@ -16,7 +16,7 @@ process CATPACK_CONTIGS {
 
     output:
     tuple val(meta), path("*.ORF2LCA.txt"), emit: orf2lca
-    tuple val(meta), path("*.contig2classification.txt"), emit: contig2classification
+    tuple val(meta), path("*.contig2classification.txt.gz"), emit: contig2classification
     tuple val(meta), path("*.log"), emit: log
     tuple val(meta), path("*.diamond"), optional: true, emit: diamond
     tuple val(meta), path("*.predicted_proteins.faa"), optional: true, emit: faa
@@ -44,6 +44,8 @@ process CATPACK_CONTIGS {
         ${premade_proteins} \\
         ${premade_table} \\
         ${args}
+
+    gzip ${prefix}.contig2classification.txt
 
     cat <<-END_VERSIONS > versions.yml
     "${task.process}":
