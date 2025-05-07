@@ -1,6 +1,6 @@
 # ebi-metagenomics/assembly-analysis-pipeline: Citations
 
-## MGnify
+## [MGnify](https://www.ebi.ac.uk/metagenomics/)
 
 > Richardson L, Allen B, Baldi G, Beracochea M, Bileschi ML, Burdett T, et al. MGnify: the microbiome sequence data analysis resource in 2023 [Internet]. Vol. 51, Nucleic Acids Research. Oxford University Press (OUP); 2022. p. D753–9. Available from: http://dx.doi.org/10.1093/nar/gkac1080
 

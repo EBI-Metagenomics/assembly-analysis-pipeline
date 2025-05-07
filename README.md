@@ -69,22 +69,19 @@ The MGnify assembly analysis pipeline, version 6.0.0 and onwards, provides the f
 
 ### Reference databases
 
-This pipeline uses several reference databases. The files required to run the pipeline are listed below, we provide some ready-made version of them for some tools. The complete list:
+This pipeline uses several reference databases, you can find the list of them in the follow table. The databases marked with <sup>\*</sup> are downloaded and post-processed by the [Microbiome Informatics reference-databases-preprocessing-pipeline](https://github.com/EBI-Metagenomics/reference-databases-preprocessing-pipeline). Our team also stores ready to use version of these databases in EBI's FTP server. (TODO: add link)
 
-| Reference database                                                                                           | Version    | Purpose                                                                                          | Download path                                                                               |
-| ------------------------------------------------------------------------------------------------------------ | ---------- | ------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------- |
-| [Rfam covariance models](https://rfam.org/)                                                                  | 15         | rRNA covariance models                                                                           | https://ftp.ebi.ac.uk/pub/databases/Rfam/15.0/Rfam.cm.gz                                    |
-| [Rfam clan info](https://rfam.org/)                                                                          | 15         | rRNA clan information                                                                            | https://ftp.ebi.ac.uk/pub/databases/Rfam/15.0/Rfam.clanin                                   |
-| [InterProScan](https://www.ebi.ac.uk/interpro/download/InterProScan/)                                        | 5.73-104.0 | InterProScan reference database                                                                  | https://ftp.ebi.ac.uk/pub/software/unix/iprscan/5/5.73-104.0/                               |
-| [eggNOG-mapper](https://github.com/eggnogdb/eggnog-mapper/wiki/eggNOG-mapper-v2.1.5-to-v2.1.12#requirements) | 2.1.12     | eggNOG-mapper annotation databases and Diamond                                                   | https://github.com/eggnogdb/eggnog-mapper/wiki/eggNOG-mapper-v2.1.5-to-v2.1.12#requirements |
-| [antiSMASH](https://rfam.org/)                                                                               | 7.1.0      | The antiSMASH reference database                                                                 | https://docs.antismash.secondarymetabolites.org/install/#antismash-standalone-lite          |
-| [KOFAM](https://www.genome.jp/tools/kofamkoala/)                                                             | 2025-04    | KOfam - HMM profiles for KEGG/KO. Our reference generation pipeline generates the required files | https://github.com/EBI-Metagenomics/reference-databases-preprocessing-pipeline              |
-| [GO Slims](https://geneontology.org/docs/go-subset-guide/)                                                   | -          | Metagenomics GO Slims                                                                            | FTP-link                                                                                    |
-| [run_dbCAN](https://dbcan.readthedocs.io/en/latest/installation.html#build-database)                         | -          | Pre-build run_DBCan refenrence database                                                          | FTP-link                                                                                    |
-| [CAT_Pack]()                                                                                                 | -          | Metagenomics GO Slims                                                                            | FTP-link                                                                                    |
-
-> [!NOTE]
-> The preprocessed databases are generated with the [Microbiome Informatics reference-databases-preprocessing-pipeline](https://github.com/EBI-Metagenomics/reference-databases-preprocessing-pipeline).
+| Reference database                                                                                           | Version    | Purpose                                                                                          | Download                                                                                        |
+| ------------------------------------------------------------------------------------------------------------ | ---------- | ------------------------------------------------------------------------------------------------ | ----------------------------------------------------------------------------------------------- |
+| [Rfam covariance models](https://rfam.org/)                                                                  | 15         | rRNA covariance models                                                                           | https://ftp.ebi.ac.uk/pub/databases/Rfam/15.0/Rfam.cm.gz                                        |
+| [Rfam clan info](https://rfam.org/)                                                                          | 15         | rRNA clan information                                                                            | https://ftp.ebi.ac.uk/pub/databases/Rfam/15.0/Rfam.clanin                                       |
+| [InterProScan](https://www.ebi.ac.uk/interpro/download/InterProScan/)                                        | 5.73-104.0 | InterProScan reference database                                                                  | https://ftp.ebi.ac.uk/pub/software/unix/iprscan/5/5.73-104.0/                                   |
+| [eggNOG-mapper](https://github.com/eggnogdb/eggnog-mapper/wiki/eggNOG-mapper-v2.1.5-to-v2.1.12#requirements) | 2.1.12     | eggNOG-mapper annotation databases and Diamond                                                   | https://github.com/eggnogdb/eggnog-mapper/wiki/eggNOG-mapper-v2.1.5-to-v2.1.12#requirements     |
+| [antiSMASH](https://rfam.org/)                                                                               | 7.1.0      | The antiSMASH reference database                                                                 | https://docs.antismash.secondarymetabolites.org/install/#antismash-standalone-lite              |
+| [KOFAM](https://www.genome.jp/tools/kofamkoala/)<sup>\*</sup>                                                | 2025-04    | KOfam - HMM profiles for KEGG/KO. Our reference generation pipeline generates the required files | https://github.com/EBI-Metagenomics/reference-databases-preprocessing-pipeline                  |
+| [GO Slims](https://geneontology.org/docs/go-subset-guide/)<sup>\*</sup>                                      | -          | Metagenomics GO Slims                                                                            | FTP-link                                                                                        |
+| [run_dbCAN](https://dbcan.readthedocs.io/en/latest/installation.html#build-database)                         | -          | Pre-built run_DBCan reference database                                                           | FTP-link                                                                                        |
+| [CAT_Pack](https://github.com/MGXlab/CAT_pack)                                                               | 2025_01    | CAT/BAT/RAT Genome Taxonomy Database (GTDB) pre-made reference database and                      | https://github.com/MGXlab/CAT_pack?tab=readme-ov-file#downloading-preconstructed-database-files |
 
 ## How to run
 
@@ -94,29 +91,28 @@ At the moment the only prerequisites for running it are Nextflow and [Docker](ht
 
 ### Input shape
 
-The input data for the pipeline is amplicon sequencing reads (either paired-end or single-end) in the form of FASTQ files. These files should be specified using a `.csv` samplesheet file with this format:
+The input data for the pipeline is metagenomic assemblies FASTA files. These files should be specified using a `.csv` samplesheet file with this format:
 
 ```
-sample,fastq_1,fastq_2,single_end
-SRR9674618,/path/to/reads/SRR9674618.fastq.gz,,true
-SRR17062740,/path/to/reads/SRR17062740_1.fastq.gz,/path/to/reads/SRR17062740_2.fastq.gz,false
+sample,assembly_fasta
+ERZ999,/path/to/assembly/ERZ999.fasta.gz
+ERZ998,/path/to/assembly/ERZ998.fasta.gz
 ```
 
 ### Execution
 
-You can run the current version of the pipeline on SLURM like this:
+You can run the current version of the pipeline with:
 
 ```bash
 nextflow run ebi-metagenomics/assembly-analysis-pipeline \
     -r main \
-    -profile codon_slurm \
     --input /path/to/samplesheet.csv \
     --outdir /path/to/outputdir
 ```
 
-## Outputs
+This pipeline supports [nf-core shared configuration files](https://nf-co.re/docs/usage/getting_started/configuration#shared-nf-coreconfigs).
 
-WIP
+## Outputs
 
 For a more detailed description of the different output files, see the [outputs](https://github.com/EBI-Metagenomics/amplicon-pipeline/blob/main/docs/output.md) file.
 
