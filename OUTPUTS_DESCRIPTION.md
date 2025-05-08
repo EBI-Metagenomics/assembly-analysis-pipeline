@@ -87,7 +87,7 @@ The `taxonomy` directory contains output files summarising the various taxonomic
 - **ERZ12345_contigs_taxonomy.tsv.gz**: This `tsv` file contains the output from `CAT_pack` that describes taxonomy assignments to contigs in the assembly.
 - **ERZ12345.krona.txt**: This `txt` file contains the Krona text input that is used to generate the Krona HTML file. It contains the distribution of the different taxonomic assignments from the `CAT_pack` output.
 - **ERZ12345.html**: This `html` file contains the Krona HTML file that interactively displays the distribution of the different taxonomic assignments from `CAT_pack`.
-- **ERZ12345_SSU.fasta.gz**: This `fasta` file contains all of the matching sequences to a particular rRNA amplicon type from running `cmsearch` on the contigs, being in this case the SSU. As described previously, this file name would be different if a different amplicon was matched, e.g. the suffix could be `_LSU` if it were matching to the LSU model, and you could have multiple files depending on how many marker genes were detected.
+- **ERZ12345_SSU.fasta.gz**: This `fasta` file contains all of the matching sequences to a particular rRNA marker gene type from running `cmsearch` on the contigs, being in this case the SSU. As described previously, this file name would be different if a different marker gene was matched, e.g. the suffix could be `_LSU` if it were matching to the LSU model, and you could have multiple files depending on how many marker genes were detected.
 
 ### functional-annotation
 
@@ -111,8 +111,8 @@ The `functional-annotation` directory contains seven subdirectories of results, 
 │   │   ├── ERZ12345_goslim_summary.tsv.gz
 │   │   └── ERZ12345_goslim_summary.tsv.gz.gzi
 │   ├── eggnog
-│   │   ├── ERZ12345_emapper_annotations.tsv.gz
-│   │   └── ERZ12345_emapper_seed_orthologs.tsv.gz
+│   │   ├── ERZ12345_emapper_seed_orthologs.tsv.gz
+│   │   └── ERZ12345_emapper_annotations.tsv.gz
 │   ├── kegg
 │   │   ├── ERZ12345_ko_summary.tsv.gz
 │   │   └── ERZ12345_ko_summary.tsv.gz.gzi
@@ -121,8 +121,8 @@ The `functional-annotation` directory contains seven subdirectories of results, 
 │   │   └── ERZ12345_proteins2rhea.tsv.gz.gzi
 │   └── dbcan
 │       ├── ERZ12345_dbcan_cgc.gff.gz
-│       ├── ERZ12345_dbcan_overview.tsv.gz
 │       ├── ERZ12345_dbcan_standard_out.tsv.gz
+│       ├── ERZ12345_dbcan_overview.tsv.gz
 │       ├── ERZ12345_dbcan_sub_hmm.tsv.gz
 │       └── ERZ12345_dbcan_substrates.tsv.gz
 ├── pathways-and-systems
@@ -157,104 +157,143 @@ This subdirectory contains the output of extracting the Gene Ontology (GO) signa
 
 This subdirectory contains the output of running `EggNOG-mapper` on the proteins of the assembly.
 
-- **ERZ12345_emapper_annotations.tsv.gz**: This `tsv` file contains the summary counts of the different Pfam signatures that appear in the assembly.
-- **ERZ12345_emapper_seed_orthologs.tsv.gz**: This file is an index for the Pfam count summary file.
+- **ERZ12345_emapper_seed_orthologs.tsv.gz**: This `tsv` file contains the seed ortholog matches from running `EggNOG-mapper`.
+- **ERZ12345_emapper_annotations.tsv.gz**: This `tsv` file contains the the different annotations from running `EggNOG-mapper`.
+
+#### Output files - kegg
+
+This subdirectory contains the output of running `hmmsearch` on KEGG orthologs, and then summarising their counts.
+
+- **ERZ12345_ko_summary.tsv.gz**: This `tsv` file contains the summary counts of the different KOs that appear in the assembly.
+- **ERZ12345_ko_summary.tsv.gz.gzi**: This file is an index for the KO count summary file.
+
+#### Output files - rhea-reactions
+
+This subdirectory contains the output of running `DIAMOND` on a database containing `Rhea` reactions, which are then also linked to their different `ChEBI` accessions.
+
+- **ERZ12345_proteins2rhea.tsv.gz**: This `tsv` file contains the different Rhea IDs and ChEBI reactions in the proteins of the assembly.
+- **ERZ12345_proteins2rhea.tsv.gz.gzi**: This file is an index for the Proteins2Rhea output.
+
+#### Output files - dbcan
+
+This subdirectory contains the output of running `run_dbCAN` on the assembly proteins, generating annotations for CAZymes and CAZyme Gene Clusters (CGC).
+
+- **ERZ12345_dbcan_cgc.gff.gz**: This `gff` file is annotated with functional genes for CGCFinder and visualization.
+- **ERZ12345_dbcan_standard_out.tsv.gz**: This `tsv` file lists all identified CGCs and their components.
+- **ERZ12345_dbcan_overview.tsv.gz**: This `tsv` file contains a summary of identified CAZymes.
+- **ERZ12345_dbcan_sub_hmm.tsv.gz**: This file `tsv` file contains the detailed HMMER results.
+- **ERZ12345_dbcan_substrates.tsv.gz**: This `tsv` file contains the dbCAN sub-HMM results, including substrate specificity.
+
+### pathways-and-systems
+
+The `pathways-and-systems` directory contains five subdirectories of results, one for each pathway/system annotation tool used by the pipeline. The results range from KEGG pathways, to Biosynthetic Gene Clusters (BGCs) by `antiSMASH` and `SanntiS`. Just like the functional annotations, most of these annotations are on a per-protein basis.
+
+```bash
+├── qc
+├── cds
+├── taxonomy
+├── functional-annotation
+├── pathways-and-systems
+│   ├── antismash
+│   │   ├── ERZ12345_antismash.gbk.gz
+│   │   ├── ERZ12345_antismash.gff.gz
+│   │   ├── ERZ12345_merged.json
+│   │   └── ERZ12345_antismash_summary.tsv.gz
+│   ├── sanntis
+│   │   └── ERZ12345_sanntis_concatenated.gff.gz
+│   ├── genome-properties
+│   │   ├── ERZ12345_gp.json.gz
+│   │   ├── ERZ12345_gp.tsv.gz
+│   │   └── ERZ12345_gp.txt.gz
+│   ├── kegg-modules
+│   │   ├── ERZ12345_kegg_modules_per_contigs.tsv.gz
+│   │   ├── ERZ12345_kegg_modules_per_contigs.tsv.gz.gzi
+│   │   ├── ERZ12345_kegg_modules_summary.tsv.gz
+│   │   └── ERZ12345_kegg_modules_summary.tsv.gz.gzi
+│   └── dram-distill
+│       ├── ERZ12345_dram.tsv.gz
+│       ├── ERZ12345_dram.html.gz
+│       ├── ERZ12345_genome_stats.tsv.gz
+│       └── ERZ12345_metabolism_summary.xlsx.gz
+└── gff
+```
+
+#### Output files - antismash
+
+This subdirectory contains the outputs of running `AntiSMASH` on the proteins of the assembly, describing the detected BGCs and outputting them in multiple different formats.
+
+- **ERZ12345_antismash.gbk.gz**: This `gbk` file contains the different AntiSMASH annotations in the GenBank format.
+- **ERZ12345_antismash.gff.gz**: This `gff` file contains the different AntiSMASH annotations in the GFF3 format.
+- **ERZ12345_merged.json**: This `json` file contains the different AntiSMASH annotations in a JSON object file.
+- **ERZ12345_antismash_summary.tsv.gz**: This `tsv` file contains the different AntiSMASH labels in the proteins of the assembly.
+
+#### Output files - sanntis
+
+This subdirectory contains the outputs of running `SanntiS` on the proteins of the assembly, also describing the detected BGCs using this new machine learning-based tool.
+
+- **ERZ12345_sanntis.gff.gz**: This `gff` file contains the different SanntiS annotations in the GFF3 format.
+
+#### Output files - genome-properties
+
+This subdirectory contains the outputs of running `Genome Properties` on the proteins of the assembly, describing different sets of protein signatures that exist in the set of proteins in the assembly, in three different formats.
+
+- **ERZ12345_gp.json.gz**: This `json` file contains the different Genome Properties annotations in a JSON object file.
+- **ERZ12345_gp.tsv.gz**: This `tsv` file contains the different Genome Properties annotations in a tab-separated file.
+- **ERZ12345_gp.txt.gz**: This `txt` file contains the different Genome Proeprties annotations in a simple text file.
+
+#### Output files - kegg-modules
+
+This subdirectory contains the outputs of computing the different modules and pathsways that the set of KEGG KOs make up in the assembly. Completeness measures for different modules are computed based on this presence of KOs.
+
+- **ERZ12345_kegg_modules_per_contigs.tsv.gz**: This `tsv` file contains the different KEGG modules and their completeness, including the contig they originate from.
+- **ERZ12345_kegg_modules_per_contigs.tsv.gz.gzi**: This file is an index for the per-contig KEGG modules file.
+- **ERZ12345_kegg_modules_summary.tsv.gz**: This `tsv` file contains a summary of the different KEGG modules and their completeness for the whole assembly, not on a per-contig basis
+- **ERZ12345_kegg_modules_summary.tsv.gz.gzi**: This file is an index for the summary KEGG modules file.
+
+#### Output files - dram-distill
+
+This subdirectory contains the outputs of running `DRAM-distill` on some of the outputs of the pipeline, generating analysis and summary reports and visualisations for the annotations on a per-assembly basis, into four different files.
+
+- **ERZ12345_dram.tsv.gz**: This `tsv` file contains the product of `DRAM-distill` for the assembly, including functions that were detected.
+- **ERZ12345_dram.html.gz**: This `html` file contains a heatmap visualisation of the detected functions by `DRAM-distill`.
+- **ERZ12345_genome_stats.tsv.gz**: This `tsv` file contains a summary of the assembly quality, including number of scaffolds.
+- **ERZ12345_metabolism_summary.xlsx.gz**: This `xlsx` file is an Excel spreadsheet containing information about annotations that represent common metabolisms.
+
+### gff
+
+The `gff` directory contains a single file that summarises most of the functional annotations generated by the pipeline on a per-protein basis into a single file.
+
+```bash
+├── qc
+├── cds
+├── taxonomy
+├── functional-annotation
+├── pathways-and-systems
+└── gff
+    └── ERZ12345_annotation_summary.gff.gz
+```
+
+#### Output files
+
+- **ERZ12345_annotation_summarygz**: This `gff` file contains an expansive and large summary of most of the functional annotations each protein has into a single GFF3 format file.
 
 ## Per-study output files
 
-The pipeline generated four different per-study output files that aggregate and summarise data, from failed runs to primer validation metadata.
+The pipeline generated four different per-study output files that aggregate and summarise data, from successful assembly analysis runs to study-wide `MultiQC` reports. These are stored at the root of the study analysis directory.
+
+### Successfully analyed assemblies
+
+The IDs of assemblies that are successfully analysed are aggregated into a top-level file (`analysed_assemblies.csv `), which looks like this::
+
+```
+ERZ12345,success
+ERZ56789,success
+```
 
 ### MultiQC
 
-The pipeline generates two [MultiQC](https://seqera.io/multiqc/) reports: one per-study (`study_multiqc_report.html`), and one per-run (`qc/${id}_multiqc_report.html`). These reports aggregate a few QC statistics from some of the tools run by the pipeline, including:
+Just like the pipeline generates MultiQC reports on a per-assembly basis, it also generates the same kind of report but on a per-study basis, which are located in the `multiqc/` directory.
 
-- fastp
-- cutadapt
-- DADA2 (as a custom report)
+### dram-distill
 
-### QC failed runs
-
-The pipeline runs a couple of sanity and QC checks on every input run. In the case where a run fails, it will be added to a top-level report (`qc_failed_runs.csv`) that aggregates the IDs of any other run that failed, along with the particular reason it failed. For example:
-
-```
-ERR6093685,no_reads
-ERRSFXHDFAIL,sfxhd_fail
-ERRSEQFUFAIL,seqfu_fail
-SRRLIBSTRATFAIL,libstrat_fail
-```
-
-The different exclusion messages are:
-
-| Exclusion message |                                                                                        Description                                                                                        |
-| :---------------: | :---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------: |
-|   `seqfu_fail`    |                                       Run had an error after running `seqfu check`. Check the log file in `qc/${id}_seqfu.tsv` for the exact reason                                       |
-|   `sfxhd_fail`    | Run had an error related to the suffix of the file `_1/_2` not matching the headers inside the fastq file. Check the log file in `qc/${id}_suffix_header_err.json` for the reads at fault |
-|  `libstrat_fail`  |                                  Run was predicted to likely not be of AMPLICON sequencing based on base-conservation patterns at the beginning of reads                                  |
-|    `no_reads`     |                                                                        Run had no reads left after running `fastp`                                                                        |
-
-### QC passed runs
-
-Similarly to runs that fail QC, runs that pass QC are guaranteed to generate results. The IDs of such runs is aggregated into a top-level file (`qc_passed_runs.csv`). For example:
-
-```
-SRR17062740,all_results
-ERR4334351,all_results
-ERRNOASVS,no_asvs
-```
-
-An important thing to note is that while a run might succeed at generating results for the closed-reference based method, it might fail at some extra QC checks required for generating results using the ASV method. For this reason, there are two statuses a passed run can have:
-
-- `all_results` - if results for both methods could be generated
-- `no_asvs` - if ASV results could not be generated
-
-### Primer validation summary
-
-The pipeline performs inferrence of primer presence and sequence using [PIMENTO](https://github.com/EBI-Metagenomics/PIMENTO/tree/dev). For any runs where a primer was detected, metadata about it will be aggregated into a top-level primer validation summary file (`primer_validation_summary.json`), including its sequence, region, and identification strategy. For example:
-
-```json
-[
-  {
-    "id": "SRR17062740",
-    "primers": [
-      {
-        "name": "F_auto",
-        "region": "V4",
-        "strand": "fwd",
-        "sequence": "ATTCCAGCTCCAATAG",
-        "identification_strategy": "auto"
-      },
-      {
-        "name": "R_auto",
-        "region": "V4",
-        "strand": "rev",
-        "sequence": "GACTACGATGGTATNTAATC",
-        "identification_strategy": "auto"
-      }
-    ]
-  },
-  {
-    "id": "ERR4334351",
-    "primers": [
-      {
-        "name": "341F",
-        "region": "V3",
-        "strand": "fwd",
-        "sequence": "CCTACGGGNGGCWGCAG",
-        "identification_strategy": "std"
-      },
-      {
-        "name": "805R",
-        "region": "V4",
-        "strand": "rev",
-        "sequence": "GACTACHVGGGTATCTAATCC",
-        "identification_strategy": "std"
-      }
-    ]
-  }
-]
-```
-
-The value of the `identification_strategy` key can either be:
-
-- `std` - Meaning the primer was matched to one of the standard library primers (more reliable)
-- `auto` - Meaning the primer was automatically predicted (less reliable)
+Just like the pipeline generates `DRAM-distil` outputs on a per-assembly basis, it also generates the same kind of outputs on a per-study basis, which are located in the `dram-distill/` directory.
