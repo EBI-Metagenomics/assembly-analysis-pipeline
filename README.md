@@ -81,7 +81,7 @@ This pipeline uses several reference databases, you can find the list of them in
 | [KOFAM](https://www.genome.jp/tools/kofamkoala/)<sup>\*</sup>                                                | 2025-04    | KOfam - HMM profiles for KEGG/KO. Our reference generation pipeline generates the required files | https://github.com/EBI-Metagenomics/reference-databases-preprocessing-pipeline                  |
 | [GO Slims](https://geneontology.org/docs/go-subset-guide/)<sup>\*</sup>                                      | -          | Metagenomics GO Slims                                                                            | FTP-link                                                                                        |
 | [run_dbCAN](https://dbcan.readthedocs.io/en/latest/installation.html#build-database)                         | -          | Pre-built run_DBCan reference database                                                           | FTP-link                                                                                        |
-| [CAT_Pack](https://github.com/MGXlab/CAT_pack)                                                               | 2025_01    | CAT/BAT/RAT Genome Taxonomy Database (GTDB) pre-made reference database and                      | https://github.com/MGXlab/CAT_pack?tab=readme-ov-file#downloading-preconstructed-database-files |
+| [CAT_Pack](https://github.com/MGXlab/CAT_pack)                                                               | 2025_01    | CAT/BAT/RAT NCBI taxoomy pre-made reference database and                                         | https://github.com/MGXlab/CAT_pack?tab=readme-ov-file#downloading-preconstructed-database-files |
 
 ## How to run
 
