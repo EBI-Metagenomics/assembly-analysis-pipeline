@@ -15,8 +15,7 @@ process ANTISMASH_JSON_TO_GFF {
 
     script:
     """
-    # TODO: fix this in the toolkit
-    python /usr/local/lib/python3.11/site-packages/mgnify_pipelines_toolkit/analysis/assembly/antismash_gff_builder.py \\
+    antismash_gff_builder.py \\
         --input ${antismash_json} \\
         --output ${antismash_json.simpleName}.gff
 
