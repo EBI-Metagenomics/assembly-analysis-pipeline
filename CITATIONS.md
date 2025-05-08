@@ -1,5 +1,9 @@
 # ebi-metagenomics/assembly-analysis-pipeline: Citations
 
+## [MGnify](https://www.ebi.ac.uk/metagenomics/)
+
+> Richardson L, Allen B, Baldi G, Beracochea M, Bileschi ML, Burdett T, et al. MGnify: the microbiome sequence data analysis resource in 2023 [Internet]. Vol. 51, Nucleic Acids Research. Oxford University Press (OUP); 2022. p. D753–9. Available from: http://dx.doi.org/10.1093/nar/gkac1080
+
 ## [nf-core](https://pubmed.ncbi.nlm.nih.gov/32055031/)
 
 > Ewels PA, Peltzer A, Fillinger S, Patel H, Alneberg J, Wilm A, Garcia MU, Di Tommaso P, Nahnsen S. The nf-core framework for community-curated bioinformatics pipelines. Nat Biotechnol. 2020 Mar;38(3):276-278. doi: 10.1038/s41587-020-0439-x. PubMed PMID: 32055031.
@@ -10,9 +14,73 @@
 
 ## Pipeline tools
 
-- [MultiQC](https://pubmed.ncbi.nlm.nih.gov/27312411/)
+- [Diamond](http://dx.doi.org/10.1038/s41592-021-01101-x)
 
-> Ewels P, Magnusson M, Lundin S, Käller M. MultiQC: summarize analysis results for multiple tools and samples in a single report. Bioinformatics. 2016 Oct 1;32(19):3047-8. doi: 10.1093/bioinformatics/btw354. Epub 2016 Jun 16. PubMed PMID: 27312411; PubMed Central PMCID: PMC5039924.
+  > Buchfink B, Reuter K, Drost HG. Sensitive protein alignments at tree-of-life scale using DIAMOND. Vol. 18, Nature Methods. Springer Science and Business Media LLC; 202p. 366–8. Available from: http://dx.doi.org/10.1038/s41592-021-01101-x
+
+- [Infernal](http://dx.doi.org/10.1093/bioinformatics/btt509)
+
+  > Nawrocki EP, Eddy SR. Infernal 1.1: 100-fold faster RNA homology searches. Vol. 29, Bioinformatics. Oxford University Press (OUP); 2013. p. 2933–5. Available from: http://dx.doi.org/10.1093/bioinformatics/btt509
+
+- [Combined Gene Caller](http://dx.doi.org/10.1093/nar/gkac1080)
+
+  > Richardson L, Allen B, Baldi G, Beracochea M, Bileschi ML, Burdett T, et al. MGnify: the microbiome sequence data analysis resource in 2023. Vol. 51, Nucleic Acids Research. Oxford University Press (OUP); 2022. p. D753–9. Available from: http://dx.doi.org/10.1093/nar/gkac1080
+
+- [Krona](http://dx.doi.org/10.1186/1471-2105-12-385)
+
+  > Ondov BD, Bergman NH, Phillippy AM. Interactive metagenomic visualization in a Web browser. Vol. 12, BMC Bioinformatics. Springer Science and Business Media LLC; 201Available from: http://dx.doi.org/10.1186/1471-2105-12-385
+
+- [Pyrodigal](http://dx.doi.org/10.21105/joss.04296)
+
+  > Larralde M. Pyrodigal: Python bindings and interface to Prodigal, an efficient method for gene prediction in prokaryotes. Vol. 7, Journal of Open Source Software. The Open Journal; 2022. p. 4296. Available from: http://dx.doi.org/10.21105/joss.04296
+
+- [dbCAN](http://dx.doi.org/10.1093/nar/gkad328)
+
+  > Zheng J, Ge Q, Yan Y, Zhang X, Huang L, Yin Y. dbCAN3: automated carbohydrate-active enzyme and substrate annotation. Vol. 51, Nucleic Acids Research. Oxford University Press (OUP); 2023. p. W115–2Available from: http://dx.doi.org/10.1093/nar/gkad328
+
+- [InterProScan](http://dx.doi.org/10.1093/bioinformatics/btu031)
+
+  > Jones P, Binns D, Chang HY, Fraser M, Li W, McAnulla C, et al. InterProScan 5: genome-scale protein function classification. Vol. 30, Bioinformatics. Oxford University Press (OUP); 2014. p. 1236–40. Available from: http://dx.doi.org/10.1093/bioinformatics/btu031
+
+- [catpack](http://dx.doi.org/10.1186/s13059-019-1817-x)
+
+  > von Meijenfeldt FAB, Arkhipova K, Cambuy DD, Coutinho FH, Dutilh BE. Robust taxonomic classification of uncharted microbial sequences and bins with CAT and BAT. Vol. 20, Genome Biology. Springer Science and Business Media LLC; 2019. Available from: http://dx.doi.org/10.1186/s13059-019-1817-x
+
+- [FragGeneScanRs](http://dx.doi.org/10.1186/s12859-022-04736-5)
+
+  > Van der Jeugt F, Dawyndt P, Mesuere B. FragGeneScanRs: faster gene prediction for short reads. Vol. 23, BMC Bioinformatics. Springer Science and Business Media LLC; 2022. Available from: http://dx.doi.org/10.1186/s12859-022-04736-5
+
+- [SanntiS](http://dx.doi.org/10.1101/2023.05.23.540769)
+
+  > Sanchez S, Rogers JD, Rogers AB, Nassar M, McEntyre J, Welch M, et al. Expansion of novel biosynthetic gene clusters from diverse environments using SanntiS. Cold Spring Harbor Laboratory; 2023. Available from: http://dx.doi.org/10.1101/2023.05.23.540769
+
+- [DRAM](http://dx.doi.org/10.1093/nar/gkaa621)
+
+  > Shaffer M, Borton MA, McGivern BB, Zayed AA, La Rosa SL, Solden LM, et al. DRAM for distilling microbial metabolism to automate the curation of microbiome function. Vol. 48, Nucleic Acids Research. Oxford University Press (OUP); 2020. p. 8883–900. Available from: http://dx.doi.org/10.1093/nar/gkaa621
+
+- [Genome properties](http://dx.doi.org/10.1093/nar/gky1013)
+
+  > Richardson LJ, Rawlings ND, Salazar GA, Almeida A, Haft DR, Ducq G, et al. Genome properties in 2019: a new companion database to InterPro for the inference of complete functional attributes. Vol. 47, Nucleic Acids Research. Oxford University Press (OUP); 2018. p. D564–72. Available from: http://dx.doi.org/10.1093/nar/gky1013
+
+- [tabix](http://dx.doi.org/10.1093/bioinformatics/btp352)
+
+  > Li H, Handsaker B, Wysoker A, Fennell T, Ruan J, Homer N, et al. The Sequence Alignment/Map format and SAMtools. Vol. 25, Bioinformatics. Oxford University Press (OUP); 2009. p. 2078–9. Available from: http://dx.doi.org/10.1093/bioinformatics/btp352
+
+- [antiSMASH](http://dx.doi.org/10.1093/nar/gkab335)
+
+  > Blin K, Shaw S, Kloosterman AM, Charlop-Powers Z, van Wezel GP, Medema MH, et al. antiSMASH 6.0: improving cluster detection and comparison capabilities. Vol. 49, Nucleic Acids Research. Oxford University Press (OUP); 202p. W29–35. Available from: http://dx.doi.org/10.1093/nar/gkab335
+
+- [HMMER](http://dx.doi.org/10.1371/journal.pcbi.1002195)
+
+  > Eddy SR. Accelerated Profile HMM Searches. Pearson WR, editor. Vol. 7, PLoS Computational Biology. Public Library of Science (PLoS); 201p. e1002195. Available from: http://dx.doi.org/10.1371/journal.pcbi.1002195
+
+- [QUAST](http://dx.doi.org/10.1093/bioinformatics/btt086)
+
+  > Gurevich A, Saveliev V, Vyahhi N, Tesler G. QUAST: quality assessment tool for genome assemblies. Vol. 29, Bioinformatics. Oxford University Press (OUP); 2013. p. 1072–5. Available from: http://dx.doi.org/10.1093/bioinformatics/btt086
+
+- [SeqKit](http://dx.doi.org/10.1371/journal.pone.0163962)
+
+  > Shen W, Le S, Li Y, Hu F. SeqKit: A Cross-Platform and Ultrafast Toolkit for FASTA/Q File Manipulation. Zou Q, editor. Vol. 11, PLOS ONE. Public Library of Science (PLoS); 2016. p. e0163962. Available from: http://dx.doi.org/10.1371/journal.pone.0163962
 
 ## Software packaging/containerisation tools
 

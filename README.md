@@ -1,80 +1,124 @@
 # ebi-metagenomics/assembly-analysis-pipeline
 
 [![GitHub Actions CI Status](https://github.com/ebi-metagenomics/assembly-analysis-pipeline/actions/workflows/ci.yml/badge.svg)](https://github.com/ebi-metagenomics/assembly-analysis-pipeline/actions/workflows/ci.yml)
-[![GitHub Actions Linting Status](https://github.com/ebi-metagenomics/assembly-analysis-pipeline/actions/workflows/linting.yml/badge.svg)](https://github.com/ebi-metagenomics/assembly-analysis-pipeline/actions/workflows/linting.yml)[![Cite with Zenodo](http://img.shields.io/badge/DOI-10.5281/zenodo.XXXXXXX-1073c8?labelColor=000000)](https://doi.org/10.5281/zenodo.XXXXXXX)
+[![GitHub Actions Linting Status](https://github.com/ebi-metagenomics/assembly-analysis-pipeline/actions/workflows/linting.yml/badge.svg)](https://github.com/ebi-metagenomics/assembly-analysis-pipeline/actions/workflows/linting.yml)
 [![nf-test](https://img.shields.io/badge/unit_tests-nf--test-337ab7.svg)](https://www.nf-test.com)
-
 [![Nextflow](https://img.shields.io/badge/nextflow%20DSL2-%E2%89%A524.04.3-23aa62.svg)](https://www.nextflow.io/)
-[![run with conda](http://img.shields.io/badge/run%20with-conda-3EB049?labelColor=000000&logo=anaconda)](https://docs.conda.io/en/latest/)
-[![run with docker](https://img.shields.io/badge/run%20with-docker-0db7ed?labelColor=000000&logo=docker)](https://www.docker.com/)
-[![run with singularity](https://img.shields.io/badge/run%20with-singularity-1d355c.svg?labelColor=000000)](https://sylabs.io/docs/)
-[![Launch on Seqera Platform](https://img.shields.io/badge/Launch%20%F0%9F%9A%80-Seqera%20Platform-%234256e7)](https://cloud.seqera.io/launch?pipeline=https://github.com/ebi-metagenomics/assembly-analysis-pipeline)
 
 ## Introduction
 
-**ebi-metagenomics/assembly-analysis-pipeline** is a bioinformatics pipeline that ...
+# MGnify assembly analysis pipeline
 
-<!-- TODO nf-core:
-   Complete this sentence with a 2-3 sentence summary of what types of data the pipeline ingests, a brief overview of the
-   major pipeline sections and the types of output it produces. You're giving an overview to someone new
-   to nf-core here, in 15-20 seconds. For an example, see https://github.com/nf-core/rnaseq/blob/master/README.md#introduction
--->
+This repository contains the [MGnify](https://www.ebi.ac.uk/metagenomics) assembly analysis pipeline, from version 6.0.0 onwards. For version 5.0 of the pipeline, please [follow this link](https://github.com/EBI-Metagenomics/pipeline-v5).
 
-<!-- TODO nf-core: Include a figure that guides the user through the major workflow steps. Many nf-core
-     workflows use the "tube map" design for that. See https://nf-co.re/docs/contributing/design_guidelines#examples for examples.   -->
-<!-- TODO nf-core: Fill in short bullet-pointed list of the default steps in the pipeline -->2. Present QC for raw reads ([`MultiQC`](http://multiqc.info/))
+![V6 Schema](assets/schema.png)
 
-## Usage
+## Pipeline description
 
-> [!NOTE]
-> If you are new to Nextflow and nf-core, please refer to [this page](https://nf-co.re/docs/usage/installation) on how to set-up Nextflow.Make sure to [test your setup](https://nf-co.re/docs/usage/introduction#how-to-run-a-pipeline) with `-profile test` before running the workflow on actual data.
+### Features
 
-<!-- TODO nf-core: Describe the minimum required steps to execute the pipeline, e.g. how to prepare samplesheets.
-     Explain what rows and columns represent. For instance (please edit as appropriate):
+The MGnify assembly analysis pipeline, version 6.0.0 and onwards, provides the following key features:
 
-First, prepare a samplesheet with your input data that looks as follows:
+- Assembly Quality Control: The pipeline performs quality control on the assembled contigs, with plans to add decontamination functionality in the near future.
+- CDS Prediction: The pipeline utilizes the [MGnify Combined Gene Caller](link_to_combined_gene_caller) to predict coding sequences (CDS) within the assembled contigs.
+- Taxonomic Assignment: The pipeline assigns taxonomic classifications to the assembled contigs using [Contig Annotation Tool (CAT)](https://github.com/MGXlab/CAT_pack).
+- Functional Annotation:
+  - [InterProScan](https://www.ebi.ac.uk/interpro/interproscan.html): Identifies protein domains, families, and functional sites.
+  - [eggNOG Mapper](https://eggnog-mapper.embl.de/): Assigns clusters of orthologs groups (COGs) annotations and eggNOG functional descriptions.
+  - [GO Slims](http://www.geneontology.org/ontology/subsets/goslim_metagenomics.obo): The pipeline maps the protein sequences to Gene Ontology (GO) Slim terms.
+  - [run_dbCAN](https://github.com/bcb-unl/run_dbcan): Annotates carbohydrate-active enzymes.
+  - [KEGG Orthologs](https://www.genome.jp/kegg/ko.html): Assigns KEGG Orthologs (KO) identifiers using HMMER.
+  - [RHEA](https://www.rhea-db.org/): Proteins are assigned RHEA ids.
+- Biosynthetic Gene Cluster Annotation: The pipeline uses [AntiSMASH](https://antismash.secondarymetabolites.org/) and [SanntiS](https://github.com/Finn-Lab/SanntiS) to identify and annotate biosynthetic gene clusters associated with secondary metabolite production.
+- KEGG Modules completeness: The pipeline analyzes the KEGG Orthologs annotations to infer the presence and completeness of KEGG modules.
+- Consolidated annotation: The pipeline aggregates all the generated annotations into a single consolidated GFF file.
 
-`samplesheet.csv`:
+### Tools
 
-```csv
-sample,fastq_1,fastq_2
-CONTROL_REP1,AEG588A1_S1_L002_R1_001.fastq.gz,AEG588A1_S1_L002_R2_001.fastq.gz
+`TODO: add versions`
+
+| Tool                                                                                              | Version | Purpose                                                                                                        |
+| ------------------------------------------------------------------------------------------------- | ------- | -------------------------------------------------------------------------------------------------------------- |
+| [antiSMASH](https://antismash.secondarymetabolites.org/#!/start)                                  |         | Tool for the identification and annotation of secondary metabolite biosynthesis gene clusters                  |
+| [CAT_pack](https://github.com/MGXlab/CAT_pack)                                                    |         | Taxonomic classification of the contigs in the assembly                                                        |
+| [cmsearchtbloutdeoverlap](https://github.com/nawrockie/cmsearch_tblout_deoverlap/)                |         | Deoverlapping of cmsearch results                                                                              |
+| [csvtk](http://bioinf.shenwei.me/csvtk)                                                           |         | A cross-platform, efficient, and practical CSV/TSV toolkit                                                     |
+| [Combined Gene Caller - Merge](https://www.ebi.ac.uk/metagenomics)                                |         | Combined gene caller merge script used to combine predictions of Pyrodigal and FragGeneScanRS                  |
+| [Diamond](https://github.com/bbuchfink/diamond)                                                   |         | Used to match predicted CDS against the CAT reference database for the taxonomic classification of the contigs |
+| [DRAM](https://github.com/WrightonLabCSU/DRAM)                                                    |         | Summarizes annotations from multiple tools like KEGG, Pfam, and CAZy                                           |
+| [easel](https://github.com/EddyRivasLab/easel)                                                    |         | Extracts FASTA sequences by name from a cmsearch deoverlap result                                              |
+| [extractcoords](https://github.com/EBI-Metagenomics/mgnify-pipelines-toolkit)                     |         | Processes output from easel-sfetch to extract SSU and LSU sequences.                                           |
+| [FragGeneScanRs](https://github.com/unipept/FragGeneScanRs)                                       |         | CDS calling; this tool specializes in calling fragmented CDS                                                   |
+| [generategaf](https://github.com/EBI-Metagenomics/mgnify-pipelines-toolkit)                       |         | Script that generates a GO Annotation File (GAF) from an InterProScan result TSV file                          |
+| [Genome Properties](https://www.ebi.ac.uk/interpro/genomeproperties/)                             |         | Uses protein signatures as evidence to determine the presence of each step within a property                   |
+| [Infernal - cmscan](http://eddylab.org/infernal/)                                                 |         | RNA sequence searching                                                                                         |
+| [InterProScan](https://www.ebi.ac.uk/interpro/download/InterProScan/)                             |         | Functionally characterizes nucleotide or protein sequences by scanning them against the InterPro database.     |
+| [HMMER](http://hmmer.org/)                                                                        |         | Used to annotate CDS with KO                                                                                   |
+| [Krona](https://github.com/marbl/Krona/wiki/KronaTools)                                           |         | Krona chart visualization                                                                                      |
+| [kegg-pathways-completeness](https://github.com/EBI-Metagenomics/kegg-pathways-completeness-tool) |         | Computes the completeness of each KEGG pathway module based on KEGG orthologue (KO) annotations.               |
+| [MGnify pipelines toolkit](https://github.com/EBI-Metagenomics/mgnify-pipelines-toolkit)          |         | Collection of tools and scripts used in MGnify pipelines.                                                      |
+| [MultiQC](http://multiqc.info/)                                                                   |         | Tool to aggregate bioinformatic analysis results.                                                              |
+| [Owltools](https://github.com/owlcollab/owltools)                                                 |         | Tool utilized to map GO terms to GO-slims                                                                      |
+| [Pyrodigal](https://pyrodigal.readthedocs.org/)                                                   |         | CDS calling                                                                                                    |
+| [pigz](https://zlib.net/pigz/)                                                                    |         | A parallel implementation of gzip for modern multi-processor, multi-core systems                               |
+| [QUAST](http://quast.sourceforge.net/quast)                                                       |         | Tool used evaluates genome assemblies, it's part of the pipeline QC module.                                    |
+| [run_dbCAN](https://github.com/bcb-unl/run_dbcan)                                                 |         | Annotation tool for the Carbohydrate-Active enZYmes Database (CAZy)                                            |
+| [SeqKit](https://bioinf.shenwei.me/seqkit/)                                                       |         | Used to manipulate FASTA files                                                                                 |
+| [SanntiS](https://github.com/Finn-Lab/SanntiS)                                                    |         | Tool used to identify biosynthetic gene clusters                                                               |
+| [tabix](http://www.htslib.org/doc/tabix.html)                                                     |         | Generic indexer for TAB-delimited genome position files                                                        |
+
+### Reference databases
+
+This pipeline uses several reference databases, you can find the list of them in the follow table. The databases marked with <sup>\*</sup> are downloaded and post-processed by the [Microbiome Informatics reference-databases-preprocessing-pipeline](https://github.com/EBI-Metagenomics/reference-databases-preprocessing-pipeline). Our team also stores ready to use version of these databases in EBI's FTP server. (TODO: add link)
+
+| Reference database                                                                                           | Version    | Purpose                                                                                          | Download                                                                                        |
+| ------------------------------------------------------------------------------------------------------------ | ---------- | ------------------------------------------------------------------------------------------------ | ----------------------------------------------------------------------------------------------- |
+| [Rfam covariance models](https://rfam.org/)                                                                  | 15         | rRNA covariance models                                                                           | https://ftp.ebi.ac.uk/pub/databases/Rfam/15.0/Rfam.cm.gz                                        |
+| [Rfam clan info](https://rfam.org/)                                                                          | 15         | rRNA clan information                                                                            | https://ftp.ebi.ac.uk/pub/databases/Rfam/15.0/Rfam.clanin                                       |
+| [InterProScan](https://www.ebi.ac.uk/interpro/download/InterProScan/)                                        | 5.73-104.0 | InterProScan reference database                                                                  | https://ftp.ebi.ac.uk/pub/software/unix/iprscan/5/5.73-104.0/                                   |
+| [eggNOG-mapper](https://github.com/eggnogdb/eggnog-mapper/wiki/eggNOG-mapper-v2.1.5-to-v2.1.12#requirements) | 2.1.12     | eggNOG-mapper annotation databases and Diamond                                                   | https://github.com/eggnogdb/eggnog-mapper/wiki/eggNOG-mapper-v2.1.5-to-v2.1.12#requirements     |
+| [antiSMASH](https://rfam.org/)                                                                               | 7.1.0      | The antiSMASH reference database                                                                 | https://docs.antismash.secondarymetabolites.org/install/#antismash-standalone-lite              |
+| [KOFAM](https://www.genome.jp/tools/kofamkoala/)<sup>\*</sup>                                                | 2025-04    | KOfam - HMM profiles for KEGG/KO. Our reference generation pipeline generates the required files | https://github.com/EBI-Metagenomics/reference-databases-preprocessing-pipeline                  |
+| [GO Slims](https://geneontology.org/docs/go-subset-guide/)<sup>\*</sup>                                      | -          | Metagenomics GO Slims                                                                            | FTP-link                                                                                        |
+| [run_dbCAN](https://dbcan.readthedocs.io/en/latest/installation.html#build-database)                         | -          | Pre-built run_DBCan reference database                                                           | FTP-link                                                                                        |
+| [CAT_Pack](https://github.com/MGXlab/CAT_pack)                                                               | 2025_01    | CAT/BAT/RAT Genome Taxonomy Database (GTDB) pre-made reference database and                      | https://github.com/MGXlab/CAT_pack?tab=readme-ov-file#downloading-preconstructed-database-files |
+
+## How to run
+
+### Requirements
+
+At the moment the only prerequisites for running it are Nextflow and [Docker](https://www.docker.com/)/[Singularity](https://docs.sylabs.io/guides/3.5/user-guide/introduction.html), since all the Nextflow processes use pre-built containers.
+
+### Input shape
+
+The input data for the pipeline is metagenomic assemblies FASTA files. These files should be specified using a `.csv` samplesheet file with this format:
+
+```
+sample,assembly_fasta
+ERZ999,/path/to/assembly/ERZ999.fasta.gz
+ERZ998,/path/to/assembly/ERZ998.fasta.gz
 ```
 
-Each row represents a fastq file (single-end) or a pair of fastq files (paired end).
+### Execution
 
--->
-
-Now, you can run the pipeline using:
-
-<!-- TODO nf-core: update the following command to include all required parameters for a minimal example -->
+You can run the current version of the pipeline with:
 
 ```bash
 nextflow run ebi-metagenomics/assembly-analysis-pipeline \
-   -profile <docker/singularity/.../institute> \
-   --input samplesheet.csv \
-   --outdir <OUTDIR>
+    -r main \
+    --input /path/to/samplesheet.csv \
+    --outdir /path/to/outputdir
 ```
 
-> [!WARNING]
-> Please provide pipeline parameters via the CLI or Nextflow `-params-file` option. Custom config files including those provided by the `-c` Nextflow option can be used to provide any configuration _**except for parameters**_; see [docs](https://nf-co.re/docs/usage/getting_started/configuration#custom-configuration-files).
+This pipeline supports [nf-core shared configuration files](https://nf-co.re/docs/usage/getting_started/configuration#shared-nf-coreconfigs).
 
-## Credits
+## Outputs
 
-ebi-metagenomics/assembly-analysis-pipeline was originally written by mberacochea.
-
-We thank the following people for their extensive assistance in the development of this pipeline:
-
-<!-- TODO nf-core: If applicable, make list of people who have also contributed -->
-
-## Contributions and Support
-
-If you would like to contribute to this pipeline, please see the [contributing guidelines](.github/CONTRIBUTING.md).
+For a more detailed description of the different output files, see the [outputs](https://github.com/EBI-Metagenomics/amplicon-pipeline/blob/main/docs/output.md) file.
 
 ## Citations
 
-<!-- TODO nf-core: Add citation for pipeline after first release. Uncomment lines below and update Zenodo doi and badge at the top of this file. -->
-<!-- If you use ebi-metagenomics/assembly-analysis-pipeline for your analysis, please cite it using the following doi: [10.5281/zenodo.XXXXXX](https://doi.org/10.5281/zenodo.XXXXXX) --><!-- TODO nf-core: Add bibliography of tools and data used in your pipeline -->
+> Richardson L, Allen B, Baldi G, Beracochea M, Bileschi ML, Burdett T, et al. MGnify: the microbiome sequence data analysis resource in 2023 [Internet]. Vol. 51, Nucleic Acids Research. Oxford University Press (OUP); 2022. p. D753–9. Available from: http://dx.doi.org/10.1093/nar/gkac1080
 
 An extensive list of references for the tools used by the pipeline can be found in the [`CITATIONS.md`](CITATIONS.md) file.
 
