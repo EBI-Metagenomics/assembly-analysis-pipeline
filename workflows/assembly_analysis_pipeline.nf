@@ -275,7 +275,30 @@ workflow ASSEMBLY_ANALYSIS_PIPELINE {
                 return "${meta.id},success"
             }
         }
-        .collectFile(name: "analysed_assemblies.csv", storeDir: "${params.outdir}", newLine: true, cache: false)
+        .collectFile(name: "analysed_assemblies.csv", storeDir: params.outdir, newLine: true, cache: false)
+
+
+    /*************************/
+    /* Downtream samplesheet */
+    /************************/
+
+    // VIRIfy samplesheet //
+    ASSEMBLY_QC.out.assembly_filtered.join(
+        COMBINED_GENE_CALLER.out.gff
+    ).map {
+        meta, assembly, gff -> {
+            // We need to handle relative paths
+            def outdir_file = file(params.outdir)
+            def output_full_path = "${outdir_file.getParent()}/${outdir_file.getName()}"
+            return "${meta.id},,,${output_full_path}/${assembly.name},${output_full_path}/${gff.name}"
+        }
+    }.collectFile(
+        name: "virify_samplesheet.csv",
+        storeDir: "${params.outdir}/downstream_samplesheets/",
+        newLine: true,
+        cache: false,
+        seed: "id,assembly,fastq_1,fastq_2,proteins"
+    )
 
     emit:
     multiqc_report = MULTIQC_PER_SAMPLESHEET.out.report.toList() // channel: /path/to/multiqc_report.html
