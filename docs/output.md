@@ -67,7 +67,7 @@ The `cds` directory contains output files related to the combined gene caller su
 
 ### taxonomy
 
-The `taxonomy` directory contains output files summarising the various taxonomic assignment results using tools like `CAT_pack`, `cmsearch`, and `Krona`. There are four output files in this directory.
+The `taxonomy` directory contains output files from taxonomic assignment tools such as `CAT_pack` and `cmsearch`, as well as visualizations generated with `Krona`.
 
 ```bash
 ├── qc
