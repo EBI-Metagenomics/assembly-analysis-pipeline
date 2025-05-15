@@ -233,28 +233,28 @@ This subdirectory contains the results of running `AntiSMASH` on the assembly’
 
 This subdirectory contains the outputs of running `SanntiS` on the proteins of the assembly, also describing the detected BGCs using this new machine learning-based tool.
 
-- **ERZ12345_sanntis.gff.gz**: This `gff` file contains the different SanntiS annotations in the GFF3 format.
+- **ERZ12345_sanntis.gff.gz**: This `gff` file contains the different SanntiS annotations in the GFF3 format. The GFF3 specification can be found in the [tool repo](https://github.com/Finn-Lab/SanntiS?tab=readme-ov-file#ouput) 
 
 #### Output files - genome-properties
 
-This subdirectory contains the outputs of running `Genome Properties` on the proteins of the assembly, describing different sets of protein signatures that exist in the set of proteins in the assembly, in three different formats.
+This subdirectory contains the results of running `Genome Properties` on the assembly’s proteins, detailing various protein signature sets present in the assembly. The results are provided in three formats.
 
-- **ERZ12345_gp.json.gz**: This `json` file contains the different Genome Properties annotations in a JSON object file.
-- **ERZ12345_gp.tsv.gz**: This `tsv` file contains the different Genome Properties annotations in a tab-separated file.
-- **ERZ12345_gp.txt.gz**: This `txt` file contains the different Genome Proeprties annotations in a simple text file.
+- **ERZ12345_gp.json.gz**: A JSON format file containing Genome Properties annotations
+- **ERZ12345_gp.tsv.gz**: A `tsv` file containing Genome Properties annotations in a tab-separated format.
+- **ERZ12345_gp.txt.gz**: A plain text file containing the Genome Properties annotations.
 
 #### Output files - kegg-modules
 
-This subdirectory contains the outputs of computing the different modules and pathsways that the set of KEGG KOs make up in the assembly. Completeness measures for different modules are computed based on this presence of KOs.
+This subdirectory contains results from evaluating which KEGG modules and pathways are represented in the assembly based on the presence of KEGG Orthologs (KOs). For each module, a completeness score is calculated depending on how many required KOs are detected.
 
-- **ERZ12345_kegg_modules_per_contigs.tsv.gz**: This `tsv` file contains the different KEGG modules and their completeness, including the contig they originate from.
+- **ERZ12345_kegg_modules_per_contigs.tsv.gz**: This `tsv` file contains the different KEGG modules and their completeness, including the contig they were found on.
 - **ERZ12345_kegg_modules_per_contigs.tsv.gz.gzi**: This file is an index for the per-contig KEGG modules file.
-- **ERZ12345_kegg_modules_summary.tsv.gz**: This `tsv` file contains a summary of the different KEGG modules and their completeness for the whole assembly, not on a per-contig basis
+- **ERZ12345_kegg_modules_summary.tsv.gz**: This `tsv` file contains a summary of the KEGG modules and their completeness for the whole assembly, not on a per-contig basis.
 - **ERZ12345_kegg_modules_summary.tsv.gz.gzi**: This file is an index for the summary KEGG modules file.
 
 #### Output files - dram-distill
 
-This subdirectory contains the outputs of running `DRAM-distill` on some of the outputs of the pipeline, generating analysis and summary reports and visualisations for the annotations on a per-assembly basis, into four different files.
+This subdirectory contains the outputs of running `DRAM-distill` on the KO hits per contig, the InterProscan and run_DBCan. DRAM generates summary reports and visualisations for the annotations on a per-assembly basis, into four different files.
 
 - **ERZ12345_dram.tsv.gz**: This `tsv` file contains the product of `DRAM-distill` for the assembly, including functions that were detected.
 - **ERZ12345_dram.html.gz**: This `html` file contains a heatmap visualisation of the detected functions by `DRAM-distill`.
@@ -281,11 +281,11 @@ The `gff` directory contains a single file that summarises most of the functiona
 
 ## Per-study output files
 
-The pipeline generated four different per-study output files that aggregate and summarise data, from successful assembly analysis runs to study-wide `MultiQC` reports. These are stored at the root of the study analysis directory.
+The pipeline generates four different per-study output files that aggregate and summarise data, from successful assembly analysis runs to study-wide `MultiQC` reports. These are stored at the root of the study analysis directory.
 
 ### Successfully analyed assemblies
 
-The IDs of assemblies that are successfully analysed are aggregated into a top-level file (`analysed_assemblies.csv `), which looks like this::
+The IDs of assemblies that have been successfully analysed are aggregated into a top-level file (`analysed_assemblies.csv`), which looks like this:
 
 ```
 ERZ12345,success
@@ -298,4 +298,4 @@ Just like the pipeline generates MultiQC reports on a per-assembly basis, it als
 
 ### dram-distill
 
-Just like the pipeline generates `DRAM-distil` outputs on a per-assembly basis, it also generates the same kind of outputs on a per-study basis, which are located in the `dram-distill/` directory.
+Just as the pipeline generates `DRAM-distill` outputs on a per-assembly basis, it also produces similar outputs on a per-study basis, which are located in the `dram-distill/` directory.
