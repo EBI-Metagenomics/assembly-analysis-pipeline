@@ -14,14 +14,14 @@ There are six general categories of results, which are separated into six differ
 ├── taxonomy
 ├── functional-annotation
 ├── pathways-and-systems
-└── gff
+└── annotation-summary
 ```
 
 As these results are per-assembly, most of the outputs use an assembly ID as a prefix. For the purposes of this documentation, we are using the assembly ID `ERZ12345`.
 
 ### qc
 
-The `qc` directory contains output files related to the quality control steps of the pipeline, from the contig length filtering by `seqkit`, to the quality assessment done by `QUAST`. The structure of the `qc` directory contains three output files and one output directory.
+The `qc` directory contains output files related to the quality control steps of the pipeline, from the contig length filtering by [seqkit](https://bioinf.shenwei.me/seqkit), to the quality assessment done by [QUAST](https://github.com/ablab/quast). The structure of the `qc` directory contains three output files and one output directory.
 
 ```bash
 ├── qc
@@ -33,7 +33,7 @@ The `qc` directory contains output files related to the quality control steps of
 ├── taxonomy
 ├── functional-annotation
 ├── pathways-and-systems
-└── gff
+└── annotation-summary
 ```
 
 #### Output files
@@ -45,7 +45,7 @@ The `qc` directory contains output files related to the quality control steps of
 
 ### cds
 
-The `cds` directory contains output files related to the combined gene caller subworkflow, which calls genes using both `Pyrodigal` and `FragGeneScanRs`, which are Python interface to Prodigal and a Rust re-implementation of FragGeneScan, respectively. The identified genes are then merged, and the resulting outputs are saved in this directory in three different formats.
+The `cds` directory contains output files related to the combined gene caller subworkflow, which calls genes using both [Pyrodigal](https://github.com/althonos/pyrodigal/) and [FragGeneScanRs](https://github.com/unipept/FragGeneScanRs), which are Python interface to Prodigal and a Rust re-implementation of FragGeneScan, respectively. The identified genes are then merged, and the resulting outputs are saved in this directory in three different formats.
 
 ```bash
 ├── qc
@@ -56,7 +56,7 @@ The `cds` directory contains output files related to the combined gene caller su
 ├── taxonomy
 ├── functional-annotation
 ├── pathways-and-systems
-└── gff
+└── annotation-summary
 ```
 
 #### Output files
@@ -67,7 +67,7 @@ The `cds` directory contains output files related to the combined gene caller su
 
 ### taxonomy
 
-The `taxonomy` directory contains output files from taxonomic assignment tools such as `CAT_pack` and `cmsearch`, as well as visualizations generated with `Krona`.
+The `taxonomy` directory contains output files from taxonomic assignment tools such as [CAT_pack](https://github.com/MGXlab/CAT_pack) and [cmsearch](http://eddylab.org/infernal/), as well as visualizations generated with [Krona](https://github.com/marbl/Krona/wiki/KronaTools).
 
 ```bash
 ├── qc
@@ -79,20 +79,20 @@ The `taxonomy` directory contains output files from taxonomic assignment tools s
 │   └── ERZ12345_SSU.fasta.gz
 ├── functional-annotation
 ├── pathways-and-systems
-└── gff
+└── annotation-summary
 ```
 
 #### Output files
 
-- **ERZ12345_contigs_taxonomy.tsv.gz**: This `tsv` file contains the output from `CAT_pack` that describes taxonomy assignments to contigs in the assembly.
-- **ERZ12345.krona.txt**: This `txt` file contains the Krona text input that is used to generate the Krona HTML file. It contains the distribution of the different taxonomic assignments from the `CAT_pack` output.
-- **ERZ12345.html**: This `html` file contains the Krona HTML file that interactively displays the distribution of the different taxonomic assignments from `CAT_pack`.
-- **ERZ12345_SSU.fasta.gz**: This `FASTA` file contains all sequences from the assembly's contigs that matched the `SSU` (Small Subunit) rRNA marker gene, as identified by running `cmsearch`. These sequences represent regions of the contigs that align to the `SSU` model used in the search. This file may be absent if no marker genes of this type were detected in the assembly.
-- **ERZ12345_LSU.fasta.gz**: This `FASTA` file contains sequences matching the `LSU` (Large Subunit) rRNA marker gene, identified in the same way via `cmsearch`. This file may be absent if no marker genes of this type were detected in the assembly.
+- **ERZ12345_contigs_taxonomy.tsv.gz**: This `tsv` file contains the output from [CAT_pack](https://github.com/MGXlab/CAT_pack) that describes taxonomy assignments to contigs in the assembly.
+- **ERZ12345.krona.txt**: This `txt` file contains the Krona text input that is used to generate the Krona HTML file. It contains the distribution of the different taxonomic assignments from the [CAT_pack](https://github.com/MGXlab/CAT_pack) output.
+- **ERZ12345.html**: This `html` file contains the Krona HTML file that interactively displays the distribution of the different taxonomic assignments from [CAT_pack](https://github.com/MGXlab/CAT_pack).
+- **ERZ12345_SSU.fasta.gz**: This `FASTA` file contains all sequences from the assembly's contigs that matched the `SSU` (Small Subunit) rRNA marker gene, as identified by running [cmsearch](http://eddylab.org/infernal/). These sequences represent regions of the contigs that align to the `SSU` model used in the search. This file may be absent if no marker genes of this type were detected in the assembly.
+- **ERZ12345_LSU.fasta.gz**: This `FASTA` file contains sequences matching the `LSU` (Large Subunit) rRNA marker gene, identified in the same way via [cmsearch](http://eddylab.org/infernal/). This file may be absent if no marker genes of this type were detected in the assembly.
 
 ### functional-annotation
 
-The `functional-annotation` directory contains seven subdirectories of results, one for each functional annotation tool used in the pipeline. Specifically, the functional annotations in this directory are assigned on a per-protein basis, and range from tools like `InterProScan` to `dbCAN`.
+The `functional-annotation` directory contains seven subdirectories of results, one for each functional annotation tool used in the pipeline. Specifically, the functional annotations in this directory are assigned on a per-protein basis, and range from tools like [InterProScan](https://github.com/ebi-pf-team/interproscan) to [run_dbCAN](https://github.com/bcb-unl/run_dbcan).
 
 ```bash
 ├── qc
@@ -127,20 +127,20 @@ The `functional-annotation` directory contains seven subdirectories of results, 
 │       ├── ERZ12345_dbcan_sub_hmm.tsv.gz
 │       └── ERZ12345_dbcan_substrates.tsv.gz
 ├── pathways-and-systems
-└── gff
+└── annotation-summary
 ```
 
-#### Output files - interpro
+#### Output files - interproscan
 
-This subdirectory contains the output generated by running `InterProScan` on the protein sequences of the assembly.
+This subdirectory contains the output generated by running [InterProScan](https://github.com/ebi-pf-team/interproscan) on the protein sequences of the assembly.
 
-- **ERZ12345_interproscan.tsv.gz**: This `tsv` file contains the detailed results from `InterProScan`, including the InterPro identifiers, descriptions of the functional domains or protein families detected, and the specific proteins from the assembly that match each signature. Each entry links a protein to its associated functional features, such as protein families, motifs, domains, and Gene Ontology (GO) terms.
+- **ERZ12345_interproscan.tsv.gz**: This `tsv` file contains the detailed results from [InterProScan](https://github.com/ebi-pf-team/interproscan), including the InterPro identifiers, descriptions of the functional domains or protein families detected, and the specific proteins from the assembly that match each signature. Each entry links a protein to its associated functional features, such as protein families, motifs, domains, and Gene Ontology (GO) terms.
 - **ERZ12345_interpro_summary.tsv.gz**: This `tsv` file provides a summary of the count of different InterPro signatures that were detected across all proteins in the assembly. The summary includes the total number of proteins annotated with each InterPro signature, offering a high-level overview of the functional diversity present in the assembly.
 - **ERZ12345_interpro_summary.tsv.gz.gzi**: This file is an index for the InterPro count summary file.
 
 #### Output files - pfam
 
-This subdirectory contains summaries of Pfam domain matches extracted from the `InterProScan` results.
+This subdirectory contains summaries of Pfam domain matches extracted from the [InterProScan](https://github.com/ebi-pf-team/interproscan) results.
 
 - **ERZ12345_pfam_summary.tsv.gz**: This `tsv` file contains a summary of the counts of the different Pfam signatures identified across all proteins in the assembly. Each entry represents a specific Pfam family or domain, with associated counts indicating how many proteins in the assembly match the signature.
 - **ERZ12345_pfam_summary.tsv.gz.gzi**: This file is an index for the Pfam count summary file.
@@ -154,30 +154,30 @@ This subdirectory contains output files summarising Gene Ontology (GO) annotatio
 - **ERZ12345_goslim_summary.tsv.gz**: This `tsv` file contains summary counts of the GO-slim terms (a simplified subset of GO terms) assigned to proteins in the assembly.
 - **ERZ12345_goslim_summary.tsv.gz.gzi**: This file is an index for the GO-slim summary count file.
 
-#### Output files - eggnog
+#### Output files - eggnog-mapper
 
-This subdirectory contains the output of running `EggNOG-mapper` on the protein sequences from the assembly.
+This subdirectory contains the output of running [EggNOG-mapper](https://github.com/eggnogdb/eggnog-mapper) on the protein sequences from the assembly.
 
-- **ERZ12345_emapper_seed_orthologs.tsv.gz**: This `tsv` file lists the seed orthologs identified for each protein during the `EggNOG-mapper` run.
-- **ERZ12345_emapper_annotations.tsv.gz**: This `tsv` file contains the functional annotations assigned to the proteins by `EggNOG-mapper` using the seed orthologs.
+- **ERZ12345_emapper_seed_orthologs.tsv.gz**: This `tsv` file lists the seed orthologs identified for each protein during the [EggNOG-mapper](https://github.com/eggnogdb/eggnog-mapper) run.
+- **ERZ12345_emapper_annotations.tsv.gz**: This `tsv` file contains the functional annotations assigned to the proteins by [EggNOG-mapper](https://github.com/eggnogdb/eggnog-mapper) using the seed orthologs.
 
 #### Output files - kegg
 
-This subdirectory contains the results of identifying KEGG Orthologs (KOs) in the assembly’s proteins using `hmmsearch`, with their occurrences summarised in a count table.
+This subdirectory contains the results of identifying KEGG Orthologs (KOs) in the assembly’s proteins using [hmmsearch](https://github.com/EddyRivasLab/hmmer), with their occurrences summarised in a count table.
 
 - **ERZ12345_ko_summary.tsv.gz**: This `tsv` file listing the counts of each KO detected in the assembly.
 - **ERZ12345_ko_summary.tsv.gz.gzi**: This file is an index for the KO summary count file.
 
 #### Output files - rhea-reactions
 
-This subdirectory contains results from running `DIAMOND` to match the assembly’s proteins against a UniRef90 database with Rhea reactions and corresponding ChEBI compounds assigned.
+This subdirectory contains results from running [DIAMOND](https://github.com/bbuchfink/diamond) to match the assembly’s proteins against a UniRef90 database with Rhea reactions and corresponding ChEBI compounds assigned.
 
 - **ERZ12345_proteins2rhea.tsv.gz**: This `tsv` file listing the Rhea reaction IDs and corresponding ChEBI compounds assigned to the proteins in the assembly based on their matches to UniRef90 database.
 - **ERZ12345_proteins2rhea.tsv.gz.gzi**: This file is an index for the Proteins2Rhea output.
 
 #### Output files - dbcan
 
-This subdirectory contains the output of running `run_dbCAN` on the assembly proteins, generating annotations for CAZymes and CAZyme Gene Clusters (CGC).
+This subdirectory contains the output of running [run_dbCAN](https://github.com/bcb-unl/run_dbcan) on the assembly proteins, generating annotations for CAZymes and CAZyme Gene Clusters (CGC).
 
 - **ERZ12345_dbcan_cgc.gff.gz**: This `gff` file is annotated with functional genes for CGCFinder and visualization tools.
 - **ERZ12345_dbcan_standard_out.tsv.gz**: This `tsv` file lists all identified CGCs and their components.
@@ -188,7 +188,7 @@ This subdirectory contains the output of running `run_dbCAN` on the assembly pro
 
 ### pathways-and-systems
 
-The `pathways-and-systems` directory contains five subdirectories of results, one for each pathway/system annotation tool used by the pipeline. The results range from KEGG pathways, to Biosynthetic Gene Clusters (BGCs) detected by `antiSMASH` and `SanntiS`. Just like the functional annotations, most of these annotations are on a per-protein basis.
+The `pathways-and-systems` directory contains five subdirectories of results, one for each pathway/system annotation tool used by the pipeline. The results range from KEGG pathways, to Biosynthetic Gene Clusters (BGCs) detected by [antiSMASH](https://github.com/antismash/antismash) and [SanntiS](https://github.com/Finn-Lab/SanntiS). Just like the functional annotations, most of these annotations are on a per-protein basis.
 
 ```bash
 ├── qc
@@ -217,27 +217,27 @@ The `pathways-and-systems` directory contains five subdirectories of results, on
 │       ├── ERZ12345_dram.html.gz
 │       ├── ERZ12345_genome_stats.tsv.gz
 │       └── ERZ12345_metabolism_summary.xlsx.gz
-└── gff
+└── annotation-summary
 ```
 
 #### Output files - antismash
 
-This subdirectory contains the results of running `AntiSMASH` on the assembly’s proteins, including annotations for detected BGCs in various formats.
+This subdirectory contains the results of running [antiSMASH](https://github.com/antismash/antismash) on the assembly’s proteins, including annotations for detected BGCs in various formats.
 
-- **ERZ12345_antismash.gbk.gz**: A GenBank format file containing AntiSMASH annotations.
-- **ERZ12345_antismash.gff.gz**: A GFF3 format file containing AntiSMASH annotations.
-- **ERZ12345_merged.json**: A JSON file containing AntiSMASH annotations.
-- **ERZ12345_antismash_summary.tsv.gz**: This `tsv` file listing the counts of each AntiSMASH entry detected in the assembly.
+- **ERZ12345_antismash.gbk.gz**: A GenBank format file containing antiSMASH annotations.
+- **ERZ12345_antismash.gff.gz**: A GFF3 format file containing antiSMASH annotations.
+- **ERZ12345_merged.json**: A JSON file containing antiSMASH annotations.
+- **ERZ12345_antismash_summary.tsv.gz**: This `tsv` file listing the counts of each antiSMASH entry detected in the assembly.
 
 #### Output files - sanntis
 
-This subdirectory contains the outputs of running `SanntiS` on the proteins of the assembly, also describing the detected BGCs using this new machine learning-based tool.
+This subdirectory contains the outputs of running [SanntiS](https://github.com/Finn-Lab/SanntiS) on the proteins of the assembly, also describing the detected BGCs using this new machine learning-based tool.
 
 - **ERZ12345_sanntis.gff.gz**: This `gff` file contains the different SanntiS annotations in the GFF3 format. The GFF3 specification can be found in the [tool repo](https://github.com/Finn-Lab/SanntiS?tab=readme-ov-file#ouput)
 
 #### Output files - genome-properties
 
-This subdirectory contains the outputs of running `Genome Properties` on the proteins of the assembly. Genome properties is an annotation system whereby functional attributes can be assigned to a assembly, based on the presence of a defined set of protein signatures within that assembly. The results are available in three different formats.
+This subdirectory contains the outputs of running [Genome Properties](https://github.com/EBI-Metagenomics/genome-properties) on the proteins of the assembly. Genome properties is an annotation system whereby functional attributes can be assigned to a assembly, based on the presence of a defined set of protein signatures within that assembly. The results are available in three different formats.
 
 - **ERZ12345_gp.json.gz**: A JSON format file containing Genome Properties annotations
 - **ERZ12345_gp.tsv.gz**: A `tsv` file containing Genome Properties annotations in a tab-separated format.
@@ -254,14 +254,14 @@ This subdirectory contains results from evaluating which KEGG modules and pathwa
 
 #### Output files - dram-distill
 
-This subdirectory contains the outputs of running `DRAM-distill` on the KO hits per contig, the InterProScan and run_dbCan. DRAM generates summary reports and visualisations for the annotations on a per-assembly basis, and outputs four different files.
+This subdirectory contains the outputs of running [DRAM-distill](https://github.com/WrightonLabCSU/DRAM) on the KO hits per contig, the InterProScan and run_dbCan. DRAM generates summary reports and visualisations for the annotations on a per-assembly basis, and outputs four different files.
 
-- **ERZ12345_dram.tsv.gz**: This `tsv` file contains the product of `DRAM-distill` for the assembly, including functions that were detected.
-- **ERZ12345_dram.html.gz**: This `html` file contains a heatmap visualisation of the detected functions by `DRAM-distill`.
+- **ERZ12345_dram.tsv.gz**: This `tsv` file contains the product of https://github.com/WrightonLabCSU/DRAM for the assembly, including functions that were detected.
+- **ERZ12345_dram.html.gz**: This `html` file contains a heatmap visualisation of the detected functions by https://github.com/WrightonLabCSU/DRAM.
 
-### gff
+### annotation-summary
 
-The `gff` directory contains a single file that summarises the annotations generated by the pipeline, integrating functional annotation per protein and other genomic features.
+The `annotation-summary` directory contains a single file that summarises the annotations generated by the pipeline, integrating functional annotation per protein and other genomic features.
 
 ```bash
 ├── qc
@@ -269,7 +269,7 @@ The `gff` directory contains a single file that summarises the annotations gener
 ├── taxonomy
 ├── functional-annotation
 ├── pathways-and-systems
-└── gff
+└── annotation-summary
     └── ERZ12345_annotation_summary.gff.gz
 ```
 
@@ -279,7 +279,7 @@ The `gff` directory contains a single file that summarises the annotations gener
 
 ## Per-study output files
 
-The pipeline generates four different per-study output files that aggregate and summarise data, from successful assembly analysis runs to study-wide `MultiQC` reports. These are stored at the root of the study analysis directory.
+The pipeline generates four different per-study output files that aggregate and summarise data, from successful assembly analysis runs to study-wide [MultiQC](https://github.com/MultiQC/MultiQC) reports. These are stored at the root of the study analysis directory.
 
 ### Successfully analysed assemblies
 
@@ -296,4 +296,4 @@ In addition to generating MultiQC reports for each assembly, the pipeline also p
 
 ### dram-distill
 
-Just as the pipeline generates `DRAM-distill` outputs on a per-assembly basis, it also produces similar outputs on a per-study basis, which are located in the `dram-distill/` directory by concatenating assembly-level files.
+Just as the pipeline generates https://github.com/WrightonLabCSU/DRAM outputs on a per-assembly basis, it also produces similar outputs on a per-study basis, which are located in the `dram-distill/` directory by concatenating assembly-level files.
