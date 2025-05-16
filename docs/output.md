@@ -17,7 +17,7 @@ There are six general categories of results, which are separated into six differ
 └── gff
 ```
 
-As these results are per-assembly, most of the outputs use an assembly ID as a prefix. For the purposes of this documentation, we are using the run ID `ERZ12345`.
+As these results are per-assembly, most of the outputs use an assembly ID as a prefix. For the purposes of this documentation, we are using the assembly ID `ERZ12345`.
 
 ### qc
 
@@ -188,7 +188,7 @@ This subdirectory contains the output of running `run_dbCAN` on the assembly pro
 
 ### pathways-and-systems
 
-The `pathways-and-systems` directory contains five subdirectories of results, one for each pathway/system annotation tool used by the pipeline. The results range from KEGG pathways, to Biosynthetic Gene Clusters (BGCs) by `antiSMASH` and `SanntiS`. Just like the functional annotations, most of these annotations are on a per-protein basis.
+The `pathways-and-systems` directory contains five subdirectories of results, one for each pathway/system annotation tool used by the pipeline. The results range from KEGG pathways, to Biosynthetic Gene Clusters (BGCs) detected by `antiSMASH` and `SanntiS`. Just like the functional annotations, most of these annotations are on a per-protein basis.
 
 ```bash
 ├── qc
@@ -254,7 +254,7 @@ This subdirectory contains results from evaluating which KEGG modules and pathwa
 
 #### Output files - dram-distill
 
-This subdirectory contains the outputs of running `DRAM-distill` on the KO hits per contig, the InterProscan and run_DBCan. DRAM generates summary reports and visualisations for the annotations on a per-assembly basis, into four different files.
+This subdirectory contains the outputs of running `DRAM-distill` on the KO hits per contig, the InterProScan and run_dbCan. DRAM generates summary reports and visualisations for the annotations on a per-assembly basis, and outputs four different files.
 
 - **ERZ12345_dram.tsv.gz**: This `tsv` file contains the product of `DRAM-distill` for the assembly, including functions that were detected.
 - **ERZ12345_dram.html.gz**: This `html` file contains a heatmap visualisation of the detected functions by `DRAM-distill`.
@@ -294,7 +294,7 @@ ERZ56789,success
 
 ### MultiQC
 
-Just like the pipeline generates MultiQC reports on a per-assembly basis, it also generates the same kind of report but on a per-study basis, which are located in the `multiqc/` directory.
+In addition to generating MultiQC reports for each assembly, the pipeline also produces per-study reports, which can be found in the `multiqc/` directory.
 
 ### dram-distill
 
