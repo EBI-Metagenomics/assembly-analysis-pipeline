@@ -114,7 +114,7 @@ This pipeline supports [nf-core shared configuration files](https://nf-co.re/doc
 
 ## Outputs
 
-For a more detailed description of the different output files, see the [outputs](https://github.com/EBI-Metagenomics/amplicon-pipeline/blob/main/docs/output.md) file.
+For a more detailed description of the different output files, see the [outputs](docs/output.md) file.
 
 ## Citations
 
