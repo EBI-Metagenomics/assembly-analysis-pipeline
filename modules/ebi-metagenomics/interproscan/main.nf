@@ -37,15 +37,14 @@ process INTERPROSCAN {
     script:
     def args = task.ext.args ?: ''
     def prefix = task.ext.prefix ?: "${meta.id}"
-    def is_compressed = fasta.getExtension() == "gz"
-    def fasta_file_name = fasta.name.replace(".gz", "")
-
-    // -dp (disable precalculation) is on so no online dependency
+    def is_compressed = fasta.extension == "gz"
+    def fasta_file_name = fasta.name - ~/\.gz$/
     """
     if [ "$is_compressed" == "true" ]; then
         gzip -c -d ${fasta} > ${fasta_file_name}
     fi
 
+    # -dp (disable precalculation) is on so no online dependency
     interproscan.sh \\
         -cpu $task.cpus \\
         -i ${fasta_file_name} \\

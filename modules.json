@@ -171,7 +171,7 @@
                     },
                     "interproscan": {
                         "branch": "main",
-                        "git_sha": "75bee0dac2cb4b978fb62a8e8b8aab491507bb04",
+                        "git_sha": "ea911976cc5b6e3ed97474399b81041a04e86dcb",
                         "installed_by": ["modules"],
                         "patch": "modules/ebi-metagenomics/interproscan/interproscan.diff"
                     },
