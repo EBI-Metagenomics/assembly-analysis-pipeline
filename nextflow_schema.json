@@ -104,7 +104,7 @@
                 },
                 "mpt_version": {
                     "type": "string",
-                    "default": "1.0.8--pyhdfd78af_0",
+                    "default": "1.2.0--pyhdfd78af_0",
                     "description": "General version of mgnify-pipeline-toolkit",
                     "help": "Keeps all mpt tools updated and synced to chosen release."
                 }

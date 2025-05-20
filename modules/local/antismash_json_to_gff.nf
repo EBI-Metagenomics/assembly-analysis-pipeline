@@ -15,7 +15,7 @@ process ANTISMASH_JSON_TO_GFF {
 
     script:
     """
-    antismash_gff_builder.py \\
+    antismash_gff_builder \\
         --input ${antismash_json} \\
         --output ${antismash_json.simpleName}.gff
 
