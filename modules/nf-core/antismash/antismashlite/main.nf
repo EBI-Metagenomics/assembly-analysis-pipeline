@@ -2,7 +2,7 @@ process ANTISMASH_ANTISMASHLITE {
     tag "${meta.id}"
     label 'process_medium'
 
-    container 'quay.io/microbiome-informatics/antismash:7.1.0.1_2'
+    container 'microbiome-informatics/antismash:8.0.0'
 
     input:
     tuple val(meta), path(sequence_input), path(gff)

@@ -14,21 +14,23 @@ process GFF_SUMMARY {
     path "versions.yml"              , emit: versions
 
     script:
-    """
-    process_dbcan_cazys \\
-        -hmm ${dbcan_hmm} \\
-        -ov ${dbcan_overview} \\
-        -g ${cds} \\
-        -v ${params.dbcan_database_version} \\
-        -o ${meta.id}_dbcan_cazys.gff
+    // TODO: re-enable dbcan when the module is completed
 
+    // process_dbcan_cazys \\
+    //     -hmm ${dbcan_hmm} \\
+    //     -g ${cds} \\
+    //     -ov ${dbcan_overview} \\
+    //     -v ${params.dbcan_database_version} \\
+    //     -o ${meta.id}_dbcan_cazys.gff
+
+    //        --dbcan-cazys ${meta.id}_dbcan_cazys.gff \\
+    """
     gff_toolkit \\
         -g ${cds} \\
         -i ${ips} \\
         -e ${eggnog} \\
         -s ${sanntis} \\
         --antismash ${antismash} \\
-        --dbcan-cazys ${meta.id}_dbcan_cazys.gff \\
         -o ${meta.id}_annotation_summary.gff
 
     gzip ${meta.id}_annotation_summary.gff
