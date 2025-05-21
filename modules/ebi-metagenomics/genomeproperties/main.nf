@@ -1,7 +1,7 @@
 
 process GENOMEPROPERTIES {
     tag "$meta.id"
-    label 'process_low'
+    label 'process_medium'
 
     conda "${moduleDir}/environment.yml"
     container 'microbiome-informatics/genome-properties:2.0'
