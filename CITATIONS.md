@@ -28,7 +28,7 @@
 
 - [Krona](http://dx.doi.org/10.1186/1471-2105-12-385)
 
-  > Ondov BD, Bergman NH, Phillippy AM. Interactive metagenomic visualization in a Web browser. Vol. 12, BMC Bioinformatics. Springer Science and Business Media LLC; 201Available from: http://dx.doi.org/10.1186/1471-2105-12-385
+  > Ondov BD, Bergman NH, Phillippy AM. Interactive metagenomic visualization in a Web browser. Vol. 12, BMC Bioinformatics. Springer Science and Business Media LLC; 201. Available from: http://dx.doi.org/10.1186/1471-2105-12-385
 
 - [Pyrodigal](http://dx.doi.org/10.21105/joss.04296)
 
@@ -36,7 +36,7 @@
 
 - [dbCAN](http://dx.doi.org/10.1093/nar/gkad328)
 
-  > Zheng J, Ge Q, Yan Y, Zhang X, Huang L, Yin Y. dbCAN3: automated carbohydrate-active enzyme and substrate annotation. Vol. 51, Nucleic Acids Research. Oxford University Press (OUP); 2023. p. W115–2Available from: http://dx.doi.org/10.1093/nar/gkad328
+  > Zheng J, Ge Q, Yan Y, Zhang X, Huang L, Yin Y. dbCAN3: automated carbohydrate-active enzyme and substrate annotation. Vol. 51, Nucleic Acids Research. Oxford University Press (OUP); 2023. p. W115–2. Available from: http://dx.doi.org/10.1093/nar/gkad328
 
 - [InterProScan](http://dx.doi.org/10.1093/bioinformatics/btu031)
 
@@ -81,6 +81,10 @@
 - [SeqKit](http://dx.doi.org/10.1371/journal.pone.0163962)
 
   > Shen W, Le S, Li Y, Hu F. SeqKit: A Cross-Platform and Ultrafast Toolkit for FASTA/Q File Manipulation. Zou Q, editor. Vol. 11, PLOS ONE. Public Library of Science (PLoS); 2016. p. e0163962. Available from: http://dx.doi.org/10.1371/journal.pone.0163962
+
+- [Genome Tools](http://dx.doi.org/10.1109/TCBB.2013.68)
+
+  > G. Gremme, S. Steinbiss and S. Kurtz. "GenomeTools: A Comprehensive Software Library for Efficient Processing of Structured Genome Annotations" in IEEE/ACM Transactions on Computational Biology and Bioinformatics, vol. 10, no. 03, pp. 645-656, May-June 2013, Available from: http://dx.doi.org/10.1109/TCBB.2013.68.
 
 ## Software packaging/containerisation tools
 
