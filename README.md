@@ -29,7 +29,7 @@ The MGnify assembly analysis pipeline, version 6.0.0 and onwards, provides the f
   - [run_dbCAN](https://github.com/bcb-unl/run_dbcan): Annotates carbohydrate-active enzymes.
   - [KEGG Orthologs](https://www.genome.jp/kegg/ko.html): Assigns KEGG Orthologs (KO) identifiers using HMMER.
   - [RHEA](https://www.rhea-db.org/): Proteins are assigned RHEA ids.
-- Biosynthetic Gene Cluster Annotation: The pipeline uses [AntiSMASH](https://antismash.secondarymetabolites.org/) and [SanntiS](https://github.com/Finn-Lab/SanntiS) to identify and annotate biosynthetic gene clusters associated with secondary metabolite production.
+- Biosynthetic Gene Cluster Annotation: The pipeline uses [antiSMASH](https://antismash.secondarymetabolites.org/) and [SanntiS](https://github.com/Finn-Lab/SanntiS) to identify and annotate biosynthetic gene clusters associated with secondary metabolite production.
 - KEGG Modules completeness: The pipeline analyzes the KEGG Orthologs annotations to infer the presence and completeness of KEGG modules.
 - Consolidated annotation: The pipeline aggregates all the generated annotations into a single consolidated GFF file.
 
@@ -66,6 +66,7 @@ The MGnify assembly analysis pipeline, version 6.0.0 and onwards, provides the f
 | [SeqKit](https://bioinf.shenwei.me/seqkit/)                                                       |         | Used to manipulate FASTA files                                                                                 |
 | [SanntiS](https://github.com/Finn-Lab/SanntiS)                                                    |         | Tool used to identify biosynthetic gene clusters                                                               |
 | [tabix](http://www.htslib.org/doc/tabix.html)                                                     |         | Generic indexer for TAB-delimited genome position files                                                        |
+| [Genome Tools - gff3validator](https://genometools.org/tools/gt_gff3validator.html)               |         | Used to validate the analysis summary GFF file                                                                 |
 
 ### Reference databases
 

@@ -276,19 +276,27 @@ The `annotation-summary` directory contains a single file that summarises the an
 #### Output files
 
 - **ERZ12345_annotation_summary.gff.gz**: This `gff` file contains an expansive and large summary of most of the functional annotations each protein has into a single GFF3 format file.
+- **ERZ12345_gff_validation_errors.log**: **If** [the GFF file is not valid](https://genometools.org/tools/gt_gff3validator.html), then a log file is created with the validation errors.
 
 ## Per-study output files
 
 The pipeline generates four different per-study output files that aggregate and summarise data, from successful assembly analysis runs to study-wide [MultiQC](https://github.com/MultiQC/MultiQC) reports. These are stored at the root of the study analysis directory.
 
-### Successfully analysed assemblies
+### Analysed assemblies
 
-The IDs of assemblies that have been successfully analysed are aggregated into a top-level file (`analysed_assemblies.csv`), which looks like this:
+The IDs of assemblies that have been analysed are aggregated into a top-level file (`analysed_assemblies.csv`), which looks like this:
 
 ```
 ERZ12345,success
 ERZ56789,success
 ```
+
+#### The possible statuses are
+
+| Status              | Description                                                    |
+| ------------------- | -------------------------------------------------------------- |
+| success             | The assembly was successfully annotated                        |
+| invalid_summary_gff | The assembly summary GFF file is not valid, treat with caution |
 
 ### MultiQC
 
