@@ -276,6 +276,7 @@ The `annotation-summary` directory contains a single file that summarises the an
 #### Output files
 
 - **ERZ12345_annotation_summary.gff.gz**: This `gff` file contains an expansive and large summary of most of the functional annotations each protein has into a single GFF3 format file.
+- **ERZ12345_gff_validation_errors.log**: **If** [the GFF file is not valid](https://genometools.org/tools/gt_gff3validator.html), then a log file is created with the validation errors.
 
 ## Per-study output files
 
