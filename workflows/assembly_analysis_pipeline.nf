@@ -284,10 +284,11 @@ workflow ASSEMBLY_ANALYSIS_PIPELINE {
     // specifically those without IPS annotations or BGC. We need to retrieve
     // examples of these assemblies from the current backlog database.
 
-    GFF_SUMMARY.out.gff_summary
-        .map { meta, __ ->
+
+    GFF_SUMMARY.out.gff_summary.join(GT_GFF3VALIDATOR.out.error_log, remainder: true)
+        .map { meta, _gff_summary, gff_validation_error ->
             {
-                return "${meta.id},success"
+                return "${meta.id},${ (!gff_validation_error) ? 'success' : 'invalid_summary_gff' }"
             }
         }
         .collectFile(name: "analysed_assemblies.csv", storeDir: params.outdir, newLine: true, cache: false)
