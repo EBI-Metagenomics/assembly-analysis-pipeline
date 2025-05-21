@@ -19,6 +19,7 @@ include { methodsDescriptionText             } from '../subworkflows/local/utils
 include { SEQKIT_SPLIT2                      } from '../modules/nf-core/seqkit/split2/main'
 include { PIGZ_UNCOMPRESS as PIGZ_CONTIGS    } from '../modules/nf-core/pigz/uncompress/main'
 include { PIGZ_UNCOMPRESS as PIGZ_PROTEINS   } from '../modules/nf-core/pigz/uncompress/main'
+include { GT_GFF3VALIDATOR                   } from '../modules/nf-core/gt/gff3validator/main'
 
 /*
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -185,6 +186,20 @@ workflow ASSEMBLY_ANALYSIS_PIPELINE {
         )
     )
     ch_versions = ch_versions.mix(GFF_SUMMARY.out.versions)
+
+    // Run the genometools GFF validation
+    // If there are any errors with the GFF, these will be added to a log file for further inspection,
+    // but an invalid GFF won't make the pipeline fail. Doing so would be a waste of compute and not
+    // something we could take care of at this point of the execution.
+    // This is based on the assumption that we will test the pipeline with loads of different kinds of assemblies and by then
+    // we should have ironed out any issues.
+    // The log file will be used in the automation system to flag the jobs for inspection.
+    // But, I'm up to discuss this @mberacochea
+    // TODO: Maybe add a parameter to make the pipeline fail on invalid GFF?
+    GT_GFF3VALIDATOR(
+        GFF_SUMMARY.out.gff_summary
+    )
+    ch_versions = ch_versions.mix(GT_GFF3VALIDATOR.out.versions)
 
     //
     // Collate and save software versions
