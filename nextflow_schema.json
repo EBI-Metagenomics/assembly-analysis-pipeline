@@ -241,10 +241,10 @@
                     "help": "Specify the version of the GO slim release used.",
                     "default": "20160705"
                 },
-                "rfam_cm": {
+                "rfam_covariance_models": {
                     "type": "string",
                     "format": "file-path",
-                    "description": "Path to the Rfam covariance model file to use with cmsearch/cmscan.",
+                    "description": "Path to the Rfam covariance models file to use with cmsearch/cmscan.",
                     "help": "This file contains the covariance model for RNA families from the Rfam database."
                 },
                 "rfam_claninfo": {
