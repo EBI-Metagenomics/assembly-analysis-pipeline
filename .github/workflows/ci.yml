@@ -34,7 +34,7 @@ jobs:
         test_name:
           - "test_full"
         isMaster:
-          - ${{ github.base_ref == 'master' }}
+          - ${{ github.base_ref == 'main' }}
         # Exclude singularity on dev
         exclude:
           - isMaster: false
