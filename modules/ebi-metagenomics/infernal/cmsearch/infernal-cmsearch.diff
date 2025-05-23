@@ -1,0 +1,38 @@
+Changes in component 'ebi-metagenomics/infernal/cmsearch'
+'modules/ebi-metagenomics/infernal/cmsearch/meta.yml' is unchanged
+Changes in 'infernal/cmsearch/main.nf':
+--- modules/ebi-metagenomics/infernal/cmsearch/main.nf
++++ modules/ebi-metagenomics/infernal/cmsearch/main.nf
+@@ -13,6 +13,7 @@
+     input:
+     tuple val(meta), path(seqdb)
+     path covariance_model_database
++    val rfam_version
+ 
+     output:
+     tuple val(meta), path("*.cmsearch_matches.tbl.gz"), emit: cmsearch_tbl
+@@ -44,6 +45,7 @@
+     cat <<-END_VERSIONS > versions.yml
+     "${task.process}":
+         cmsearch: \$(cmsearch -h | grep -o '^# INFERNAL [0-9.]*' | sed 's/^# INFERNAL *//')
++        Rfam version: $rfam_version
+     END_VERSIONS
+     """
+ 
+@@ -56,7 +58,8 @@
+ 
+     cat <<-END_VERSIONS > versions.yml
+     "${task.process}":
+-        infernal: \$(cmsearch -h | grep -o '^# INFERNAL [0-9.]*' | sed 's/^# INFERNAL *//')
++        cmsearch: \$(cmsearch -h | grep -o '^# INFERNAL [0-9.]*' | sed 's/^# INFERNAL *//')
++        Rfam version: $rfam_version
+     END_VERSIONS
+     """
+ }
+
+'modules/ebi-metagenomics/infernal/cmsearch/tests/tRNA5.c.cm' is unchanged
+'modules/ebi-metagenomics/infernal/cmsearch/tests/main.nf.test.snap' is unchanged
+'modules/ebi-metagenomics/infernal/cmsearch/tests/tags.yml' is unchanged
+'modules/ebi-metagenomics/infernal/cmsearch/tests/nextflow.config' is unchanged
+'modules/ebi-metagenomics/infernal/cmsearch/tests/main.nf.test' is unchanged
+************************************************************

@@ -9,6 +9,7 @@ process OWLTOOLS {
     tuple val(meta), path(input_gaf)
     path go_obo
     path goslim_ids
+    val goslim_version
 
     output:
     tuple val(meta), path("*.gaf"), emit: gaf
@@ -32,6 +33,7 @@ process OWLTOOLS {
     cat <<-END_VERSIONS > versions.yml
     "${task.process}":
         owltools: 2024-06-12
+        golism version: $goslim_version
     END_VERSIONS
     """
 
@@ -44,6 +46,7 @@ process OWLTOOLS {
     cat <<-END_VERSIONS > versions.yml
     "${task.process}":
         owltools: 2024-06-12
+        golism version: $goslim_version
     END_VERSIONS
     """
 }

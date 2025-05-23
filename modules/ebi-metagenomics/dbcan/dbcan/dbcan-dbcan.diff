@@ -23,6 +23,24 @@ Changes in 'dbcan/dbcan/main.nf':
          ${mode}
  
      # Bulk rename of the results, dbcan has a prefix parameter but it breaks when (for example) using --clusters and/or --cgc_substrate
+@@ -59,7 +62,7 @@
+     cat <<-END_VERSIONS > versions.yml
+     "${task.process}":
+         dbcan: 4.1.4
+-        dbcan_db: "${db_version}"
++        dbcan database: "${db_version}"
+     END_VERSIONS
+     """
+ 
+@@ -77,7 +80,7 @@
+     cat <<-END_VERSIONS > versions.yml
+     "${task.process}":
+         dbcan: 4.1.4
+-        dbcan_db: ${db_version}
++        dbcan database: ${db_version}
+     END_VERSIONS
+     """
+ }
 
 'modules/ebi-metagenomics/dbcan/dbcan/tests/main.nf.test.snap' is unchanged
 'modules/ebi-metagenomics/dbcan/dbcan/tests/nextflow.config' is unchanged

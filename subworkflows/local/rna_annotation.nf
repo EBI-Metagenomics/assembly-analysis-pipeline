@@ -26,9 +26,10 @@ workflow RNA_ANNOTATION {
 
     DETECT_RNA(
         SEQKIT_SPLIT2.out.assembly.transpose(),
-        file(params.rfam_cm, checkIfExists: true),
+        file(params.rfam_covariance_models, checkIfExists: true),
         file(params.rfam_claninfo, checkIfExists: true),
-        "cmsearch"
+        "cmsearch",
+        params.rfam_version,
     )
     ch_versions = ch_versions.mix(DETECT_RNA.out.versions)
 

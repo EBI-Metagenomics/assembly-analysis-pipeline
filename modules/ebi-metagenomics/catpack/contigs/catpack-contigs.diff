@@ -4,7 +4,16 @@ Changes in component 'ebi-metagenomics/catpack/contigs'
 Changes in 'catpack/contigs/main.nf':
 --- modules/ebi-metagenomics/catpack/contigs/main.nf
 +++ modules/ebi-metagenomics/catpack/contigs/main.nf
-@@ -29,12 +29,15 @@
+@@ -16,7 +16,7 @@
+ 
+     output:
+     tuple val(meta), path("*.ORF2LCA.txt"), emit: orf2lca
+-    tuple val(meta), path("*.contig2classification.txt"), emit: contig2classification
++    tuple val(meta), path("*.contig2classification.txt.gz"), emit: contig2classification
+     tuple val(meta), path("*.log"), emit: log
+     tuple val(meta), path("*.diamond"), optional: true, emit: diamond
+     tuple val(meta), path("*.predicted_proteins.faa"), optional: true, emit: faa
+@@ -29,18 +29,23 @@
      script:
      def args = task.ext.args ?: ''
      def prefix = task.ext.prefix ?: "${meta.id}"
@@ -22,6 +31,14 @@ Changes in 'catpack/contigs/main.nf':
          --database_folder ${database} \\
          --taxonomy_folder ${taxonomy} \\
          --out_prefix ${prefix} \\
+         ${premade_proteins} \\
+         ${premade_table} \\
+         ${args}
++
++    gzip ${prefix}.contig2classification.txt
+ 
+     cat <<-END_VERSIONS > versions.yml
+     "${task.process}":
 
 'modules/ebi-metagenomics/catpack/contigs/tests/main.nf.test.snap' is unchanged
 'modules/ebi-metagenomics/catpack/contigs/tests/nextflow.config' is unchanged

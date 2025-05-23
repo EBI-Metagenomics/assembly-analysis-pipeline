@@ -6,10 +6,11 @@ include { MGNIFYPIPELINESTOOLKIT_SUMMARISEGOSLIMS  } from '../../../modules/ebi-
 workflow GOSLIM_SWF {
 
     take:
-    ch_ips     // channel: [ val(meta), path(tsv) ]
-    go_obo     // file: path(obo)
-    goslim_ids // file: path(txt)
-    go_banding // file: path(txt)
+    ch_ips         // channel: [ val(meta), path(tsv) ]
+    go_obo         // file: path(obo)
+    goslim_ids     // file: path(txt)
+    go_banding     // file: path(txt)
+    goslim_version // val the version of the go slims
 
     main:
 
@@ -21,7 +22,8 @@ workflow GOSLIM_SWF {
     OWLTOOLS(
         GENERATEGAF.out.gaf,
         go_obo,
-        goslim_ids
+        goslim_ids,
+        goslim_version,
     )
     ch_versions = ch_versions.mix(OWLTOOLS.out.versions.first())
 

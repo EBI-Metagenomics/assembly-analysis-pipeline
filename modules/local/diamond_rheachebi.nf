@@ -10,6 +10,7 @@ process DIAMOND_RHEACHEBI {
     tuple val(meta) , path(fasta)
     path(db)
     path(rhea2chebi)
+    val(database_version)
 
     output:
     tuple val(meta), path("*_rhea2proteins.tsv"), emit: rhea2proteins_tsv
@@ -48,6 +49,7 @@ process DIAMOND_RHEACHEBI {
     "${task.process}":
         diamond: \$(diamond --version 2>&1 | tail -n 1 | sed 's/^diamond version //')
         mgnify-pipelines-toolkit: \$(get_mpt_version)
+        uniref90rhea database: $database_version
     END_VERSIONS
     """
 
@@ -61,6 +63,7 @@ process DIAMOND_RHEACHEBI {
     "${task.process}":
         diamond: \$(diamond --version 2>&1 | tail -n 1 | sed 's/^diamond version //')
         mgnify-pipelines-toolkit: \$(get_mpt_version)
+        uniref90rhea database: $database_version
     END_VERSIONS
     """
 }

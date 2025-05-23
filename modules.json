@@ -5,11 +5,11 @@
         "https://github.com/nf-core/modules.git": {
             "modules": {
                 "nf-core": {
-                    "antismash/antismashlite": {
+                    "antismash/antismash": {
                         "branch": "master",
-                        "git_sha": "81880787133db07d9b4c1febd152c090eb8325dc",
+                        "git_sha": "3b275879f9455b2089ae0517bf7aeb5a55b3cb09",
                         "installed_by": ["modules"],
-                        "patch": "modules/nf-core/antismash/antismashlite/antismash-antismashlite.diff"
+                        "patch": "modules/nf-core/antismash/antismash/antismash-antismash.diff"
                     },
                     "cat/cat": {
                         "branch": "master",
@@ -22,6 +22,11 @@
                         "git_sha": "fa92936611247ca647ddee970f94d83f1bcb0ffe",
                         "installed_by": ["modules"],
                         "patch": "modules/nf-core/csvtk/concat/csvtk-concat.diff"
+                    },
+                    "gt/gff3validator": {
+                        "branch": "master",
+                        "git_sha": "05954dab2ff481bcb999f24455da29a5828af08d",
+                        "installed_by": ["modules"]
                     },
                     "hmmer/hmmsearch": {
                         "branch": "master",
@@ -167,11 +172,12 @@
                     "infernal/cmsearch": {
                         "branch": "main",
                         "git_sha": "62e22fb1fd131d27ed043f305f317a0cf741b900",
-                        "installed_by": ["detect_rna"]
+                        "installed_by": ["detect_rna"],
+                        "patch": "modules/ebi-metagenomics/infernal/cmsearch/infernal-cmsearch.diff"
                     },
                     "interproscan": {
                         "branch": "main",
-                        "git_sha": "75bee0dac2cb4b978fb62a8e8b8aab491507bb04",
+                        "git_sha": "ea911976cc5b6e3ed97474399b81041a04e86dcb",
                         "installed_by": ["modules"],
                         "patch": "modules/ebi-metagenomics/interproscan/interproscan.diff"
                     },
@@ -207,7 +213,8 @@
                     "owltools": {
                         "branch": "main",
                         "git_sha": "fb9a33114fe9083dc5b203fc4608825a9c51fdf6",
-                        "installed_by": ["goslim_swf"]
+                        "installed_by": ["goslim_swf"],
+                        "patch": "modules/ebi-metagenomics/owltools/owltools.diff"
                     },
                     "pyrodigal": {
                         "branch": "main",
@@ -231,7 +238,8 @@
                     "contigs_taxonomic_classification": {
                         "branch": "main",
                         "git_sha": "5fad0d0cf475b477119304430479d7d2d815a005",
-                        "installed_by": ["subworkflows"]
+                        "installed_by": ["subworkflows"],
+                        "patch": "subworkflows/ebi-metagenomics/contigs_taxonomic_classification/contigs_taxonomic_classification.diff"
                     },
                     "detect_rna": {
                         "branch": "main",
@@ -242,7 +250,8 @@
                     "goslim_swf": {
                         "branch": "main",
                         "git_sha": "fcd5bf454676aa301c45afd171916911ab4eec49",
-                        "installed_by": ["subworkflows"]
+                        "installed_by": ["subworkflows"],
+                        "patch": "subworkflows/ebi-metagenomics/goslim_swf/goslim_swf.diff"
                     }
                 }
             }

@@ -13,7 +13,25 @@ Changes in 'detect_rna/main.nf':
  
  workflow DETECT_RNA {
  
-@@ -53,16 +53,8 @@
+@@ -20,6 +20,7 @@
+     rfam         // folder: rfam for cmsearch/cmscan
+     claninfo     // file: claninfo for cmsearchtbloutdeoverlap
+     mode         // cmsearch/cmscan
++    rfam_version // Rfam version
+ 
+     main:
+ 
+@@ -29,7 +30,8 @@
+     if ( mode == 'cmsearch' ) {
+         INFERNAL_CMSEARCH(
+             ch_fasta,
+-            rfam
++            rfam,
++            rfam_version
+         )
+         ch_versions = ch_versions.mix(INFERNAL_CMSEARCH.out.versions.first())
+         cmsearch_ch = INFERNAL_CMSEARCH.out.cmsearch_tbl
+@@ -53,16 +55,8 @@
      )
      ch_versions = ch_versions.mix(CMSEARCHTBLOUTDEOVERLAP.out.versions.first())
  

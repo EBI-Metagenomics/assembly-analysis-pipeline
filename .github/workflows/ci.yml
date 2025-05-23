@@ -1,4 +1,4 @@
-name: nf-core based CI
+name: CI
 # This workflow runs the pipeline with the minimal test dataset to check that it completes without any syntax errors
 on:
   push:
@@ -27,8 +27,7 @@ jobs:
     strategy:
       matrix:
         NXF_VER:
-          - "24.04.2"
-          - "latest-everything"
+          - "24.04.3"
         profile:
           - "docker"
           - "singularity"
@@ -44,7 +43,7 @@ jobs:
       - name: Check out pipeline code
         uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4
 
-      - name: Set up Nextflow
+      - name: Install Nextflow
         uses: nf-core/setup-nextflow@v2
         with:
           version: "${{ matrix.NXF_VER }}"
@@ -58,9 +57,6 @@ jobs:
         run: |
           mkdir -p $NXF_SINGULARITY_CACHEDIR
           mkdir -p $NXF_SINGULARITY_LIBRARYDIR
-
-      - name: Clean up Disk space
-        uses: jlumbroso/free-disk-space@54081f138730dfa15788a46383842cd2f914a1be # v1.3.1
 
       - name: "Run pipeline with test data ${{ matrix.NXF_VER }} | ${{ matrix.test_name }} | ${{ matrix.profile }}"
         run: |

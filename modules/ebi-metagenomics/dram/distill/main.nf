@@ -19,6 +19,7 @@ process DRAM_DISTILL {
     input:
     tuple val(meta), path(tsv_input)
     path(dram_dbs)
+    val(dram_dbs_version)
 
     output:
     tuple val(meta), path("*_dram.html.gz")               , emit: html
@@ -62,6 +63,7 @@ process DRAM_DISTILL {
     cat <<-END_VERSIONS > versions.yml
     "${task.process}":
         dram: $VERSION
+        dram databases: $dram_dbs_version
     END_VERSIONS
     """
 
@@ -78,6 +80,7 @@ process DRAM_DISTILL {
     cat <<-END_VERSIONS > versions.yml
     "${task.process}":
         dram: $VERSION
+        dram databases: $dram_dbs_version
     END_VERSIONS
     """
 }

@@ -3,6 +3,15 @@ Changes in component 'ebi-metagenomics/genomeproperties'
 Changes in 'genomeproperties/main.nf':
 --- modules/ebi-metagenomics/genomeproperties/main.nf
 +++ modules/ebi-metagenomics/genomeproperties/main.nf
+@@ -1,7 +1,7 @@
+ 
+ process GENOMEPROPERTIES {
+     tag "$meta.id"
+-    label 'process_single'
++    label 'process_medium'
+ 
+     conda "${moduleDir}/environment.yml"
+     container 'microbiome-informatics/genome-properties:2.0'
 @@ -10,10 +10,10 @@
      tuple val(meta), path(ips)
  

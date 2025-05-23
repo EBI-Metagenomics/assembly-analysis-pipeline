@@ -12,6 +12,7 @@ lint:
     - .github/ISSUE_TEMPLATE/bug_report.yml
     - .github/CONTRIBUTING.md
     - .github/PULL_REQUEST_TEMPLATE.md
+    - .github/workflows/linting.yml
     - assets/email_template.txt
     - docs/README.md
     - assets/email_template.html

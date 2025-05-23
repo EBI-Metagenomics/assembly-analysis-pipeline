@@ -17,8 +17,8 @@
                 "type": "string",
                 "format": "file-path",
                 "exists": true,
-                "pattern": "^\\S+\\.fasta(\\.gz)?$",
-                "errorMessage": "The assembly needs to be a fasta file, either '.fasta.gz' or '.fasta'"
+                "pattern": "^\\S+\\.(fasta|fa|fna|ffn)(\\.gz)?$",
+                "errorMessage": "The assembly needs to be a fasta file, either '.fasta', '.fa', '.fna', or '.ffn' (all with or without '.gz')"
             }
         },
         "required": ["sample", "assembly_fasta"]

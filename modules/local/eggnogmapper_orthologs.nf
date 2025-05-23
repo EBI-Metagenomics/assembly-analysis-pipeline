@@ -12,6 +12,7 @@ process EGGNOGMAPPER_ORTHOLOGS {
     path(eggnog_data_dir)
     path(eggnog_db)
     path(eggnog_diamond_db)
+    val(eggnog_database_version)
 
     output:
     tuple val(meta), path("*.hits")          , emit: hits
@@ -48,6 +49,7 @@ process EGGNOGMAPPER_ORTHOLOGS {
     cat <<-END_VERSIONS > versions.yml
     "${task.process}":
         eggnog-mapper: \$(echo \$(emapper.py --version) | grep -o "emapper-[0-9]\\+\\.[0-9]\\+\\.[0-9]\\+" | sed "s/emapper-//")
+        eggnog-mapper database: $eggnog_database_version
     END_VERSIONS
     """
 
@@ -60,6 +62,7 @@ process EGGNOGMAPPER_ORTHOLOGS {
     cat <<-END_VERSIONS > versions.yml
     "${task.process}":
         eggnog-mapper: \$(echo \$(emapper.py --version) | grep -o "emapper-[0-9]\\+\\.[0-9]\\+\\.[0-9]\\+" | sed "s/emapper-//")
+        eggnog-mapper database: $eggnog_database_version
     END_VERSIONS
     """
 }

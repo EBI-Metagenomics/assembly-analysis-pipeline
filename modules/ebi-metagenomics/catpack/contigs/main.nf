@@ -13,10 +13,11 @@ process CATPACK_CONTIGS {
     tuple val(meta3), path(taxonomy)
     tuple val(meta4), path(proteins)
     tuple val(meta5), path(diamond_table)
+    val cat_db_version
 
     output:
     tuple val(meta), path("*.ORF2LCA.txt"), emit: orf2lca
-    tuple val(meta), path("*.contig2classification.txt"), emit: contig2classification
+    tuple val(meta), path("*.contig2classification.txt.gz"), emit: contig2classification
     tuple val(meta), path("*.log"), emit: log
     tuple val(meta), path("*.diamond"), optional: true, emit: diamond
     tuple val(meta), path("*.predicted_proteins.faa"), optional: true, emit: faa
@@ -45,9 +46,12 @@ process CATPACK_CONTIGS {
         ${premade_table} \\
         ${args}
 
+    gzip ${prefix}.contig2classification.txt
+
     cat <<-END_VERSIONS > versions.yml
     "${task.process}":
         catpack: \$(CAT_pack --version | sed 's/CAT_pack pack v//g;s/ .*//g')
+        catpack database: $cat_db_version
     END_VERSIONS
     """
 
@@ -64,6 +68,7 @@ process CATPACK_CONTIGS {
     cat <<-END_VERSIONS > versions.yml
     "${task.process}":
         catpack: \$(CAT_pack --version | sed 's/CAT_pack pack v//g;s/ .*//g')
+        catpack database: $cat_db_version
     END_VERSIONS
     """
 }

@@ -30,8 +30,8 @@ include { KEGG_ORTHOLOGS_SUMMARY                            } from '../../module
 include { DIAMOND_RHEACHEBI                                 } from '../../modules/local/diamond_rheachebi'
 
 workflow FUNCTIONAL_ANNOTATION {
+
     take:
-    ch_contigs            // tuple (meta, contigs_fasta)
     ch_predicted_proteins // tule (meta, faa, gff)
     ch_protein_chunked    // tuple (meta, faa_chunk)
 
@@ -57,7 +57,6 @@ workflow FUNCTIONAL_ANNOTATION {
     // For this one we use cat/cat as the TSV may have spaces that cause csvtk to complain
     // The tsv is generated directly by InterProScan and for the summary we use csvtk fix-quotes
     // So, I think it's safe to use cat/cat but we should revisit at some point
-    // TODO: check we should use csvtk fix-quotes on this one
     CONCATENATE_INTERPROSCAN_TSV(
         INTERPROSCAN.out.tsv.groupTuple(),
     )
@@ -74,12 +73,14 @@ workflow FUNCTIONAL_ANNOTATION {
         file(params.eggnog_data_dir, checkIfExists: true),
         file(params.eggnog_database, checkIfExists: true),
         file(params.eggnog_diamond_database, checkIfExists: true),
+        params.eggnog_database_version,
     )
     ch_versions = ch_versions.mix(EGGNOGMAPPER_ORTHOLOGS.out.versions.first())
 
     EGGNOGMAPPER_ANNOTATIONS(
         EGGNOGMAPPER_ORTHOLOGS.out.orthologs,
         file(params.eggnog_data_dir, checkIfExists: true),
+        params.eggnog_database_version,
     )
     ch_versions = ch_versions.mix(EGGNOGMAPPER_ANNOTATIONS.out.versions.first())
 
@@ -107,10 +108,10 @@ workflow FUNCTIONAL_ANNOTATION {
         file(params.go_obo, checkIfExists: true),
         file(params.goslim_ids, checkIfExists: true),
         file(params.go_banding, checkIfExists: true),
+        params.goslim_version
     )
     ch_versions = ch_versions.mix(GOSLIM_SWF.out.versions)
 
-    // TODO: remove this once GOSLIM_SWF produces bgzip/index tsvs
     TABIX_BGZIP_GO(
         GOSLIM_SWF.out.go_summary
     )
@@ -130,7 +131,8 @@ workflow FUNCTIONAL_ANNOTATION {
     DIAMOND_RHEACHEBI(
         ch_proteins_faa,
         file(params.uniref90rhea_diamond_database, checkIfExists: true),
-        file(params.rheachebi_mapping_tsv, checkIfExists: true)
+        file(params.rheachebi_mapping_tsv, checkIfExists: true),
+        params.uniref90rhea_diamond_database_version
     )
     ch_versions = ch_versions.mix(DIAMOND_RHEACHEBI.out.versions)
 
@@ -209,7 +211,8 @@ workflow FUNCTIONAL_ANNOTATION {
             {
                 [meta, file(params.kofam_hmm_database, checkIfExists: true), faa, false, true, true] // boolean flags are: write alignment, tblout and domtbl
             }
-        }
+        },
+        params.kofam_hmm_database_version
     )
     ch_versions = ch_versions.mix(HMMSEARCH_KOFAMS.out.versions)
 
