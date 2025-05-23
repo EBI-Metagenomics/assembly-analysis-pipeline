@@ -62,7 +62,7 @@ process DBCAN {
     cat <<-END_VERSIONS > versions.yml
     "${task.process}":
         dbcan: 4.1.4
-        dbcan_db: "${db_version}"
+        dbcan database: "${db_version}"
     END_VERSIONS
     """
 
@@ -80,7 +80,7 @@ process DBCAN {
     cat <<-END_VERSIONS > versions.yml
     "${task.process}":
         dbcan: 4.1.4
-        dbcan_db: ${db_version}
+        dbcan database: ${db_version}
     END_VERSIONS
     """
 }

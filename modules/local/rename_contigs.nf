@@ -28,7 +28,7 @@ process RENAME_CONTIGS {
     cat <<-END_VERSIONS > versions.yml
     "${task.process}":
         python: \$(python --version 2>&1 | sed 's/Python //g')
-        pyfastax: \$(python -c "import pkg_resources; print(pkg_resources.get_distribution('pyfastax').version)")
+        pyfastax: \$(python -c "import pyfastx; print(pyfastx.version())")
     END_VERSIONS
     """
 
@@ -41,7 +41,7 @@ process RENAME_CONTIGS {
     cat <<-END_VERSIONS > versions.yml
     "${task.process}":
         python: \$(python --version 2>&1 | sed 's/Python //g')
-        pyfastax: \$(python -c "import pkg_resources; print(pkg_resources.get_distribution('pyfastax').version)")
+        pyfastax: \$(python -c "import pyfastx; print(pyfastx.version())")
     END_VERSIONS
     """
 }

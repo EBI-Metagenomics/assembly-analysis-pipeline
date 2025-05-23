@@ -124,6 +124,7 @@ workflow ASSEMBLY_ANALYSIS_PIPELINE {
         ch_contigs_taxonomic_classification.proteins,
         [[id: "cat_diamond_db"], file(params.cat_diamond_database, checkIfExists: true)],
         [[id: "cat_taxonomy_db"], file(params.cat_taxonomy_database, checkIfExists: true)],
+        params.cat_database_version,
     )
     ch_versions = ch_versions.mix(CONTIGS_TAXONOMIC_CLASSIFICATION.out.versions)
 
@@ -201,7 +202,7 @@ workflow ASSEMBLY_ANALYSIS_PIPELINE {
     ch_versions = ch_versions.mix(GT_GFF3VALIDATOR.out.versions)
 
     //
-    // Collate and save software versions
+    // Collate and save software versions (it also includes the database versions)
     //
     softwareVersionsToYAML(ch_versions)
         .collectFile(

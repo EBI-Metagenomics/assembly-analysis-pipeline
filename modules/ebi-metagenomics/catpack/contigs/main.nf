@@ -13,6 +13,7 @@ process CATPACK_CONTIGS {
     tuple val(meta3), path(taxonomy)
     tuple val(meta4), path(proteins)
     tuple val(meta5), path(diamond_table)
+    val cat_db_version
 
     output:
     tuple val(meta), path("*.ORF2LCA.txt"), emit: orf2lca
@@ -50,6 +51,7 @@ process CATPACK_CONTIGS {
     cat <<-END_VERSIONS > versions.yml
     "${task.process}":
         catpack: \$(CAT_pack --version | sed 's/CAT_pack pack v//g;s/ .*//g')
+        catpack database: $cat_db_version
     END_VERSIONS
     """
 
@@ -66,6 +68,7 @@ process CATPACK_CONTIGS {
     cat <<-END_VERSIONS > versions.yml
     "${task.process}":
         catpack: \$(CAT_pack --version | sed 's/CAT_pack pack v//g;s/ .*//g')
+        catpack database: $cat_db_version
     END_VERSIONS
     """
 }

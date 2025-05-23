@@ -9,6 +9,7 @@ workflow CONTIGS_TAXONOMIC_CLASSIFICATION {
     ch_proteins    // [ val(meta), path(proteins_fasta) ]
     cat_db        // [ val(meta), path(catdb_folder)  ]
     taxonomy_db   // [ val(meta), path(cattax_folder) ]
+    cat_database_version // val(version of the CAT_pack db)
 
     main:
 
@@ -42,7 +43,8 @@ workflow CONTIGS_TAXONOMIC_CLASSIFICATION {
         cat_db,
         taxonomy_db,
         catpack_input_ch.proteins,
-        catpack_input_ch.diamond_txt
+        catpack_input_ch.diamond_txt,
+        cat_database_version
     )
     ch_versions = ch_versions.mix(CATPACK_CONTIGS.out.versions.first())
 

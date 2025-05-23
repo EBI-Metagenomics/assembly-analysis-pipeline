@@ -24,7 +24,8 @@ workflow DRAM_DISTILL_SWF {
     // Per assembly distill
     DRAM_DISTILL_PER_ASSEMBLY(
         SUMMARISE_FOR_DRAM_INPUT.out.dram_summary.groupTuple(),
-        params.dram_databases
+        file(params.dram_databases, checkIfExists: true),
+        params.dram_databases_version,
     )
     ch_versions = ch_versions.mix(DRAM_DISTILL_PER_ASSEMBLY.out.versions)
 
@@ -34,7 +35,8 @@ workflow DRAM_DISTILL_SWF {
 
     DRAM_DISTILL_PER_SAMPLESHEET(
         samplesheet_level_dram_summary.map { summary -> [ [id:"samplesheet"], summary ] },
-        params.dram_databases
+        file(params.dram_databases, checkIfExists: true),
+        params.dram_databases_version,
     )
     ch_versions = ch_versions.mix(DRAM_DISTILL_PER_SAMPLESHEET.out.versions)
 

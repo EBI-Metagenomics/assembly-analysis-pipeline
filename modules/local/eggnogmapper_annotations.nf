@@ -10,6 +10,7 @@ process EGGNOGMAPPER_ANNOTATIONS {
     input:
     tuple val(meta), path(annotation_hit_table)
     path(eggnog_data_dir)
+    val(eggnog_database_version)
 
     output:
     tuple val(meta), path("*.annotations")  , emit: annotations
@@ -35,6 +36,7 @@ process EGGNOGMAPPER_ANNOTATIONS {
     cat <<-END_VERSIONS > versions.yml
     "${task.process}":
         eggnog-mapper: \$(echo \$(emapper.py --version) | grep -o "emapper-[0-9]\\+\\.[0-9]\\+\\.[0-9]\\+" | sed "s/emapper-//")
+        eggnog-mapper database: $eggnog_database_version
     END_VERSIONS
     """
 
@@ -47,6 +49,7 @@ process EGGNOGMAPPER_ANNOTATIONS {
     cat <<-END_VERSIONS > versions.yml
     "${task.process}":
         eggnog-mapper: \$(echo \$(emapper.py --version) | grep -o "emapper-[0-9]\\+\\.[0-9]\\+\\.[0-9]\\+" | sed "s/emapper-//")
+        eggnog-mapper database: $eggnog_database_version
     END_VERSIONS
     """
 }

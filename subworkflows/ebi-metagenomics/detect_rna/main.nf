@@ -20,6 +20,7 @@ workflow DETECT_RNA {
     rfam         // folder: rfam for cmsearch/cmscan
     claninfo     // file: claninfo for cmsearchtbloutdeoverlap
     mode         // cmsearch/cmscan
+    rfam_version // Rfam version
 
     main:
 
@@ -29,7 +30,8 @@ workflow DETECT_RNA {
     if ( mode == 'cmsearch' ) {
         INFERNAL_CMSEARCH(
             ch_fasta,
-            rfam
+            rfam,
+            rfam_version
         )
         ch_versions = ch_versions.mix(INFERNAL_CMSEARCH.out.versions.first())
         cmsearch_ch = INFERNAL_CMSEARCH.out.cmsearch_tbl

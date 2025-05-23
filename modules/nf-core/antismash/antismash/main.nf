@@ -8,6 +8,7 @@ process ANTISMASH_ANTISMASH {
     input:
     tuple val(meta), path(sequence_input), path(gff)
     path databases
+    val database_version
 
     output:
     tuple val(meta), path("${prefix}/clusterblast/*_c*.txt"), optional: true, emit: clusterblast_file
@@ -73,6 +74,7 @@ process ANTISMASH_ANTISMASH {
     cat <<-END_VERSIONS > versions.yml
     "${task.process}":
         antismash: \$(echo \$(antismash --version) | sed 's/antiSMASH //;s/-.*//g')
+        antismash database: $database_version
     END_VERSIONS
     """
 
@@ -98,6 +100,7 @@ process ANTISMASH_ANTISMASH {
     cat <<-END_VERSIONS > versions.yml
     "${task.process}":
         antismash: \$(echo \$(antismash --version) | sed 's/antiSMASH //;s/-.*//g')
+        antismash database: $database_version
     END_VERSIONS
     """
 }

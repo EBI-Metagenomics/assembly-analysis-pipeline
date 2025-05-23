@@ -9,6 +9,7 @@ process HMMER_HMMSEARCH {
 
     input:
     tuple val(meta), path(hmmfile), path(seqdb), val(write_align), val(write_target), val(write_domain)
+    val hmm_version
 
     output:
     tuple val(meta), path('*.txt.gz')   , emit: output
@@ -48,6 +49,7 @@ process HMMER_HMMSEARCH {
     cat <<-END_VERSIONS > versions.yml
     "${task.process}":
         hmmer: \$(hmmsearch -h | grep -o '^# HMMER [0-9.]*' | sed 's/^# HMMER *//')
+        kofam version: $hmm_version
     END_VERSIONS
     """
 
@@ -67,6 +69,7 @@ process HMMER_HMMSEARCH {
     cat <<-END_VERSIONS > versions.yml
     "${task.process}":
         hmmer: \$(hmmsearch -h | grep -o '^# HMMER [0-9.]*' | sed 's/^# HMMER *//')
+        kofam version: $hmm_version
     END_VERSIONS
     """
 }

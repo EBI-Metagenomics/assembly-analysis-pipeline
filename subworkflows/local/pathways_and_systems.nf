@@ -100,7 +100,8 @@ workflow PATHWAYS_AND_SYSTEMS {
 
     ANTISMASH_ANTISMASH(
         antismash_channel,
-        file(params.antismash_database, checkIfExists: true)
+        file(params.antismash_database, checkIfExists: true),
+        params.antismash_database_version
     )
     ch_versions = ch_versions.mix(ANTISMASH_ANTISMASH.out.versions)
 
