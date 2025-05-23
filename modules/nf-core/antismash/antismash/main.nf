@@ -1,8 +1,9 @@
-process ANTISMASH_ANTISMASHLITE {
+process ANTISMASH_ANTISMASH {
     tag "${meta.id}"
     label 'process_medium'
 
-    container 'microbiome-informatics/antismash:8.0.0'
+    conda "${moduleDir}/environment.yml"
+    container "nf-core/antismash:8.0.0"
 
     input:
     tuple val(meta), path(sequence_input), path(gff)
@@ -32,23 +33,31 @@ process ANTISMASH_ANTISMASHLITE {
 
     script:
     def args = task.ext.args ?: ''
-    prefix   = task.ext.suffix ?: "${meta.id}"
-    
-    def gff_flag = gff ? "--genefinding-gff3 ${gff.name.replace('.gz', '')}" : ""
-    
-    def is_compressed = sequence_input.getExtension() == "gz" ? true : false
-    def sequence_file = is_compressed ? sequence_input.getBaseName() : sequence_input
+    prefix = task.ext.suffix ? "${meta.id}${task.ext.suffix}" : "${meta.id}"
+
+    // Handle a compressed fasta file
+    def is_seq_compressed = sequence_input.getExtension() == "gz" ? true : false
+    def sequence_file = is_seq_compressed ? sequence_input.getBaseName() : sequence_input
+    // Handle a compressed gff file
+    def is_gff_compressed = gff.getExtension() == "gz" ? true : false
+    def gff_file = is_gff_compressed ? gff.getBaseName() : gff
+
+    gff_flag = gff ? "--genefinding-gff3 ${gff_file}" : ""
     """
     ## We specifically do not include on-the-fly annotations (--genefinding-tool none) as
     ## this should be run as a separate module for versioning purposes
 
-    if [ "${is_compressed}" == "true" ]; then
+    if [ "${is_seq_compressed}" == "true" ]; then
         # - remove in case of retry - #
         rm -f ${sequence_file}
         gzip -c -d ${sequence_input} > ${sequence_file}
     fi
 
-    gunzip -c -d ${gff} > ${gff.name.replace('.gz', '')}
+    if [ "${is_gff_compressed}" == "true" ]; then
+        # - remove in case of retry - #
+        rm -f ${gff_file}
+        gunzip -c -d ${gff} > ${gff_file}
+    fi
 
     antismash \\
         ${args} \\
@@ -63,7 +72,7 @@ process ANTISMASH_ANTISMASHLITE {
 
     cat <<-END_VERSIONS > versions.yml
     "${task.process}":
-        antismash-lite: \$(echo \$(antismash --version) | sed 's/antiSMASH //;s/-.*//g')
+        antismash: \$(echo \$(antismash --version) | sed 's/antiSMASH //;s/-.*//g')
     END_VERSIONS
     """
 
@@ -88,7 +97,7 @@ process ANTISMASH_ANTISMASHLITE {
 
     cat <<-END_VERSIONS > versions.yml
     "${task.process}":
-        antismash-lite: \$(echo \$(antismash --version) | sed 's/antiSMASH //;s/-.*//g')
+        antismash: \$(echo \$(antismash --version) | sed 's/antiSMASH //;s/-.*//g')
     END_VERSIONS
     """
 }

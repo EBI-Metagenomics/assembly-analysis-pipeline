@@ -30,8 +30,8 @@ include { KEGG_ORTHOLOGS_SUMMARY                            } from '../../module
 include { DIAMOND_RHEACHEBI                                 } from '../../modules/local/diamond_rheachebi'
 
 workflow FUNCTIONAL_ANNOTATION {
+
     take:
-    ch_contigs            // tuple (meta, contigs_fasta)
     ch_predicted_proteins // tule (meta, faa, gff)
     ch_protein_chunked    // tuple (meta, faa_chunk)
 

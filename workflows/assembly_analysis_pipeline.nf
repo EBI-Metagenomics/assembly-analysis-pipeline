@@ -144,7 +144,6 @@ workflow ASSEMBLY_ANALYSIS_PIPELINE {
     * Annotation of the proteins.
     */
     FUNCTIONAL_ANNOTATION(
-        ASSEMBLY_QC.out.assembly_filtered,
         COMBINED_GENE_CALLER.out.faa.join(COMBINED_GENE_CALLER.out.gff),
         ch_protein_chunks,
     )
