@@ -1,7 +1,7 @@
 /* NF-CORE */
 include { SEQKIT_SEQ as SEQKIT_SEQ_BGC                                   } from '../../modules/nf-core/seqkit/seq/main'
 include { SEQKIT_SPLIT2                                                  } from '../../modules/nf-core/seqkit/split2/main'
-include { ANTISMASH_ANTISMASHLITE                                        } from '../../modules/nf-core/antismash/antismashlite/main'
+include { ANTISMASH_ANTISMASH                                            } from '../../modules/nf-core/antismash/antismash/main'
 include { TABIX_BGZIP as TABIX_BGZIP_KEGGPATHWAYSCOMPLETENESS            } from '../../modules/nf-core/tabix/bgzip/main'
 include { TABIX_BGZIP as TABIX_BGZIP_KEGGPATHWAYSCOMPLETENESS_PER_CONTIG } from '../../modules/nf-core/tabix/bgzip/main'
 include { CAT_CAT as CONCATENATE_ANTISMASH_GBK                           } from '../../modules/nf-core/cat/cat/main'
@@ -98,14 +98,14 @@ workflow PATHWAYS_AND_SYSTEMS {
     antismash_channel = ch_contigs_and_predicted_proteins.combine(ch_chunked_assembly_fasta, by: 0)
         .map { meta, _all_contigs_fasta, _faa, gff, _ips_tsv, contigs_chunk -> [meta, contigs_chunk, gff] }
 
-    ANTISMASH_ANTISMASHLITE(
+    ANTISMASH_ANTISMASH(
         antismash_channel,
         file(params.antismash_database, checkIfExists: true)
     )
-    ch_versions = ch_versions.mix(ANTISMASH_ANTISMASHLITE.out.versions)
+    ch_versions = ch_versions.mix(ANTISMASH_ANTISMASH.out.versions)
 
     ANTISMASH_JSON_TO_GFF(
-        ANTISMASH_ANTISMASHLITE.out.json_results
+        ANTISMASH_ANTISMASH.out.json_results
     )
     ch_versions = ch_versions.mix(ANTISMASH_JSON_TO_GFF.out.versions.first())
 
@@ -115,12 +115,12 @@ workflow PATHWAYS_AND_SYSTEMS {
     ch_versions = ch_versions.mix(CONCATENATE_ANTISMASH_GFFS.out.versions)
 
     CONCATENATE_ANTISMASH_GBK(
-        ANTISMASH_ANTISMASHLITE.out.gbk_input.groupTuple()
+        ANTISMASH_ANTISMASH.out.gbk_input.groupTuple()
     )
     ch_versions = ch_versions.mix(CONCATENATE_ANTISMASH_GBK.out.versions)
 
     MERGE_ANTISMASH_JSON(
-        ANTISMASH_ANTISMASHLITE.out.json_results.groupTuple()
+        ANTISMASH_ANTISMASH.out.json_results.groupTuple()
     )
     ch_versions = ch_versions.mix(MERGE_ANTISMASH_JSON.out.versions)
 
