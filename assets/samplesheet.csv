@@ -1,2 +1,2 @@
 sample,assembly_fasta
-SAMPLE_PAIRED_END,/path/to/fastq/assembly.fasta.gz
+ERZ43,/path/to/fastq/assembly.fasta.gz
