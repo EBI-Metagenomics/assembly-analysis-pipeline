@@ -29,8 +29,7 @@ workflow ASSEMBLY_QC {
     QUAST(
         ch_assembly.mix( FILTER_ASSEMBLY.out.fasta ).groupTuple()
     )
-
-    ch_versions = ch_versions.mix(FILTER_ASSEMBLY.out.versions)
+    ch_versions = ch_versions.mix(QUAST.out.versions)
 
     emit:
     assembly_filtered = FILTER_ASSEMBLY.out.fasta

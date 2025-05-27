@@ -34,7 +34,7 @@ process ANTISMASH_ANTISMASH {
 
     script:
     def args = task.ext.args ?: ''
-    prefix = task.ext.suffix ? "${meta.id}${task.ext.suffix}" : "${meta.id}"
+    prefix   = task.ext.suffix ?: "${meta.id}"
 
     // Handle a compressed fasta file
     def is_seq_compressed = sequence_input.getExtension() == "gz" ? true : false
