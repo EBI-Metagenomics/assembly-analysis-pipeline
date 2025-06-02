@@ -66,9 +66,9 @@
 
   > Li H, Handsaker B, Wysoker A, Fennell T, Ruan J, Homer N, et al. The Sequence Alignment/Map format and SAMtools. Vol. 25, Bioinformatics. Oxford University Press (OUP); 2009. p. 2078–9. Available from: http://dx.doi.org/10.1093/bioinformatics/btp352
 
-- [antiSMASH](http://dx.doi.org/10.1093/nar/gkab335)
+- [antiSMASH](http://dx.doi.org/10.1093/nar/gkaf334)
 
-  > Blin K, Shaw S, Kloosterman AM, Charlop-Powers Z, van Wezel GP, Medema MH, et al. antiSMASH 6.0: improving cluster detection and comparison capabilities. Vol. 49, Nucleic Acids Research. Oxford University Press (OUP); 202p. W29–35. Available from: http://dx.doi.org/10.1093/nar/gkab335
+  > Blin K, Shaw S, Vader L, Szenei J, Reitz ZL, Augustijn HE, Cediel-Becerra JDD, de Crécy-Lagard V, Koetsier RA, Williams SE, Cruz-Morales P, Wongwas S, Segurado Luchsinger AE, Biermann F, Korenskaia A, Zdouc MM, Meijer D, Terlouw BR, van der Hooft JJJ, Ziemert N, Helfrich EJN, Masschelein J, Corre C, Chevrette MG, van Wezel GP, Medema MH, Weber T. antiSMASH 8.0: extended gene cluster detection capabilities and analyses of chemistry, enzymology, and regulation. Vol. 53, Nucleic Acids Research. Oxford University Press (OUP); 2025. Available from: http://dx.doi.org/10.1093/nar/gkaf334
 
 - [HMMER](http://dx.doi.org/10.1371/journal.pcbi.1002195)
 
