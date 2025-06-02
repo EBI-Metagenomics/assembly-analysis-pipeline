@@ -46,7 +46,7 @@ process FILTER_ASSEMBLY {
                 --out-file ${prefix}_filtered.fasta.gz
         else
             echo "No contigs after the N bases filtering"
-            EXIT_REASON="insufficient_contigs_after_n_bases_filtering"
+            EXIT_REASON="insufficient_contigs_after_n_content_filtering"
         fi
     fi
 
