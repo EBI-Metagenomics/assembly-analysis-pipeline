@@ -31,7 +31,8 @@ process SANNTIS_SUMMARY {
 
     stub:
     """
-    touch ${sanntis_gff.simpleName}_summary.tsv.gz
+    touch ${sanntis_gff.simpleName}_summary.tsv
+    bgzip -@${task.cpus} --index ${sanntis_gff.simpleName}_summary.tsv
 
     cat <<-END_VERSIONS > versions.yml
     "${task.process}":
