@@ -284,16 +284,10 @@ workflow ASSEMBLY_ANALYSIS_PIPELINE {
     // specifically those without IPS annotations or BGC. We need to retrieve
     // examples of these assemblies from the current backlog database.
 
-    ch_assembly
-        .join( GT_GFF3VALIDATOR.out.success_log, remainder: true )
+    GT_GFF3VALIDATOR.out.success_log
         .join( GT_GFF3VALIDATOR.out.error_log, remainder: true )
-        .join( ASSEMBLY_QC.out.qc_failed_assemblies, remainder: true )
-        .map { meta, _contigs, _gff_success, gff_validation_error, qc_failed_message ->
-            {
+        .map { meta, _gff_success, gff_validation_error -> {
                 def message = "success"
-                if ( qc_failed_message ) {
-                    message = qc_failed_message
-                }
                 if ( gff_validation_error ) {
                     message = "invalid_summary_gff"
                 }
@@ -302,6 +296,14 @@ workflow ASSEMBLY_ANALYSIS_PIPELINE {
         }
         .collectFile(name: "analysed_assemblies.csv", storeDir: params.outdir, newLine: true, cache: false)
 
+    // QC Failed  assemblies //
+    ASSEMBLY_QC.out.qc_failed_assemblies
+        .filter { _meta, qc_failed_message -> qc_failed_message }
+        .map { meta, qc_failed_message -> {
+                return "${meta.id},${qc_failed_message}"
+            }
+        }
+        .collectFile(name: "qc_failed_assemblies.csv", storeDir: params.outdir, newLine: true, cache: false)
 
     /*************************/
     /* Downtream samplesheet */

@@ -294,17 +294,29 @@ The IDs of assemblies that have been analysed are aggregated into a top-level fi
 
 ```
 ERZ12345,success
-ERZ56789,success
-ERZ56790,insufficient_contigs_after_length_filtering
-ERZ56791,insufficient_contigs_after_n_content_filtering
+ERZ56789,invalid_summary_gff
 ```
 
 #### The possible statuses are
 
+| Status              | Description                                                    |
+| ------------------- | -------------------------------------------------------------- |
+| success             | The assembly was successfully annotated                        |
+| invalid_summary_gff | The assembly summary GFF file is not valid, treat with caution |
+
+### QC failed assemblies
+
+The IDs of assemblies that have been failed in the QC step are aggregated into a top-level file (`qc_failed_assemblies.csv`), which looks like this:
+
+```
+ERZ12346,insufficient_contigs_after_length_filtering
+ERZ56790,insufficient_contigs_after_n_content_filtering
+```
+
+#### The possible QC failed statuses are
+
 | Status                                         | Description                                                                |
 | ---------------------------------------------- | -------------------------------------------------------------------------- |
-| success                                        | The assembly was successfully annotated                                    |
-| invalid_summary_gff                            | The assembly summary GFF file is not valid, treat with caution             |
 | insufficient_contigs_after_length_filtering    | No contigs remained after applying the minimum length filter.              |
 | insufficient_contigs_after_n_content_filtering | No contigs remained after filtering out sequences with high N-base content |
 
@@ -312,6 +324,6 @@ ERZ56791,insufficient_contigs_after_n_content_filtering
 
 In addition to generating MultiQC reports for each assembly, the pipeline also produces per-study reports, which can be found in the `multiqc/` directory.
 
-### dram-distill
+### DRAM-distill
 
 Just as the pipeline generates https://github.com/WrightonLabCSU/DRAM outputs on a per-assembly basis, it also produces similar outputs on a per-study basis, which are located in the `dram-distill/` directory by concatenating assembly-level files.
