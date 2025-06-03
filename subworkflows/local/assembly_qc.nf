@@ -24,15 +24,16 @@ workflow ASSEMBLY_QC {
         ch_assembly
     )
 
-    ch_versions = ch_versions.mix(FILTER_ASSEMBLY.out.versions)
+    ch_versions = ch_versions.mix( FILTER_ASSEMBLY.out.versions )
 
     QUAST(
-        ch_assembly.mix( FILTER_ASSEMBLY.out.fasta ).groupTuple()
+        ch_assembly.mix( FILTER_ASSEMBLY.out.fasta.ifEmpty([]) ).groupTuple()
     )
     ch_versions = ch_versions.mix(QUAST.out.versions)
 
     emit:
-    assembly_filtered = FILTER_ASSEMBLY.out.fasta
-    quast_report_tsv  = QUAST.out.tsv
-    versions          = ch_versions
+    assembly_filtered    = FILTER_ASSEMBLY.out.fasta
+    qc_failed_assemblies = FILTER_ASSEMBLY.out.exit_reason
+    quast_report_tsv     = QUAST.out.tsv
+    versions             = ch_versions
 }

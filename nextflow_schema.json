@@ -54,6 +54,12 @@
                     "description": "Minimum length of a contig; contigs shorter than this will not be considered by the pipeline.",
                     "fa_icon": "fas fa-weight"
                 },
+                "max_contig_n_content": {
+                    "type": "integer",
+                    "default": 10,
+                    "description": "Maximum ambiguous bases (N) content (as % of the total) allowed per contig; contigs with more N content than this will not be considered by the pipeline.",
+                    "fa_icon": "fas fa-weight"
+                },
                 "bgc_min_contig_length": {
                     "type": "integer",
                     "default": 1000,

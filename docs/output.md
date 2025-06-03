@@ -201,8 +201,11 @@ The `pathways-and-systems` directory contains five subdirectories of results, on
 │   │   ├── ERZ12345_antismash.gff.gz
 │   │   ├── ERZ12345_merged.json
 │   │   └── ERZ12345_antismash_summary.tsv.gz
+│   │   └── ERZ12345_antismash_summary.tsv.gz.gzi
 │   ├── sanntis
 │   │   └── ERZ12345_sanntis_concatenated.gff.gz
+│   │   ├── ERZ12345_sanntis_summary.tsv.gz
+│   │   └── ERZ12345_sanntis_summary.tsv.gz.gzi
 │   ├── genome-properties
 │   │   ├── ERZ12345_gp.json.gz
 │   │   ├── ERZ12345_gp.tsv.gz
@@ -228,12 +231,15 @@ This subdirectory contains the results of running [antiSMASH](https://github.com
 - **ERZ12345_antismash.gff.gz**: A GFF3 format file containing antiSMASH annotations.
 - **ERZ12345_merged.json**: A JSON file containing antiSMASH annotations.
 - **ERZ12345_antismash_summary.tsv.gz**: This `tsv` file listing the counts of each antiSMASH entry detected in the assembly.
+- **ERZ12345_antismash_summary.tsv.gz.gzi**: This is the index of the antiSMASH summary `tsv`
 
 #### Output files - sanntis
 
 This subdirectory contains the outputs of running [SanntiS](https://github.com/Finn-Lab/SanntiS) on the proteins of the assembly, also describing the detected BGCs using this new machine learning-based tool.
 
 - **ERZ12345_sanntis.gff.gz**: This `gff` file contains the different SanntiS annotations in the GFF3 format. The GFF3 specification can be found in the [tool repo](https://github.com/Finn-Lab/SanntiS?tab=readme-ov-file#ouput)
+- **ERZ12345_sanntis_summary.tsv.gz**: This `tsv` file listing the counts of each SanntiS entry detected in the assembly.
+- **ERZ12345_sanntis_summary.tsv.gz.gzi**: This is the index of the SanntiS summary `tsv`
 
 #### Output files - genome-properties
 
@@ -289,14 +295,18 @@ The IDs of assemblies that have been analysed are aggregated into a top-level fi
 ```
 ERZ12345,success
 ERZ56789,success
+ERZ56790,insufficient_contigs_after_length_filtering
+ERZ56791,insufficient_contigs_after_n_content_filtering
 ```
 
 #### The possible statuses are
 
-| Status              | Description                                                    |
-| ------------------- | -------------------------------------------------------------- |
-| success             | The assembly was successfully annotated                        |
-| invalid_summary_gff | The assembly summary GFF file is not valid, treat with caution |
+| Status                                         | Description                                                                |
+| ---------------------------------------------- | -------------------------------------------------------------------------- |
+| success                                        | The assembly was successfully annotated                                    |
+| invalid_summary_gff                            | The assembly summary GFF file is not valid, treat with caution             |
+| insufficient_contigs_after_length_filtering    | No contigs remained after applying the minimum length filter.              |
+| insufficient_contigs_after_n_content_filtering | No contigs remained after filtering out sequences with high N-base content |
 
 ### MultiQC
 
