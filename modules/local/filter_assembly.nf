@@ -37,7 +37,7 @@ process FILTER_ASSEMBLY {
         seqkit fx2tab ${prefix}_len_filtered.fasta \\
             --threads ${task.cpus} \\
             --base-content N | \\
-        awk '\$3 < 10' > ${prefix}_nbases_filtered.tab2fx
+        awk '\$3 < ${params.max_contig_n_content}' > ${prefix}_nbases_filtered.tab2fx
 
         # Check if N-base filtering produced any sequences
         if [[ -s ${prefix}_nbases_filtered.tab2fx ]]; then
