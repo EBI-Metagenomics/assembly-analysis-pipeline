@@ -190,7 +190,8 @@
                     "krona/ktimporttext": {
                         "branch": "main",
                         "git_sha": "172e93318ac2e2db5f9885b07ffb80443e67848a",
-                        "installed_by": ["contigs_taxonomic_classification"]
+                        "installed_by": ["contigs_taxonomic_classification"],
+                        "patch": "modules/ebi-metagenomics/krona/ktimporttext/krona-ktimporttext.diff"
                     },
                     "mgnifypipelinestoolkit/kronatxtfromcatclassification": {
                         "branch": "main",

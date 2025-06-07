@@ -74,7 +74,7 @@ The `taxonomy` directory contains output files from taxonomic assignment tools s
 ├── cds
 ├── taxonomy
 │   ├── ERZ12345_contigs_taxonomy.tsv.gz
-│   ├── ERZ12345.krona.txt
+│   ├── ERZ12345.krona.txt.gz
 │   ├── ERZ12345.html
 │   └── ERZ12345_SSU.fasta.gz
 ├── functional-annotation
@@ -85,7 +85,7 @@ The `taxonomy` directory contains output files from taxonomic assignment tools s
 #### Output files
 
 - **ERZ12345_contigs_taxonomy.tsv.gz**: This `tsv` file contains the output from [CAT_pack](https://github.com/MGXlab/CAT_pack) that describes taxonomy assignments to contigs in the assembly.
-- **ERZ12345.krona.txt**: This `txt` file contains the Krona text input that is used to generate the Krona HTML file. It contains the distribution of the different taxonomic assignments from the [CAT_pack](https://github.com/MGXlab/CAT_pack) output.
+- **ERZ12345.krona.txt.gz**: This compressed `txt` file contains the Krona text input that is used to generate the Krona HTML file. It contains the distribution of the different taxonomic assignments from the [CAT_pack](https://github.com/MGXlab/CAT_pack) output.
 - **ERZ12345.html**: This `html` file contains the Krona HTML file that interactively displays the distribution of the different taxonomic assignments from [CAT_pack](https://github.com/MGXlab/CAT_pack).
 - **ERZ12345_SSU.fasta.gz**: This `FASTA` file contains all sequences from the assembly's contigs that matched the `SSU` (Small Subunit) rRNA marker gene, as identified by running [cmsearch](http://eddylab.org/infernal/). These sequences represent regions of the contigs that align to the `SSU` model used in the search. This file may be absent if no marker genes of this type were detected in the assembly.
 - **ERZ12345_LSU.fasta.gz**: This `FASTA` file contains sequences matching the `LSU` (Large Subunit) rRNA marker gene, identified in the same way via [cmsearch](http://eddylab.org/infernal/). This file may be absent if no marker genes of this type were detected in the assembly.

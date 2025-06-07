@@ -25,10 +25,12 @@ process KRONA_KTIMPORTTEXT {
     def args = task.ext.args ?: ''
     def prefix = task.ext.prefix ?: "${meta.id}"
     """
+    gunzip -c ${report} > ${report.name.replace(".gz", "")}
+
     ktImportText  \\
         $args \\
         -o ${prefix}.html \\
-        $report
+        ${report.name.replace(".gz", "")}
 
     cat <<-END_VERSIONS > versions.yml
     "${task.process}":

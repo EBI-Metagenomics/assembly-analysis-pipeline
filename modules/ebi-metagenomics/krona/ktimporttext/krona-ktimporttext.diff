@@ -1,0 +1,25 @@
+Changes in component 'ebi-metagenomics/krona/ktimporttext'
+'modules/ebi-metagenomics/krona/ktimporttext/environment.yml' is unchanged
+'modules/ebi-metagenomics/krona/ktimporttext/meta.yml' is unchanged
+Changes in 'krona/ktimporttext/main.nf':
+--- modules/ebi-metagenomics/krona/ktimporttext/main.nf
++++ modules/ebi-metagenomics/krona/ktimporttext/main.nf
+@@ -25,10 +25,12 @@
+     def args = task.ext.args ?: ''
+     def prefix = task.ext.prefix ?: "${meta.id}"
+     """
++    gunzip -c ${report} > ${report.name.replace(".gz", "")}
++
+     ktImportText  \\
+         $args \\
+         -o ${prefix}.html \\
+-        $report
++        ${report.name.replace(".gz", "")}
+ 
+     cat <<-END_VERSIONS > versions.yml
+     "${task.process}":
+
+'modules/ebi-metagenomics/krona/ktimporttext/tests/main.nf.test.snap' is unchanged
+'modules/ebi-metagenomics/krona/ktimporttext/tests/tags.yml' is unchanged
+'modules/ebi-metagenomics/krona/ktimporttext/tests/main.nf.test' is unchanged
+************************************************************
