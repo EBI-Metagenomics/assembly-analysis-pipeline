@@ -34,7 +34,6 @@ process ANTISMASH_ANTISMASH {
     script:
     def args = task.ext.args   ?: ''
     prefix   = task.ext.suffix ?: "${meta.id}"
-    gff_flag = gff ? "--genefinding-gff3 ${gff}" : ""
 
     // Handle a compressed fasta file
     def is_seq_compressed = sequence_input.getExtension() == "gz" ? true : false
@@ -42,7 +41,6 @@ process ANTISMASH_ANTISMASH {
     // Handle a compressed gff file
     def is_gff_compressed = gff.getExtension() == "gz" ? true : false
     def gff_file = is_gff_compressed ? gff.getBaseName() : gff
-
     gff_flag = gff ? "--genefinding-gff3 ${gff_file}" : ""
     """
     ## We specifically do not include on-the-fly annotations (--genefinding-tool none) as
