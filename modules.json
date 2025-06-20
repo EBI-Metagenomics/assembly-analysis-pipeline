@@ -120,11 +120,10 @@
                         "installed_by": ["detect_rna"],
                         "patch": "modules/ebi-metagenomics/convertcmscantocmsearch/convertcmscantocmsearch.diff"
                     },
-                    "dbcan/dbcan": {
+                    "dbcan/easysubstrate": {
                         "branch": "main",
-                        "git_sha": "2f2f837279b44825254ea736b12ea4797b350d0a",
-                        "installed_by": ["modules"],
-                        "patch": "modules/ebi-metagenomics/dbcan/dbcan/dbcan-dbcan.diff"
+                        "git_sha": "e5106daeff5e88748eff45d802927abc61132cab",
+                        "installed_by": ["modules"]
                     },
                     "diamond/blastp": {
                         "branch": "main",
