@@ -122,9 +122,8 @@
                     },
                     "dbcan/easysubstrate": {
                         "branch": "main",
-                        "git_sha": "ef7ce2d865ac57ff113e33c23f50d8d82a7d863b",
-                        "installed_by": ["modules"],
-                        "patch": "modules/ebi-metagenomics/dbcan/easysubstrate/dbcan-easysubstrate.diff"
+                        "git_sha": "5890d5897fc62893eb568e7cf910c2fdd0597c28",
+                        "installed_by": ["modules"]
                     },
                     "diamond/blastp": {
                         "branch": "main",
