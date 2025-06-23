@@ -14,7 +14,7 @@ include { TABIX_BGZIP as TABIX_BGZIP_RHEAANDCHEBI         } from '../../modules/
 
 /* EBI-METAGENOMICS */
 include { INTERPROSCAN                             } from '../../modules/ebi-metagenomics/interproscan/main'
-include { DBCAN                                    } from '../../modules/ebi-metagenomics/dbcan/dbcan/main'
+include { DBCAN                                    } from '../../modules/ebi-metagenomics/dbcan/easysubstrate/main'
 include { GOSLIM_SWF                               } from '../../subworkflows/ebi-metagenomics/goslim_swf/main'
 
 /* LOCAL */
@@ -162,7 +162,7 @@ workflow FUNCTIONAL_ANNOTATION {
     ch_versions = ch_versions.mix(CONCATENATE_DBCAN_GFFS.out.versions)
 
     CONCATENATE_DBCAN_OVERVIEW(
-        DBCAN.out.overview_output.groupTuple(),
+        DBCAN.out.overview_txt.groupTuple(),
         "tsv",
         "tsv",
         true // compress
@@ -170,7 +170,7 @@ workflow FUNCTIONAL_ANNOTATION {
     ch_versions = ch_versions.mix(CONCATENATE_DBCAN_OVERVIEW.out.versions)
 
     CONCATENATE_DBCAN_STANDARD_OUT(
-        DBCAN.out.cgc_standard_output.groupTuple(),
+        DBCAN.out.cgc_standard_tsv.groupTuple(),
         "tsv",
         "tsv",
         true // compress
@@ -178,7 +178,7 @@ workflow FUNCTIONAL_ANNOTATION {
     ch_versions = ch_versions.mix(CONCATENATE_DBCAN_STANDARD_OUT.out.versions)
 
     CONCATENATE_DBCAN_SUBSTRATES(
-        DBCAN.out.substrate_out.groupTuple(),
+        DBCAN.out.substrate_prediction_tsv.groupTuple(),
         "tsv",
         "tsv",
         true // compress
@@ -190,7 +190,7 @@ workflow FUNCTIONAL_ANNOTATION {
     * it looks like this extra column is a duplicated "Coverage". In order to concatenate the
     * tsv with csvtk (which ensures consistency) we run csvtk fix first to adjust the tsvs
     */
-    SEQKIT_FIX(DBCAN.out.dbsub_output)
+    SEQKIT_FIX(DBCAN.out.dbsub_output_tsv)
 
     ch_versions = ch_versions.mix(SEQKIT_FIX.out.versions.first())
 
