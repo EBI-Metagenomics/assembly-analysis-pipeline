@@ -122,7 +122,7 @@
                     },
                     "dbcan/easysubstrate": {
                         "branch": "main",
-                        "git_sha": "5890d5897fc62893eb568e7cf910c2fdd0597c28",
+                        "git_sha": "e0f0c9ab51854dbea0d1eb05fa71790a05fbc459",
                         "installed_by": ["modules"]
                     },
                     "diamond/blastp": {
