@@ -4,13 +4,6 @@
             "description": "Define where the pipeline should find input data and save output data.",
             "fa_icon": "fas fa-terminal",
             "properties": {
-                "email": {
-                    "description": "Email address for completion summary.",
-                    "fa_icon": "fas fa-envelope",
-                    "help_text": "Set this parameter to your e-mail address to get a summary e-mail with details of the run sent to you when the workflow exits. If set in your user config file (`~/.nextflow/config`) then you don't need to specify this on the command line for every run.",
-                    "pattern": "^([a-zA-Z0-9_\\-\\.]+)@([a-zA-Z0-9_\\-\\.]+)\\.([a-zA-Z]{2,5})$",
-                    "type": "string"
-                },
                 "input": {
                     "description": "Path to comma-separated file containing information about the samples in the experiment.",
                     "exists": true,
@@ -22,22 +15,23 @@
                     "schema": "assets/schema_input.json",
                     "type": "string"
                 },
+                "outdir": {
+                    "type": "string",
+                    "format": "directory-path",
+                    "description": "The output directory where the results will be saved. You have to use absolute paths to storage on Cloud infrastructure.",
+                    "fa_icon": "fas fa-folder-open"
+                },
                 "multiqc_title": {
                     "description": "MultiQC report title. Printed as page header, used for filename if not otherwise specified.",
                     "fa_icon": "fas fa-file-signature",
                     "type": "string"
                 },
-                "max_contig_n_content": {
-                    "type": "integer",
-                    "default": 10,
-                    "description": "Maximum ambiguous bases (N) content (as % of the total) allowed per contig; contigs with more N content than this will not be considered by the pipeline.",
-                    "fa_icon": "fas fa-weight"
-                },
-                "bgc_min_contig_length": {
-                    "type": "integer",
-                    "default": 1000,
-                    "description": "Minimum length of a contig to be analyzed by the Biosynthetic Gene Cluster subworkflow.",
-                    "fa_icon": "fas fa-weight"
+                "email": {
+                    "description": "Email address for completion summary.",
+                    "fa_icon": "fas fa-envelope",
+                    "help_text": "Set this parameter to your e-mail address to get a summary e-mail with details of the run sent to you when the workflow exits. If set in your user config file (`~/.nextflow/config`) then you don't need to specify this on the command line for every run.",
+                    "pattern": "^([a-zA-Z0-9_\\-\\.]+)@([a-zA-Z0-9_\\-\\.]+)\\.([a-zA-Z]{2,5})$",
+                    "type": "string"
                 }
             }
         },
@@ -50,6 +44,12 @@
                     "description": "Minimum length of a contig to be analyzed by the Biosynthetic Gene Cluster subworkflow.",
                     "fa_icon": "fas fa-weight",
                     "type": "integer"
+                },
+                "max_contig_n_content": {
+                    "type": "integer",
+                    "default": 10,
+                    "description": "Maximum ambiguous bases (N) content (as % of the total) allowed per contig; contigs with more N content than this will not be considered by the pipeline.",
+                    "fa_icon": "fas fa-weight"
                 },
                 "min_contig_length": {
                     "default": 500,
