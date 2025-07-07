@@ -70,10 +70,31 @@ workflow ASSEMBLY_ANALYSIS_PIPELINE {
     * The first step is to:
     * - Gather some statistics about the assembly
     * - Filter by length
-    * - TODO: Remove human and any other host specified - https://www.ebi.ac.uk/panda/jira/browse/EMG-7487
+    * - Human, PhyX and host-contaminant decontamination
     */
+
+    /*
+    We need to adjust the meta, the human and PhiX references can be either set in the samplesheet, otherwise
+    they will be taken from the parameters
+    */
+    def renamed_contigs = RENAME_CONTIGS.out.renamed_fasta.map {
+        meta, contigs -> {
+            def new_meta = meta.clone()
+            if ( !params.skip_decontamination && !meta.contaminant_reference ) {
+                new_meta.contaminant_reference = params.contaminant_reference
+            }
+            if ( !params.skip_decontamination && !meta.human_reference ) {
+                new_meta.human_reference = params.human_reference
+            }
+            if ( !params.skip_decontamination && !meta.phix_reference ) {
+                new_meta.phix_reference = params.phix_reference
+            }
+            [new_meta, contigs]
+        }
+    }
+
     ASSEMBLY_QC(
-        RENAME_CONTIGS.out.renamed_fasta
+        renamed_contigs
     )
     ch_versions = ch_versions.mix(ASSEMBLY_QC.out.versions)
 
@@ -81,7 +102,7 @@ workflow ASSEMBLY_ANALYSIS_PIPELINE {
      * Run the RNA detection subworklow
     */
     RNA_ANNOTATION(
-        ASSEMBLY_QC.out.assembly_filtered
+        ASSEMBLY_QC.out.assembly_qc_pass
     )
     ch_versions = ch_versions.mix(RNA_ANNOTATION.out.versions)
 
@@ -89,7 +110,7 @@ workflow ASSEMBLY_ANALYSIS_PIPELINE {
     * Protein prediction with the combined-gene-caller, and masking the rRNAs genes
     */
     // We need to sync the sequences and the rRNA outputs //
-    ASSEMBLY_QC.out.assembly_filtered
+    ASSEMBLY_QC.out.assembly_qc_pass
         .join(RNA_ANNOTATION.out.ssu_lsu_coords)
         .multiMap { meta, assembly_fasta, ssu_lsu_coords ->
             assembly: [meta, assembly_fasta]
@@ -110,7 +131,7 @@ workflow ASSEMBLY_ANALYSIS_PIPELINE {
      * This outside of the taxonomical_annotation suboworkflow because it has a dependency with the
      * CGC predicted proteins
     */
-    ASSEMBLY_QC.out.assembly_filtered
+    ASSEMBLY_QC.out.assembly_qc_pass
         .join( COMBINED_GENE_CALLER.out.faa )
         .multiMap { meta, contigs, faa ->
             contigs: [meta, contigs]
@@ -155,7 +176,7 @@ workflow ASSEMBLY_ANALYSIS_PIPELINE {
     */
     PATHWAYS_AND_SYSTEMS(
         ch_protein_chunks,
-        ASSEMBLY_QC.out.assembly_filtered.join(
+        ASSEMBLY_QC.out.assembly_qc_pass.join(
             COMBINED_GENE_CALLER.out.faa
         ).join(
             COMBINED_GENE_CALLER.out.gff
@@ -310,7 +331,7 @@ workflow ASSEMBLY_ANALYSIS_PIPELINE {
     /************************/
 
     // VIRIfy samplesheet //
-    ASSEMBLY_QC.out.assembly_filtered.join(
+    ASSEMBLY_QC.out.assembly_qc_pass.join(
         COMBINED_GENE_CALLER.out.gff
     ).map {
         meta, assembly, gff -> {
