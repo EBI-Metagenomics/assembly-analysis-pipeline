@@ -96,9 +96,9 @@ At the moment the only prerequisites for running it are Nextflow and [Docker](ht
 The input data for the pipeline is metagenomic assemblies FASTA files. These files should be specified using a `.csv` samplesheet file with this format:
 
 ```
-sample,assembly_fasta
-ERZ999,/path/to/assembly/ERZ999.fasta.gz
-ERZ998,/path/to/assembly/ERZ998.fasta.gz
+sample,assembly_fasta,contaminant_reference,human_reference,phix_reference
+ERZ999,/path/to/assembly/ERZ999.fasta.gz,,,
+ERZ998,/path/to/assembly/ERZ998.fasta.gz,,,
 ```
 
 ### Execution
