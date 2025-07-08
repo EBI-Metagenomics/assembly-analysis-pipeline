@@ -35,10 +35,10 @@ ERZ222,ERZ222.fasta.gz,,,
 
 The pipeline includes a contig decontamination subworkflow that can be used to remove contaminated data from human, PhiX ([used as sequencing quality control in Illumina sequencing](https://www.illumina.com/products/by-type/sequencing-kits/cluster-gen-sequencing-reagents/phix-control-v3.html)), and custom reference genomes (i.e., to deplete the host genome from host-associated samples). The subworkflow uses minimap2 to map the contigs against the references and removes any contigs that have query coverage ≥ minimum coverage threshold AND percentage identity ≥ minimum identity threshold. Both the minimum coverage (`min_qcov`) and minimum identity (`min_pid`) thresholds are parameters of the pipeline.
 
-> [!NOTE] Decontamination defaults
+> [!NOTE]
 > The decontamination reference genome files are expected to exist in the params.reference_genomes_folder directory.
 
-> [!IMPORTANT] MGnify production process defaults
+> [!IMPORTANT]
 > During the analysis of metagenomic assemblies as part of MGnify, the data will be decontaminated of human, PhiX, and relevant contaminant genomes.
 
 > An [example samplesheet](../assets/samplesheet.csv) has been provided with the pipeline.
