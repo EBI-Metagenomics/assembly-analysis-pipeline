@@ -70,7 +70,7 @@ workflow ASSEMBLY_ANALYSIS_PIPELINE {
     * The first step is to:
     * - Gather some statistics about the assembly
     * - Filter by length
-    * - Human, PhyX and host-contaminant decontamination
+    * - Remove human, phiX and/or host/contanimation data from the contigs.
     */
 
     /*

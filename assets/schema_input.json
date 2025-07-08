@@ -21,7 +21,7 @@
                 "errorMessage": "The assembly needs to be a fasta file, either '.fasta', '.fa', '.fna', or '.ffn' (all with or without '.gz')"
             },
             "contaminant_reference": {
-                "errorMessage": "Fasta file for decontamination, cannot contain spaces and must have extension '.fa', '.fasta', '.fna', '.fa.gz', '.fasta.gz or '.fna.gz'",
+                "errorMessage": "The reference genome to be used as part of the decontamination process, cannot contain spaces and must have extension '.fa', '.fasta', '.fna', '.fa.gz', '.fasta.gz or '.fna.gz'",
                 "anyOf": [
                     {
                         "type": "string",
