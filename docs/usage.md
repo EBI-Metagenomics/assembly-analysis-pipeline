@@ -20,17 +20,28 @@ You will need to create a samplesheet with information about the samples you wou
 The `sample` identifiers have to be the same when you have re-sequenced the same sample more than once e.g. to increase sequencing depth. The pipeline will concatenate the raw reads before performing any downstream analysis. Below is an example for the same sample sequenced across 3 lanes:
 
 ```csv title="samplesheet.csv"
-sample,assembly_fasta
-ERZ111,ERZ111.fasta.gz
-ERZ222,ERZ222.fasta.gz
+sample,assembly_fasta,contaminant_reference,human_reference,phix_reference
+ERZ111,ERZ111.fasta.gz,,,
+ERZ222,ERZ222.fasta.gz,,,
 ```
 
-| Column           | Description                                                                                                                                                                            |
-| ---------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `sample`         | Custom sample name. This entry will be identical for multiple sequencing libraries/runs from the same sample. Spaces in sample names are automatically converted to underscores (`_`). |
-| `assembly_fasta` | Full path to a metagenomic assembly in FASTA format, extensions ".fasta", ".fa", ".fna" and ".ffn" with or without ".gz" supported                                                     |
+| Column                  | Description                                                                                                                                                                                                               |
+| ----------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `sample`                | Custom sample name. This entry will be identical for multiple sequencing libraries/runs from the same sample. Spaces in sample names are automatically converted to underscores (`_`).                                    |
+| `assembly_fasta`        | Full path to a metagenomic assembly in FASTA format. Supported extensions: ".fasta", ".fa", ".fna", and ".ffn" with or without ".gz" compression.                                                                         |
+| `contaminant_reference` | Name of the contaminant reference genome file. FASTA file containing the contaminant genome sequence. Supported extensions: ".fasta", ".fa", ".fna", and ".ffn" with or without ".gz" compression. **Optional**           |
+| `human_reference`       | Name of the human reference genome file. Human reference genome in FASTA format to remove human DNA sequences. Supported extensions: ".fasta", ".fa", ".fna", and ".ffn" with or without ".gz" compression. **Optional**  |
+| `phix_reference`        | Name of the PhiX reference genome file. PhiX reference genome in FASTA format to remove PhiX control sequences. Supported extensions: ".fasta", ".fa", ".fna", and ".ffn" with or without ".gz" compression. **Optional** |
 
-An [example samplesheet](../assets/samplesheet.csv) has been provided with the pipeline.
+The pipeline includes a contig decontamination subworkflow that can be used to remove contaminated data from human, PhiX ([used as sequencing quality control in Illumina sequencing](https://www.illumina.com/products/by-type/sequencing-kits/cluster-gen-sequencing-reagents/phix-control-v3.html)), and custom reference genomes (i.e., to deplete the host genome from host-associated samples). The subworkflow uses minimap2 to map the contigs against the references and removes any contigs that have query coverage ≥ minimum coverage threshold AND percentage identity ≥ minimum identity threshold. Both the minimum coverage (`min_qcov`) and minimum identity (`min_pid`) thresholds are parameters of the pipeline.
+
+> [!NOTE]
+> The decontamination reference genome files are expected to exist in the params.reference_genomes_folder directory.
+
+> [!IMPORTANT]
+> During the analysis of metagenomic assemblies as part of MGnify, the data will be decontaminated of human, PhiX, and relevant contaminant genomes.
+
+> An [example samplesheet](../assets/samplesheet.csv) has been provided with the pipeline.
 
 ## Running the pipeline
 

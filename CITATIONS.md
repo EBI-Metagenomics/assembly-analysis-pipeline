@@ -86,6 +86,10 @@
 
   > G. Gremme, S. Steinbiss and S. Kurtz. "GenomeTools: A Comprehensive Software Library for Efficient Processing of Structured Genome Annotations" in IEEE/ACM Transactions on Computational Biology and Bioinformatics, vol. 10, no. 03, pp. 645-656, May-June 2013, Available from: http://dx.doi.org/10.1109/TCBB.2013.68.
 
+- [minimap2](https://doi.org/10.1093/bioinformatics/bty191)
+
+  > Heng Li, Minimap2: pairwise alignment for nucleotide sequences, Bioinformatics, Volume 34, Issue 18, September 2018, Available from: https://doi.org/10.1093/bioinformatics/bty191
+
 ## Software packaging/containerisation tools
 
 - [Anaconda](https://anaconda.com)

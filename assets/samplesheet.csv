@@ -1,2 +1,2 @@
-sample,assembly_fasta
-ERZ43,/path/to/fastq/assembly.fasta.gz
+sample,assembly_fasta,contaminant_reference,human_reference,phix_reference
+ERZ43,/path/to/fastq/assembly.fasta.gz,,,

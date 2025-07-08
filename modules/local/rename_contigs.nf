@@ -7,7 +7,7 @@ process RENAME_CONTIGS {
         'biocontainers/pyfastx:2.2.0--py39h0699b22_0' }"
 
     input:
-    tuple val(meta), path(fasta)
+    tuple val(meta), path(fasta, stageAs: "original_input.fasta")
 
     output:
     tuple val(meta), path('*.fasta') , emit: renamed_fasta
@@ -21,8 +21,8 @@ process RENAME_CONTIGS {
     def prefix = task.ext.prefix ?: "${meta.id}"
     """
     rename_contigs.py --prefix ${meta.id}_ \\
-    --input ${fasta} \\
-    --output ${prefix}_renamed.fasta \\
+    --input original_input.fasta \\
+    --output ${prefix}.fasta \\
     --mapping ${prefix}_mapping.csv
 
     cat <<-END_VERSIONS > versions.yml
