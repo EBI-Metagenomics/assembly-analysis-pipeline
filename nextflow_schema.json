@@ -67,17 +67,19 @@
             "fa_icon": "fas fa-filter",
             "properties": {
                 "contaminant_reference": {
-                    "description": "Path to contaminant reference genome file.",
+                    "description": "Name of the subfolder with the contaminant reference genome and its minimap2 index.",
                     "format": "file-path",
-                    "help_text": "FASTA file containing the contaminant genome sequence.",
+                    "help_text": "FASTA file must have path <contaminant_reference>/<contaminant_reference>.fna and minimap2 index must have path <contaminant_reference>/minimap2/<contaminant_reference>.fna.mmi",
                     "mimetype": "text/plain",
+                    "pattern": "^\\S+\\$",
                     "type": "string"
                 },
                 "human_reference": {
-                    "description": "Path to human reference genome file.",
+                    "description": "Name of the subfolder with the human reference genome and its minimap2 index.",
                     "format": "file-path",
-                    "help_text": "Human reference genome in FASTA format to remove human DNA sequences.",
+                    "help_text": "FASTA file must have path <human_reference>/<human_reference>.fna and minimap2 index must have path <human_reference>/minimap2/<human_reference>.fna.mmi",
                     "mimetype": "text/plain",
+                    "pattern": "^\\S+\\$",
                     "type": "string"
                 },
                 "min_pid": {
@@ -93,14 +95,15 @@
                     "type": "number"
                 },
                 "phix_reference": {
-                    "description": "Path to PhiX reference genome file.",
+                    "description": "Name of the subfolder with the PhiX reference genome and its minimap2 index.",
                     "format": "file-path",
-                    "help_text": "PhiX reference genome in FASTA format to remove PhiX control sequences.",
+                    "help_text": "FASTA file must have path <phix_reference>/<phix_reference>.fna and minimap2 index must have path <phix_reference>/minimap2/<phix_reference>.fna.mmi",
                     "mimetype": "text/plain",
+                    "pattern": "^\\S+\\$",
                     "type": "string"
                 },
                 "reference_genomes_folder": {
-                    "description": "The folder with the reference genomes.",
+                    "description": "Path to the folder containing the reference genomes subfolders. It must follow a specific structure — see README for details.",
                     "fa_icon": "fas fa-folder",
                     "format": "directory-path",
                     "help_text": "The folder where the reference genomes fasta files are stored",

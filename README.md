@@ -85,6 +85,39 @@ This pipeline uses several reference databases, you can find the list of them in
 | [CAT_Pack](https://github.com/MGXlab/CAT_pack)                                                               | 2025_01    | CAT/BAT/RAT NCBI taxonomy pre-made reference database                                            | https://github.com/MGXlab/CAT_pack?tab=readme-ov-file#downloading-preconstructed-database-files                                                                                                                        |
 | [DRAM](https://github.com/WrightonLabCSU/DRAM)                                                               | 1.3.0      | DRAM databases                                                                                   | https://github.com/WrightonLabCSU/DRAM/wiki#dram-setup                                                                                                                                                                 |
 
+### Reference genomes
+
+The pipeline includes an optional decontamination step that requires reference genomes (e.g., human, PhiX174, or any user-supplied genome). Frequently used reference genomes are available on our [FTP server](https://ftp.ebi.ac.uk/pub/databases/metagenomics/pipelines/references/).
+
+Use the following pipeline options to configure references:
+
+- `--reference_genomes_folder`: Path to a folder containing all reference genome subfolders.
+
+- `--human_reference`, `--phyx_reference`, `--contaminant_reference`: Names of the subfolders (not paths) for each specific reference.
+
+Each genome should be organized as follows:
+
+```
+<reference_genomes_folder>/
+├── <genome_prefix>/
+│   ├── <genome_prefix>.fna
+│   └── minimap2/
+│       └── <genome_prefix>.fna.mmi
+```
+
+For each genome, create a subdirectory that includes:
+
+- the FASTA file itself (`<genome_prefix>.fna`)
+- a `minimap2/` folder containing the Minimap2 index file
+
+You can create the Minimap2 index using (see the [Minimap2 documentation](https://github.com/lh3/minimap2?tab=readme-ov-file#getting-started) for more details):
+
+`minimap2 -d <genome_prefix>.fna.mmi <genome_prefix>.fna`
+
+> **Important**:
+>
+> FASTA files must use the `.fna` extension. Minimap2 files must use the `.fna.mmi` extension
+
 ## How to run
 
 ### Requirements
