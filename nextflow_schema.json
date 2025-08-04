@@ -71,7 +71,6 @@
                     "format": "file-path",
                     "help_text": "FASTA file must have path <contaminant_reference>/<contaminant_reference>.fna and minimap2 index must have path <contaminant_reference>/minimap2/<contaminant_reference>.fna.mmi",
                     "mimetype": "text/plain",
-                    "pattern": "^\\S+\\$",
                     "type": "string"
                 },
                 "human_reference": {
@@ -79,7 +78,6 @@
                     "format": "file-path",
                     "help_text": "FASTA file must have path <human_reference>/<human_reference>.fna and minimap2 index must have path <human_reference>/minimap2/<human_reference>.fna.mmi",
                     "mimetype": "text/plain",
-                    "pattern": "^\\S+\\$",
                     "type": "string"
                 },
                 "min_pid": {
@@ -99,7 +97,6 @@
                     "format": "file-path",
                     "help_text": "FASTA file must have path <phix_reference>/<phix_reference>.fna and minimap2 index must have path <phix_reference>/minimap2/<phix_reference>.fna.mmi",
                     "mimetype": "text/plain",
-                    "pattern": "^\\S+\\$",
                     "type": "string"
                 },
                 "reference_genomes_folder": {
