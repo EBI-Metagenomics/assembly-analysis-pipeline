@@ -71,7 +71,6 @@
                     "format": "file-path",
                     "help_text": "FASTA file containing the contaminant genome sequence.",
                     "mimetype": "text/plain",
-                    "pattern": "^\\S+\\.(fasta|fa|fna|ffn)(\\.gz)?$",
                     "type": "string"
                 },
                 "human_reference": {
@@ -79,7 +78,6 @@
                     "format": "file-path",
                     "help_text": "Human reference genome in FASTA format to remove human DNA sequences.",
                     "mimetype": "text/plain",
-                    "pattern": "^\\S+\\.(fasta|fa|fna|ffn)(\\.gz)?$",
                     "type": "string"
                 },
                 "min_pid": {
@@ -99,7 +97,6 @@
                     "format": "file-path",
                     "help_text": "PhiX reference genome in FASTA format to remove PhiX control sequences.",
                     "mimetype": "text/plain",
-                    "pattern": "^\\S+\\.(fasta|fa|fna|ffn)(\\.gz)?$",
                     "type": "string"
                 },
                 "reference_genomes_folder": {
