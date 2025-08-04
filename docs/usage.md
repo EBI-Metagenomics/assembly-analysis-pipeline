@@ -25,13 +25,13 @@ ERZ111,ERZ111.fasta.gz,,,
 ERZ222,ERZ222.fasta.gz,,,
 ```
 
-| Column                  | Description                                                                                                                                                                                                               |
-| ----------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `sample`                | Custom sample name. This entry will be identical for multiple sequencing libraries/runs from the same sample. Spaces in sample names are automatically converted to underscores (`_`).                                    |
-| `assembly_fasta`        | Full path to a metagenomic assembly in FASTA format. Supported extensions: ".fasta", ".fa", ".fna", and ".ffn" with or without ".gz" compression.                                                                         |
-| `contaminant_reference` | Name of the contaminant reference genome file. FASTA file containing the contaminant genome sequence. Supported extensions: ".fasta", ".fa", ".fna", and ".ffn" with or without ".gz" compression. **Optional**           |
-| `human_reference`       | Name of the human reference genome file. Human reference genome in FASTA format to remove human DNA sequences. Supported extensions: ".fasta", ".fa", ".fna", and ".ffn" with or without ".gz" compression. **Optional**  |
-| `phix_reference`        | Name of the PhiX reference genome file. PhiX reference genome in FASTA format to remove PhiX control sequences. Supported extensions: ".fasta", ".fa", ".fna", and ".ffn" with or without ".gz" compression. **Optional** |
+| Column                  | Description                                                                                                                                                                            |
+| ----------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `sample`                | Custom sample name. This entry will be identical for multiple sequencing libraries/runs from the same sample. Spaces in sample names are automatically converted to underscores (`_`). |
+| `assembly_fasta`        | Full path to a metagenomic assembly in FASTA format. Supported extensions: ".fasta", ".fa", ".fna", and ".ffn" with or without ".gz" compression.                                      |
+| `contaminant_reference` | Name of the contaminant reference genome subfolder. Folder must contain FASTA file with the contaminant genome sequence and its minimap2 index. **Optional**                           |
+| `human_reference`       | Name of the human reference genome subfolder. Folder must contain FASTA file with the human genome sequence and its minimap2 index to remove human DNA sequences. **Optional**         |
+| `phix_reference`        | Name of the PhiX reference genome subfolder. Folder must contain FASTA file with the PhiX genome sequence and its minimap2 index. to remove PhiX control sequences. **Optional**       |
 
 The pipeline includes a contig decontamination subworkflow that can be used to remove contaminated data from human, PhiX ([used as sequencing quality control in Illumina sequencing](https://www.illumina.com/products/by-type/sequencing-kits/cluster-gen-sequencing-reagents/phix-control-v3.html)), and custom reference genomes (i.e., to deplete the host genome from host-associated samples). The subworkflow uses minimap2 to map the contigs against the references and removes any contigs that have query coverage ≥ minimum coverage threshold AND percentage identity ≥ minimum identity threshold. Both the minimum coverage (`min_qcov`) and minimum identity (`min_pid`) thresholds are parameters of the pipeline.
 
