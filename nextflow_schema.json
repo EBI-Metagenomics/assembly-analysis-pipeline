@@ -67,16 +67,14 @@
             "fa_icon": "fas fa-filter",
             "properties": {
                 "contaminant_reference": {
-                    "description": "Name of the subfolder with the contaminant reference genome and its minimap2 index.",
-                    "format": "file-path",
-                    "help_text": "FASTA file must have path <contaminant_reference>/<contaminant_reference>.fna and minimap2 index must have path <contaminant_reference>/minimap2/<contaminant_reference>.fna.mmi",
+                    "description": "Name of the subfolder with the contaminant reference genome in FASTA format.",
+                    "help_text": "FASTA file must have path <contaminant_reference>/<contaminant_reference>.fna",
                     "mimetype": "text/plain",
                     "type": "string"
                 },
                 "human_reference": {
-                    "description": "Name of the subfolder with the human reference genome and its minimap2 index.",
-                    "format": "file-path",
-                    "help_text": "FASTA file must have path <human_reference>/<human_reference>.fna and minimap2 index must have path <human_reference>/minimap2/<human_reference>.fna.mmi",
+                    "description": "Name of the subfolder with the human reference genome in FASTA format.",
+                    "help_text": "FASTA file must have path <human_reference>/<human_reference>.fna",
                     "mimetype": "text/plain",
                     "type": "string"
                 },
@@ -93,9 +91,8 @@
                     "type": "number"
                 },
                 "phix_reference": {
-                    "description": "Name of the subfolder with the PhiX reference genome and its minimap2 index.",
-                    "format": "file-path",
-                    "help_text": "FASTA file must have path <phix_reference>/<phix_reference>.fna and minimap2 index must have path <phix_reference>/minimap2/<phix_reference>.fna.mmi",
+                    "description": "Name of the subfolder with the PhiX reference genome in FASTA format.",
+                    "help_text": "FASTA file must have path <phix_reference>/<phix_reference>.fna",
                     "mimetype": "text/plain",
                     "type": "string"
                 },

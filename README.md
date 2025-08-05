@@ -100,23 +100,12 @@ Each genome should be organized as follows:
 ```
 <reference_genomes_folder>/
 ├── <genome_prefix>/
-│   ├── <genome_prefix>.fna
-│   └── minimap2/
-│       └── <genome_prefix>.fna.mmi
+│   └── <genome_prefix>.fna
 ```
-
-For each genome, create a subdirectory that includes:
-
-- the FASTA file itself (`<genome_prefix>.fna`)
-- a `minimap2/` folder containing the Minimap2 index file
-
-You can create the Minimap2 index using (see the [Minimap2 documentation](https://github.com/lh3/minimap2?tab=readme-ov-file#getting-started) for more details):
-
-`minimap2 -d <genome_prefix>.fna.mmi <genome_prefix>.fna`
 
 > **Important**:
 >
-> FASTA files must use the `.fna` extension. Minimap2 files must use the `.fna.mmi` extension
+> FASTA files must use the `.fna` extension.
 
 ## How to run
 
