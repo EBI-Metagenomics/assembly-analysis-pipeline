@@ -70,12 +70,14 @@
                     "description": "Name of the subfolder with the contaminant reference genome in FASTA format.",
                     "help_text": "FASTA file must have path <contaminant_reference>/<contaminant_reference>.fna",
                     "mimetype": "text/plain",
+                    "pattern": "^\\S+$",
                     "type": "string"
                 },
                 "human_reference": {
                     "description": "Name of the subfolder with the human reference genome in FASTA format.",
                     "help_text": "FASTA file must have path <human_reference>/<human_reference>.fna",
                     "mimetype": "text/plain",
+                    "pattern": "^\\S+$",
                     "type": "string"
                 },
                 "min_pid": {
@@ -94,6 +96,7 @@
                     "description": "Name of the subfolder with the PhiX reference genome in FASTA format.",
                     "help_text": "FASTA file must have path <phix_reference>/<phix_reference>.fna",
                     "mimetype": "text/plain",
+                    "pattern": "^\\S+$",
                     "type": "string"
                 },
                 "reference_genomes_folder": {

@@ -25,7 +25,7 @@
                 "anyOf": [
                     {
                         "type": "string",
-                        "pattern": "^\\S+\\$"
+                        "pattern": "^\\S+$"
                     },
                     {
                         "type": "string",
@@ -39,7 +39,7 @@
                 "anyOf": [
                     {
                         "type": "string",
-                        "pattern": "^\\S+\\$"
+                        "pattern": "^\\S+$"
                     },
                     {
                         "type": "string",
@@ -53,7 +53,7 @@
                 "anyOf": [
                     {
                         "type": "string",
-                        "pattern": "^\\S+\\$"
+                        "pattern": "^\\S+$"
                     },
                     {
                         "type": "string",
