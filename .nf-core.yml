@@ -2,7 +2,7 @@ repository_type: pipeline
 
 nf_core_version: 3.2.0
 
-org_path: null
+org_path: ebi-metagenomics
 
 lint:
   files_unchanged:

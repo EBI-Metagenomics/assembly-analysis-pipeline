@@ -9,7 +9,7 @@
                         "human_reference": "human",
                         "contaminant_reference": null
                     },
-                    "sample1_cleaned.fa.gz:md5,a9e09e2aa32fa94543bab203db8c65e2"
+                    "sample1.fa.gz:md5,a9e09e2aa32fa94543bab203db8c65e2"
                 ],
                 [
                     {
@@ -18,7 +18,7 @@
                         "human_reference": null,
                         "contaminant_reference": "contamination"
                     },
-                    "sample2_cleaned.fa.gz:md5,e94629f8dec8ddd183beaae566c95c3f"
+                    "sample2.fa.gz:md5,e94629f8dec8ddd183beaae566c95c3f"
                 ]
             ],
             [
@@ -76,7 +76,7 @@
             "nf-test": "0.9.0",
             "nextflow": "25.04.1"
         },
-        "timestamp": "2025-08-04T13:12:40.369467"
+        "timestamp": "2025-08-05T16:11:25.408034"
     },
     "assembly_decontamination - phix only": {
         "content": [
@@ -88,7 +88,7 @@
                         "human_reference": null,
                         "contaminant_reference": null
                     },
-                    "test_sample_phix_cleaned.fa.gz:md5,99855030a1f86513a54dfbb7c4dfcb33"
+                    "test_sample_phix.fa.gz:md5,99855030a1f86513a54dfbb7c4dfcb33"
                 ]
             ],
             [
@@ -114,7 +114,7 @@
             "nf-test": "0.9.0",
             "nextflow": "25.04.1"
         },
-        "timestamp": "2025-08-04T13:12:16.951658"
+        "timestamp": "2025-08-05T16:11:08.355247"
     },
     "assembly_decontamination - host only": {
         "content": [
@@ -126,7 +126,7 @@
                         "human_reference": null,
                         "contaminant_reference": "contamination"
                     },
-                    "test_sample_host_cleaned.fa.gz:md5,e94629f8dec8ddd183beaae566c95c3f"
+                    "test_sample_host.fa.gz:md5,e94629f8dec8ddd183beaae566c95c3f"
                 ]
             ],
             [
@@ -152,7 +152,7 @@
             "nf-test": "0.9.0",
             "nextflow": "25.04.1"
         },
-        "timestamp": "2025-08-04T13:12:29.66431"
+        "timestamp": "2025-08-05T16:11:17.964707"
     },
     "assembly_decontamination - all references": {
         "content": [
@@ -164,7 +164,7 @@
                         "human_reference": "human",
                         "contaminant_reference": "contamination"
                     },
-                    "test_sample_all_cleaned.fa.gz:md5,25aa49239f327c6704ad4590eb1698c9"
+                    "test_sample_all.fa.gz:md5,25aa49239f327c6704ad4590eb1698c9"
                 ]
             ],
             [
@@ -222,7 +222,7 @@
             "nf-test": "0.9.0",
             "nextflow": "25.04.1"
         },
-        "timestamp": "2025-08-04T13:12:10.563516"
+        "timestamp": "2025-08-05T16:11:02.969589"
     },
     "assembly_decontamination - human only": {
         "content": [
@@ -234,7 +234,7 @@
                         "human_reference": "human",
                         "contaminant_reference": null
                     },
-                    "test_sample_human_cleaned.fa.gz:md5,34ac8d3b788517e6aae1c5e7c63c720a"
+                    "test_sample_human.fa.gz:md5,34ac8d3b788517e6aae1c5e7c63c720a"
                 ]
             ],
             [
@@ -260,6 +260,6 @@
             "nf-test": "0.9.0",
             "nextflow": "25.04.1"
         },
-        "timestamp": "2025-08-04T13:12:23.223994"
+        "timestamp": "2025-08-05T16:11:13.132533"
     }
 }
