@@ -19,7 +19,7 @@ This repository contains the [MGnify](https://www.ebi.ac.uk/metagenomics) assemb
 
 The MGnify assembly analysis pipeline, version 6.0.0 and onwards, provides the following key features:
 
-- Assembly Quality Control: The pipeline performs quality control on the assembled contigs, with plans to add decontamination functionality in the near future.
+- Assembly Quality Control: The pipeline performs quality control on the assembled contigs and includes optional decontamination functionality to remove human, PhiX, and custom contaminant sequences.
 - CDS Prediction: The pipeline utilizes the [MGnify Combined Gene Caller](link_to_combined_gene_caller) to predict coding sequences (CDS) within the assembled contigs.
 - Taxonomic Assignment: The pipeline assigns taxonomic classifications to the assembled contigs using [Contig Annotation Tool (CAT)](https://github.com/MGXlab/CAT_pack).
 - Functional Annotation:
@@ -84,6 +84,28 @@ This pipeline uses several reference databases, you can find the list of them in
 | [run_dbCAN](https://dbcan.readthedocs.io/en/latest/installation.html#build-database)                         | 4.1.4-V13  | Pre-built run_DBCan reference database                                                           | [ftp://ftp.ebi.ac.uk/pub/databases/metagenomics/pipelines/tool-dbs/dbcan/dbcan_4.1.3_V12.tar.gz](http://ftp.ebi.ac.uk/pub/databases/metagenomics/pipelines/tool-dbs/dbcan/dbcan_4.1.3_V12.tar.gz)                      |
 | [CAT_Pack](https://github.com/MGXlab/CAT_pack)                                                               | 2025_01    | CAT/BAT/RAT NCBI taxonomy pre-made reference database                                            | https://github.com/MGXlab/CAT_pack?tab=readme-ov-file#downloading-preconstructed-database-files                                                                                                                        |
 | [DRAM](https://github.com/WrightonLabCSU/DRAM)                                                               | 1.3.0      | DRAM databases                                                                                   | https://github.com/WrightonLabCSU/DRAM/wiki#dram-setup                                                                                                                                                                 |
+
+### Reference genomes
+
+The pipeline includes an optional decontamination step that requires reference genomes (e.g., human, PhiX174, or any user-supplied genome). Frequently used reference genomes are available on our [FTP server](https://ftp.ebi.ac.uk/pub/databases/metagenomics/pipelines/references/).
+
+Use the following pipeline options to configure references:
+
+- `--reference_genomes_folder`: Path to a folder containing all reference genome subfolders.
+
+- `--human_reference`, `--phyx_reference`, `--contaminant_reference`: Names of the subfolders (not paths) for each specific reference.
+
+Each genome should be organized as follows:
+
+```
+<reference_genomes_folder>/
+├── <genome_prefix>/
+│   └── <genome_prefix>.fna
+```
+
+> **Important**:
+>
+> FASTA files must use the `.fna` extension.
 
 ## How to run
 

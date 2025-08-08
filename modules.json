@@ -247,7 +247,7 @@
                 "ebi-metagenomics": {
                     "assembly_decontamination": {
                         "branch": "main",
-                        "git_sha": "f668bd1b9f70987344f58f84b5405d825263f94d",
+                        "git_sha": "683ff8e221ce69533846d39e3741c48fbabe3351",
                         "installed_by": ["subworkflows"]
                     },
                     "combined_gene_caller": {
