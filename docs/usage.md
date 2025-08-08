@@ -33,10 +33,28 @@ ERZ222,ERZ222.fasta.gz,,,
 | `human_reference`       | Name of the human reference genome subfolder. Folder must contain FASTA file with the human genome sequence to remove human DNA sequences. **Optional**                                |
 | `phix_reference`        | Name of the PhiX reference genome subfolder. Folder must contain FASTA file with the PhiX genome sequence to remove PhiX control sequences. **Optional**                               |
 
-The pipeline includes a contig decontamination subworkflow that can be used to remove contaminated data from human, PhiX ([used as sequencing quality control in Illumina sequencing](https://www.illumina.com/products/by-type/sequencing-kits/cluster-gen-sequencing-reagents/phix-control-v3.html)), and custom reference genomes (i.e., to deplete the host genome from host-associated samples). The subworkflow uses minimap2 to map the contigs against the references and removes any contigs that have query coverage ≥ minimum coverage threshold AND percentage identity ≥ minimum identity threshold. Both the minimum coverage (`min_qcov`) and minimum identity (`min_pid`) thresholds are parameters of the pipeline.
+The pipeline includes a contig decontamination subworkflow that performs sequential decontamination to remove contaminated data from human, PhiX ([used as sequencing quality control in Illumina sequencing](https://www.illumina.com/products/by-type/sequencing-kits/cluster-gen-sequencing-reagents/phix-control-v3.html)), and custom reference genomes (i.e., to deplete the host genome from host-associated samples).
+
+The decontamination process follows this sequential order:
+
+1. **PhiX decontamination** (if `phix_reference` is specified)
+2. **Human decontamination** (if `human_reference` is specified)
+3. **Custom contaminant decontamination** (if `contaminant_reference` is specified)
+
+The subworkflow uses minimap2 to map the contigs against the references and removes any contigs that have query coverage ≥ minimum coverage threshold AND percentage identity ≥ minimum identity threshold. The default thresholds are:
+
+- `--min_qcov`: Minimum query coverage threshold (default: 0.3)
+- `--min_pid`: Minimum percentage identity threshold (default: 0.4)
+
+### Decontamination Parameters
+
+To use the decontamination functionality, configure the following parameters:
+
+- `--reference_genomes_folder`: Path to the folder containing all reference genome subfolders
+- `--skip_decontamination`: Set to `true` to skip the decontamination process entirely (default: `false`)
 
 > [!NOTE]
-> The decontamination reference genome files are expected to exist in the params.reference_genomes_folder directory.
+> The decontamination reference genome files are expected to exist in the `--reference_genomes_folder` directory using the folder structure described above.
 
 > [!IMPORTANT]
 > During the analysis of metagenomic assemblies as part of MGnify, the data will be decontaminated of human, PhiX, and relevant contaminant genomes.

@@ -19,7 +19,7 @@ This repository contains the [MGnify](https://www.ebi.ac.uk/metagenomics) assemb
 
 The MGnify assembly analysis pipeline, version 6.0.0 and onwards, provides the following key features:
 
-- Assembly Quality Control: The pipeline performs quality control on the assembled contigs, with plans to add decontamination functionality in the near future.
+- Assembly Quality Control: The pipeline performs quality control on the assembled contigs and includes optional decontamination functionality to remove human, PhiX, and custom contaminant sequences.
 - CDS Prediction: The pipeline utilizes the [MGnify Combined Gene Caller](link_to_combined_gene_caller) to predict coding sequences (CDS) within the assembled contigs.
 - Taxonomic Assignment: The pipeline assigns taxonomic classifications to the assembled contigs using [Contig Annotation Tool (CAT)](https://github.com/MGXlab/CAT_pack).
 - Functional Annotation:
