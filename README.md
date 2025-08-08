@@ -103,8 +103,7 @@ Each genome should be organized as follows:
 │   └── <genome_prefix>.fna
 ```
 
-> **Important**:
->
+> [!IMPORTANT]
 > FASTA files must use the `.fna` extension.
 
 ## How to run
