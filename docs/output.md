@@ -26,6 +26,8 @@ The `qc` directory contains output files related to the quality control steps of
 ```bash
 ├── qc
 │   ├── ERZ12345_filtered_contigs.fasta.gz
+│   ├── ERZ12345_filtered_contigs.fasta.gz.gzi
+│   ├── ERZ12345_filtered_contigs.fasta.gz.fai
 │   ├── ERZ12345.tsv
 │   ├── multiqc_report.html
 │   └── multiqc_data/
@@ -39,6 +41,8 @@ The `qc` directory contains output files related to the quality control steps of
 #### Output files
 
 - **ERZ12345_filtered_contigs.fasta.gz**: This `FASTA` file contains the filtered contigs after the removal of those that are shorter than 500 bases, and which have a proportion of ambiguous bases higher than 10%.
+- **ERZ12345_filtered_contigs.fasta.gz.gzi**: This file is a compression index for the blockzip compressed filtered_contigs fasta file.
+- **ERZ12345_filtered_contigs.fasta.gz.fai**: This file is a FASTA index for the blockzip compressed filtered_contigs fasta file.
 - **ERZ12345.tsv**: This `tsv` file contains the QUAST summary output, giving an assessment of the quality of the contigs of this assembly.
 - **multiqc_report.html**: This `html` file contains the `MultiQC` report for that assembly. It combines outputs from multiple tools, including `QUAST` (run both before and after quality control during assembly preprocessing), as well as records of the software versions used by the pipeline.
 - **multiqc_data/**: This `directory` contains the input files used by MultiQC to generate its report.
