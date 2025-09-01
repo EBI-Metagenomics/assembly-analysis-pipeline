@@ -1,4 +1,4 @@
-process GFF_SUMMARY {
+process CREATE_GFF_SUMMARY {
     tag "${meta.id}"
     label 'process_low'
 
@@ -10,8 +10,8 @@ process GFF_SUMMARY {
     tuple val(meta), path(cds), path(ips), path(eggnog), path(dbcan_overview), path(dbcan_hmm), path(sanntis), path(antismash)
 
     output:
-    tuple val(meta), path("*.gff.gz"), emit: gff_summary
-    path "versions.yml"              , emit: versions
+    tuple val(meta), path("*.gff"), emit: gff_summary
+    path "versions.yml"           , emit: versions
 
     script:
     // TODO: re-enable dbcan when the module is completed
@@ -33,8 +33,6 @@ process GFF_SUMMARY {
         --antismash ${antismash} \\
         -o ${meta.id}_annotation_summary.gff
 
-    gzip ${meta.id}_annotation_summary.gff
-
     cat <<-END_VERSIONS > versions.yml
     "${task.process}":
         mgnify-pipelines-toolkit: \$(get_mpt_version)
@@ -43,7 +41,7 @@ process GFF_SUMMARY {
 
     stub:
     """
-    touch ${meta.id}_annotation_summary.gff.gz
+    touch ${meta.id}_annotation_summary.gff
 
     cat <<-END_VERSIONS > versions.yml
     "${task.process}":

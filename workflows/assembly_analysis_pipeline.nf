@@ -37,7 +37,7 @@ include { CONTIGS_TAXONOMIC_CLASSIFICATION   } from '../subworkflows/ebi-metagen
 */
 
 include { RENAME_CONTIGS                     } from '../modules/local/rename_contigs'
-include { GFF_SUMMARY                        } from '../modules/local/gff_summary'
+include { GFF_SUMMARY                        } from '../subworkflows/local/gff_summary'
 include { RNA_ANNOTATION                     } from '../subworkflows/local/rna_annotation'
 include { FUNCTIONAL_ANNOTATION              } from '../subworkflows/local/functional_annotation'
 include { PATHWAYS_AND_SYSTEMS               } from '../subworkflows/local/pathways_and_systems'
