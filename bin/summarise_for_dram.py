@@ -55,7 +55,9 @@ def extract_cazy_families_from_dbcan(dbcan_overview_tsv: Path) -> dict:
     with gzip.open(dbcan_overview_tsv, "rt") as f:
         csv_reader = csv.reader(f, delimiter="\t")
         next(csv_reader)
-        for protein_id, _, hmmer, dbcan_sub, diamond, _ in csv_reader:
+        # Header, separated by tabs
+        # Gene ID, EC#, dbCAN_hmm, dbCAN_sub, DIAMOND, #ofTools , Recommend Results
+        for protein_id, _, hmmer, dbcan_sub, diamond, *_ in csv_reader:
             contig = get_contig_id(protein_id)
             hmmer_list = [
                 s.split("(")[0] for s in hmmer.split("+")
