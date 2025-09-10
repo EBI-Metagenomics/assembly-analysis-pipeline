@@ -1,118 +1,40 @@
 Changes in component 'ebi-metagenomics/filterpaf'
-Changes in 'filterpaf/meta.yml':
---- modules/ebi-metagenomics/filterpaf/meta.yml
-+++ modules/ebi-metagenomics/filterpaf/meta.yml
-@@ -1,32 +1,33 @@
-+---
- # yaml-language-server: $schema=https://raw.githubusercontent.com/nf-core/modules/master/modules/meta-schema.json
- name: "filterpaf"
- description: Module that uses awk to filter alignments in a PAF file based on query coverage and percentage identity (PID).
- keywords:
-- - awk
-- - paf
-- - minimap2
-- - alignment
-- - filtering
-+  - awk
-+  - paf
-+  - minimap2
-+  - alignment
-+  - filtering
- tools:
-- - awk:
--     description: GNU Awk is a powerful text-processing language used to manipulate structured text files.
--     homepage: "https://www.gnu.org/software/gawk/"
--     documentation: "https://www.gnu.org/software/gawk/manual/"
--     tool_dev_url: "https://github.com/onetrueawk/awk"
--     licence: ["GPL-3.0-or-later"]
-+  - awk:
-+      description: GNU Awk is a powerful text-processing language used to manipulate structured text files.
-+      homepage: "https://www.gnu.org/software/gawk/"
-+      documentation: "https://www.gnu.org/software/gawk/manual/"
-+      tool_dev_url: "https://github.com/onetrueawk/awk"
-+      licence: ["GPL-3.0-or-later"]
- input:
-- - - meta:
--       type: map
--       description: |
--         Groovy Map containing sample information
--         e.g. `[ id:'sample1', single_end:false ]`
--   - paf_file:
--       type: file
--       description: PAF file produced by minimap2 containing sequence alignment records.
--       pattern: "*.paf"
-+  - - meta:
-+        type: map
-+        description: |
-+          Groovy Map containing sample information
-+          e.g. `[ id:'sample1', single_end:false ]`
-+    - paf_file:
-+        type: file
-+        description: PAF file produced by minimap2 containing sequence alignment records.
-+        pattern: "*.paf"
- output:
-   - mapped_contigs_txt:
--    - - meta:
-+      - meta:
-           type: map
-           description: |
-             Groovy Map containing sample information
-@@ -35,27 +36,11 @@
-           type: file
-           description: Plain text file containing the IDs of query sequences that mapped the reference with high confidence.
-           pattern: "*.txt"
--          ontologies:
--            - edam: "http://edamontology.org/format_2330"
--  - mapped_contigs_tsv:
--    - - meta:
--          type: map
--          description: |
--            Groovy Map containing sample information
--            e.g. `[ id:'sample1', single_end:false ]`
--      - "*.tsv":
--          type: file
--          description: TSV file containing sequence ID, query coverage, and identity for sequences that failed quality filters.
--          pattern: "*.tsv"
--          ontologies:
--            - edam: "http://edamontology.org/format_3475"
-   - versions:
-       - "versions.yml":
-           type: file
-           description: YAML file with software versions used in this module.
-           pattern: "versions.yml"
--          ontologies:
--            - edam: "http://edamontology.org/format_3750"
- authors:
-- - "@ochkalova"
-- - "@jmattock5"
-+  - "@ochkalova"
-+  - "@jmattock5"
-
+'modules/ebi-metagenomics/filterpaf/meta.yml' is unchanged
 Changes in 'filterpaf/main.nf':
 --- modules/ebi-metagenomics/filterpaf/main.nf
 +++ modules/ebi-metagenomics/filterpaf/main.nf
-@@ -10,9 +10,9 @@
+@@ -10,14 +10,18 @@
      tuple val(meta), path(paf_file)
  
      output:
 -    tuple val(meta), path("${prefix}.txt"), emit: mapped_contigs_txt
--    tuple val(meta), path("${prefix}.tsv"), emit: mapped_contigs_tsv
--    path "versions.yml",                    emit: versions
+-    path "versions.yml"                    , emit: versions
 +    tuple val(meta), path("${prefix}.txt"),        emit: mapped_contigs_txt
 +    tuple val(meta), path("${prefix}_mapped.tsv"), emit: mapped_contigs_tsv, optional: true
 +    path "versions.yml",                           emit: versions
  
      script:
      prefix = task.ext.prefix ?: "${meta.id}"
-@@ -42,10 +42,16 @@
-                 printf "%s\\t%.4f\\t%.4f\\n", \$1, query_coverage, identity;
+     """
+     # Filter PAF by query coverage and MAPQ
+     awk '
++        BEGIN {
++            printf "sequence_id\\tquery_coverage\\tidentity\\n";
++        }
+         {
+             query_len = \$2;
+             query_start = \$3;
+@@ -35,10 +39,19 @@
+             identity = matching_bases / total_bases;
+ 
+             if (query_coverage >= ${params.min_qcov} && identity >= ${params.min_pid}) {
+-                print \$1;
++                printf "%s\\t%.4f\\t%.4f\\n", \$1, query_coverage, identity;
              }
          }
--    ' ${paf_file} > ${prefix}_failed.tsv
+-    ' ${paf_file} > ${prefix}.txt
 +    ' ${paf_file} > ${prefix}_mapped.tsv
- 
--    # Extract just the sequence IDs from failed sequences
--    awk '{print \$1}' ${prefix}_failed.tsv > ${prefix}.txt
++
 +    # Remove TSV file if it only contains the header (no contaminated contigs found)
 +    if [ \$(wc -l < ${prefix}_mapped.tsv) -le 1 ]; then
 +        rm ${prefix}_mapped.tsv
@@ -124,11 +46,10 @@ Changes in 'filterpaf/main.nf':
  
      cat <<-END_VERSIONS > versions.yml
      "${task.process}":
-@@ -57,7 +63,7 @@
+@@ -50,6 +63,7 @@
      prefix = task.ext.prefix ?: "${meta.id}"
      """
      touch ${prefix}.txt
--    touch ${prefix}.tsv
 +    # In stub mode, don't create the TSV file (simulating empty results)
  
      cat <<-END_VERSIONS > versions.yml
@@ -136,5 +57,5 @@ Changes in 'filterpaf/main.nf':
 
 'modules/ebi-metagenomics/filterpaf/tests/main.nf.test.snap' is unchanged
 'modules/ebi-metagenomics/filterpaf/tests/main.nf.test' is unchanged
-'modules/ebi-metagenomics/filterpaf/tests/data/test.paf' was created
+'modules/ebi-metagenomics/filterpaf/tests/data/test.paf' is unchanged
 ************************************************************
