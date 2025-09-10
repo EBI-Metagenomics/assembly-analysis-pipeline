@@ -9,7 +9,7 @@ report_section_order:
   software_versions:
     order: -1001
   quast:
-    order: -900
+    order: -801
   custom_content:
     order: -800
 
