@@ -8,6 +8,10 @@ report_section_order:
     order: -1002
   software_versions:
     order: -1001
+  quast:
+    order: -900
+  custom_content:
+    order: -800
 
 export_plots: true
 
@@ -17,9 +21,102 @@ run_modules:
   - quast
   - custom_content
 
+custom_data:
+  human_decontamination:
+    parent_id: "decontamination_summary"
+    parent_name: "Decontamination summary"
+    parent_description: "The following contigs were removed during decontamination. Contigs are classified as contaminated if they have query coverage ≥ min_qcov AND identity ≥ min_pid when aligned to the reference genome."
+    id: "human_decontamination"
+    section_name: "Human contaminated contigs"
+    plot_type: "table"
+    pconfig:
+      id: "human_decontamination_table"
+      title: "Human Contamination Removal"
+      save_file: true
+    headers:
+      sequence_id:
+        title: "Contig"
+        description: "Contig accession"
+      query_coverage:
+        title: "Query Coverage"
+        description: "Query coverage of the alignment to human genome"
+        max: 1.0
+        min: 0.0
+        scale: "RdYlBu-rev"
+        format: "{:.4f}"
+      identity:
+        title: "Identity"
+        description: "Percentage identity of the alignment to human genome"
+        max: 1.0
+        min: 0.0
+        scale: "RdYlBu-rev"
+        format: "{:.4f}"
+
+  phix_decontamination:
+    parent_id: "decontamination_summary"
+    id: "phix_decontamination"
+    section_name: "PhiX contaminated contigs"
+    plot_type: "table"
+    pconfig:
+      id: "phix_decontamination_table"
+      title: "PhiX Contamination Removal"
+      save_file: true
+    headers:
+      sequence_id:
+        title: "Contig"
+        description: "Contig accession"
+      query_coverage:
+        title: "Query Coverage"
+        description: "Query coverage of the alignment to PhiX genome"
+        max: 1.0
+        min: 0.0
+        scale: "RdYlBu-rev"
+        format: "{:.4f}"
+      identity:
+        title: "Identity"
+        description: "Percentage identity of the alignment to PhiX genome"
+        max: 1.0
+        min: 0.0
+        scale: "RdYlBu-rev"
+        format: "{:.4f}"
+
+  host_decontamination:
+    parent_id: "decontamination_summary"
+    id: "host_decontamination"
+    section_name: "Host/Contaminant contaminated contigs"
+    plot_type: "table"
+    pconfig:
+      id: "host_decontamination_table"
+      title: "Host/Contaminant Removal"
+      save_file: true
+    headers:
+      sequence_id:
+        title: "Contig"
+        description: "Contig accession"
+      query_coverage:
+        title: "Query Coverage"
+        description: "Query coverage of the alignment to host/contaminant genome"
+        max: 1.0
+        min: 0.0
+        scale: "RdYlBu-rev"
+        format: "{:.4f}"
+      identity:
+        title: "Identity"
+        description: "Percentage identity of the alignment to host/contaminant genome"
+        max: 1.0
+        min: 0.0
+        scale: "RdYlBu-rev"
+        format: "{:.4f}"
+
 sp:
   quast:
-    fn: "*.tsv"
+    fn: "*quast.tsv"
+  human_decontamination:
+    fn: "*human_mapped.tsv"
+  phix_decontamination:
+    fn: "*phix_mapped.tsv"
+  host_decontamination:
+    fn: "*contaminant_mapped.tsv"
 
 ## Prettification
 custom_logo: "mgnify_wordmark_dark_on_light.png"

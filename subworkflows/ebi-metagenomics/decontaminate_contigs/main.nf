@@ -60,6 +60,7 @@ workflow DECONTAMINATE_CONTIGS {
     ch_versions = ch_versions.mix(SEQKIT_GREP.out.versions.first())
 
     emit:
-    cleaned_contigs = SEQKIT_GREP.out.filter
-    versions        = ch_versions
+    cleaned_contigs    = SEQKIT_GREP.out.filter
+    mapped_contigs_tsv = FILTERPAF.out.mapped_contigs_tsv
+    versions           = ch_versions
 }

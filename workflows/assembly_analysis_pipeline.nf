@@ -277,8 +277,22 @@ workflow ASSEMBLY_ANALYSIS_PIPELINE {
 
     common_files = ch_multiqc_files.collect()
 
+    // Collect decontamination TSV files for MultiQC per assembly
+    // Use join with remainder: true to handle optional decontamination channels
+    ch_per_assembly_files = ASSEMBLY_QC.out.quast_report_tsv
+        .join(ASSEMBLY_QC.out.human_contaminated_contigs_tsv, remainder: true)
+        .join(ASSEMBLY_QC.out.phix_contaminated_contigs_tsv, remainder: true)
+        .join(ASSEMBLY_QC.out.host_contaminated_contigs_tsv, remainder: true)
+        .map { meta, quast, human, phix, host ->
+            def files = [quast]
+            if (human) files.add(human)
+            if (phix) files.add(phix)
+            if (host) files.add(host)
+            [meta, files]
+        }
+
     MULTIQC_PER_ASSEMBLY(
-        ASSEMBLY_QC.out.quast_report_tsv,
+        ch_per_assembly_files,
         common_files,
         ch_multiqc_config.toList(),
         ch_multiqc_custom_config.toList(),
