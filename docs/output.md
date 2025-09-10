@@ -30,7 +30,8 @@ The `qc` directory contains output files related to the quality control steps of
 │   ├── ERZ12345_filtered_contigs.fasta.gz.fai
 │   ├── ERZ12345.tsv
 │   ├── multiqc_report.html
-│   └── multiqc_data/
+│   ├── multiqc_data/
+│   └── decontamination/
 ├── cds
 ├── taxonomy
 ├── functional-annotation
@@ -44,8 +45,21 @@ The `qc` directory contains output files related to the quality control steps of
 - **ERZ12345_filtered_contigs.fasta.gz.gzi**: This file is a compression index for the blockzip compressed filtered_contigs fasta file.
 - **ERZ12345_filtered_contigs.fasta.gz.fai**: This file is a FASTA index for the blockzip compressed filtered_contigs fasta file.
 - **ERZ12345.tsv**: This `tsv` file contains the QUAST summary output, giving an assessment of the quality of the contigs of this assembly.
-- **multiqc_report.html**: This `html` file contains the `MultiQC` report for that assembly. It combines outputs from multiple tools, including `QUAST` (run both before and after quality control during assembly preprocessing), as well as records of the software versions used by the pipeline.
+- **multiqc_report.html**: This `html` file contains the `MultiQC` report for that assembly. It combines outputs from multiple tools, including `QUAST` (run both before and after quality control during assembly preprocessing), decontamination summary tables (if contaminated contigs were detected), and records of the software versions used by the pipeline.
 - **multiqc_data/**: This `directory` contains the input files used by MultiQC to generate its report.
+- **decontamination/**: This `directory` contains TSV files with details of contigs that were removed during decontamination steps (only created if contaminated contigs are found).
+
+#### Decontamination output files
+
+When the decontamination step is enabled and contaminated contigs are detected, TSV files are created in the `decontamination/` subdirectory. Each TSV file contains three columns: `sequence_id` (contig identifier), `query_coverage` (coverage of the alignment), and `identity` (percentage identity of the alignment). Contigs are classified as contaminated if they have query coverage ≥ min_qcov AND identity ≥ min_pid when aligned to the respective reference genome.
+
+The following files may be created:
+
+- **ERZ12345_human_contaminated_contigs.tsv**: Contigs identified as contaminated with human DNA.
+- **ERZ12345_phyx_contaminated_contigs.tsv**: Contigs identified as contaminated with PhiX DNA.
+- **ERZ12345_contaminant_contaminated_contigs.tsv**: Contigs identified as contaminated with custom host/contaminant DNA.
+
+These files are integrated into the MultiQC report as interactive tables under the "Decontamination Summary" section.
 
 ### cds
 
