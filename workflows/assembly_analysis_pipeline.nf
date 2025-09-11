@@ -16,10 +16,11 @@ include { methodsDescriptionText             } from '../subworkflows/local/utils
     NF-CORE MODULES and SUBWORKFLOWS
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 */
-include { SEQKIT_SPLIT2                      } from '../modules/nf-core/seqkit/split2/main'
-include { PIGZ_UNCOMPRESS as PIGZ_CONTIGS    } from '../modules/nf-core/pigz/uncompress/main'
-include { PIGZ_UNCOMPRESS as PIGZ_PROTEINS   } from '../modules/nf-core/pigz/uncompress/main'
-include { GT_GFF3VALIDATOR                   } from '../modules/nf-core/gt/gff3validator/main'
+include { SEQKIT_SPLIT2                    } from '../modules/nf-core/seqkit/split2/main'
+include { PIGZ_UNCOMPRESS as PIGZ_CONTIGS  } from '../modules/nf-core/pigz/uncompress/main'
+include { PIGZ_UNCOMPRESS as PIGZ_PROTEINS } from '../modules/nf-core/pigz/uncompress/main'
+include { FIND_UNPIGZ                      } from '../modules/nf-core/find/unpigz/main'
+include { GT_GFF3VALIDATOR                 } from '../modules/nf-core/gt/gff3validator/main'
 
 /*
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -222,6 +223,25 @@ workflow ASSEMBLY_ANALYSIS_PIPELINE {
     )
     ch_versions = ch_versions.mix(GT_GFF3VALIDATOR.out.versions)
 
+    // Collect decontamination TSV files for MultiQC per assembly
+    // Use join with remainder: true to handle optional decontamination channels
+    ch_per_assembly_files_compressed = ASSEMBLY_QC.out.quast_report_tsv
+        .join(ASSEMBLY_QC.out.human_contaminated_contigs_tsv, remainder: true)
+        .join(ASSEMBLY_QC.out.phix_contaminated_contigs_tsv, remainder: true)
+        .join(ASSEMBLY_QC.out.host_contaminated_contigs_tsv, remainder: true)
+        .map { meta, quast, human, phix, host ->
+            def files = [quast]
+            if (human) files.add(human)
+            if (phix) files.add(phix)
+            if (host) files.add(host)
+            [meta, files]
+        }
+
+    // Un-compress for multiqc //
+    FIND_UNPIGZ(ch_per_assembly_files_compressed)
+
+    ch_versions = ch_versions.mix(FIND_UNPIGZ.out.versions)
+
     //
     // Collate and save software versions (it also includes the database versions)
     //
@@ -278,7 +298,7 @@ workflow ASSEMBLY_ANALYSIS_PIPELINE {
     common_files = ch_multiqc_files.collect()
 
     MULTIQC_PER_ASSEMBLY(
-        ASSEMBLY_QC.out.quast_report_tsv,
+        FIND_UNPIGZ.out.file_out,
         common_files,
         ch_multiqc_config.toList(),
         ch_multiqc_custom_config.toList(),

@@ -23,6 +23,11 @@
                         "installed_by": ["modules"],
                         "patch": "modules/nf-core/csvtk/concat/csvtk-concat.diff"
                     },
+                    "find/unpigz": {
+                        "branch": "master",
+                        "git_sha": "41dfa3f7c0ffabb96a6a813fe321c6d1cc5b6e46",
+                        "installed_by": ["modules"]
+                    },
                     "gt/gff3validator": {
                         "branch": "master",
                         "git_sha": "05954dab2ff481bcb999f24455da29a5828af08d",
@@ -149,7 +154,8 @@
                     "filterpaf": {
                         "branch": "main",
                         "git_sha": "ad73b5f1d3e4ed60ba329d3e5be3afdca32f938f",
-                        "installed_by": ["decontaminate_contigs"]
+                        "installed_by": ["decontaminate_contigs"],
+                        "patch": "modules/ebi-metagenomics/filterpaf/filterpaf.diff"
                     },
                     "fraggenescanrs": {
                         "branch": "main",
@@ -248,7 +254,8 @@
                     "assembly_decontamination": {
                         "branch": "main",
                         "git_sha": "683ff8e221ce69533846d39e3741c48fbabe3351",
-                        "installed_by": ["subworkflows"]
+                        "installed_by": ["subworkflows"],
+                        "patch": "subworkflows/ebi-metagenomics/assembly_decontamination/assembly_decontamination.diff"
                     },
                     "combined_gene_caller": {
                         "branch": "main",
@@ -264,7 +271,8 @@
                     "decontaminate_contigs": {
                         "branch": "main",
                         "git_sha": "639364111105fb9f2c3ca5fbf543a974c8fb8e9f",
-                        "installed_by": ["assembly_decontamination"]
+                        "installed_by": ["assembly_decontamination"],
+                        "patch": "subworkflows/ebi-metagenomics/decontaminate_contigs/decontaminate_contigs.diff"
                     },
                     "detect_rna": {
                         "branch": "main",
