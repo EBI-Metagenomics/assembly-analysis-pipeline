@@ -10,9 +10,9 @@ process FILTERPAF {
     tuple val(meta), path(paf_file)
 
     output:
-    tuple val(meta), path("${prefix}.txt"),        emit: mapped_contigs_txt
-    tuple val(meta), path("${prefix}_mapped.tsv"), emit: mapped_contigs_tsv, optional: true
-    path "versions.yml",                           emit: versions
+    tuple val(meta), path("${prefix}.txt"),           emit: mapped_contigs_txt
+    tuple val(meta), path("${prefix}_mapped.tsv.gz"), emit: mapped_contigs_tsv, optional: true
+    path "versions.yml",                              emit: versions
 
     script:
     prefix = task.ext.prefix ?: "${meta.id}"
@@ -51,6 +51,7 @@ process FILTERPAF {
     else
         # Extract just the sequence IDs from failed sequences
         awk '{print \$1}' ${prefix}_mapped.tsv > ${prefix}.txt
+        gzip ${prefix}_mapped.tsv
     fi
 
     cat <<-END_VERSIONS > versions.yml

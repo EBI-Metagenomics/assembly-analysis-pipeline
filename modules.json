@@ -23,6 +23,11 @@
                         "installed_by": ["modules"],
                         "patch": "modules/nf-core/csvtk/concat/csvtk-concat.diff"
                     },
+                    "find/unpigz": {
+                        "branch": "master",
+                        "git_sha": "41dfa3f7c0ffabb96a6a813fe321c6d1cc5b6e46",
+                        "installed_by": ["modules"]
+                    },
                     "gt/gff3validator": {
                         "branch": "master",
                         "git_sha": "05954dab2ff481bcb999f24455da29a5828af08d",
