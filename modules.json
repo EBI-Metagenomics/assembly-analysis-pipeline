@@ -271,7 +271,8 @@
                     "decontaminate_contigs": {
                         "branch": "main",
                         "git_sha": "639364111105fb9f2c3ca5fbf543a974c8fb8e9f",
-                        "installed_by": ["assembly_decontamination"]
+                        "installed_by": ["assembly_decontamination"],
+                        "patch": "subworkflows/ebi-metagenomics/decontaminate_contigs/decontaminate_contigs.diff"
                     },
                     "detect_rna": {
                         "branch": "main",
