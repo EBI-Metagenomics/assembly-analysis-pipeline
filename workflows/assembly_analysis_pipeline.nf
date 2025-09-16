@@ -81,14 +81,22 @@ workflow ASSEMBLY_ANALYSIS_PIPELINE {
     def renamed_contigs = RENAME_CONTIGS.out.renamed_fasta.map {
         meta, contigs -> {
             def new_meta = meta.clone()
-            if ( !params.skip_decontamination && !meta.contaminant_reference ) {
-                new_meta.contaminant_reference = params.contaminant_reference
-            }
-            if ( !params.skip_decontamination && !meta.human_reference ) {
-                new_meta.human_reference = params.human_reference
-            }
-            if ( !params.skip_decontamination && !meta.phix_reference ) {
-                new_meta.phix_reference = params.phix_reference
+            if ( params.skip_decontamination ) {
+                // We remove the refs from the meta to skip that code
+                new_meta.contaminant_reference = null
+                new_meta.human_reference = null
+                new_meta.phix_reference  = null
+            } else {
+                // If the user didn't provide refs, use the ones in the parameters
+                if (!meta.contaminant_reference) {
+                    new_meta.contaminant_reference = params.contaminant_reference ?: null
+                }
+                if (!meta.human_reference) {
+                    new_meta.human_reference = params.human_reference ?: null
+                }
+                if (!meta.phix_reference) {
+                    new_meta.phix_reference = params.phix_reference ?: null
+                }
             }
             [new_meta, contigs]
         }
