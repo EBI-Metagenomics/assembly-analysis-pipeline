@@ -316,7 +316,7 @@ workflow ASSEMBLY_ANALYSIS_PIPELINE {
     )
 
     MULTIQC_PER_SAMPLESHEET(
-        ASSEMBLY_QC.out.quast_report_tsv.map { _meta, files -> files }.collect().map { files -> [[id:"samplesheet"], files] },
+        FIND_UNPIGZ.out.file_out.map { _meta, files -> files }.collect().map { files -> [[id:"samplesheet"], files] },
         common_files,
         ch_multiqc_config.toList(),
         ch_multiqc_custom_config.toList(),
