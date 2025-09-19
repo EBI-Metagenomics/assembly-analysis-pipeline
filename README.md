@@ -125,29 +125,26 @@ ERZ998,/path/to/assembly/ERZ998.fasta.gz,,,
 
 #### FIRE Download Support (EBI Network Only)
 
+> [!IMPORTANT]
+> This funcionlaity is only enabled on EBI Network (which is only accessible to EBI Staff)
+> There are no funcional changes on the annotation, this only affects the download assembly step
+
 The pipeline includes support for downloading assembly files directly from the EBI FIRE system. This feature is only available when running on the EBI network and is disabled by default (`--use_fire_download false`).
 
-To use FIRE download functionality:
+To use this feature:
 
-1. Network requirement: Must be running on the EBI network
+1. Network requirement: You must be connected to the EBI network (only available for EBI Staff)
 2. Enable FIRE download: Add `--use_fire_download` parameter when running the pipeline
-3. Configure samplesheet: Use EBI FTP URLs or ENA HTTP links in the `assembly_fasta` column (the script will automatically translate these to FIRE S3 URLs)
+3. Configure samplesheet: Use ENA FTP URLs or ENA HTTP links in the `assembly_fasta` column (the script will automatically translate these to FIRE S3 URLs)
 4. Set credentials: Ensure `FIRE_ACCESS_KEY` and `FIRE_SECRET_KEY` environment variables are set
 
-Example samplesheet with EBI FTP URLs or ENA HTTP links:
+Example samplesheet with ENA FTP URLs or ENA HTTP links:
 
 ```
 sample,assembly_fasta,contaminant_reference,human_reference,phix_reference
 ERZ999,ftp://ftp.ebi.ac.uk/pub/databases/metagenomics/assembly/ERZ999.fasta.gz,,,
 ERZ998,https://ftp.ebi.ac.uk/pub/databases/ena/wgs_set/ERZ998/ERZ998.fasta.gz,,,
 ```
-
-Important notes:
-
-- This feature requires EBI FTP URLs or ENA HTTP links in the `assembly_fasta` column
-- The FIRE module automatically translates EBI FTP URLs and ENA HTTP links to FIRE S3 URLs for faster download
-- Only works on the EBI network infrastructure
-- The parameter defaults to `false` and must be explicitly enabled
 
 ### Execution
 
