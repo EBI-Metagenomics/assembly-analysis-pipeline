@@ -126,7 +126,7 @@ ERZ998,/path/to/assembly/ERZ998.fasta.gz,,,
 #### FIRE Download Support (EBI Network Only)
 
 > [!IMPORTANT]
-> This funcionlaity is only enabled on EBI Network (which is only accessible to EBI Staff)
+> This functionality is only enabled on EBI Network (which is only accessible to EBI Staff)
 > There are no funcional changes on the annotation, this only affects the download assembly step
 
 The pipeline includes support for downloading assembly files directly from the EBI FIRE system. This feature is only available when running on the EBI network and is disabled by default (`--use_fire_download false`).
