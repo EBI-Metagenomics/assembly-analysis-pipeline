@@ -38,6 +38,7 @@ The MGnify assembly analysis pipeline, version 6.0.0 and onwards, provides the f
 | Tool                                                                                              | Version              | Purpose                                                                                                                                           |
 | ------------------------------------------------------------------------------------------------- | -------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------- |
 | [antiSMASH](https://antismash.secondarymetabolites.org/#!/start)                                  | 8.0.1                | Tool for the identification and annotation of secondary metabolite biosynthesis gene clusters                                                     |
+| [boto3](https://github.com/boto/boto3)                                                            | 1.35.37              | AWS SDK for Python used to access EBI FIRE S3 storage for assembly file downloads                                                                 |
 | [CAT_pack](https://github.com/MGXlab/CAT_pack)                                                    | 6.0                  | Taxonomic classification of the contigs in the assembly                                                                                           |
 | [cmsearchtbloutdeoverlap](https://github.com/nawrockie/cmsearch_tblout_deoverlap/)                | 0.09                 | Deoverlapping of cmsearch results                                                                                                                 |
 | [csvtk](http://bioinf.shenwei.me/csvtk)                                                           | 0.31.0               | A cross-platform, efficient, and practical CSV/TSV toolkit                                                                                        |
@@ -120,6 +121,29 @@ The input data for the pipeline is metagenomic assemblies FASTA files. These fil
 sample,assembly_fasta,contaminant_reference,human_reference,phix_reference
 ERZ999,/path/to/assembly/ERZ999.fasta.gz,,,
 ERZ998,/path/to/assembly/ERZ998.fasta.gz,,,
+```
+
+#### FIRE Download Support (EBI Network Only)
+
+> [!IMPORTANT]
+> This functionality is only enabled on EBI Network (which is only accessible to EBI Staff)
+> There are no funcional changes on the annotation, this only affects the download assembly step
+
+The pipeline includes support for downloading assembly files directly from the EBI FIRE system. This feature is only available when running on the EBI network and is disabled by default (`--use_fire_download false`).
+
+To use this feature:
+
+1. Network requirement: You must be connected to the EBI network (only available for EBI Staff)
+2. Enable FIRE download: Add `--use_fire_download` parameter when running the pipeline
+3. Configure samplesheet: Use ENA FTP URLs or ENA HTTP links in the `assembly_fasta` column (the script will automatically translate these to FIRE S3 URLs)
+4. Set credentials: Ensure `FIRE_ACCESS_KEY` and `FIRE_SECRET_KEY` environment variables are set
+
+Example samplesheet with ENA FTP URLs or ENA HTTP links:
+
+```
+sample,assembly_fasta,contaminant_reference,human_reference,phix_reference
+ERZ999,ftp://ftp.ebi.ac.uk/pub/databases/metagenomics/assembly/ERZ999.fasta.gz,,,
+ERZ998,https://ftp.ebi.ac.uk/pub/databases/ena/wgs_set/ERZ998/ERZ998.fasta.gz,,,
 ```
 
 ### Execution

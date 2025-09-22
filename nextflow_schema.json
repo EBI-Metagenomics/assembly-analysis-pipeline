@@ -32,6 +32,13 @@
                     "help_text": "Set this parameter to your e-mail address to get a summary e-mail with details of the run sent to you when the workflow exits. If set in your user config file (`~/.nextflow/config`) then you don't need to specify this on the command line for every run.",
                     "pattern": "^([a-zA-Z0-9_\\-\\.]+)@([a-zA-Z0-9_\\-\\.]+)\\.([a-zA-Z]{2,5})$",
                     "type": "string"
+                },
+                "use_fire_download": {
+                    "default": false,
+                    "description": "Enable downloading files from EBI FIRE system (EBI network only).",
+                    "fa_icon": "fas fa-download",
+                    "help_text": "This feature is only available on the EBI network and is disabled by default. When enabled, the pipeline translates ENA FTP URLs and ENA HTTP URLs to EBI's FIRE S3 URLs and downloads assembly files directly from the FIRE system for faster download. Requires ENA FTP URLs or ENA HTTP links in the assembly_fasta column and FIRE_ACCESS_KEY/FIRE_SECRET_KEY environment variables.",
+                    "type": "boolean"
                 }
             }
         },

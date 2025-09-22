@@ -140,6 +140,11 @@
                         "git_sha": "f85a33e88680924f76aaccb3c120983ff4134747",
                         "installed_by": ["contigs_taxonomic_classification"]
                     },
+                    "downloadfromfire": {
+                        "branch": "main",
+                        "git_sha": "0ed5e91ea0790d0fa12387bacc1c93915c6bcfd8",
+                        "installed_by": ["modules"]
+                    },
                     "dram/distill": {
                         "branch": "main",
                         "git_sha": "2ba3fbfba678c0c8e1e7537fa908b04575b5b916",

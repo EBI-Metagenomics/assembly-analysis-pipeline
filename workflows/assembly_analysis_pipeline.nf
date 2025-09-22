@@ -27,6 +27,7 @@ include { GT_GFF3VALIDATOR                 } from '../modules/nf-core/gt/gff3val
     EBI-METAGENOMICS MODULES and SUBWORKFLOWS
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 */
+include { DOWNLOAD_FROM_FIRE                 } from '../modules/ebi-metagenomics/downloadfromfire/main'
 include { ASSEMBLY_QC                        } from '../subworkflows/local/assembly_qc'
 include { COMBINED_GENE_CALLER               } from '../subworkflows/ebi-metagenomics/combined_gene_caller/main'
 include { CONTIGS_TAXONOMIC_CLASSIFICATION   } from '../subworkflows/ebi-metagenomics/contigs_taxonomic_classification/main'
@@ -57,6 +58,28 @@ workflow ASSEMBLY_ANALYSIS_PIPELINE {
 
     ch_versions = Channel.empty()
     ch_multiqc_files = Channel.empty()
+
+    /*
+     * FIRE download: Download files from EBI FIRE system if enabled
+     * This is only available on EBI network
+     */
+    if ( params.use_fire_download ) {
+        // This module will transform the FTP links to FIRE-S3 ones and it will download them
+        DOWNLOAD_FROM_FIRE(
+            ch_assembly.map { meta, assembly_fasta -> {
+                    [meta, [assembly_fasta]] // This is workaround as the module expects a list of accessions (for fwd/rev reads)
+                }
+            }
+        )
+        ch_versions = ch_versions.mix(DOWNLOAD_FROM_FIRE.out.versions)
+
+        // Replace original assembly paths with downloaded files
+        ch_assembly = ch_assembly
+            .join(DOWNLOAD_FROM_FIRE.out.downloaded_files)
+            .map { meta, _assembly_fasta, downloaded_files ->
+                [meta, downloaded_files] // It's just the one file
+            }
+    }
 
     /*
      * Rename the contigs using the provided prefix, seqs will be named >{prefix}_{n}
