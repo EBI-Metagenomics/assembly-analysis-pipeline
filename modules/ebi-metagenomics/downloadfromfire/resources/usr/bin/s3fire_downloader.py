@@ -30,7 +30,7 @@ def transform_ftp_to_s3(ftp_path: str) -> tuple[str, str]:
     :raises ValueError: If the FTP path does not match the expected format.
     """
     if ftp_path.startswith("https"):
-        ftp_path = f'ftp://{ftp_path.replace("https://", "")}'
+        ftp_path = ftp_path.replace("https://", "ftp://")
     if ftp_path.startswith(PUBLIC_FTP_PATH):
         s3_key = ftp_path.replace(PUBLIC_FTP_PATH, "")
         logger.info(f"Detected a public file for FTP path: {ftp_path}")

@@ -27,7 +27,7 @@ include { GT_GFF3VALIDATOR                 } from '../modules/nf-core/gt/gff3val
     EBI-METAGENOMICS MODULES and SUBWORKFLOWS
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 */
-include { DOWNLOAD_FROM_FIRE                 } from '../modules/ebi-metagenomics/download_from_fire/main'
+include { DOWNLOAD_FROM_FIRE                 } from '../modules/ebi-metagenomics/downloadfromfire/main'
 include { ASSEMBLY_QC                        } from '../subworkflows/local/assembly_qc'
 include { COMBINED_GENE_CALLER               } from '../subworkflows/ebi-metagenomics/combined_gene_caller/main'
 include { CONTIGS_TAXONOMIC_CLASSIFICATION   } from '../subworkflows/ebi-metagenomics/contigs_taxonomic_classification/main'
