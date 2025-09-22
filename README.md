@@ -19,7 +19,7 @@ This repository contains the [MGnify](https://www.ebi.ac.uk/metagenomics) assemb
 
 The MGnify assembly analysis pipeline, version 6.0.0 and onwards, provides the following key features:
 
-- Assembly Quality Control: The pipeline performs quality control on the assembled contigs, with plans to add decontamination functionality in the near future.
+- Assembly Quality Control: The pipeline performs quality control on the assembled contigs and includes optional decontamination functionality to remove human, PhiX, and custom contaminant sequences.
 - CDS Prediction: The pipeline utilizes the [MGnify Combined Gene Caller](link_to_combined_gene_caller) to predict coding sequences (CDS) within the assembled contigs.
 - Taxonomic Assignment: The pipeline assigns taxonomic classifications to the assembled contigs using [Contig Annotation Tool (CAT)](https://github.com/MGXlab/CAT_pack).
 - Functional Annotation:
@@ -37,7 +37,8 @@ The MGnify assembly analysis pipeline, version 6.0.0 and onwards, provides the f
 
 | Tool                                                                                              | Version              | Purpose                                                                                                                                           |
 | ------------------------------------------------------------------------------------------------- | -------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------- |
-| [antiSMASH](https://antismash.secondarymetabolites.org/#!/start)                                  | 8.0.0                | Tool for the identification and annotation of secondary metabolite biosynthesis gene clusters                                                     |
+| [antiSMASH](https://antismash.secondarymetabolites.org/#!/start)                                  | 8.0.1                | Tool for the identification and annotation of secondary metabolite biosynthesis gene clusters                                                     |
+| [boto3](https://github.com/boto/boto3)                                                            | 1.35.37              | AWS SDK for Python used to access EBI FIRE S3 storage for assembly file downloads                                                                 |
 | [CAT_pack](https://github.com/MGXlab/CAT_pack)                                                    | 6.0                  | Taxonomic classification of the contigs in the assembly                                                                                           |
 | [cmsearchtbloutdeoverlap](https://github.com/nawrockie/cmsearch_tblout_deoverlap/)                | 0.09                 | Deoverlapping of cmsearch results                                                                                                                 |
 | [csvtk](http://bioinf.shenwei.me/csvtk)                                                           | 0.31.0               | A cross-platform, efficient, and practical CSV/TSV toolkit                                                                                        |
@@ -55,12 +56,13 @@ The MGnify assembly analysis pipeline, version 6.0.0 and onwards, provides the f
 | [Krona](https://github.com/marbl/Krona/wiki/KronaTools)                                           | 2.8.1                | Krona chart visualization                                                                                                                         |
 | [kegg-pathways-completeness](https://github.com/EBI-Metagenomics/kegg-pathways-completeness-tool) | 1.3.0                | Computes the completeness of each KEGG pathway module based on KEGG orthologue (KO) annotations.                                                  |
 | [MGnify pipelines toolkit](https://github.com/EBI-Metagenomics/mgnify-pipelines-toolkit)          | 1.2.0                | Collection of tools and scripts used in MGnify pipelines.                                                                                         |
+| [minimap2](https://lh3.github.io/minimap2/)                                                       | 2.29-r1283           | A versatile pairwise aligner for genomic and spliced nucleotide sequences. Used in the assembly decontamination subworkflow                       |
 | [MultiQC](http://multiqc.info/)                                                                   | 1.29                 | Tool to aggregate bioinformatic analysis results.                                                                                                 |
 | [Owltools](https://github.com/owlcollab/owltools)                                                 | 2024-06-12T00:00:00Z | Tool utilized to map GO terms to GO-slims                                                                                                         |
 | [Pyrodigal](https://pyrodigal.readthedocs.org/)                                                   | 3.6.3                | CDS calling                                                                                                                                       |
 | [pigz](https://zlib.net/pigz/)                                                                    | 2.3.4                | A parallel implementation of gzip for modern multi-processor, multi-core systems                                                                  |
 | [QUAST](http://quast.sourceforge.net/quast)                                                       | 5.2.0                | Tool used evaluates genome assemblies, it's part of the pipeline QC module.                                                                       |
-| [run_dbCAN](https://github.com/bcb-unl/run_dbcan)                                                 | 4.1.4                | Annotation tool for the Carbohydrate-Active enZYmes Database (CAZy)                                                                               |
+| [run_dbCAN](https://github.com/bcb-unl/run_dbcan)                                                 | 5.1.2                | Annotation tool for the Carbohydrate-Active enZYmes Database (CAZy)                                                                               |
 | [SeqKit](https://bioinf.shenwei.me/seqkit/)                                                       | 2.8.0                | Used to manipulate FASTA files                                                                                                                    |
 | [SanntiS](https://github.com/Finn-Lab/SanntiS)                                                    | 0.9.4.1              | Tool used to identify biosynthetic gene clusters                                                                                                  |
 | [tabix](http://www.htslib.org/doc/tabix.html)                                                     | 1.21                 | Generic indexer for TAB-delimited genome position files                                                                                           |
@@ -77,12 +79,33 @@ This pipeline uses several reference databases, you can find the list of them in
 | [Rfam clan info](https://rfam.org/)                                                                          | 15         | rRNA clan information                                                                            | [ftp://ftp.ebi.ac.uk/pub/databases/Rfam/15.0/Rfam.clanin](https://ftp.ebi.ac.uk/pub/databases/Rfam/15.0/Rfam.clanin)                                                                                                   |
 | [InterProScan](https://www.ebi.ac.uk/interpro/download/InterProScan/)                                        | 5.73-104.0 | InterProScan reference database                                                                  | [ftp://ftp.ebi.ac.uk/pub/software/unix/iprscan/5/5.73-104.0/](httpd://ftp.ebi.ac.uk/pub/software/unix/iprscan/5/5.73-104.0/)                                                                                           |
 | [eggNOG-mapper](https://github.com/eggnogdb/eggnog-mapper/wiki/eggNOG-mapper-v2.1.5-to-v2.1.12#requirements) | 5.0.2      | eggNOG-mapper annotation databases and Diamond                                                   | https://github.com/eggnogdb/eggnog-mapper/wiki/eggNOG-mapper-v2.1.5-to-v2.1.12#requirements                                                                                                                            |
-| [antiSMASH](https://rfam.org/)                                                                               | 8.0.0      | The antiSMASH reference database                                                                 | https://docs.antismash.secondarymetabolites.org/install/#antismash-standalone-lite                                                                                                                                     |
+| [antiSMASH](https://rfam.org/)                                                                               | 8.0.1      | The antiSMASH reference database                                                                 | https://docs.antismash.secondarymetabolites.org/install/#antismash-standalone-lite                                                                                                                                     |
 | [KOFAM](https://www.genome.jp/tools/kofamkoala/)<sup>\*</sup>                                                | 2025-04    | KOfam - HMM profiles for KEGG/KO. Our reference generation pipeline generates the required files | https://github.com/EBI-Metagenomics/reference-databases-preprocessing-pipeline                                                                                                                                         |
 | [GO Slims](https://geneontology.org/docs/go-subset-guide/)<sup>\*</sup>                                      | 20160705   | Metagenomics GO Slims                                                                            | [ftp://ftp.ebi.ac.uk/pub/databases/metagenomics/pipelines/tool-dbs/goslim/20160705/goslim_20160705.tar.gz](https://ftp.ebi.ac.uk/pub/databases/metagenomics/pipelines/tool-dbs/goslim/20160705/goslim_20160705.tar.gz) |
 | [run_dbCAN](https://dbcan.readthedocs.io/en/latest/installation.html#build-database)                         | 4.1.4-V13  | Pre-built run_DBCan reference database                                                           | [ftp://ftp.ebi.ac.uk/pub/databases/metagenomics/pipelines/tool-dbs/dbcan/dbcan_4.1.3_V12.tar.gz](http://ftp.ebi.ac.uk/pub/databases/metagenomics/pipelines/tool-dbs/dbcan/dbcan_4.1.3_V12.tar.gz)                      |
 | [CAT_Pack](https://github.com/MGXlab/CAT_pack)                                                               | 2025_01    | CAT/BAT/RAT NCBI taxonomy pre-made reference database                                            | https://github.com/MGXlab/CAT_pack?tab=readme-ov-file#downloading-preconstructed-database-files                                                                                                                        |
 | [DRAM](https://github.com/WrightonLabCSU/DRAM)                                                               | 1.3.0      | DRAM databases                                                                                   | https://github.com/WrightonLabCSU/DRAM/wiki#dram-setup                                                                                                                                                                 |
+
+### Reference genomes
+
+The pipeline includes an optional decontamination step that requires reference genomes (e.g., human, PhiX174, or any user-supplied genome). Frequently used reference genomes are available on our [FTP server](https://ftp.ebi.ac.uk/pub/databases/metagenomics/pipelines/references/).
+
+Use the following pipeline options to configure references:
+
+- `--reference_genomes_folder`: Path to a folder containing all reference genome subfolders.
+
+- `--human_reference`, `--phyx_reference`, `--contaminant_reference`: Names of the subfolders (not paths) for each specific reference.
+
+Each genome should be organized as follows:
+
+```
+<reference_genomes_folder>/
+├── <genome_prefix>/
+│   └── <genome_prefix>.fna
+```
+
+> [!IMPORTANT]
+> FASTA files must use the `.fna` extension.
 
 ## How to run
 
@@ -95,9 +118,32 @@ At the moment the only prerequisites for running it are Nextflow and [Docker](ht
 The input data for the pipeline is metagenomic assemblies FASTA files. These files should be specified using a `.csv` samplesheet file with this format:
 
 ```
-sample,assembly_fasta
-ERZ999,/path/to/assembly/ERZ999.fasta.gz
-ERZ998,/path/to/assembly/ERZ998.fasta.gz
+sample,assembly_fasta,contaminant_reference,human_reference,phix_reference
+ERZ999,/path/to/assembly/ERZ999.fasta.gz,,,
+ERZ998,/path/to/assembly/ERZ998.fasta.gz,,,
+```
+
+#### FIRE Download Support (EBI Network Only)
+
+> [!IMPORTANT]
+> This functionality is only enabled on EBI Network (which is only accessible to EBI Staff)
+> There are no funcional changes on the annotation, this only affects the download assembly step
+
+The pipeline includes support for downloading assembly files directly from the EBI FIRE system. This feature is only available when running on the EBI network and is disabled by default (`--use_fire_download false`).
+
+To use this feature:
+
+1. Network requirement: You must be connected to the EBI network (only available for EBI Staff)
+2. Enable FIRE download: Add `--use_fire_download` parameter when running the pipeline
+3. Configure samplesheet: Use ENA FTP URLs or ENA HTTP links in the `assembly_fasta` column (the script will automatically translate these to FIRE S3 URLs)
+4. Set credentials: Ensure `FIRE_ACCESS_KEY` and `FIRE_SECRET_KEY` environment variables are set
+
+Example samplesheet with ENA FTP URLs or ENA HTTP links:
+
+```
+sample,assembly_fasta,contaminant_reference,human_reference,phix_reference
+ERZ999,ftp://ftp.ebi.ac.uk/pub/databases/metagenomics/assembly/ERZ999.fasta.gz,,,
+ERZ998,https://ftp.ebi.ac.uk/pub/databases/ena/wgs_set/ERZ998/ERZ998.fasta.gz,,,
 ```
 
 ### Execution

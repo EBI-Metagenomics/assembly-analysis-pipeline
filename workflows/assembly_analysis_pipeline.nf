@@ -16,16 +16,18 @@ include { methodsDescriptionText             } from '../subworkflows/local/utils
     NF-CORE MODULES and SUBWORKFLOWS
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 */
-include { SEQKIT_SPLIT2                      } from '../modules/nf-core/seqkit/split2/main'
-include { PIGZ_UNCOMPRESS as PIGZ_CONTIGS    } from '../modules/nf-core/pigz/uncompress/main'
-include { PIGZ_UNCOMPRESS as PIGZ_PROTEINS   } from '../modules/nf-core/pigz/uncompress/main'
-include { GT_GFF3VALIDATOR                   } from '../modules/nf-core/gt/gff3validator/main'
+include { SEQKIT_SPLIT2                    } from '../modules/nf-core/seqkit/split2/main'
+include { PIGZ_UNCOMPRESS as PIGZ_CONTIGS  } from '../modules/nf-core/pigz/uncompress/main'
+include { PIGZ_UNCOMPRESS as PIGZ_PROTEINS } from '../modules/nf-core/pigz/uncompress/main'
+include { FIND_UNPIGZ                      } from '../modules/nf-core/find/unpigz/main'
+include { GT_GFF3VALIDATOR                 } from '../modules/nf-core/gt/gff3validator/main'
 
 /*
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     EBI-METAGENOMICS MODULES and SUBWORKFLOWS
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 */
+include { DOWNLOAD_FROM_FIRE                 } from '../modules/ebi-metagenomics/downloadfromfire/main'
 include { ASSEMBLY_QC                        } from '../subworkflows/local/assembly_qc'
 include { COMBINED_GENE_CALLER               } from '../subworkflows/ebi-metagenomics/combined_gene_caller/main'
 include { CONTIGS_TAXONOMIC_CLASSIFICATION   } from '../subworkflows/ebi-metagenomics/contigs_taxonomic_classification/main'
@@ -37,7 +39,7 @@ include { CONTIGS_TAXONOMIC_CLASSIFICATION   } from '../subworkflows/ebi-metagen
 */
 
 include { RENAME_CONTIGS                     } from '../modules/local/rename_contigs'
-include { GFF_SUMMARY                        } from '../modules/local/gff_summary'
+include { GFF_SUMMARY                        } from '../subworkflows/local/gff_summary'
 include { RNA_ANNOTATION                     } from '../subworkflows/local/rna_annotation'
 include { FUNCTIONAL_ANNOTATION              } from '../subworkflows/local/functional_annotation'
 include { PATHWAYS_AND_SYSTEMS               } from '../subworkflows/local/pathways_and_systems'
@@ -58,6 +60,28 @@ workflow ASSEMBLY_ANALYSIS_PIPELINE {
     ch_multiqc_files = Channel.empty()
 
     /*
+     * FIRE download: Download files from EBI FIRE system if enabled
+     * This is only available on EBI network
+     */
+    if ( params.use_fire_download ) {
+        // This module will transform the FTP links to FIRE-S3 ones and it will download them
+        DOWNLOAD_FROM_FIRE(
+            ch_assembly.map { meta, assembly_fasta -> {
+                    [meta, [assembly_fasta]] // This is workaround as the module expects a list of accessions (for fwd/rev reads)
+                }
+            }
+        )
+        ch_versions = ch_versions.mix(DOWNLOAD_FROM_FIRE.out.versions)
+
+        // Replace original assembly paths with downloaded files
+        ch_assembly = ch_assembly
+            .join(DOWNLOAD_FROM_FIRE.out.downloaded_files)
+            .map { meta, _assembly_fasta, downloaded_files ->
+                [meta, downloaded_files] // It's just the one file
+            }
+    }
+
+    /*
      * Rename the contigs using the provided prefix, seqs will be named >{prefix}_{n}
      * there n is just an autoincrement
     */
@@ -70,10 +94,39 @@ workflow ASSEMBLY_ANALYSIS_PIPELINE {
     * The first step is to:
     * - Gather some statistics about the assembly
     * - Filter by length
-    * - TODO: Remove human and any other host specified - https://www.ebi.ac.uk/panda/jira/browse/EMG-7487
+    * - Remove human, phiX and/or host/contanimation data from the contigs.
     */
+
+    /*
+    We need to adjust the meta, the human and PhiX references can be either set in the samplesheet, otherwise
+    they will be taken from the parameters
+    */
+    def renamed_contigs = RENAME_CONTIGS.out.renamed_fasta.map {
+        meta, contigs -> {
+            def new_meta = meta.clone()
+            if ( params.skip_decontamination ) {
+                // We remove the refs from the meta to skip that code
+                new_meta.contaminant_reference = null
+                new_meta.human_reference = null
+                new_meta.phix_reference  = null
+            } else {
+                // If the user didn't provide refs, use the ones in the parameters
+                if (!meta.contaminant_reference) {
+                    new_meta.contaminant_reference = params.contaminant_reference ?: null
+                }
+                if (!meta.human_reference) {
+                    new_meta.human_reference = params.human_reference ?: null
+                }
+                if (!meta.phix_reference) {
+                    new_meta.phix_reference = params.phix_reference ?: null
+                }
+            }
+            [new_meta, contigs]
+        }
+    }
+
     ASSEMBLY_QC(
-        RENAME_CONTIGS.out.renamed_fasta
+        renamed_contigs
     )
     ch_versions = ch_versions.mix(ASSEMBLY_QC.out.versions)
 
@@ -81,7 +134,7 @@ workflow ASSEMBLY_ANALYSIS_PIPELINE {
      * Run the RNA detection subworklow
     */
     RNA_ANNOTATION(
-        ASSEMBLY_QC.out.assembly_filtered
+        ASSEMBLY_QC.out.assembly_qc_pass
     )
     ch_versions = ch_versions.mix(RNA_ANNOTATION.out.versions)
 
@@ -89,7 +142,7 @@ workflow ASSEMBLY_ANALYSIS_PIPELINE {
     * Protein prediction with the combined-gene-caller, and masking the rRNAs genes
     */
     // We need to sync the sequences and the rRNA outputs //
-    ASSEMBLY_QC.out.assembly_filtered
+    ASSEMBLY_QC.out.assembly_qc_pass
         .join(RNA_ANNOTATION.out.ssu_lsu_coords)
         .multiMap { meta, assembly_fasta, ssu_lsu_coords ->
             assembly: [meta, assembly_fasta]
@@ -110,7 +163,7 @@ workflow ASSEMBLY_ANALYSIS_PIPELINE {
      * This outside of the taxonomical_annotation suboworkflow because it has a dependency with the
      * CGC predicted proteins
     */
-    ASSEMBLY_QC.out.assembly_filtered
+    ASSEMBLY_QC.out.assembly_qc_pass
         .join( COMBINED_GENE_CALLER.out.faa )
         .multiMap { meta, contigs, faa ->
             contigs: [meta, contigs]
@@ -155,7 +208,7 @@ workflow ASSEMBLY_ANALYSIS_PIPELINE {
     */
     PATHWAYS_AND_SYSTEMS(
         ch_protein_chunks,
-        ASSEMBLY_QC.out.assembly_filtered.join(
+        ASSEMBLY_QC.out.assembly_qc_pass.join(
             COMBINED_GENE_CALLER.out.faa
         ).join(
             COMBINED_GENE_CALLER.out.gff
@@ -200,6 +253,25 @@ workflow ASSEMBLY_ANALYSIS_PIPELINE {
         GFF_SUMMARY.out.gff_summary
     )
     ch_versions = ch_versions.mix(GT_GFF3VALIDATOR.out.versions)
+
+    // Collect decontamination TSV files for MultiQC per assembly
+    // Use join with remainder: true to handle optional decontamination channels
+    ch_per_assembly_files_compressed = ASSEMBLY_QC.out.quast_report_tsv
+        .join(ASSEMBLY_QC.out.human_contaminated_contigs_tsv, remainder: true)
+        .join(ASSEMBLY_QC.out.phix_contaminated_contigs_tsv, remainder: true)
+        .join(ASSEMBLY_QC.out.host_contaminated_contigs_tsv, remainder: true)
+        .map { meta, quast, human, phix, host ->
+            def files = [quast]
+            if (human) files.add(human)
+            if (phix) files.add(phix)
+            if (host) files.add(host)
+            [meta, files]
+        }
+
+    // Un-compress for multiqc //
+    FIND_UNPIGZ(ch_per_assembly_files_compressed)
+
+    ch_versions = ch_versions.mix(FIND_UNPIGZ.out.versions)
 
     //
     // Collate and save software versions (it also includes the database versions)
@@ -257,7 +329,7 @@ workflow ASSEMBLY_ANALYSIS_PIPELINE {
     common_files = ch_multiqc_files.collect()
 
     MULTIQC_PER_ASSEMBLY(
-        ASSEMBLY_QC.out.quast_report_tsv,
+        FIND_UNPIGZ.out.file_out,
         common_files,
         ch_multiqc_config.toList(),
         ch_multiqc_custom_config.toList(),
@@ -267,7 +339,7 @@ workflow ASSEMBLY_ANALYSIS_PIPELINE {
     )
 
     MULTIQC_PER_SAMPLESHEET(
-        ASSEMBLY_QC.out.quast_report_tsv.map { _meta, files -> files }.collect().map { files -> [[id:"samplesheet"], files] },
+        FIND_UNPIGZ.out.file_out.map { _meta, files -> files }.collect().map { files -> [[id:"samplesheet"], files] },
         common_files,
         ch_multiqc_config.toList(),
         ch_multiqc_custom_config.toList(),
@@ -284,22 +356,33 @@ workflow ASSEMBLY_ANALYSIS_PIPELINE {
     // specifically those without IPS annotations or BGC. We need to retrieve
     // examples of these assemblies from the current backlog database.
 
-
-    GFF_SUMMARY.out.gff_summary.join(GT_GFF3VALIDATOR.out.error_log, remainder: true)
-        .map { meta, _gff_summary, gff_validation_error ->
-            {
-                return "${meta.id},${ (!gff_validation_error) ? 'success' : 'invalid_summary_gff' }"
+    GT_GFF3VALIDATOR.out.success_log
+        .join( GT_GFF3VALIDATOR.out.error_log, remainder: true )
+        .map { meta, _gff_success, gff_validation_error -> {
+                def message = "success"
+                if ( gff_validation_error ) {
+                    message = "invalid_summary_gff"
+                }
+                return "${meta.id},${message}"
             }
         }
         .collectFile(name: "analysed_assemblies.csv", storeDir: params.outdir, newLine: true, cache: false)
 
+    // QC Failed  assemblies //
+    ASSEMBLY_QC.out.qc_failed_assemblies
+        .filter { _meta, qc_failed_message -> qc_failed_message }
+        .map { meta, qc_failed_message -> {
+                return "${meta.id},${qc_failed_message}"
+            }
+        }
+        .collectFile(name: "qc_failed_assemblies.csv", storeDir: params.outdir, newLine: true, cache: false)
 
     /*************************/
     /* Downtream samplesheet */
     /************************/
 
     // VIRIfy samplesheet //
-    ASSEMBLY_QC.out.assembly_filtered.join(
+    ASSEMBLY_QC.out.assembly_qc_pass.join(
         COMBINED_GENE_CALLER.out.gff
     ).map {
         meta, assembly, gff -> {

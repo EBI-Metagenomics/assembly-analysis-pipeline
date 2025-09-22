@@ -3,7 +3,7 @@ Changes in component 'ebi-metagenomics/mgnifypipelinestoolkit/kronatxtfromcatcla
 Changes in 'mgnifypipelinestoolkit/kronatxtfromcatclassification/main.nf':
 --- modules/ebi-metagenomics/mgnifypipelinestoolkit/kronatxtfromcatclassification/main.nf
 +++ modules/ebi-metagenomics/mgnifypipelinestoolkit/kronatxtfromcatclassification/main.nf
-@@ -2,7 +2,9 @@
+@@ -2,26 +2,32 @@
      tag "${meta.id}"
      label 'process_single'
  
@@ -14,11 +14,20 @@ Changes in 'mgnifypipelinestoolkit/kronatxtfromcatclassification/main.nf':
  
      input:
      tuple val(meta), path(cat_output)
-@@ -17,8 +19,10 @@
+     tuple val(meta2), path(taxonomy)
+ 
+     output:
+-    tuple val(meta), path("${meta.id}.krona.txt"), emit: krona_txt
+-    path "versions.yml"                          , emit: versions
++    tuple val(meta), path("${meta.id}.krona.txt.gz"), emit: krona_txt
++    path "versions.yml"                             , emit: versions
+ 
+     when:
+     task.ext.when == null || task.ext.when
  
      script:
      """
-+    gunzip ${cat_output}
++    gunzip -c ${cat_output} > ${cat_output.name.replace(".gz", "")}
 +
      krona_txt_from_cat_classification \\
 -        --input ${cat_output} \\
@@ -26,6 +35,11 @@ Changes in 'mgnifypipelinestoolkit/kronatxtfromcatclassification/main.nf':
          --output ${meta.id}.krona.txt \\
          --names_dmp ${taxonomy}/names.dmp \\
          --nodes_dmp ${taxonomy}/nodes.dmp
++
++    gzip ${meta.id}.krona.txt
+ 
+     cat <<-END_VERSIONS > versions.yml
+     "${task.process}":
 
 'modules/ebi-metagenomics/mgnifypipelinestoolkit/kronatxtfromcatclassification/tests/main.nf.test.snap' is unchanged
 'modules/ebi-metagenomics/mgnifypipelinestoolkit/kronatxtfromcatclassification/tests/main.nf.test' is unchanged

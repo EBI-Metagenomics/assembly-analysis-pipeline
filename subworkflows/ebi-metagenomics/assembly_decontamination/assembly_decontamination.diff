@@ -1,0 +1,26 @@
+Changes in component 'ebi-metagenomics/assembly_decontamination'
+'subworkflows/ebi-metagenomics/assembly_decontamination/nextflow.config' is unchanged
+'subworkflows/ebi-metagenomics/assembly_decontamination/meta.yml' is unchanged
+Changes in 'assembly_decontamination/main.nf':
+--- subworkflows/ebi-metagenomics/assembly_decontamination/main.nf
++++ subworkflows/ebi-metagenomics/assembly_decontamination/main.nf
+@@ -119,6 +119,9 @@
+     )
+ 
+     emit:
+-    cleaned_contigs = cleaned_contigs
+-    versions        = ch_versions
++    cleaned_contigs                = cleaned_contigs
++    phix_contaminated_contigs_tsv  = PHIX_DECONTAMINATE_CONTIGS.out.mapped_contigs_tsv
++    human_contaminated_contigs_tsv = HUMAN_DECONTAMINATE_CONTIGS.out.mapped_contigs_tsv
++    host_contaminated_contigs_tsv  = HOST_DECONTAMINATE_CONTIGS.out.mapped_contigs_tsv
++    versions                       = ch_versions
+ }
+
+'subworkflows/ebi-metagenomics/assembly_decontamination/tests/main.nf.test.snap' is unchanged
+'subworkflows/ebi-metagenomics/assembly_decontamination/tests/main.nf.test' is unchanged
+'subworkflows/ebi-metagenomics/assembly_decontamination/tests/data/test.fasta' is unchanged
+'subworkflows/ebi-metagenomics/assembly_decontamination/tests/data/human/human.fna' is unchanged
+'subworkflows/ebi-metagenomics/assembly_decontamination/tests/data/phyx/phyx.fna' is unchanged
+'subworkflows/ebi-metagenomics/assembly_decontamination/tests/data/contamination/contamination.fna' is unchanged
+************************************************************

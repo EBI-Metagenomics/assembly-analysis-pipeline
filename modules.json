@@ -7,7 +7,7 @@
                 "nf-core": {
                     "antismash/antismash": {
                         "branch": "master",
-                        "git_sha": "3b275879f9455b2089ae0517bf7aeb5a55b3cb09",
+                        "git_sha": "e2684f20ddc22b76879d4d9afdf12180036c6ca0",
                         "installed_by": ["modules"],
                         "patch": "modules/nf-core/antismash/antismash/antismash-antismash.diff"
                     },
@@ -22,6 +22,11 @@
                         "git_sha": "fa92936611247ca647ddee970f94d83f1bcb0ffe",
                         "installed_by": ["modules"],
                         "patch": "modules/nf-core/csvtk/concat/csvtk-concat.diff"
+                    },
+                    "find/unpigz": {
+                        "branch": "master",
+                        "git_sha": "41dfa3f7c0ffabb96a6a813fe321c6d1cc5b6e46",
+                        "installed_by": ["modules"]
                     },
                     "gt/gff3validator": {
                         "branch": "master",
@@ -70,6 +75,11 @@
                     "tabix/bgzip": {
                         "branch": "master",
                         "git_sha": "69fdb99a8affa55adfda16966aa4568e103dc1b6",
+                        "installed_by": ["modules"]
+                    },
+                    "tabix/bgziptabix": {
+                        "branch": "master",
+                        "git_sha": "f2cfcf9d3f6a2d123e6c44aefa788aa232204a7a",
                         "installed_by": ["modules"]
                     }
                 }
@@ -120,16 +130,20 @@
                         "installed_by": ["detect_rna"],
                         "patch": "modules/ebi-metagenomics/convertcmscantocmsearch/convertcmscantocmsearch.diff"
                     },
-                    "dbcan/dbcan": {
+                    "dbcan/easysubstrate": {
                         "branch": "main",
-                        "git_sha": "2f2f837279b44825254ea736b12ea4797b350d0a",
-                        "installed_by": ["modules"],
-                        "patch": "modules/ebi-metagenomics/dbcan/dbcan/dbcan-dbcan.diff"
+                        "git_sha": "e0f0c9ab51854dbea0d1eb05fa71790a05fbc459",
+                        "installed_by": ["modules"]
                     },
                     "diamond/blastp": {
                         "branch": "main",
                         "git_sha": "f85a33e88680924f76aaccb3c120983ff4134747",
                         "installed_by": ["contigs_taxonomic_classification"]
+                    },
+                    "downloadfromfire": {
+                        "branch": "main",
+                        "git_sha": "0ed5e91ea0790d0fa12387bacc1c93915c6bcfd8",
+                        "installed_by": ["modules"]
                     },
                     "dram/distill": {
                         "branch": "main",
@@ -146,6 +160,12 @@
                         "git_sha": "33ea81307e5bf9772861d2a3cb1b4f4694a04db6",
                         "installed_by": ["modules"],
                         "patch": "modules/ebi-metagenomics/extractcoords/extractcoords.diff"
+                    },
+                    "filterpaf": {
+                        "branch": "main",
+                        "git_sha": "ad73b5f1d3e4ed60ba329d3e5be3afdca32f938f",
+                        "installed_by": ["decontaminate_contigs"],
+                        "patch": "modules/ebi-metagenomics/filterpaf/filterpaf.diff"
                     },
                     "fraggenescanrs": {
                         "branch": "main",
@@ -190,7 +210,8 @@
                     "krona/ktimporttext": {
                         "branch": "main",
                         "git_sha": "172e93318ac2e2db5f9885b07ffb80443e67848a",
-                        "installed_by": ["contigs_taxonomic_classification"]
+                        "installed_by": ["contigs_taxonomic_classification"],
+                        "patch": "modules/ebi-metagenomics/krona/ktimporttext/krona-ktimporttext.diff"
                     },
                     "mgnifypipelinestoolkit/kronatxtfromcatclassification": {
                         "branch": "main",
@@ -210,6 +231,11 @@
                         "installed_by": ["goslim_swf"],
                         "patch": "modules/ebi-metagenomics/mgnifypipelinestoolkit/summarisegoslims/mgnifypipelinestoolkit-summarisegoslims.diff"
                     },
+                    "minimap2/align": {
+                        "branch": "main",
+                        "git_sha": "53d777039662e354c21a144088ab99982b31ccb7",
+                        "installed_by": ["decontaminate_contigs"]
+                    },
                     "owltools": {
                         "branch": "main",
                         "git_sha": "fb9a33114fe9083dc5b203fc4608825a9c51fdf6",
@@ -225,11 +251,22 @@
                         "branch": "main",
                         "git_sha": "0d489b1617f2015cd99eea7f9369491723eb9260",
                         "installed_by": ["modules"]
+                    },
+                    "seqkit/grep": {
+                        "branch": "main",
+                        "git_sha": "9f20a3e1ef64f1562992239d951522bf71dea159",
+                        "installed_by": ["decontaminate_contigs"]
                     }
                 }
             },
             "subworkflows": {
                 "ebi-metagenomics": {
+                    "assembly_decontamination": {
+                        "branch": "main",
+                        "git_sha": "683ff8e221ce69533846d39e3741c48fbabe3351",
+                        "installed_by": ["subworkflows"],
+                        "patch": "subworkflows/ebi-metagenomics/assembly_decontamination/assembly_decontamination.diff"
+                    },
                     "combined_gene_caller": {
                         "branch": "main",
                         "git_sha": "b84a0c52b92eef58ba2aeb2d22ae45d5bc6ae294",
@@ -240,6 +277,12 @@
                         "git_sha": "5fad0d0cf475b477119304430479d7d2d815a005",
                         "installed_by": ["subworkflows"],
                         "patch": "subworkflows/ebi-metagenomics/contigs_taxonomic_classification/contigs_taxonomic_classification.diff"
+                    },
+                    "decontaminate_contigs": {
+                        "branch": "main",
+                        "git_sha": "639364111105fb9f2c3ca5fbf543a974c8fb8e9f",
+                        "installed_by": ["assembly_decontamination"],
+                        "patch": "subworkflows/ebi-metagenomics/decontaminate_contigs/decontaminate_contigs.diff"
                     },
                     "detect_rna": {
                         "branch": "main",

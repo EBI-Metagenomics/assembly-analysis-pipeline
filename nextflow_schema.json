@@ -1,27 +1,19 @@
 {
-    "$schema": "https://json-schema.org/draft/2020-12/schema",
-    "$id": "https://raw.githubusercontent.com/ebi-metagenomics/assembly-analysis-pipeline/main/nextflow_schema.json",
-    "title": "ebi-metagenomics/assembly-analysis-pipeline pipeline parameters",
-    "description": "MGnify's assembly analysis pipeline performs taxonomic classification, protein function prediction, and identifies metabolic pathways and biosynthetic gene clusters.",
-    "type": "object",
     "$defs": {
         "input_output_options": {
-            "title": "Input/output options",
-            "type": "object",
-            "fa_icon": "fas fa-terminal",
             "description": "Define where the pipeline should find input data and save output data.",
-            "required": ["input", "outdir"],
+            "fa_icon": "fas fa-terminal",
             "properties": {
                 "input": {
-                    "type": "string",
-                    "format": "file-path",
+                    "description": "Path to comma-separated file containing information about the samples in the experiment.",
                     "exists": true,
-                    "schema": "assets/schema_input.json",
+                    "fa_icon": "fas fa-file-csv",
+                    "format": "file-path",
+                    "help_text": "You will need to create a design file with information about the samples in your experiment before running the pipeline. Use this parameter to specify its location. It has to be a comma-separated file with 3 columns, and a header row.",
                     "mimetype": "text/csv",
                     "pattern": "^\\S+\\.csv$",
-                    "description": "Path to comma-separated file containing information about the samples in the experiment.",
-                    "help_text": "You will need to create a design file with information about the samples in your experiment before running the pipeline. Use this parameter to specify its location. It has to be a comma-separated file with 3 columns, and a header row.",
-                    "fa_icon": "fas fa-file-csv"
+                    "schema": "assets/schema_input.json",
+                    "type": "string"
                 },
                 "outdir": {
                     "type": "string",
@@ -29,429 +21,541 @@
                     "description": "The output directory where the results will be saved. You have to use absolute paths to storage on Cloud infrastructure.",
                     "fa_icon": "fas fa-folder-open"
                 },
+                "multiqc_title": {
+                    "description": "MultiQC report title. Printed as page header, used for filename if not otherwise specified.",
+                    "fa_icon": "fas fa-file-signature",
+                    "type": "string"
+                },
                 "email": {
-                    "type": "string",
                     "description": "Email address for completion summary.",
                     "fa_icon": "fas fa-envelope",
                     "help_text": "Set this parameter to your e-mail address to get a summary e-mail with details of the run sent to you when the workflow exits. If set in your user config file (`~/.nextflow/config`) then you don't need to specify this on the command line for every run.",
-                    "pattern": "^([a-zA-Z0-9_\\-\\.]+)@([a-zA-Z0-9_\\-\\.]+)\\.([a-zA-Z]{2,5})$"
+                    "pattern": "^([a-zA-Z0-9_\\-\\.]+)@([a-zA-Z0-9_\\-\\.]+)\\.([a-zA-Z]{2,5})$",
+                    "type": "string"
                 },
-                "multiqc_title": {
-                    "type": "string",
-                    "description": "MultiQC report title. Printed as page header, used for filename if not otherwise specified.",
-                    "fa_icon": "fas fa-file-signature"
+                "use_fire_download": {
+                    "default": false,
+                    "description": "Enable downloading files from EBI FIRE system (EBI network only).",
+                    "fa_icon": "fas fa-download",
+                    "help_text": "This feature is only available on the EBI network and is disabled by default. When enabled, the pipeline translates ENA FTP URLs and ENA HTTP URLs to EBI's FIRE S3 URLs and downloads assembly files directly from the FIRE system for faster download. Requires ENA FTP URLs or ENA HTTP links in the assembly_fasta column and FIRE_ACCESS_KEY/FIRE_SECRET_KEY environment variables.",
+                    "type": "boolean"
                 }
             }
         },
         "contigs_filtering_thresholds": {
-            "title": "Contigs Filtering Thresholds",
-            "type": "object",
             "description": "Set of threshold values used when filtering contigs.",
+            "fa_icon": "fas fa-cut",
             "properties": {
-                "min_contig_length": {
-                    "type": "integer",
-                    "default": 500,
-                    "description": "Minimum length of a contig; contigs shorter than this will not be considered by the pipeline.",
-                    "fa_icon": "fas fa-weight"
-                },
                 "bgc_min_contig_length": {
-                    "type": "integer",
                     "default": 1000,
                     "description": "Minimum length of a contig to be analyzed by the Biosynthetic Gene Cluster subworkflow.",
+                    "fa_icon": "fas fa-weight",
+                    "type": "integer"
+                },
+                "max_contig_n_content": {
+                    "type": "integer",
+                    "default": 10,
+                    "description": "Maximum ambiguous bases (N) content (as % of the total) allowed per contig; contigs with more N content than this will not be considered by the pipeline.",
                     "fa_icon": "fas fa-weight"
+                },
+                "min_contig_length": {
+                    "default": 500,
+                    "description": "Minimum length of a contig; contigs shorter than this will not be considered by the pipeline.",
+                    "fa_icon": "fas fa-weight",
+                    "type": "integer"
                 }
             },
-            "fa_icon": "fas fa-cut"
+            "title": "Contigs Filtering Thresholds",
+            "type": "object"
+        },
+        "decontamination": {
+            "default": "",
+            "description": "The pipeline includes the Microbiome Informatics assembly decontamination subworkflow to remove Human, PhyX and any host-associated data from the assemblies.",
+            "fa_icon": "fas fa-filter",
+            "properties": {
+                "contaminant_reference": {
+                    "description": "Name of the subfolder with the contaminant reference genome in FASTA format.",
+                    "help_text": "FASTA file must have path <contaminant_reference>/<contaminant_reference>.fna",
+                    "mimetype": "text/plain",
+                    "pattern": "^\\S+$",
+                    "type": "string"
+                },
+                "human_reference": {
+                    "description": "Name of the subfolder with the human reference genome in FASTA format.",
+                    "help_text": "FASTA file must have path <human_reference>/<human_reference>.fna",
+                    "mimetype": "text/plain",
+                    "pattern": "^\\S+$",
+                    "type": "string"
+                },
+                "min_pid": {
+                    "default": 0.4,
+                    "description": "Minimum percentage identity for sequence removal.",
+                    "help_text": "Minimum percentage identity threshold used with min_qcov to select sequences for removal during decontamination.",
+                    "type": "number"
+                },
+                "min_qcov": {
+                    "default": 0.3,
+                    "description": "Minimum query coverage for sequence removal.",
+                    "help_text": "Minimum query coverage threshold used with min_pid to select sequences for removal during decontamination.",
+                    "type": "number"
+                },
+                "phix_reference": {
+                    "description": "Name of the subfolder with the PhiX reference genome in FASTA format.",
+                    "help_text": "FASTA file must have path <phix_reference>/<phix_reference>.fna",
+                    "mimetype": "text/plain",
+                    "pattern": "^\\S+$",
+                    "type": "string"
+                },
+                "reference_genomes_folder": {
+                    "description": "Path to the folder containing the reference genomes subfolders. It must follow a specific structure — see README for details.",
+                    "fa_icon": "fas fa-folder",
+                    "format": "directory-path",
+                    "help_text": "The folder where the reference genomes fasta files are stored",
+                    "type": "string"
+                },
+                "skip_decontamination": {
+                    "default": false,
+                    "description": "Skip the decontamination process.",
+                    "help_text": "When set to true, assemblies will not be decontaminated.",
+                    "type": "boolean"
+                }
+            },
+            "title": "Assembly decontamination parameters",
+            "type": "object",
+            "required": [
+                "antismash_database",
+                "cat_diamond_database",
+                "cat_taxonomy_database",
+                "dbcan_database",
+                "dram_databases",
+                "eggnog_data_dir",
+                "eggnog_database",
+                "eggnog_diamond_database",
+                "go_banding",
+                "go_obo",
+                "goslim_ids",
+                "interproscan_database",
+                "ko_list_txt",
+                "kofam_hmm_database",
+                "rheachebi_mapping_tsv",
+                "rfam_claninfo",
+                "rfam_covariance_models",
+                "uniref90rhea_diamond_database"
+            ]
         },
         "nucleotide_and_protein_fasta_file_chunking_options": {
-            "title": "Nucleotide and protein fasta file chunking options",
-            "type": "object",
             "description": "Chunking input fasta files is used to parallelize the execution of some tools",
+            "fa_icon": "fas fa-cut",
             "properties": {
+                "bgc_contigs_chunksize": {
+                    "default": "50M",
+                    "description": "Number of nucleotide base pairs each chunk should contain. The proteins are not truncated, and this is the maximum value a record can have per chunk.",
+                    "type": "string"
+                },
                 "proteins_chunksize": {
-                    "type": "integer",
                     "default": 10000000,
                     "description": "Number of amino acids each chunk should contain. The proteins are not truncated, and this is the maximum value a record can have per chunk.",
-                    "fa_icon": "fas fa-weight"
-                },
-                "bgc_contigs_chunksize": {
-                    "type": "string",
-                    "default": "50M",
-                    "description": "Number of nucleotide base pairs each chunk should contain. The proteins are not truncated, and this is the maximum value a record can have per chunk."
+                    "fa_icon": "fas fa-weight",
+                    "type": "integer"
                 }
             },
-            "fa_icon": "fas fa-cut"
+            "title": "Nucleotide and protein fasta file chunking options",
+            "type": "object"
         },
         "tools_settings": {
-            "title": "Settings for some of the tools of the pipeline",
-            "type": "object",
-            "description": "Settings meant to tweak some parameters of the tools used in the pipeline.",
             "default": "",
+            "description": "Settings meant to tweak some parameters of the tools used in the pipeline.",
+            "fa_icon": "fas fa-database",
             "properties": {
                 "cgc_merge_priority": {
-                    "type": "string",
                     "default": "Pyrodigal_FragGeneScanRS",
-                    "enum": ["Pyrodigal_FragGeneScanRS", "FragGeneScanRS_Pyrodigal"],
                     "description": "Training model for FragGeneScan.",
-                    "help": "The gene caller merge priority for the combined gene caller"
+                    "enum": ["Pyrodigal_FragGeneScanRS", "FragGeneScanRS_Pyrodigal"],
+                    "help": "The gene caller merge priority for the combined gene caller",
+                    "type": "string"
                 },
                 "fraggenescanrs_train_model": {
-                    "type": "string",
                     "default": "illumina_5",
-                    "format": "string",
                     "description": "Training model for FragGeneScan.",
-                    "help": "Specify the training model to use for gene prediction. Default is 'illumina_5'."
+                    "format": "string",
+                    "help": "Specify the training model to use for gene prediction. Default is 'illumina_5'.",
+                    "type": "string"
                 },
                 "mpt_version": {
-                    "type": "string",
                     "default": "1.2.0--pyhdfd78af_0",
                     "description": "General version of mgnify-pipeline-toolkit",
-                    "help": "Keeps all mpt tools updated and synced to chosen release."
+                    "help": "Keeps all mpt tools updated and synced to chosen release.",
+                    "type": "string"
                 }
             },
-            "fa_icon": "fas fa-database"
+            "title": "Settings for some of the tools of the pipeline",
+            "type": "object"
         },
         "reference_databases": {
-            "title": "Reference databases for the pipeline",
-            "type": "object",
-            "description": "Paths to the different reference databases needed for the pipeline",
             "default": "",
+            "description": "Paths to the different reference databases needed for the pipeline",
+            "fa_icon": "fas fa-database",
             "properties": {
-                "interproscan_database": {
-                    "type": "string",
-                    "format": "directory-path",
-                    "fa_icon": "fas fa-folder-open",
-                    "description": "Path to the interproscan database (untarred ftp://ftp.ebi.ac.uk/pub/software/unix/iprscan/5/${version_major}-${version_minor}/interproscan-${version_major}-${version_minor}-64-bit.tar.gz)"
-                },
-                "interproscan_database_version": {
-                    "type": "string",
-                    "default": "5.73-104.0",
-                    "description": "The version of the interproscan database.",
-                    "fa_icon": "fas fa-code-branch"
-                },
-                "interpro_licensed_software": {
-                    "type": "boolean",
-                    "default": false,
-                    "description": "Enables the use of licensed software in InterProScan. Set to true if the required licensed software is in the licensed database folder, https://interproscan-docs.readthedocs.io/en/v5/HowToRun.html#included-analyses.",
-                    "fa_icon": "fas fa-file-contract"
-                },
-                "eggnog_database": {
-                    "type": "string",
-                    "format": "file-path",
-                    "fa_icon": "fas fa-database",
-                    "description": "The EggNOG reference database folder, https://github.com/eggnogdb/eggnog-mapper/wiki/eggNOG-mapper-v2.1.5-to-v2.1.12#requirements",
-                    "help_text": "Set this variable to the path of the uncompressed tarball for the database."
-                },
-                "eggnog_data_dir": {
-                    "type": "string",
-                    "format": "directory-path",
-                    "fa_icon": "fas fa-database",
-                    "description": "Directory containing eggnog database files"
-                },
-                "eggnog_diamond_database": {
-                    "type": "string",
-                    "format": "file-path",
-                    "fa_icon": "fas fa-database",
-                    "description": "The eggnog Diamond protein database file"
-                },
-                "eggnog_database_version": {
-                    "type": "string",
-                    "default": "5.0.2",
-                    "description": "The EggNOG reference database version.",
-                    "fa_icon": "fas fa-code-branch"
-                },
-                "dbcan_database": {
-                    "type": "string",
-                    "format": "directory-path",
-                    "description": "The dbCAN reference database path.",
-                    "fa_icon": "fas fa-database"
-                },
-                "dbcan_database_version": {
-                    "type": "string",
-                    "default": "4.1.4-V13",
-                    "description": "The dbCAN reference database version.",
-                    "fa_icon": "fas fa-code-branch"
-                },
-                "uniref90rhea_diamond_database": {
-                    "type": "string",
-                    "format": "file-path",
-                    "description": "This is a diamond database created from the Uniref90 ammended with Rhea and CHEMI annotations.",
-                    "fa_icon": "fas fa-database",
-                    "help_text": "Path to user-defined local Uniref90 + Rhea and CHEMI annotations diamond database file."
-                },
-                "uniref90rhea_diamond_database_version": {
-                    "type": "string",
-                    "default": "2025_01",
-                    "description": "The version of the UniRef90 used to generate the database.",
-                    "fa_icon": "fas fa-database"
-                },
-                "rheachebi_mapping_tsv": {
-                    "type": "string",
-                    "format": "file-path",
-                    "description": "This TSV file contains the mapping between RHEA terms and Chebi accesions.",
-                    "fa_icon": "fas fa-database",
-                    "help_text": "Path to the TSV file that contains the the mapping between RHEA terms and Chebi accesions."
-                },
-                "kofam_hmm_database": {
-                    "type": "string",
-                    "format": "file-path",
-                    "description": "KEGG Orthologs HMM models, as generated by https://github.com/EBI-Metagenomics/reference-databases-preprocessing-pipeline",
-                    "fa_icon": "fas fa-database",
-                    "help_text": "Path to the HMM file that contaisn the KOFam models."
-                },
-                "ko_list_txt": {
-                    "type": "string",
-                    "format": "file-path",
-                    "description": "KEGG Orthologs list, this is the TSV that you can obtain from ftp://ftp.genome.jp/pub/db/kofam/ko_list.gz",
-                    "fa_icon": "fas fa-database",
-                    "help_text": "This file is used to get the descriptions from the KO entries in this pipeline summary files."
-                },
-                "kofam_hmm_database_version": {
-                    "type": "string",
-                    "format": "string",
-                    "description": "Version of the KOFam models used, they are not version so this is the download date.",
-                    "help": "Specify the date YYYY_MMMM when the models where downloaded from KEGG.",
-                    "default": "2025_03"
-                },
-                "go_obo": {
-                    "type": "string",
-                    "format": "file-path",
-                    "description": "Gene ontology .OBO file, for example go-basic. Can usually be downloaded here https://geneontology.org/docs/download-ontology/",
-                    "fa_icon": "fas fa-database",
-                    "help_text": "Path to the .obo file"
-                },
-                "goslim_ids": {
-                    "type": "string",
-                    "format": "file-path",
-                    "description": "Text file containing the GO terms that make up the input GO-slim",
-                    "fa_icon": "fas fa-database",
-                    "help_text": "Path to the GO terms txt file, to make the GO-slim"
-                },
-                "go_banding": {
-                    "type": "string",
-                    "format": "file-path",
-                    "description": "Text file containing the GO terms and descriptions that make up the input GO-slim",
-                    "fa_icon": "fas fa-database",
-                    "help_text": "Path to the GO terms and descriptions, to make the GO-slim"
-                },
-                "goslim_version": {
-                    "type": "string",
-                    "format": "string",
-                    "description": "Version of the GO slim release used.",
-                    "help": "Specify the version of the GO slim release used.",
-                    "default": "20160705"
-                },
-                "rfam_covariance_models": {
-                    "type": "string",
-                    "format": "file-path",
-                    "description": "Path to the Rfam covariance models file to use with cmsearch/cmscan.",
-                    "help": "This file contains the covariance model for RNA families from the Rfam database."
-                },
-                "rfam_claninfo": {
-                    "type": "string",
-                    "format": "file-path",
-                    "description": "Path to the Rfam clan information file.",
-                    "help": "This file provides information about the clans of RNA families in the Rfam database."
-                },
-                "rfam_version": {
-                    "type": "string",
-                    "format": "string",
-                    "description": "Version of the Rfam database being used.",
-                    "help": "Specify the version of the Rfam database to ensure compatibility with the models.",
-                    "default": "15"
-                },
-                "cat_diamond_database": {
-                    "type": "string",
-                    "format": "directory-path",
-                    "description": "Directory containing the CAT database produced with catpack/prepare.",
-                    "help": "The folder must contain DIAMOND db *.dmnd, *.fastaid2LCAtaxid, *.taxids_with_multiple_offspring."
-                },
-                "cat_taxonomy_database": {
-                    "type": "string",
-                    "format": "directory-path",
-                    "description": "Directory containing the tax/ folder of the CAT database produced with catpack/prepare.",
-                    "help": "The folder must contain names.dmp and nodes.dmp"
-                },
-                "cat_database_version": {
-                    "type": "string",
-                    "default": "2025_01",
-                    "description": "The CAT_pack prepare database datastamp (YYYY_MM), as they are not versioned.",
-                    "fa_icon": "fas fa-database"
-                },
                 "antismash_database": {
-                    "type": "string",
-                    "format": "directory-path",
                     "description": "Path to user-defined local antiSMASH database.",
                     "fa_icon": "fas fa-database",
-                    "help_text": "Pre downloaded antiSMASH databases, download from https://nf-co.re/funcscan/usage#antismash-1 or from our the Microbiome Informatics FTP."
+                    "format": "directory-path",
+                    "help_text": "Pre downloaded antiSMASH databases, download from https://nf-co.re/funcscan/usage#antismash-1 or from our the Microbiome Informatics FTP.",
+                    "type": "string"
                 },
                 "antismash_database_version": {
-                    "type": "string",
                     "default": "8.0.0",
                     "description": "The version of the antiSMASH database.",
-                    "fa_icon": "fas fa-database"
+                    "fa_icon": "fas fa-database",
+                    "type": "string"
+                },
+                "cat_database_version": {
+                    "default": "2025_01",
+                    "description": "The CAT_pack prepare database datastamp (YYYY_MM), as they are not versioned.",
+                    "fa_icon": "fas fa-database",
+                    "type": "string"
+                },
+                "cat_diamond_database": {
+                    "description": "Directory containing the CAT database produced with catpack/prepare.",
+                    "format": "directory-path",
+                    "help": "The folder must contain DIAMOND db *.dmnd, *.fastaid2LCAtaxid, *.taxids_with_multiple_offspring.",
+                    "type": "string"
+                },
+                "cat_taxonomy_database": {
+                    "description": "Directory containing the tax/ folder of the CAT database produced with catpack/prepare.",
+                    "format": "directory-path",
+                    "help": "The folder must contain names.dmp and nodes.dmp",
+                    "type": "string"
+                },
+                "dbcan_database": {
+                    "description": "The dbCAN reference database path.",
+                    "fa_icon": "fas fa-database",
+                    "format": "directory-path",
+                    "type": "string"
+                },
+                "dbcan_database_version": {
+                    "default": "4.1.4-V13",
+                    "description": "The dbCAN reference database version.",
+                    "fa_icon": "fas fa-code-branch",
+                    "type": "string"
                 },
                 "dram_databases": {
-                    "type": "string",
-                    "format": "directory-path",
                     "description": "Path to user-defined local DRAM databases folder.",
                     "fa_icon": "fas fa-database",
-                    "help_text": "DRAM version 1.3 databases, these are required to run the distill module"
+                    "format": "directory-path",
+                    "help_text": "DRAM version 1.3 databases, these are required to run the distill module",
+                    "type": "string"
                 },
                 "dram_databases_version": {
-                    "type": "string",
                     "default": "1.3.0",
                     "description": "The version of the DRAM databases.",
-                    "fa_icon": "fas fa-database"
+                    "fa_icon": "fas fa-database",
+                    "type": "string"
+                },
+                "eggnog_data_dir": {
+                    "description": "Directory containing eggnog database files",
+                    "fa_icon": "fas fa-database",
+                    "format": "directory-path",
+                    "type": "string"
+                },
+                "eggnog_database": {
+                    "description": "The EggNOG reference database folder, https://github.com/eggnogdb/eggnog-mapper/wiki/eggNOG-mapper-v2.1.5-to-v2.1.12#requirements",
+                    "fa_icon": "fas fa-database",
+                    "format": "file-path",
+                    "help_text": "Set this variable to the path of the uncompressed tarball for the database.",
+                    "type": "string"
+                },
+                "eggnog_database_version": {
+                    "default": "5.0.2",
+                    "description": "The EggNOG reference database version.",
+                    "fa_icon": "fas fa-code-branch",
+                    "type": "string"
+                },
+                "eggnog_diamond_database": {
+                    "description": "The eggnog Diamond protein database file",
+                    "fa_icon": "fas fa-database",
+                    "format": "file-path",
+                    "type": "string"
+                },
+                "go_banding": {
+                    "description": "Text file containing the GO terms and descriptions that make up the input GO-slim",
+                    "fa_icon": "fas fa-database",
+                    "format": "file-path",
+                    "help_text": "Path to the GO terms and descriptions, to make the GO-slim",
+                    "type": "string"
+                },
+                "go_obo": {
+                    "description": "Gene ontology .OBO file, for example go-basic. Can usually be downloaded here https://geneontology.org/docs/download-ontology/",
+                    "fa_icon": "fas fa-database",
+                    "format": "file-path",
+                    "help_text": "Path to the .obo file",
+                    "type": "string"
+                },
+                "goslim_ids": {
+                    "description": "Text file containing the GO terms that make up the input GO-slim",
+                    "fa_icon": "fas fa-database",
+                    "format": "file-path",
+                    "help_text": "Path to the GO terms txt file, to make the GO-slim",
+                    "type": "string"
+                },
+                "goslim_version": {
+                    "default": "20160705",
+                    "description": "Version of the GO slim release used.",
+                    "format": "string",
+                    "help": "Specify the version of the GO slim release used.",
+                    "type": "string"
+                },
+                "interpro_licensed_software": {
+                    "description": "Enables the use of licensed software in InterProScan. Set to true if the required licensed software is in the licensed database folder, https://interproscan-docs.readthedocs.io/en/v5/HowToRun.html#included-analyses.",
+                    "fa_icon": "fas fa-file-contract",
+                    "type": "boolean"
+                },
+                "interproscan_database": {
+                    "description": "Path to the interproscan database (untarred ftp://ftp.ebi.ac.uk/pub/software/unix/iprscan/5/${version_major}-${version_minor}/interproscan-${version_major}-${version_minor}-64-bit.tar.gz)",
+                    "fa_icon": "fas fa-folder-open",
+                    "format": "directory-path",
+                    "type": "string"
+                },
+                "interproscan_database_version": {
+                    "default": "5.73-104.0",
+                    "description": "The version of the interproscan database.",
+                    "fa_icon": "fas fa-code-branch",
+                    "type": "string"
+                },
+                "ko_list_txt": {
+                    "description": "KEGG Orthologs list, this is the TSV that you can obtain from ftp://ftp.genome.jp/pub/db/kofam/ko_list.gz",
+                    "fa_icon": "fas fa-database",
+                    "format": "file-path",
+                    "help_text": "This file is used to get the descriptions from the KO entries in this pipeline summary files.",
+                    "type": "string"
+                },
+                "kofam_hmm_database": {
+                    "description": "KEGG Orthologs HMM models, as generated by https://github.com/EBI-Metagenomics/reference-databases-preprocessing-pipeline",
+                    "fa_icon": "fas fa-database",
+                    "format": "file-path",
+                    "help_text": "Path to the HMM file that contaisn the KOFam models.",
+                    "type": "string"
+                },
+                "kofam_hmm_database_version": {
+                    "default": "2025_03",
+                    "description": "Version of the KOFam models used, they are not version so this is the download date.",
+                    "format": "string",
+                    "help": "Specify the date YYYY_MMMM when the models where downloaded from KEGG.",
+                    "type": "string"
+                },
+                "rheachebi_mapping_tsv": {
+                    "description": "This TSV file contains the mapping between RHEA terms and Chebi accesions.",
+                    "fa_icon": "fas fa-database",
+                    "format": "file-path",
+                    "help_text": "Path to the TSV file that contains the the mapping between RHEA terms and Chebi accesions.",
+                    "type": "string"
+                },
+                "rfam_claninfo": {
+                    "description": "Path to the Rfam clan information file.",
+                    "format": "file-path",
+                    "help": "This file provides information about the clans of RNA families in the Rfam database.",
+                    "type": "string"
+                },
+                "rfam_covariance_models": {
+                    "description": "Path to the Rfam covariance models file to use with cmsearch/cmscan.",
+                    "format": "file-path",
+                    "help": "This file contains the covariance model for RNA families from the Rfam database.",
+                    "type": "string"
+                },
+                "rfam_version": {
+                    "default": "15",
+                    "description": "Version of the Rfam database being used.",
+                    "format": "string",
+                    "help": "Specify the version of the Rfam database to ensure compatibility with the models.",
+                    "type": "string"
+                },
+                "uniref90rhea_diamond_database": {
+                    "description": "This is a diamond database created from the Uniref90 ammended with Rhea and CHEMI annotations.",
+                    "fa_icon": "fas fa-database",
+                    "format": "file-path",
+                    "help_text": "Path to user-defined local Uniref90 + Rhea and CHEMI annotations diamond database file.",
+                    "type": "string"
+                },
+                "uniref90rhea_diamond_database_version": {
+                    "default": "2025_01",
+                    "description": "The version of the UniRef90 used to generate the database.",
+                    "fa_icon": "fas fa-database",
+                    "type": "string"
                 }
             },
-            "fa_icon": "fas fa-database"
-        },
-        "institutional_config_options": {
-            "title": "Institutional config options",
-            "type": "object",
-            "fa_icon": "fas fa-university",
-            "description": "Parameters used to describe centralised config profiles. These should not be edited.",
-            "help_text": "The centralised nf-core configuration profiles use a handful of pipeline parameters to describe themselves. This information is then printed to the Nextflow log when you run a pipeline. You should not need to change these values when you run a pipeline.",
-            "properties": {
-                "custom_config_version": {
-                    "type": "string",
-                    "description": "Git commit id for Institutional configs.",
-                    "default": "master",
-                    "hidden": true,
-                    "fa_icon": "fas fa-users-cog"
-                },
-                "custom_config_base": {
-                    "type": "string",
-                    "description": "Base directory for Institutional configs.",
-                    "default": "https://raw.githubusercontent.com/nf-core/configs/master",
-                    "hidden": true,
-                    "help_text": "If you're running offline, Nextflow will not be able to fetch the institutional config files from the internet. If you don't need them, then this is not a problem. If you do need them, you should download the files from the repo and tell Nextflow where to find them with this parameter.",
-                    "fa_icon": "fas fa-users-cog"
-                },
-                "config_profile_name": {
-                    "type": "string",
-                    "description": "Institutional config name.",
-                    "hidden": true,
-                    "fa_icon": "fas fa-users-cog"
-                },
-                "config_profile_description": {
-                    "type": "string",
-                    "description": "Institutional config description.",
-                    "hidden": true,
-                    "fa_icon": "fas fa-users-cog"
-                },
-                "config_profile_contact": {
-                    "type": "string",
-                    "description": "Institutional config contact information.",
-                    "hidden": true,
-                    "fa_icon": "fas fa-users-cog"
-                },
-                "config_profile_url": {
-                    "type": "string",
-                    "description": "Institutional config URL link.",
-                    "hidden": true,
-                    "fa_icon": "fas fa-users-cog"
-                }
-            }
+            "required": [
+                "antismash_database",
+                "cat_diamond_database",
+                "cat_taxonomy_database",
+                "dbcan_database",
+                "dram_databases",
+                "eggnog_data_dir",
+                "eggnog_database",
+                "eggnog_diamond_database",
+                "go_banding",
+                "go_obo",
+                "goslim_ids",
+                "interproscan_database",
+                "ko_list_txt",
+                "kofam_hmm_database",
+                "rheachebi_mapping_tsv",
+                "rfam_claninfo",
+                "rfam_covariance_models",
+                "uniref90rhea_diamond_database"
+            ],
+            "title": "Reference databases for the pipeline",
+            "type": "object"
         },
         "generic_options": {
-            "title": "Generic options",
-            "type": "object",
-            "fa_icon": "fas fa-file-import",
             "description": "Less common options for the pipeline, typically set in a config file.",
+            "fa_icon": "fas fa-file-import",
             "help_text": "These options are common to all nf-core pipelines and allow you to customise some of the core preferences for how the pipeline runs.\n\nTypically these options would be set in a Nextflow config file loaded for all pipeline runs, such as `~/.nextflow/config`.",
             "properties": {
-                "version": {
-                    "type": "boolean",
-                    "description": "Display version and exit.",
-                    "fa_icon": "fas fa-question-circle",
-                    "hidden": true
-                },
-                "publish_dir_mode": {
-                    "type": "string",
-                    "default": "copy",
-                    "description": "Method used to save pipeline results to output directory.",
-                    "help_text": "The Nextflow `publishDir` option specifies which intermediate files should be saved to the output directory. This option tells the pipeline what method should be used to move these files. See [Nextflow docs](https://www.nextflow.io/docs/latest/process.html#publishdir) for details.",
-                    "fa_icon": "fas fa-copy",
-                    "enum": ["symlink", "rellink", "link", "copy", "copyNoFollow", "move"],
-                    "hidden": true
-                },
                 "email_on_fail": {
-                    "type": "string",
                     "description": "Email address for completion summary, only when pipeline fails.",
                     "fa_icon": "fas fa-exclamation-triangle",
-                    "pattern": "^([a-zA-Z0-9_\\-\\.]+)@([a-zA-Z0-9_\\-\\.]+)\\.([a-zA-Z]{2,5})$",
                     "help_text": "An email address to send a summary email to when the pipeline is completed - ONLY sent if the pipeline does not exit successfully.",
-                    "hidden": true
-                },
-                "plaintext_email": {
-                    "type": "boolean",
-                    "description": "Send plain-text email instead of HTML.",
-                    "fa_icon": "fas fa-remove-format",
-                    "hidden": true
+                    "hidden": true,
+                    "pattern": "^([a-zA-Z0-9_\\-\\.]+)@([a-zA-Z0-9_\\-\\.]+)\\.([a-zA-Z]{2,5})$",
+                    "type": "string"
                 },
                 "max_multiqc_email_size": {
-                    "type": "string",
-                    "description": "File size limit when attaching MultiQC reports to summary emails.",
-                    "pattern": "^\\d+(\\.\\d+)?\\.?\\s*(K|M|G|T)?B$",
                     "default": "25.MB",
+                    "description": "File size limit when attaching MultiQC reports to summary emails.",
                     "fa_icon": "fas fa-file-upload",
-                    "hidden": true
+                    "hidden": true,
+                    "pattern": "^\\d+(\\.\\d+)?\\.?\\s*(K|M|G|T)?B$",
+                    "type": "string"
                 },
                 "monochrome_logs": {
-                    "type": "boolean",
                     "description": "Do not use coloured log outputs.",
                     "fa_icon": "fas fa-palette",
-                    "hidden": true
+                    "hidden": true,
+                    "type": "boolean"
                 },
                 "multiqc_config": {
-                    "type": "string",
-                    "format": "file-path",
                     "description": "Custom config file to supply to MultiQC.",
                     "fa_icon": "fas fa-cog",
-                    "hidden": true
+                    "format": "file-path",
+                    "hidden": true,
+                    "type": "string"
                 },
                 "multiqc_logo": {
-                    "type": "string",
                     "description": "Custom logo file to supply to MultiQC. File name must also be set in the MultiQC config file",
                     "fa_icon": "fas fa-image",
-                    "hidden": true
+                    "hidden": true,
+                    "type": "string"
                 },
                 "multiqc_methods_description": {
-                    "type": "string",
                     "description": "Custom MultiQC yaml file containing HTML including a methods description.",
-                    "fa_icon": "fas fa-cog"
-                },
-                "validate_params": {
-                    "type": "boolean",
-                    "description": "Boolean whether to validate parameters against the schema at runtime",
-                    "default": true,
-                    "fa_icon": "fas fa-check-square",
-                    "hidden": true
+                    "fa_icon": "fas fa-cog",
+                    "type": "string"
                 },
                 "pipelines_testdata_base_path": {
-                    "type": "string",
-                    "fa_icon": "far fa-check-circle",
-                    "description": "Base URL or local path to location of pipeline test dataset files",
                     "default": "https://raw.githubusercontent.com/nf-core/test-datasets/",
-                    "hidden": true
+                    "description": "Base URL or local path to location of pipeline test dataset files",
+                    "fa_icon": "far fa-check-circle",
+                    "hidden": true,
+                    "type": "string"
+                },
+                "plaintext_email": {
+                    "description": "Send plain-text email instead of HTML.",
+                    "fa_icon": "fas fa-remove-format",
+                    "hidden": true,
+                    "type": "boolean"
+                },
+                "publish_dir_mode": {
+                    "default": "copy",
+                    "description": "Method used to save pipeline results to output directory.",
+                    "enum": ["symlink", "rellink", "link", "copy", "copyNoFollow", "move"],
+                    "fa_icon": "fas fa-copy",
+                    "help_text": "The Nextflow `publishDir` option specifies which intermediate files should be saved to the output directory. This option tells the pipeline what method should be used to move these files. See [Nextflow docs](https://www.nextflow.io/docs/latest/process.html#publishdir) for details.",
+                    "hidden": true,
+                    "type": "string"
                 },
                 "trace_report_suffix": {
-                    "type": "string",
-                    "fa_icon": "far calendar",
                     "description": "Suffix to add to the trace report filename. Default is the date and time in the format yyyy-MM-dd_HH-mm-ss.",
-                    "hidden": true
+                    "fa_icon": "far calendar",
+                    "hidden": true,
+                    "type": "string"
+                },
+                "validate_params": {
+                    "default": true,
+                    "description": "Boolean whether to validate parameters against the schema at runtime",
+                    "fa_icon": "fas fa-check-square",
+                    "hidden": true,
+                    "type": "boolean"
+                },
+                "version": {
+                    "description": "Display version and exit.",
+                    "fa_icon": "fas fa-question-circle",
+                    "hidden": true,
+                    "type": "boolean"
                 }
-            }
+            },
+            "title": "Generic options",
+            "type": "object"
+        },
+        "institutional_config_options": {
+            "description": "Parameters used to describe centralised config profiles. These should not be edited.",
+            "fa_icon": "fas fa-university",
+            "help_text": "The centralised nf-core configuration profiles use a handful of pipeline parameters to describe themselves. This information is then printed to the Nextflow log when you run a pipeline. You should not need to change these values when you run a pipeline.",
+            "properties": {
+                "config_profile_contact": {
+                    "description": "Institutional config contact information.",
+                    "fa_icon": "fas fa-users-cog",
+                    "hidden": true,
+                    "type": "string"
+                },
+                "config_profile_description": {
+                    "description": "Institutional config description.",
+                    "fa_icon": "fas fa-users-cog",
+                    "hidden": true,
+                    "type": "string"
+                },
+                "config_profile_name": {
+                    "description": "Institutional config name.",
+                    "fa_icon": "fas fa-users-cog",
+                    "hidden": true,
+                    "type": "string"
+                },
+                "config_profile_url": {
+                    "description": "Institutional config URL link.",
+                    "fa_icon": "fas fa-users-cog",
+                    "hidden": true,
+                    "type": "string"
+                },
+                "custom_config_base": {
+                    "default": "https://raw.githubusercontent.com/nf-core/configs/master",
+                    "description": "Base directory for Institutional configs.",
+                    "fa_icon": "fas fa-users-cog",
+                    "help_text": "If you're running offline, Nextflow will not be able to fetch the institutional config files from the internet. If you don't need them, then this is not a problem. If you do need them, you should download the files from the repo and tell Nextflow where to find them with this parameter.",
+                    "hidden": true,
+                    "type": "string"
+                },
+                "custom_config_version": {
+                    "default": "master",
+                    "description": "Git commit id for Institutional configs.",
+                    "fa_icon": "fas fa-users-cog",
+                    "hidden": true,
+                    "type": "string"
+                }
+            },
+            "title": "Institutional config options",
+            "type": "object"
         }
     },
+    "$id": "https://raw.githubusercontent.com/ebi-metagenomics/assembly-analysis-pipeline/main/nextflow_schema.json",
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
     "allOf": [
         {
             "$ref": "#/$defs/input_output_options"
         },
         {
             "$ref": "#/$defs/contigs_filtering_thresholds"
+        },
+        {
+            "$ref": "#/$defs/decontamination"
         },
         {
             "$ref": "#/$defs/nucleotide_and_protein_fasta_file_chunking_options"
@@ -468,5 +572,8 @@
         {
             "$ref": "#/$defs/generic_options"
         }
-    ]
+    ],
+    "description": "MGnify's assembly analysis pipeline performs taxonomic classification, protein function prediction, and identifies metabolic pathways and biosynthetic gene clusters.",
+    "title": "ebi-metagenomics/assembly-analysis-pipeline pipeline parameters",
+    "type": "object"
 }

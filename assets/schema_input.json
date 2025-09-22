@@ -15,10 +15,51 @@
             },
             "assembly_fasta": {
                 "type": "string",
-                "format": "file-path",
                 "exists": true,
                 "pattern": "^\\S+\\.(fasta|fa|fna|ffn)(\\.gz)?$",
                 "errorMessage": "The assembly needs to be a fasta file, either '.fasta', '.fa', '.fna', or '.ffn' (all with or without '.gz')"
+            },
+            "contaminant_reference": {
+                "errorMessage": "The reference genome prefix to be used as part of the decontamination process, corresponding folder must exist in the reference_genomes_folder",
+                "anyOf": [
+                    {
+                        "type": "string",
+                        "pattern": "^\\S+$"
+                    },
+                    {
+                        "type": "string",
+                        "maxLength": 0
+                    }
+                ],
+                "meta": ["contaminant_reference"]
+            },
+            "human_reference": {
+                "errorMessage": "Human reference genome prefix to use for decontamination, corresponding folder must exist in the reference_genomes_folder",
+                "anyOf": [
+                    {
+                        "type": "string",
+                        "pattern": "^\\S+$"
+                    },
+                    {
+                        "type": "string",
+                        "maxLength": 0
+                    }
+                ],
+                "meta": ["human_reference"]
+            },
+            "phix_reference": {
+                "errorMessage": "PhiX reference genome prefix to use for decontamination, corresponding folder must exist in the reference_genomes_folder",
+                "anyOf": [
+                    {
+                        "type": "string",
+                        "pattern": "^\\S+$"
+                    },
+                    {
+                        "type": "string",
+                        "maxLength": 0
+                    }
+                ],
+                "meta": ["phix_reference"]
             }
         },
         "required": ["sample", "assembly_fasta"]

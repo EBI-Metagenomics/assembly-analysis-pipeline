@@ -26,9 +26,12 @@ The `qc` directory contains output files related to the quality control steps of
 ```bash
 ├── qc
 │   ├── ERZ12345_filtered_contigs.fasta.gz
-│   ├── ERZ12345.tsv
+│   ├── ERZ12345_filtered_contigs.fasta.gz.gzi
+│   ├── ERZ12345_filtered_contigs.fasta.gz.fai
+│   ├── ERZ12345_quast_stats.tsv.gz
 │   ├── multiqc_report.html
-│   └── multiqc_data/
+│   ├── multiqc_data/
+│   └── decontamination/
 ├── cds
 ├── taxonomy
 ├── functional-annotation
@@ -39,9 +42,24 @@ The `qc` directory contains output files related to the quality control steps of
 #### Output files
 
 - **ERZ12345_filtered_contigs.fasta.gz**: This `FASTA` file contains the filtered contigs after the removal of those that are shorter than 500 bases, and which have a proportion of ambiguous bases higher than 10%.
-- **ERZ12345.tsv**: This `tsv` file contains the QUAST summary output, giving an assessment of the quality of the contigs of this assembly.
-- **multiqc_report.html**: This `html` file contains the `MultiQC` report for that assembly. It combines outputs from multiple tools, including `QUAST` (run both before and after quality control during assembly preprocessing), as well as records of the software versions used by the pipeline.
+- **ERZ12345_filtered_contigs.fasta.gz.gzi**: This file is a compression index for the blockzip compressed filtered_contigs fasta file.
+- **ERZ12345_filtered_contigs.fasta.gz.fai**: This file is a FASTA index for the blockzip compressed filtered_contigs fasta file.
+- **ERZ12345_quast_stats.tsv.gz**: This compressed `tsv` file contains the QUAST summary output, giving an assessment of the quality of the contigs of this assembly.
+- **multiqc_report.html**: This `html` file contains the `MultiQC` report for that assembly. It combines outputs from multiple tools, including `QUAST` (run both before and after quality control during assembly preprocessing), decontamination summary tables (if contaminated contigs were detected), and records of the software versions used by the pipeline.
 - **multiqc_data/**: This `directory` contains the input files used by MultiQC to generate its report.
+- **decontamination/**: This `directory` contains TSV files with details of contigs that were removed during decontamination steps (only created if contaminated contigs are found).
+
+#### Decontamination output files
+
+When the decontamination step is enabled and contaminated contigs are detected, TSV files are created in the `decontamination/` subdirectory. Each TSV file contains three columns: `sequence_id` (contig identifier), `query_coverage` (coverage of the alignment), and `identity` (percentage identity of the alignment). Contigs are classified as contaminated if they have query coverage ≥ min_qcov AND identity ≥ min_pid when aligned to the respective reference genome.
+
+The following files may be created:
+
+- **ERZ12345_aligned_to_human.tsv.gz**: Contigs identified as contaminated with human DNA.
+- **ERZ12345_aligned_to_phix.tsv.gz**: Contigs identified as contaminated with PhiX DNA.
+- **ERZ12345_aligned_to_contaminant.tsv.gz**: Contigs identified as contaminated with custom host/contaminant DNA.
+
+These files are integrated into the MultiQC report as interactive tables under the "Decontamination Summary" section.
 
 ### cds
 
@@ -74,7 +92,7 @@ The `taxonomy` directory contains output files from taxonomic assignment tools s
 ├── cds
 ├── taxonomy
 │   ├── ERZ12345_contigs_taxonomy.tsv.gz
-│   ├── ERZ12345.krona.txt
+│   ├── ERZ12345.krona.txt.gz
 │   ├── ERZ12345.html
 │   └── ERZ12345_SSU.fasta.gz
 ├── functional-annotation
@@ -85,7 +103,7 @@ The `taxonomy` directory contains output files from taxonomic assignment tools s
 #### Output files
 
 - **ERZ12345_contigs_taxonomy.tsv.gz**: This `tsv` file contains the output from [CAT_pack](https://github.com/MGXlab/CAT_pack) that describes taxonomy assignments to contigs in the assembly.
-- **ERZ12345.krona.txt**: This `txt` file contains the Krona text input that is used to generate the Krona HTML file. It contains the distribution of the different taxonomic assignments from the [CAT_pack](https://github.com/MGXlab/CAT_pack) output.
+- **ERZ12345.krona.txt.gz**: This compressed `txt` file contains the Krona text input that is used to generate the Krona HTML file. It contains the distribution of the different taxonomic assignments from the [CAT_pack](https://github.com/MGXlab/CAT_pack) output.
 - **ERZ12345.html**: This `html` file contains the Krona HTML file that interactively displays the distribution of the different taxonomic assignments from [CAT_pack](https://github.com/MGXlab/CAT_pack).
 - **ERZ12345_SSU.fasta.gz**: This `FASTA` file contains all sequences from the assembly's contigs that matched the `SSU` (Small Subunit) rRNA marker gene, as identified by running [cmsearch](http://eddylab.org/infernal/). These sequences represent regions of the contigs that align to the `SSU` model used in the search. This file may be absent if no marker genes of this type were detected in the assembly.
 - **ERZ12345_LSU.fasta.gz**: This `FASTA` file contains sequences matching the `LSU` (Large Subunit) rRNA marker gene, identified in the same way via [cmsearch](http://eddylab.org/infernal/). This file may be absent if no marker genes of this type were detected in the assembly.
@@ -182,7 +200,6 @@ This subdirectory contains the output of running [run_dbCAN](https://github.com/
 - **ERZ12345_dbcan_cgc.gff.gz**: This `gff` file is annotated with functional genes for CGCFinder and visualization tools.
 - **ERZ12345_dbcan_standard_out.tsv.gz**: This `tsv` file lists all identified CGCs and their components.
 - **ERZ12345_dbcan_overview.tsv.gz**: This `tsv` file contains a summary of identified CAZymes.
-- **ERZ12345_dbcan_hmm.tsv.gz**: This `tsv` file contains the detailed HMMER results.
 - **ERZ12345_dbcan_sub_hmm.tsv.gz**: This `tsv` file contains the detailed sub-HMMER results.
 - **ERZ12345_dbcan_substrates.tsv.gz**: This `tsv` file contains the substrate prediction results for CGCs.
 
@@ -201,8 +218,11 @@ The `pathways-and-systems` directory contains five subdirectories of results, on
 │   │   ├── ERZ12345_antismash.gff.gz
 │   │   ├── ERZ12345_merged.json
 │   │   └── ERZ12345_antismash_summary.tsv.gz
+│   │   └── ERZ12345_antismash_summary.tsv.gz.gzi
 │   ├── sanntis
-│   │   └── ERZ12345_sanntis_concatenated.gff.gz
+│   │   ├── ERZ12345_sanntis.gff.gz
+│   │   ├── ERZ12345_sanntis_summary.tsv.gz
+│   │   └── ERZ12345_sanntis_summary.tsv.gz.gzi
 │   ├── genome-properties
 │   │   ├── ERZ12345_gp.json.gz
 │   │   ├── ERZ12345_gp.tsv.gz
@@ -228,12 +248,15 @@ This subdirectory contains the results of running [antiSMASH](https://github.com
 - **ERZ12345_antismash.gff.gz**: A GFF3 format file containing antiSMASH annotations.
 - **ERZ12345_merged.json**: A JSON file containing antiSMASH annotations.
 - **ERZ12345_antismash_summary.tsv.gz**: This `tsv` file listing the counts of each antiSMASH entry detected in the assembly.
+- **ERZ12345_antismash_summary.tsv.gz.gzi**: This is the index of the antiSMASH summary `tsv`
 
 #### Output files - sanntis
 
 This subdirectory contains the outputs of running [SanntiS](https://github.com/Finn-Lab/SanntiS) on the proteins of the assembly, also describing the detected BGCs using this new machine learning-based tool.
 
 - **ERZ12345_sanntis.gff.gz**: This `gff` file contains the different SanntiS annotations in the GFF3 format. The GFF3 specification can be found in the [tool repo](https://github.com/Finn-Lab/SanntiS?tab=readme-ov-file#ouput)
+- **ERZ12345_sanntis_summary.tsv.gz**: This `tsv` file listing the counts of each SanntiS entry detected in the assembly.
+- **ERZ12345_sanntis_summary.tsv.gz.gzi**: This is the index of the SanntiS summary `tsv`
 
 #### Output files - genome-properties
 
@@ -258,10 +281,13 @@ This subdirectory contains the outputs of running [DRAM-distill](https://github.
 
 - **ERZ12345_dram.tsv.gz**: This `tsv` file contains the product of https://github.com/WrightonLabCSU/DRAM for the assembly, including functions that were detected.
 - **ERZ12345_dram.html.gz**: This `html` file contains a heatmap visualisation of the detected functions by https://github.com/WrightonLabCSU/DRAM.
+- **ERZ12345_genome_stats.tsv.gz**: This `tsv` file contains the genome statistics summary generated by DRAM.
+- **ERZ12345_metabolism_summary.xlsx.gz**: This Excel file contains the metabolism summary generated by DRAM.
 
 ### annotation-summary
 
-The `annotation-summary` directory contains a single file that summarises the annotations generated by the pipeline, integrating functional annotation per protein and other genomic features.
+The `annotation-summary` directory contains a single GFF file that summarises the annotations generated by the pipeline, integrating functional annotation per protein and other genomic features.
+This file is compressed and indexed with both a bgzip index and a tabix index (`.gff.gz`, `.gff.gz.gzi`, `.gff.gz.csi` files respectively).
 
 ```bash
 ├── qc
@@ -270,7 +296,9 @@ The `annotation-summary` directory contains a single file that summarises the an
 ├── functional-annotation
 ├── pathways-and-systems
 └── annotation-summary
-    └── ERZ12345_annotation_summary.gff.gz
+    ├── ERZ12345_annotation_summary.gff.gz
+    ├── ERZ12345_annotation_summary.gff.gz.gzi
+    └── ERZ12345_annotation_summary.gff.gz.csi
 ```
 
 #### Output files
@@ -288,7 +316,7 @@ The IDs of assemblies that have been analysed are aggregated into a top-level fi
 
 ```
 ERZ12345,success
-ERZ56789,success
+ERZ56789,invalid_summary_gff
 ```
 
 #### The possible statuses are
@@ -298,10 +326,34 @@ ERZ56789,success
 | success             | The assembly was successfully annotated                        |
 | invalid_summary_gff | The assembly summary GFF file is not valid, treat with caution |
 
+### QC failed assemblies
+
+The IDs of assemblies that have been failed in the QC step are aggregated into a top-level file (`qc_failed_assemblies.csv`), which looks like this:
+
+```
+ERZ12346,insufficient_contigs_after_length_filtering
+ERZ56790,insufficient_contigs_after_n_content_filtering
+```
+
+#### The possible QC failed statuses are
+
+| Status                                         | Description                                                                |
+| ---------------------------------------------- | -------------------------------------------------------------------------- |
+| insufficient_contigs_after_length_filtering    | No contigs remained after applying the minimum length filter.              |
+| insufficient_contigs_after_n_content_filtering | No contigs remained after filtering out sequences with high N-base content |
+
 ### MultiQC
 
 In addition to generating MultiQC reports for each assembly, the pipeline also produces per-study reports, which can be found in the `multiqc/` directory.
 
-### dram-distill
+### DRAM-distill
 
 Just as the pipeline generates https://github.com/WrightonLabCSU/DRAM outputs on a per-assembly basis, it also produces similar outputs on a per-study basis, which are located in the `dram-distill/` directory by concatenating assembly-level files.
+
+### Downstream samplesheets
+
+The pipeline also generates downstream samplesheets for other pipelines in the `downstream_samplesheets/` directory.
+
+### Pipeline info
+
+The pipeline generates detailed execution reports, timelines, traces, and other metadata in the `pipeline_info/` directory, providing comprehensive information about each pipeline run.

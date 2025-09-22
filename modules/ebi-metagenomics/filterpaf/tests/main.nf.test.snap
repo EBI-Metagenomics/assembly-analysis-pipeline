@@ -1,0 +1,68 @@
+{
+    "filterpaf - stub": {
+        "content": [
+            {
+                "0": [
+                    [
+                        {
+                            "id": "test"
+                        },
+                        "test.txt:md5,d41d8cd98f00b204e9800998ecf8427e"
+                    ]
+                ],
+                "1": [
+                    "versions.yml:md5,36fa37c1d22eb18fb4303cc848e8bf0a"
+                ],
+                "mapped_contigs_txt": [
+                    [
+                        {
+                            "id": "test"
+                        },
+                        "test.txt:md5,d41d8cd98f00b204e9800998ecf8427e"
+                    ]
+                ],
+                "versions": [
+                    "versions.yml:md5,36fa37c1d22eb18fb4303cc848e8bf0a"
+                ]
+            }
+        ],
+        "meta": {
+            "nf-test": "0.9.2",
+            "nextflow": "25.04.4"
+        },
+        "timestamp": "2025-07-02T21:18:43.443688"
+    },
+    "filterpaf": {
+        "content": [
+            {
+                "0": [
+                    [
+                        {
+                            "id": "test"
+                        },
+                        "test.txt:md5,51e09c5bb215ecd7e9bf0ad82316f13b"
+                    ]
+                ],
+                "1": [
+                    "versions.yml:md5,36fa37c1d22eb18fb4303cc848e8bf0a"
+                ],
+                "mapped_contigs_txt": [
+                    [
+                        {
+                            "id": "test"
+                        },
+                        "test.txt:md5,51e09c5bb215ecd7e9bf0ad82316f13b"
+                    ]
+                ],
+                "versions": [
+                    "versions.yml:md5,36fa37c1d22eb18fb4303cc848e8bf0a"
+                ]
+            }
+        ],
+        "meta": {
+            "nf-test": "0.9.2",
+            "nextflow": "25.04.4"
+        },
+        "timestamp": "2025-07-02T21:18:41.385213"
+    }
+}
