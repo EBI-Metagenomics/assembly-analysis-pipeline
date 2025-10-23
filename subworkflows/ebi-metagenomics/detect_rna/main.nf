@@ -37,17 +37,19 @@ workflow DETECT_RNA {
     if (chunk_flag){
         // Chunk the fasta into files with at most params.proteins_chunksize sequences
         SEQKIT_SPLIT2(
-            ch_fasta
+            ch_fasta,
+            params.bgc_contigs_chunksize // Define a chunk size for this one
         )
         ch_versions = ch_versions.mix(SEQKIT_SPLIT2.out.versions)
 
-        ch_sequences = SEQKIT_SPLIT2.out.reads.transpose()
+        ch_sequences = SEQKIT_SPLIT2.out.assembly.transpose()
     }
 
     if ( mode == 'cmsearch' ) {
         INFERNAL_CMSEARCH(
             ch_sequences,
-            rfam
+            rfam,
+            params.rfam_version
         )
         ch_versions = ch_versions.mix(INFERNAL_CMSEARCH.out.versions.first())
         cmsearch_ch = INFERNAL_CMSEARCH.out.cmsearch_tbl

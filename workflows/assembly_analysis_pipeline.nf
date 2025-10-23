@@ -40,7 +40,7 @@ include { CONTIGS_TAXONOMIC_CLASSIFICATION   } from '../subworkflows/ebi-metagen
 
 include { RENAME_CONTIGS                     } from '../modules/local/rename_contigs'
 include { GFF_SUMMARY                        } from '../subworkflows/local/gff_summary'
-include { RNA_ANNOTATION                     } from '../subworkflows/local/rna_annotation'
+include { DETECT_RNA                         } from '../subworkflows/ebi-metagenomics/detect_rna/main'
 include { FUNCTIONAL_ANNOTATION              } from '../subworkflows/local/functional_annotation'
 include { PATHWAYS_AND_SYSTEMS               } from '../subworkflows/local/pathways_and_systems'
 
@@ -133,17 +133,22 @@ workflow ASSEMBLY_ANALYSIS_PIPELINE {
     /*
      * Run the RNA detection subworklow
     */
-    RNA_ANNOTATION(
-        ASSEMBLY_QC.out.assembly_qc_pass
+    DETECT_RNA(
+        ASSEMBLY_QC.out.assembly_qc_pass,
+        file(params.rfam_covariance_models, checkIfExists: true),
+        file(params.rfam_claninfo, checkIfExists: true),
+        "cmsearch",
+        false,
+        true
     )
-    ch_versions = ch_versions.mix(RNA_ANNOTATION.out.versions)
+    ch_versions = ch_versions.mix(DETECT_RNA.out.versions)
 
     /*
     * Protein prediction with the combined-gene-caller, and masking the rRNAs genes
     */
     // We need to sync the sequences and the rRNA outputs //
     ASSEMBLY_QC.out.assembly_qc_pass
-        .join(RNA_ANNOTATION.out.ssu_lsu_coords)
+        .join(DETECT_RNA.out.concat_ssu_lsu_coords)
         .multiMap { meta, assembly_fasta, ssu_lsu_coords ->
             assembly: [meta, assembly_fasta]
             ssu_lsu_coords: [meta, ssu_lsu_coords]
