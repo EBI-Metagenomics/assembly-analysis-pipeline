@@ -358,7 +358,7 @@
                 },
                 "rfam_covariance_models": {
                     "description": "Path to the Rfam covariance models file to use with cmsearch/cmscan.",
-                    "format": "file-path",
+                    "format": "directory-path",
                     "help": "This file contains the covariance model for RNA families from the Rfam database.",
                     "type": "string"
                 },
