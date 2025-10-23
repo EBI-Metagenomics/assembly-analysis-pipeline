@@ -1,5 +1,6 @@
-
-include { PYRODIGAL                } from '../../../modules/ebi-metagenomics/pyrodigal/main'
+/* NF-CORE */
+include { PYRODIGAL                } from '../../../modules/nf-core/pyrodigal/main'
+/* EBI-METAGENOMICS */
 include { FRAGGENESCANRS           } from '../../../modules/ebi-metagenomics/fraggenescanrs/main'
 include { COMBINEDGENECALLER_MERGE } from '../../../modules/ebi-metagenomics/combinedgenecaller/merge/main'
 
@@ -35,13 +36,13 @@ workflow COMBINED_GENE_CALLER {
         ch_mask_file, remainder: true
     )
 
-    ch_merge = ch_annotations.map { meta, prodigal_sco, prodigal_nt_fasta, prodigal_aa_fasta, frag_gene_annot, frag_nt_fasta, frag_aa_fasta, mask ->
+    ch_merge = ch_annotations.map { meta, prodigal_gff, prodigal_nt_fasta, prodigal_aa_fasta, frag_gff, frag_nt_fasta, frag_aa_fasta, mask ->
         return [
             meta,
-            prodigal_sco,
+            prodigal_gff,
             prodigal_nt_fasta,
             prodigal_aa_fasta,
-            frag_gene_annot,
+            frag_gff,
             frag_nt_fasta,
             frag_aa_fasta,
             mask ?: []

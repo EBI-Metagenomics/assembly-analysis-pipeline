@@ -13,7 +13,6 @@ process INFERNAL_CMSEARCH {
     input:
     tuple val(meta), path(seqdb)
     path covariance_model_database
-    val rfam_version
 
     output:
     tuple val(meta), path("*.cmsearch_matches.tbl.gz"), emit: cmsearch_tbl
@@ -37,7 +36,7 @@ process INFERNAL_CMSEARCH {
         --cpu $task.cpus \\
         $args \\
         --tblout ${prefix}.cmsearch_matches.tbl \\
-        $covariance_model_database \\
+        $covariance_model_database/*.cm \\
         $seqdb_name
 
     gzip -n ${prefix}.cmsearch_matches.tbl
@@ -45,7 +44,6 @@ process INFERNAL_CMSEARCH {
     cat <<-END_VERSIONS > versions.yml
     "${task.process}":
         cmsearch: \$(cmsearch -h | grep -o '^# INFERNAL [0-9.]*' | sed 's/^# INFERNAL *//')
-        Rfam version: $rfam_version
     END_VERSIONS
     """
 
@@ -59,7 +57,6 @@ process INFERNAL_CMSEARCH {
     cat <<-END_VERSIONS > versions.yml
     "${task.process}":
         cmsearch: \$(cmsearch -h | grep -o '^# INFERNAL [0-9.]*' | sed 's/^# INFERNAL *//')
-        Rfam version: $rfam_version
     END_VERSIONS
     """
 }

@@ -1,4 +1,6 @@
-Changes in module 'ebi-metagenomics/combinedgenecaller/merge'
+Changes in component 'ebi-metagenomics/combinedgenecaller/merge'
+'modules/ebi-metagenomics/combinedgenecaller/merge/meta.yml' is unchanged
+Changes in 'combinedgenecaller/merge/main.nf':
 --- modules/ebi-metagenomics/combinedgenecaller/merge/main.nf
 +++ modules/ebi-metagenomics/combinedgenecaller/merge/main.nf
 @@ -3,8 +3,8 @@
@@ -13,4 +15,7 @@ Changes in module 'ebi-metagenomics/combinedgenecaller/merge'
      input:
      tuple val(meta), path(pyrodigal_gff, stageAs: "pyrodigal/"), path(pyrodigal_ffn, stageAs: "pyrodigal/"), path(pyrodigal_faa, stageAs: "pyrodigal/"), path(fgs_gff, stageAs: "fgsrs/"), path(fgs_ffn, stageAs: "fgsrs/"), path(fgs_faa, stageAs: "fgsrs/"), path(mask)
 
+'modules/ebi-metagenomics/combinedgenecaller/merge/tests/main.nf.test.snap' is unchanged
+'modules/ebi-metagenomics/combinedgenecaller/merge/tests/tags.yml' is unchanged
+'modules/ebi-metagenomics/combinedgenecaller/merge/tests/main.nf.test' is unchanged
 ************************************************************

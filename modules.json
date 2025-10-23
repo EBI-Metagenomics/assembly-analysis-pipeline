@@ -14,7 +14,7 @@
                     "cat/cat": {
                         "branch": "master",
                         "git_sha": "666652151335353eef2fcd58880bcef5bc2928e1",
-                        "installed_by": ["modules"],
+                        "installed_by": ["detect_rna", "modules"],
                         "patch": "modules/nf-core/cat/cat/cat-cat.diff"
                     },
                     "csvtk/concat": {
@@ -53,7 +53,7 @@
                     "pyrodigal": {
                         "branch": "master",
                         "git_sha": "938e803109104e30773f76a7142442722498fef1",
-                        "installed_by": ["modules"]
+                        "installed_by": ["_", "a", "b", "c", "d", "e", "g", "i", "l", "m", "modules", "n", "o", "r"]
                     },
                     "quast": {
                         "branch": "master",
@@ -69,7 +69,7 @@
                     "seqkit/split2": {
                         "branch": "master",
                         "git_sha": "666652151335353eef2fcd58880bcef5bc2928e1",
-                        "installed_by": ["modules"],
+                        "installed_by": ["detect_rna", "modules"],
                         "patch": "modules/nf-core/seqkit/split2/seqkit-split2.diff"
                     },
                     "tabix/bgzip": {
@@ -120,15 +120,14 @@
                     },
                     "combinedgenecaller/merge": {
                         "branch": "main",
-                        "git_sha": "b84a0c52b92eef58ba2aeb2d22ae45d5bc6ae294",
+                        "git_sha": "300036a0fc36abe2c49a846507b3d49e4c254ea6",
                         "installed_by": ["combined_gene_caller"],
                         "patch": "modules/ebi-metagenomics/combinedgenecaller/merge/combinedgenecaller-merge.diff"
                     },
                     "convertcmscantocmsearch": {
                         "branch": "main",
                         "git_sha": "937985d6147b25b74700f2eb6fc41ab4150ad7d4",
-                        "installed_by": ["detect_rna"],
-                        "patch": "modules/ebi-metagenomics/convertcmscantocmsearch/convertcmscantocmsearch.diff"
+                        "installed_by": ["detect_rna"]
                     },
                     "dbcan/easysubstrate": {
                         "branch": "main",
@@ -157,9 +156,8 @@
                     },
                     "extractcoords": {
                         "branch": "main",
-                        "git_sha": "33ea81307e5bf9772861d2a3cb1b4f4694a04db6",
-                        "installed_by": ["modules"],
-                        "patch": "modules/ebi-metagenomics/extractcoords/extractcoords.diff"
+                        "git_sha": "b8ce29264034badcba2e6bbdd69013220a3fa973",
+                        "installed_by": ["detect_rna"]
                     },
                     "filterpaf": {
                         "branch": "main",
@@ -191,9 +189,8 @@
                     },
                     "infernal/cmsearch": {
                         "branch": "main",
-                        "git_sha": "62e22fb1fd131d27ed043f305f317a0cf741b900",
-                        "installed_by": ["detect_rna"],
-                        "patch": "modules/ebi-metagenomics/infernal/cmsearch/infernal-cmsearch.diff"
+                        "git_sha": "caafb0cac8335cc1834a01091d70bb6ad60a5bf8",
+                        "installed_by": ["detect_rna"]
                     },
                     "interproscan": {
                         "branch": "main",
@@ -269,7 +266,7 @@
                     },
                     "combined_gene_caller": {
                         "branch": "main",
-                        "git_sha": "b84a0c52b92eef58ba2aeb2d22ae45d5bc6ae294",
+                        "git_sha": "1da46d2d25cc95ff87b7ca6206090223abe4c35c",
                         "installed_by": ["subworkflows"]
                     },
                     "contigs_taxonomic_classification": {
@@ -286,9 +283,8 @@
                     },
                     "detect_rna": {
                         "branch": "main",
-                        "git_sha": "937985d6147b25b74700f2eb6fc41ab4150ad7d4",
-                        "installed_by": ["subworkflows"],
-                        "patch": "subworkflows/ebi-metagenomics/detect_rna/detect_rna.diff"
+                        "git_sha": "fa6ca9ca102988669fe429250f43910132fb2fe0",
+                        "installed_by": ["subworkflows"]
                     },
                     "goslim_swf": {
                         "branch": "main",
