@@ -383,13 +383,13 @@ workflow ASSEMBLY_ANALYSIS_PIPELINE {
 
     // VIRIfy samplesheet //
     ASSEMBLY_QC.out.assembly_qc_pass.join(
-        COMBINED_GENE_CALLER.out.gff
+        COMBINED_GENE_CALLER.out.faa
     ).map {
-        meta, assembly, gff -> {
+        meta, _assembly, _faa -> {
             // We need to handle relative paths
             def outdir_file = file(params.outdir)
-            def output_full_path = "${outdir_file.getParent()}/${outdir_file.getName()}"
-            return "${meta.id},,,${output_full_path}/${assembly.name},${output_full_path}/${gff.name}"
+            def output_full_path = "${outdir_file.getParent()}/${outdir_file.getName()}/${meta.id}"
+            return "${meta.id},,,${output_full_path}/qc/${meta.id}_filtered_contigs.fasta.gz,${output_full_path}/cds/${meta.id}_predicted_cds.faa.gz"
         }
     }.collectFile(
         name: "virify_samplesheet.csv",
