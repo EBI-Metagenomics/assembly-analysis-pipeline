@@ -90,9 +90,10 @@ workflow DETECT_RNA {
     )
     ch_versions = ch_versions.mix(EASEL_ESLSFETCH.out.versions.first())
 
+    // DIFF: ASA uses the cmsearchdeoverlap output instead of matched_seqs_with_coords
     EXTRACTCOORDS(
         EASEL_ESLSFETCH.out.easel_coords,
-        EASEL_ESLSFETCH.out.matched_seqs_with_coords,
+        ch_cmsearchdeoverlap,
         separate_subunits
     )
     ch_versions = ch_versions.mix(EXTRACTCOORDS.out.versions.first())
