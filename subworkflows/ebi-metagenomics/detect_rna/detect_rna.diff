@@ -1,0 +1,46 @@
+@@ -48,11 +48,13 @@
+     ch_sequences = ch_fasta
+     if (chunk_flag){
+         // Chunk the fasta into files with at most params.proteins_chunksize sequences
+-        SEQKIT_SPLIT2(
+-            ch_fasta
+-        )
+-        ch_versions = ch_versions.mix(SEQKIT_SPLIT2.out.versions)
+-
+-        ch_sequences = SEQKIT_SPLIT2.out.reads.transpose()
++        SEQKIT_SPLIT2(
++            ch_fasta,
++            params.bgc_contigs_chunksize // Define a chunk size for this one
++        )
++        ch_versions = ch_versions.mix(SEQKIT_SPLIT2.out.versions)
++
++        ch_sequences = SEQKIT_SPLIT2.out.assembly.transpose()
+     }
+
+     if ( mode == 'cmsearch' ) {
+@@ -60,8 +62,9 @@
+         INFERNAL_CMSEARCH(
+-            ch_sequences,
+-            rfam
++            ch_sequences,
++            rfam,
++            params.rfam_version
+         )
+         ch_versions = ch_versions.mix(INFERNAL_CMSEARCH.out.versions.first())
+         cmsearch_ch = INFERNAL_CMSEARCH.out.cmsearch_tbl
+@@ -106,10 +109,12 @@
+     ch_versions = ch_versions.mix(EASEL_ESLSFETCH.out.versions.first())
+
+-    EXTRACTCOORDS(
+-        EASEL_ESLSFETCH.out.easel_coords,
+-        EASEL_ESLSFETCH.out.matched_seqs_with_coords,
+-        separate_subunits
+-    )
+-    ch_versions = ch_versions.mix(EXTRACTCOORDS.out.versions.first())
++    // DIFF: ASA uses the cmsearchdeoverlap output instead of matched_seqs_with_coords
++    EXTRACTCOORDS(
++        EASEL_ESLSFETCH.out.easel_coords,
++        ch_cmsearchdeoverlap,
++        separate_subunits
++    )
++    ch_versions = ch_versions.mix(EXTRACTCOORDS.out.versions.first())
