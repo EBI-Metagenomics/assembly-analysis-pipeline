@@ -389,7 +389,7 @@ workflow ASSEMBLY_ANALYSIS_PIPELINE {
             // We need to handle relative paths
             def outdir_file = file(params.outdir)
             def output_full_path = "${outdir_file.getParent()}/${outdir_file.getName()}/${meta.id}"
-            return "${meta.id},,,${output_full_path}/qc/${meta.id}_filtered_contigs.fasta.gz,${output_full_path}/cds/${meta.id}_predicted_cds.faa.gz"
+            return "${meta.id},${output_full_path}/qc/${meta.id}_filtered_contigs.fasta.gz,,,${output_full_path}/cds/${meta.id}_predicted_cds.faa.gz"
         }
     }.collectFile(
         name: "virify_samplesheet.csv",
