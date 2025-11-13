@@ -317,7 +317,7 @@
                     "type": "string"
                 },
                 "interproscan_database_version": {
-                    "default": "5.73-104.0",
+                    "default": "5.76-107.0",
                     "description": "The version of the interproscan database.",
                     "fa_icon": "fas fa-code-branch",
                     "type": "string"
