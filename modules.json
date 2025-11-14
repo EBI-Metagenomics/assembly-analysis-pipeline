@@ -75,7 +75,8 @@
                     "tabix/bgzip": {
                         "branch": "master",
                         "git_sha": "69fdb99a8affa55adfda16966aa4568e103dc1b6",
-                        "installed_by": ["modules"]
+                        "installed_by": ["modules"],
+                        "patch": "modules/nf-core/tabix/bgzip/tabix-bgzip.diff"
                     },
                     "tabix/bgziptabix": {
                         "branch": "master",
@@ -147,7 +148,8 @@
                     "dram/distill": {
                         "branch": "main",
                         "git_sha": "2ba3fbfba678c0c8e1e7537fa908b04575b5b916",
-                        "installed_by": ["modules"]
+                        "installed_by": ["modules"],
+                        "patch": "modules/ebi-metagenomics/dram/distill/dram-distill.diff"
                     },
                     "easel/eslsfetch": {
                         "branch": "main",
@@ -190,7 +192,8 @@
                     "infernal/cmsearch": {
                         "branch": "main",
                         "git_sha": "caafb0cac8335cc1834a01091d70bb6ad60a5bf8",
-                        "installed_by": ["detect_rna"]
+                        "installed_by": ["detect_rna"],
+                        "patch": "modules/ebi-metagenomics/infernal/cmsearch/infernal-cmsearch.diff"
                     },
                     "interproscan": {
                         "branch": "main",
@@ -283,7 +286,8 @@
                     "detect_rna": {
                         "branch": "main",
                         "git_sha": "fa6ca9ca102988669fe429250f43910132fb2fe0",
-                        "installed_by": ["subworkflows"]
+                        "installed_by": ["subworkflows"],
+                        "patch": "subworkflows/ebi-metagenomics/detect_rna/detect_rna.diff"
                     },
                     "goslim_swf": {
                         "branch": "main",
