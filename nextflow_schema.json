@@ -377,7 +377,7 @@
                     "type": "string"
                 },
                 "uniref90rhea_diamond_database_version": {
-                    "default": "2025_01",
+                    "default": "2025_11",
                     "description": "The version of the UniRef90 used to generate the database.",
                     "fa_icon": "fas fa-database",
                     "type": "string"
