@@ -1,58 +1,46 @@
-Changes in component 'ebi-metagenomics/detect_rna'
-'subworkflows/ebi-metagenomics/detect_rna/meta.yml' is unchanged
-Changes in 'detect_rna/main.nf':
---- subworkflows/ebi-metagenomics/detect_rna/main.nf
-+++ subworkflows/ebi-metagenomics/detect_rna/main.nf
-@@ -10,8 +10,8 @@
- include { INFERNAL_CMSCAN             } from '../../../modules/ebi-metagenomics/infernal/cmscan/main'
- include { CONVERTCMSCANTOCMSEARCH     } from '../../../modules/ebi-metagenomics/convertcmscantocmsearch/main'
- include { CMSEARCHTBLOUTDEOVERLAP     } from '../../../modules/ebi-metagenomics/cmsearchtbloutdeoverlap/main'
-+// Because we need this SWF to run on chunked contigs, we tool easel to the calling workflow instead
- include { EASEL_ESLSFETCH             } from '../../../modules/ebi-metagenomics/easel/eslsfetch/main'
+@@ -48,11 +48,13 @@
+     ch_sequences = ch_fasta
+     if (chunk_flag){
+         // Chunk the fasta into files with at most params.proteins_chunksize sequences
+-        SEQKIT_SPLIT2(
+-            ch_fasta
+-        )
+-        ch_versions = ch_versions.mix(SEQKIT_SPLIT2.out.versions)
 -
- 
- workflow DETECT_RNA {
- 
-@@ -20,6 +20,7 @@
-     rfam         // folder: rfam for cmsearch/cmscan
-     claninfo     // file: claninfo for cmsearchtbloutdeoverlap
-     mode         // cmsearch/cmscan
-+    rfam_version // Rfam version
- 
-     main:
- 
-@@ -29,7 +30,8 @@
+-        ch_sequences = SEQKIT_SPLIT2.out.reads.transpose()
++        SEQKIT_SPLIT2(
++            ch_fasta,
++            params.bgc_contigs_chunksize // Define a chunk size for this one
++        )
++        ch_versions = ch_versions.mix(SEQKIT_SPLIT2.out.versions)
++
++        ch_sequences = SEQKIT_SPLIT2.out.assembly.transpose()
+     }
+
      if ( mode == 'cmsearch' ) {
+@@ -60,8 +62,9 @@
          INFERNAL_CMSEARCH(
-             ch_fasta,
+-            ch_sequences,
 -            rfam
++            ch_sequences,
 +            rfam,
-+            rfam_version
++            params.rfam_version
          )
          ch_versions = ch_versions.mix(INFERNAL_CMSEARCH.out.versions.first())
          cmsearch_ch = INFERNAL_CMSEARCH.out.cmsearch_tbl
-@@ -53,16 +55,8 @@
-     )
-     ch_versions = ch_versions.mix(CMSEARCHTBLOUTDEOVERLAP.out.versions.first())
- 
--    ch_easel = ch_fasta
--                .join(CMSEARCHTBLOUTDEOVERLAP.out.cmsearch_tblout_deoverlapped)
--    EASEL_ESLSFETCH(
--        ch_easel
--    )
--    ch_versions = ch_versions.mix(EASEL_ESLSFETCH.out.versions.first())
--
-     emit:
-     cmsearch_deoverlap_out = CMSEARCHTBLOUTDEOVERLAP.out.cmsearch_tblout_deoverlapped   // channel: [ val(meta), [ deoverlapped ] ]
--    easel_out              = EASEL_ESLSFETCH.out.easel_coords                           // channel: [ val(meta), [ fasta ] ]
-     versions               = ch_versions                                                // channel: [ versions.yml ]
- }
- 
+@@ -106,10 +109,12 @@
+     ch_versions = ch_versions.mix(EASEL_ESLSFETCH.out.versions.first())
 
-'subworkflows/ebi-metagenomics/detect_rna/tests/ribo.claninfo' is unchanged
-'subworkflows/ebi-metagenomics/detect_rna/tests/main.nf.test.snap' is unchanged
-'subworkflows/ebi-metagenomics/detect_rna/tests/tags.yml' is unchanged
-'subworkflows/ebi-metagenomics/detect_rna/tests/nextflow.config' is unchanged
-'subworkflows/ebi-metagenomics/detect_rna/tests/main.nf.test' is unchanged
-'subworkflows/ebi-metagenomics/detect_rna/tests/rfam/test.cm' is unchanged
-************************************************************
+-    EXTRACTCOORDS(
+-        EASEL_ESLSFETCH.out.easel_coords,
+-        EASEL_ESLSFETCH.out.matched_seqs_with_coords,
+-        separate_subunits
+-    )
+-    ch_versions = ch_versions.mix(EXTRACTCOORDS.out.versions.first())
++    // DIFF: ASA uses the cmsearchdeoverlap output instead of matched_seqs_with_coords
++    EXTRACTCOORDS(
++        EASEL_ESLSFETCH.out.easel_coords,
++        ch_cmsearchdeoverlap,
++        separate_subunits
++    )
++    ch_versions = ch_versions.mix(EXTRACTCOORDS.out.versions.first())

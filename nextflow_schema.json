@@ -317,7 +317,7 @@
                     "type": "string"
                 },
                 "interproscan_database_version": {
-                    "default": "5.73-104.0",
+                    "default": "5.76-107.0",
                     "description": "The version of the interproscan database.",
                     "fa_icon": "fas fa-code-branch",
                     "type": "string"
@@ -358,7 +358,7 @@
                 },
                 "rfam_covariance_models": {
                     "description": "Path to the Rfam covariance models file to use with cmsearch/cmscan.",
-                    "format": "file-path",
+                    "format": "directory-path",
                     "help": "This file contains the covariance model for RNA families from the Rfam database.",
                     "type": "string"
                 },
@@ -377,7 +377,7 @@
                     "type": "string"
                 },
                 "uniref90rhea_diamond_database_version": {
-                    "default": "2025_01",
+                    "default": "2025_11",
                     "description": "The version of the UniRef90 used to generate the database.",
                     "fa_icon": "fas fa-database",
                     "type": "string"
