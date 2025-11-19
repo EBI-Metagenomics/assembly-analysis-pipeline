@@ -1,9 +1,6 @@
 name: CI
 # This workflow runs the pipeline with the minimal test dataset to check that it completes without any syntax errors
 on:
-  push:
-    branches:
-      - dev
   pull_request:
   release:
     types: [published]
@@ -42,6 +39,11 @@ jobs:
     steps:
       - name: Check out pipeline code
         uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4
+
+      - name: Free up disk space
+        uses: jlumbroso/free-disk-space@main
+        with:
+          tool-cache: false
 
       - name: Install Nextflow
         uses: nf-core/setup-nextflow@v2
