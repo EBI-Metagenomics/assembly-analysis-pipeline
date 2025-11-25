@@ -125,6 +125,8 @@ workflow PATHWAYS_AND_SYSTEMS {
     )
     ch_versions = ch_versions.mix(MERGE_ANTISMASH_JSON.out.versions)
 
+    // AntiSMASH may not produce any results, the GFF files maybe "empty" .. just the one line (the GFF header)
+    // The summary won't be generated in that case
     ANTISMASH_SUMMARY(
         CONCATENATE_ANTISMASH_GFFS.out.concatenated_gff
     )
@@ -138,7 +140,7 @@ workflow PATHWAYS_AND_SYSTEMS {
     /* should be problematic as the TSV is relativly small (<500MB)                      */
     /*************************************************************************************/
     def sanntis_channel = channel.empty()
-    // Note: same weirdness ass antismash_channel
+    // Note: same weirdness as antismash_channel
     sanntis_channel = ch_contigs_and_predicted_proteins.combine(ch_protein_chunks, by: 0)
         .map { meta, _all_contigs_fasta, _faa, _gff, ips_tsv, faa_chunk -> [meta, ips_tsv, [], faa_chunk] }
 
