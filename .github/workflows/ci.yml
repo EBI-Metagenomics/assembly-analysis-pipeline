@@ -53,6 +53,11 @@ jobs:
         with:
           version: "${{ matrix.NXF_VER }}"
 
+      - name: Install nf-test
+        uses: nf-core/setup-nf-test@v1
+        with:
+          install-pdiff: true
+
       - name: Set up Apptainer
         if: matrix.profile == 'singularity'
         uses: eWaterCycle/setup-apptainer@main
@@ -63,11 +68,53 @@ jobs:
           mkdir -p $NXF_SINGULARITY_CACHEDIR
           mkdir -p $NXF_SINGULARITY_LIBRARYDIR
 
-      - name: "Run pipeline with test data ${{ matrix.NXF_VER }} | ${{ matrix.test_name }} | ${{ matrix.profile }}"
+      - name: Run nf-test
+        shell: bash
+        env:
+          NFT_WORKDIR: "~"
         run: |
-          nextflow run ${GITHUB_WORKSPACE} -profile ${{ matrix.test_name }},${{ matrix.profile }} --outdir ./results
+          nf-test test tests/default.nf.test \
+            --profile=+${{ matrix.profile }} \
+            --ci \
+            --verbose \
+            --tap=test.tap
 
-          grep -q "ERZ101,success" results/analysed_assemblies.csv || { echo "ERZ101 missing from end of run csv"; exit 1; }
-          grep -q "ERZ999,insufficient_contigs_after_n_content_filtering" results/qc_failed_assemblies.csv || { echo "ERZ999 missing from the qc failed csv"; exit 1; }
-          grep -q "ERZ666,insufficient_contigs_after_length_filtering" results/qc_failed_assemblies.csv || { echo "ERZ666 missing from the qc failed csv"; exit 1; }
-          echo "All expected results found"
+            # Save the absolute path of the test.tap file to the output
+            echo "tap_file_path=$(realpath test.tap)" >> $GITHUB_OUTPUT
+
+      - name: Generate test summary
+        if: always()
+        shell: bash
+        run: |
+          # Add header if it doesn't exist (using a token file to track this)
+          if [ ! -f ".summary_header" ]; then
+            echo "# nf-test results" >> $GITHUB_STEP_SUMMARY
+            echo "" >> $GITHUB_STEP_SUMMARY
+            echo "| Status | Test Name | Profile |" >> $GITHUB_STEP_SUMMARY
+            echo "|:------:|-----------|---------|" >> $GITHUB_STEP_SUMMARY
+            touch .summary_header
+          fi
+
+          if [ -f test.tap ]; then
+            while IFS= read -r line; do
+              if [[ $line =~ ^ok ]]; then
+                test_name="${line#ok }"
+                # Remove the test number from the beginning
+                test_name="${test_name#* }"
+                echo "| ✅ | ${test_name} | ${{ matrix.profile }} |" >> $GITHUB_STEP_SUMMARY
+              elif [[ $line =~ ^not\ ok ]]; then
+                test_name="${line#not ok }"
+                # Remove the test number from the beginning
+                test_name="${test_name#* }"
+                echo "| ❌ | ${test_name} | ${{ matrix.profile }} |" >> $GITHUB_STEP_SUMMARY
+              fi
+            done < test.tap
+          else
+            echo "| ⚠️ | No test results found | ${{ matrix.profile }} |" >> $GITHUB_STEP_SUMMARY
+          fi
+
+      - name: Clean up
+        if: always()
+        shell: bash
+        run: |
+          sudo rm -rf /home/ubuntu/tests/

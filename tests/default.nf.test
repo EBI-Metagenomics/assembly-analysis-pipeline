@@ -5,8 +5,6 @@ nextflow_pipeline {
     tag "pipeline"
 
     test("-profile test") {
-        // This allows to also check files published with the new workflow output syntax
-        options "-output-dir $outputDir"
 
         when {
             params {
@@ -19,6 +17,10 @@ nextflow_pipeline {
             def stable_name = getAllFilesFromDir(params.outdir, relative: true, includeDir: true, ignore: ['pipeline_info/*.{html,json,txt}'])
             // stable_path: All files in ${params.outdir}/ with stable content
             def stable_path = getAllFilesFromDir(params.outdir, ignoreFile: 'tests/.nftignore')
+
+            // TODO: some files shouldn't be ignored... the content should tested (not just the checksum)
+            // ERZ101/cds/ERZ101_predicted_orf.ffn.gz
+            // ERZ101/cds/ERZ101_predicted_cds.faa.gz
 
             assertAll(
                 { assert workflow.success},

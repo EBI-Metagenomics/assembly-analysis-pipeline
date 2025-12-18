@@ -1,6 +1,6 @@
 repository_type: pipeline
 
-nf_core_version: 3.2.0
+nf_core_version: 3.3.2
 
 org_path: ebi-metagenomics
 
@@ -18,6 +18,7 @@ lint:
     - assets/email_template.html
     - assets/sendmail_template.txt
     - LICENSE
+    - .prettierrc.yml
   nextflow_config:
     - manifest.name
     - manifest.homePage
@@ -28,6 +29,9 @@ lint:
   multiqc_config:
     - report_comment
   files_exist:
+    - .github/workflows/nf-test.yml
+    - .github/actions/get-shards/action.yml
+    - .github/actions/nf-test/action.yml
     - .github/workflows/linting_comment.yml
     - .github/workflows/branch.yml
     - conf/igenomes.config
@@ -43,6 +47,8 @@ lint:
     - .github/ISSUE_TEMPLATE/config.yml
     - .github/workflows/awstest.yml
     - .github/workflows/awsfulltest.yml
+  nf_test_content:
+    - tests/nextflow.config
   merge_markers:
     - subworkflows/ebi-metagenomics/detect_rna/tests/rfam/test.cm.i1p
     - subworkflows/ebi-metagenomics/detect_rna/tests/rfam/test.cm.i1m
@@ -59,7 +65,7 @@ template:
     protein function prediction, and identifies metabolic pathways and biosynthetic
     gene clusters.
   author: mberacochea
-  version: 1.0.0dev
+  version: 6.0.0-rc.3
   force: true
   outdir: .
   skip_features:

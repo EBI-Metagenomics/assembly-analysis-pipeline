@@ -13,3 +13,4 @@ testing*
 null/
 
 .nf-test/
+.nf-test.log

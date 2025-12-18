@@ -1,0 +1,29 @@
+Changes in component 'nf-core/gt/gff3validator'
+'modules/nf-core/gt/gff3validator/environment.yml' is unchanged
+'modules/nf-core/gt/gff3validator/meta.yml' is unchanged
+Changes in 'gt/gff3validator/main.nf':
+--- modules/nf-core/gt/gff3validator/main.nf
++++ modules/nf-core/gt/gff3validator/main.nf
+@@ -44,7 +44,7 @@
+ 
+     cat <<-END_VERSIONS > versions.yml
+     "${task.process}":
+-        genometools: \$(gt --version | head -1 | sed 's/gt (GenomeTools) //')
++        genometools: \$(gt --version | head -1 | sed 's/.*) //')
+     END_VERSIONS
+     """
+ 
+@@ -55,7 +55,7 @@
+ 
+     cat <<-END_VERSIONS > versions.yml
+     "${task.process}":
+-        genometools: \$(gt --version | head -1 | sed 's/gt (GenomeTools) //')
++        genometools: \$(gt --version | head -1 | sed 's/.*) //')
+     END_VERSIONS
+     """
+ }
+
+'modules/nf-core/gt/gff3validator/tests/main.nf.test.snap' is unchanged
+'modules/nf-core/gt/gff3validator/tests/nextflow.config' is unchanged
+'modules/nf-core/gt/gff3validator/tests/main.nf.test' is unchanged
+************************************************************
