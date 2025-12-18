@@ -4,7 +4,11 @@ Changes in component 'ebi-metagenomics/catpack/contigs'
 Changes in 'catpack/contigs/main.nf':
 --- modules/ebi-metagenomics/catpack/contigs/main.nf
 +++ modules/ebi-metagenomics/catpack/contigs/main.nf
-@@ -16,7 +16,7 @@
+@@ -13,10 +13,11 @@
+     tuple val(meta3), path(taxonomy)
+     tuple val(meta4), path(proteins)
+     tuple val(meta5), path(diamond_table)
++    val cat_db_version
  
      output:
      tuple val(meta), path("*.ORF2LCA.txt"), emit: orf2lca
@@ -13,7 +17,7 @@ Changes in 'catpack/contigs/main.nf':
      tuple val(meta), path("*.log"), emit: log
      tuple val(meta), path("*.diamond"), optional: true, emit: diamond
      tuple val(meta), path("*.predicted_proteins.faa"), optional: true, emit: faa
-@@ -29,18 +29,23 @@
+@@ -29,12 +30,15 @@
      script:
      def args = task.ext.args ?: ''
      def prefix = task.ext.prefix ?: "${meta.id}"
@@ -31,14 +35,27 @@ Changes in 'catpack/contigs/main.nf':
          --database_folder ${database} \\
          --taxonomy_folder ${taxonomy} \\
          --out_prefix ${prefix} \\
-         ${premade_proteins} \\
+@@ -42,9 +46,12 @@
          ${premade_table} \\
          ${args}
-+
-+    gzip ${prefix}.contig2classification.txt
  
++    gzip ${prefix}.contig2classification.txt
++
      cat <<-END_VERSIONS > versions.yml
      "${task.process}":
+         catpack: \$(CAT_pack --version | sed 's/CAT_pack pack v//g;s/ .*//g')
++        catpack database: $cat_db_version
+     END_VERSIONS
+     """
+ 
+@@ -61,6 +68,7 @@
+     cat <<-END_VERSIONS > versions.yml
+     "${task.process}":
+         catpack: \$(CAT_pack --version | sed 's/CAT_pack pack v//g;s/ .*//g')
++        catpack database: $cat_db_version
+     END_VERSIONS
+     """
+ }
 
 'modules/ebi-metagenomics/catpack/contigs/tests/main.nf.test.snap' is unchanged
 'modules/ebi-metagenomics/catpack/contigs/tests/nextflow.config' is unchanged

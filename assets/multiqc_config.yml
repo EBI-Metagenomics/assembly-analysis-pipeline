@@ -14,6 +14,7 @@ report_section_order:
     order: 200
 
 export_plots: true
+show_analysis_paths: false
 
 disable_version_detection: true
 

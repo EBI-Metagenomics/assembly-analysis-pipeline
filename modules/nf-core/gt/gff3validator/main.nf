@@ -44,7 +44,7 @@ process GT_GFF3VALIDATOR {
 
     cat <<-END_VERSIONS > versions.yml
     "${task.process}":
-        genometools: \$(gt --version | head -1 | sed 's/gt (GenomeTools) //')
+        genometools: \$(gt --version | head -1 | sed 's/.*) //')
     END_VERSIONS
     """
 
@@ -55,7 +55,7 @@ process GT_GFF3VALIDATOR {
 
     cat <<-END_VERSIONS > versions.yml
     "${task.process}":
-        genometools: \$(gt --version | head -1 | sed 's/gt (GenomeTools) //')
+        genometools: \$(gt --version | head -1 | sed 's/.*) //')
     END_VERSIONS
     """
 }
