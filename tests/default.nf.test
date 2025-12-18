@@ -5,8 +5,6 @@ nextflow_pipeline {
     tag "pipeline"
 
     test("-profile test") {
-        // This allows to also check files published with the new workflow output syntax
-        options "-output-dir $outputDir"
 
         when {
             params {
