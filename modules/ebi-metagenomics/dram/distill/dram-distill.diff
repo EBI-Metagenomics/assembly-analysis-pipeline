@@ -1,0 +1,42 @@
+Changes in component 'ebi-metagenomics/dram/distill'
+'modules/ebi-metagenomics/dram/distill/meta.yml' is unchanged
+Changes in 'dram/distill/main.nf':
+--- modules/ebi-metagenomics/dram/distill/main.nf
++++ modules/ebi-metagenomics/dram/distill/main.nf
+@@ -19,6 +19,7 @@
+     input:
+     tuple val(meta), path(tsv_input)
+     path(dram_dbs)
++    val(dram_dbs_version)
+ 
+     output:
+     tuple val(meta), path("*_dram.html.gz")               , emit: html
+@@ -62,6 +63,7 @@
+     cat <<-END_VERSIONS > versions.yml
+     "${task.process}":
+         dram: $VERSION
++        dram databases: $dram_dbs_version
+     END_VERSIONS
+     """
+ 
+@@ -78,6 +80,7 @@
+     cat <<-END_VERSIONS > versions.yml
+     "${task.process}":
+         dram: $VERSION
++        dram databases: $dram_dbs_version
+     END_VERSIONS
+     """
+ }
+
+'modules/ebi-metagenomics/dram/distill/tests/main.nf.test.snap' is unchanged
+'modules/ebi-metagenomics/dram/distill/tests/nextflow.config' is unchanged
+'modules/ebi-metagenomics/dram/distill/tests/main.nf.test' is unchanged
+'modules/ebi-metagenomics/dram/distill/tests/tags.yaml' is unchanged
+'modules/ebi-metagenomics/dram/distill/tests/fixtures/full_input.tsv' is unchanged
+'modules/ebi-metagenomics/dram/distill/tests/fixtures/dram_dbs/function_heatmap_form.tsv' is unchanged
+'modules/ebi-metagenomics/dram/distill/tests/fixtures/dram_dbs/DRAM_CONFIG.json' is unchanged
+'modules/ebi-metagenomics/dram/distill/tests/fixtures/dram_dbs/amg_database.tsv' is unchanged
+'modules/ebi-metagenomics/dram/distill/tests/fixtures/dram_dbs/genome_summary_form.tsv' is unchanged
+'modules/ebi-metagenomics/dram/distill/tests/fixtures/dram_dbs/module_step_form.tsv' is unchanged
+'modules/ebi-metagenomics/dram/distill/tests/fixtures/dram_dbs/etc_module_database.tsv' is unchanged
+************************************************************
