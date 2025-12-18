@@ -71,7 +71,7 @@ jobs:
       - name: Run nf-test
         shell: bash
         env:
-          NFT_WORKDIR: /home/ubuntu/tests/nf-test
+          NFT_WORKDIR: "~"
         run: |
           nf-test test tests/default.nf.test \
             --profile=+${{ matrix.profile }} \
