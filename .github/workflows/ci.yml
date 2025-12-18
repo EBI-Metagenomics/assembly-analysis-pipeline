@@ -76,7 +76,6 @@ jobs:
           nf-test test tests/default.nf.test \
             --profile=+${{ matrix.profile }} \
             --ci \
-            --changed-since HEAD^ \
             --verbose \
             --tap=test.tap
 
