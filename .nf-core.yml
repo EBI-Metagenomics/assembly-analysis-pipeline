@@ -1,6 +1,6 @@
 repository_type: pipeline
 
-nf_core_version: 3.2.0
+nf_core_version: 3.3.2
 
 org_path: ebi-metagenomics
 
@@ -65,7 +65,7 @@ template:
     protein function prediction, and identifies metabolic pathways and biosynthetic
     gene clusters.
   author: mberacochea
-  version: 1.0.0dev
+  version: 6.0.0-rc.3
   force: true
   outdir: .
   skip_features:
