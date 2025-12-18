@@ -433,8 +433,15 @@
                     "hidden": true,
                     "type": "boolean"
                 },
-                "multiqc_config": {
+                "multiqc_nfschema_print_summary": {
                     "description": "Custom config file to supply to MultiQC.",
+                    "fa_icon": "fas fa-cog",
+                    "default": false,
+                    "hidden": true,
+                    "type": "boolean"
+                },
+                "multiqc_config": {
+                    "description": "By default we don't record the parameters in the multiqc report, as in production (MGnify) we have paths.",
                     "fa_icon": "fas fa-cog",
                     "format": "file-path",
                     "hidden": true,

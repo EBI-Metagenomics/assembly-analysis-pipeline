@@ -123,7 +123,7 @@
                     "Genome Properties": 2.0
                 },
                 "GT_GFF3VALIDATOR": {
-                    "genometools": "/usr/local/bin/1.6.5"
+                    "genometools": "1.6.5"
                 },
                 "HMMSEARCH_KOFAMS": {
                     "hmmer": 3.4,
@@ -409,7 +409,6 @@
                 "ERZ666_quast_stats.tsv.gz:md5,9b4095efcbe329d05308346bbbe08ed3",
                 "ERZ999_quast_stats.tsv.gz:md5,72b939c0fe473ed347c03348bc130e27",
                 "analysed_assemblies.csv:md5,899e3290256153f6d220cb1dc371334d",
-                "virify_samplesheet.csv:md5,0467f92ec6dde50113de7e30cf5b80b2",
                 "samplesheet_dram.html.gz:md5,65198bf5083e96a1e00861290586a0c4",
                 "samplesheet_dram.tsv.gz:md5,b913fe1ba596ac43f9a38058c3aae645",
                 "samplesheet_genome_stats.tsv.gz:md5,3d15bb18cc3cbc687b04e81bcccdb3ff",
@@ -429,6 +428,6 @@
             "nf-test": "0.9.2",
             "nextflow": "25.04.7"
         },
-        "timestamp": "2025-12-18T15:18:26.243721"
+        "timestamp": "2025-12-18T16:03:25.289889"
     }
 }

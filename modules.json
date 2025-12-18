@@ -31,7 +31,8 @@
                     "gt/gff3validator": {
                         "branch": "master",
                         "git_sha": "05954dab2ff481bcb999f24455da29a5828af08d",
-                        "installed_by": ["modules"]
+                        "installed_by": ["modules"],
+                        "patch": "modules/nf-core/gt/gff3validator/gt-gff3validator.diff"
                     },
                     "hmmer/hmmsearch": {
                         "branch": "master",

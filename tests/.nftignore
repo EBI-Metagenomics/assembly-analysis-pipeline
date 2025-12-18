@@ -22,3 +22,4 @@ ERZ666/qc/multiqc_report.html
 ERZ999/qc/multiqc_report.html
 dram-distill/samplesheet_dram_input.tsv
 dram-distill/samplesheet_metabolism_summary.xlsx.gz
+downstream_samplesheets/virify_samplesheet.csv
