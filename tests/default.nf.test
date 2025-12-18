@@ -20,6 +20,10 @@ nextflow_pipeline {
             // stable_path: All files in ${params.outdir}/ with stable content
             def stable_path = getAllFilesFromDir(params.outdir, ignoreFile: 'tests/.nftignore')
 
+            // TODO: some files shouldn't be ignored... the content should tested (not just the checksum)
+            // ERZ101/cds/ERZ101_predicted_orf.ffn.gz
+            // ERZ101/cds/ERZ101_predicted_cds.faa.gz
+
             assertAll(
                 { assert workflow.success},
                 { assert snapshot(

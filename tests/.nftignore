@@ -8,6 +8,8 @@ multiqc/multiqc_data/llms-full.txt
 multiqc/multiqc_plots/{svg,pdf,png}/*.{svg,pdf,png}
 multiqc/multiqc_report.html
 pipeline_info/*.{html,json,txt,yml}
+ERZ101/cds/ERZ101_predicted_orf.ffn.gz
+ERZ101/cds/ERZ101_predicted_cds.faa.gz
 ERZ101/functional-annotation/interpro/ERZ101_interproscan.tsv.gz
 ERZ101/pathways-and-systems/antismash/ERZ101_antismash.gbk.gz
 ERZ101/pathways-and-systems/antismash/ERZ101_antismash.gff.gz

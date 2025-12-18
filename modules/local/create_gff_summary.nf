@@ -10,27 +10,25 @@ process CREATE_GFF_SUMMARY {
     tuple val(meta), path(cds), path(ips), path(eggnog), path(dbcan_overview), path(dbcan_hmm), path(sanntis), path(antismash)
 
     output:
-    tuple val(meta), path("*.gff"), emit: gff_summary
-    path "versions.yml"           , emit: versions
+    tuple val(meta), path("*_annotation_summary.gff"), emit: gff_summary
+    path "versions.yml"                              , emit: versions
 
     script:
-    // TODO: re-enable dbcan when the module is completed
-
-    // process_dbcan_cazys \\
-    //     -hmm ${dbcan_hmm} \\
-    //     -g ${cds} \\
-    //     -ov ${dbcan_overview} \\
-    //     -v ${params.dbcan_database_version} \\
-    //     -o ${meta.id}_dbcan_cazys.gff
-
-    //        --dbcan-cazys ${meta.id}_dbcan_cazys.gff \\
     """
+    process_dbcan_cazys \\
+        -hmm ${dbcan_hmm} \\
+        -g ${cds} \\
+        -ov ${dbcan_overview} \\
+        -v ${params.dbcan_database_version} \\
+        -o ${meta.id}_dbcan_cazys.gff
+
     gff_toolkit \\
         -g ${cds} \\
         -i ${ips} \\
         -e ${eggnog} \\
         -s ${sanntis} \\
         --antismash ${antismash} \\
+        --dbcan-cazys ${meta.id}_dbcan_cazys.gff \\
         -o ${meta.id}_annotation_summary.gff
 
     cat <<-END_VERSIONS > versions.yml

@@ -123,7 +123,7 @@
                     "Genome Properties": 2.0
                 },
                 "GT_GFF3VALIDATOR": {
-                    "genometools": "1.6.5"
+                    "genometools": "/usr/local/bin/1.6.5"
                 },
                 "HMMSEARCH_KOFAMS": {
                     "hmmer": 3.4,
@@ -363,12 +363,10 @@
                 "qc_failed_assemblies.csv"
             ],
             [
-                "ERZ101_annotation_summary.gff.gz:md5,683de96f8f41ecad046e89041feb981c",
-                "ERZ101_annotation_summary.gff.gz.csi:md5,f6996acdd6ccc57bc4b990e150ac5fbb",
+                "ERZ101_annotation_summary.gff.gz:md5,1c228bedc129bbd7f71eb59322beceeb",
+                "ERZ101_annotation_summary.gff.gz.csi:md5,a70e5f70ccc09d2f8e7c9ffbfe65db1d",
                 "ERZ101_annotation_summary.gff.gz.gzi:md5,ae516cdccf54e18c35d9d77c7aae27f4",
-                "ERZ101_predicted_cds.faa.gz:md5,c83470ef2a3ef5f0a6aa50b1f311bd38",
                 "ERZ101_predicted_cds.gff.gz:md5,a2b9e4f849cff61e9fa825781e9938e9",
-                "ERZ101_predicted_orf.ffn.gz:md5,8d390a8678200479dd3c78e5e16c668f",
                 "ERZ101_dbcan_cgc.gff.gz:md5,e14511869398914ec5ec9037ae60f7b0",
                 "ERZ101_dbcan_overview.tsv.gz:md5,71857c4ba58ecf8345838f2f2aef11cb",
                 "ERZ101_dbcan_standard_out.tsv.gz:md5,6be9ab29b289ff46cc6e4b6fe48dc3d7",
@@ -411,7 +409,7 @@
                 "ERZ666_quast_stats.tsv.gz:md5,9b4095efcbe329d05308346bbbe08ed3",
                 "ERZ999_quast_stats.tsv.gz:md5,72b939c0fe473ed347c03348bc130e27",
                 "analysed_assemblies.csv:md5,899e3290256153f6d220cb1dc371334d",
-                "virify_samplesheet.csv:md5,56282ddaafa436ca11e18a53fd988d0f",
+                "virify_samplesheet.csv:md5,0467f92ec6dde50113de7e30cf5b80b2",
                 "samplesheet_dram.html.gz:md5,65198bf5083e96a1e00861290586a0c4",
                 "samplesheet_dram.tsv.gz:md5,b913fe1ba596ac43f9a38058c3aae645",
                 "samplesheet_genome_stats.tsv.gz:md5,3d15bb18cc3cbc687b04e81bcccdb3ff",
@@ -428,9 +426,9 @@
             ]
         ],
         "meta": {
-            "nf-test": "0.9.3",
-            "nextflow": "25.10.2"
+            "nf-test": "0.9.2",
+            "nextflow": "25.04.7"
         },
-        "timestamp": "2025-12-01T13:14:34.583327638"
+        "timestamp": "2025-12-18T11:50:57.811034"
     }
 }
