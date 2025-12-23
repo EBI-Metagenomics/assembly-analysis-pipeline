@@ -66,7 +66,7 @@
                     "python": "3.13.1"
                 },
                 "CREATE_GFF_SUMMARY": {
-                    "mgnify-pipelines-toolkit": "1.2.0"
+                    "mgnify-pipelines-toolkit": "1.4.9"
                 },
                 "DBCAN": {
                     "dbcan": "5.1.2",
@@ -226,7 +226,7 @@
                     "tabix": 1.2
                 },
                 "Workflow": {
-                    "ebi-metagenomics/assembly-analysis-pipeline": "v6.0.0-rc.3"
+                    "ebi-metagenomics/assembly-analysis-pipeline": "v6.0.0-rc.4"
                 }
             },
             [
@@ -428,6 +428,6 @@
             "nf-test": "0.9.2",
             "nextflow": "25.04.7"
         },
-        "timestamp": "2025-12-18T16:03:25.289889"
+        "timestamp": "2025-12-23T12:24:07.637398"
     }
 }
