@@ -20,6 +20,5 @@ Changes in 'pyrodigal/main.nf':
          -d ${prefix}.fna \\
 
 'modules/nf-core/pyrodigal/tests/main.nf.test.snap' is unchanged
-'modules/nf-core/pyrodigal/tests/tags.yml' is unchanged
 'modules/nf-core/pyrodigal/tests/main.nf.test' is unchanged
 ************************************************************
