@@ -3,17 +3,7 @@ Changes in component 'ebi-metagenomics/mgnifypipelinestoolkit/kronatxtfromcatcla
 Changes in 'mgnifypipelinestoolkit/kronatxtfromcatclassification/main.nf':
 --- modules/ebi-metagenomics/mgnifypipelinestoolkit/kronatxtfromcatclassification/main.nf
 +++ modules/ebi-metagenomics/mgnifypipelinestoolkit/kronatxtfromcatclassification/main.nf
-@@ -2,26 +2,32 @@
-     tag "${meta.id}"
-     label 'process_single'
- 
--    container 'microbiome-informatics/mgnify-pipelines-toolkit:1.0.4'
-+    container "${ workflow.containerEngine == 'singularity' && !task.ext.singularity_pull_docker_container ?
-+        "https://depot.galaxyproject.org/singularity/mgnify-pipelines-toolkit:${params.mpt_version}":
-+        "biocontainers/mgnify-pipelines-toolkit:${params.mpt_version}" }"
- 
-     input:
-     tuple val(meta), path(cat_output)
+@@ -9,19 +9,23 @@
      tuple val(meta2), path(taxonomy)
  
      output:
