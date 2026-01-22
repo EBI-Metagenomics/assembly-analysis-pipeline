@@ -4,8 +4,8 @@ process MGNIFYPIPELINESTOOLKIT_SUMMARISEGOSLIMS {
     label 'process_single'
 
     container "${ workflow.containerEngine == 'singularity' && !task.ext.singularity_pull_docker_container ?
-        "https://depot.galaxyproject.org/singularity/mgnify-pipelines-toolkit:${params.mpt_version}":
-        "biocontainers/mgnify-pipelines-toolkit:${params.mpt_version}" }"
+        'https://depot.galaxyproject.org/singularity/mgnify-pipelines-toolkit:1.4.13--pyhdfd78af_0':
+        'biocontainers/mgnify-pipelines-toolkit:1.4.13--pyhdfd78af_0' }"
 
     input:
     tuple val(meta), path(interproscan_tsv)
