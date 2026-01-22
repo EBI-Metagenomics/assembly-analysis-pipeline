@@ -1,0 +1,34 @@
+Changes in component 'ebi-metagenomics/contigs_taxonomic_classification'
+'subworkflows/ebi-metagenomics/contigs_taxonomic_classification/nextflow.config' is unchanged
+'subworkflows/ebi-metagenomics/contigs_taxonomic_classification/meta.yml' is unchanged
+Changes in 'contigs_taxonomic_classification/main.nf':
+--- subworkflows/ebi-metagenomics/contigs_taxonomic_classification/main.nf
++++ subworkflows/ebi-metagenomics/contigs_taxonomic_classification/main.nf
+@@ -9,6 +9,7 @@
+     ch_proteins    // [ val(meta), path(proteins_fasta) ]
+     cat_db        // [ val(meta), path(catdb_folder)  ]
+     taxonomy_db   // [ val(meta), path(cattax_folder) ]
++    cat_database_version // val(version of the CAT_pack db)
+ 
+     main:
+ 
+@@ -42,7 +43,8 @@
+         cat_db,
+         taxonomy_db,
+         catpack_input_ch.proteins,
+-        catpack_input_ch.diamond_txt
++        catpack_input_ch.diamond_txt,
++        cat_database_version
+     )
+     ch_versions = ch_versions.mix(CATPACK_CONTIGS.out.versions.first())
+ 
+
+'subworkflows/ebi-metagenomics/contigs_taxonomic_classification/tests/main.nf.test.snap' is unchanged
+'subworkflows/ebi-metagenomics/contigs_taxonomic_classification/tests/main.nf.test' is unchanged
+'subworkflows/ebi-metagenomics/contigs_taxonomic_classification/tests/data/contigs.fasta' is unchanged
+'subworkflows/ebi-metagenomics/contigs_taxonomic_classification/tests/data/proteins.fasta' is unchanged
+'subworkflows/ebi-metagenomics/contigs_taxonomic_classification/tests/data/tax/names.dmp' is unchanged
+'subworkflows/ebi-metagenomics/contigs_taxonomic_classification/tests/data/tax/nodes.dmp' is unchanged
+'subworkflows/ebi-metagenomics/contigs_taxonomic_classification/tests/data/db/2025-03-24_CAT_pack.taxids_with_multiple_offspring' is unchanged
+'subworkflows/ebi-metagenomics/contigs_taxonomic_classification/tests/data/db/2025-03-24_CAT_pack.fastaid2LCAtaxid' is unchanged
+************************************************************
