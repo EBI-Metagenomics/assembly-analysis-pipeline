@@ -216,7 +216,7 @@
                     },
                     "mgnifypipelinestoolkit/kronatxtfromcatclassification": {
                         "branch": "main",
-                        "git_sha": "3fd8d9bea7a1a459af0c0472899e62f7f8e5a2e8",
+                        "git_sha": "e55d31bc009f8360f909f2a6ee6dbbf9b52b74a8",
                         "installed_by": ["contigs_taxonomic_classification"],
                         "patch": "modules/ebi-metagenomics/mgnifypipelinestoolkit/kronatxtfromcatclassification/mgnifypipelinestoolkit-kronatxtfromcatclassification.diff"
                     },
@@ -228,7 +228,7 @@
                     },
                     "mgnifypipelinestoolkit/summarisegoslims": {
                         "branch": "main",
-                        "git_sha": "5b6cc0907498f48b2403346da520d08ec0a1d0c5",
+                        "git_sha": "62d3b11ec8bbca8a4290b7b098876c29bd12de64",
                         "installed_by": ["goslim_swf"],
                         "patch": "modules/ebi-metagenomics/mgnifypipelinestoolkit/summarisegoslims/mgnifypipelinestoolkit-summarisegoslims.diff"
                     },
@@ -275,7 +275,7 @@
                     },
                     "contigs_taxonomic_classification": {
                         "branch": "main",
-                        "git_sha": "5fad0d0cf475b477119304430479d7d2d815a005",
+                        "git_sha": "e55d31bc009f8360f909f2a6ee6dbbf9b52b74a8",
                         "installed_by": ["subworkflows"],
                         "patch": "subworkflows/ebi-metagenomics/contigs_taxonomic_classification/contigs_taxonomic_classification.diff"
                     },
@@ -287,13 +287,13 @@
                     },
                     "detect_rna": {
                         "branch": "main",
-                        "git_sha": "fa6ca9ca102988669fe429250f43910132fb2fe0",
+                        "git_sha": "c29be1061fcb3f20bb95543697299094ae2db3bd",
                         "installed_by": ["subworkflows"],
                         "patch": "subworkflows/ebi-metagenomics/detect_rna/detect_rna.diff"
                     },
                     "goslim_swf": {
                         "branch": "main",
-                        "git_sha": "fcd5bf454676aa301c45afd171916911ab4eec49",
+                        "git_sha": "62d3b11ec8bbca8a4290b7b098876c29bd12de64",
                         "installed_by": ["subworkflows"],
                         "patch": "subworkflows/ebi-metagenomics/goslim_swf/goslim_swf.diff"
                     }
