@@ -87,7 +87,7 @@
                 }
             ],
             "isBasedOn": "https://github.com/ebi-metagenomics/assembly-analysis-pipeline",
-            "license": "MIT",
+            "license": "Apache License 2.0",
             "mainEntity": {
                 "@id": "main.nf"
             },
@@ -130,7 +130,7 @@
                 "nextflow"
             ],
             "license": [
-                "MIT"
+                "Apache License 2.0 "
             ],
             "name": [
                 "ebi-metagenomics/assembly-analysis-pipeline"
@@ -145,7 +145,7 @@
                 "https://github.com/ebi-metagenomics/assembly-analysis-pipeline"
             ],
             "version": [
-                "6.0.0-beta"
+                "6.0.0-rc.5"
             ]
         },
         {
@@ -259,7 +259,7 @@
         {
             "@id": "modules.json",
             "@type": "File",
-            "description": "Version information for modules from nf-core/modules"
+            "description": "Version information for modules from nf-core/modules and ebi-metagenomics/nf-modules"
         },
         {
             "@id": "docs/usage.md",
