@@ -21,7 +21,7 @@
                     "cmsearch_tblout_deoverlap": "v0.09"
                 },
                 "COMBINEDGENECALLER_MERGE": {
-                    "mgnify-pipelines-toolkit": "1.2.0"
+                    "mgnify-pipelines-toolkit": "1.4.12"
                 },
                 "CONCATENATE_ANTISMASH_GBK": {
                     "pigz": "2.3.4"
@@ -156,10 +156,10 @@
                     "jq": 1.5
                 },
                 "MGNIFYPIPELINESTOOLKIT_KRONATXTFROMCATCLASSIFICATION": {
-                    "mgnify-pipelines-toolkit": "1.2.0"
+                    "mgnify-pipelines-toolkit": "1.4.14"
                 },
                 "MGNIFYPIPELINESTOOLKIT_SUMMARISEGOSLIMS": {
-                    "mgnify-pipelines-toolkit": "1.2.0"
+                    "mgnify-pipelines-toolkit": "1.4.13"
                 },
                 "MINIMAP2_ALIGN": {
                     "minimap2": "2.29-r1283",
@@ -373,7 +373,7 @@
                 "ERZ101_dbcan_sub_hmm.tsv.gz:md5,b9813dc2c2c30d062597f6ff81807706",
                 "ERZ101_dbcan_substrates.tsv.gz:md5,d41d8cd98f00b204e9800998ecf8427e",
                 "ERZ101_emapper_annotations.tsv.gz:md5,acf16652adebcb33083edd74c5ec6e5f",
-                "ERZ101_emapper_seed_orthologs.tsv.gz:md5,e26b3b6e24893351fa2e17972cffaa9f",
+                "ERZ101_emapper_seed_orthologs.tsv.gz:md5,57c36dd24cfd371f6a183fcd8cc85619",
                 "ERZ101_go_summary.tsv.gz:md5,7a45b33259c95c377b6a480e5a8e1a65",
                 "ERZ101_go_summary.tsv.gz.gzi:md5,7dea362b3fac8e00956a4952a3d4f474",
                 "ERZ101_goslim_summary.tsv.gz:md5,ea99428ad00b74e90d5797378bef7387",
@@ -426,8 +426,8 @@
         ],
         "meta": {
             "nf-test": "0.9.2",
-            "nextflow": "25.04.7"
+            "nextflow": "25.10.2"
         },
-        "timestamp": "2025-12-23T12:24:07.637398"
+        "timestamp": "2026-01-21T17:30:52.046204"
     }
 }

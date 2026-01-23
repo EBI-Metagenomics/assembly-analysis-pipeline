@@ -41,7 +41,6 @@ Changes in 'detect_rna/main.nf':
 
 'subworkflows/ebi-metagenomics/detect_rna/tests/ribo.claninfo' is unchanged
 'subworkflows/ebi-metagenomics/detect_rna/tests/main.nf.test.snap' is unchanged
-'subworkflows/ebi-metagenomics/detect_rna/tests/tags.yml' is unchanged
 'subworkflows/ebi-metagenomics/detect_rna/tests/nextflow.config' is unchanged
 'subworkflows/ebi-metagenomics/detect_rna/tests/main.nf.test' is unchanged
 'subworkflows/ebi-metagenomics/detect_rna/tests/rfam/test.cm' is unchanged
