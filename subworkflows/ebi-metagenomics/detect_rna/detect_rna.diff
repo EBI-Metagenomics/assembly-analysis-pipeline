@@ -3,7 +3,16 @@ Changes in component 'ebi-metagenomics/detect_rna'
 Changes in 'detect_rna/main.nf':
 --- subworkflows/ebi-metagenomics/detect_rna/main.nf
 +++ subworkflows/ebi-metagenomics/detect_rna/main.nf
-@@ -37,17 +37,19 @@
+@@ -30,24 +30,26 @@
+ 
+     main:
+ 
+-    ch_versions = Channel.empty()
+-    cmsearch_ch = Channel.empty()
++    ch_versions = channel.empty()
++    cmsearch_ch = channel.empty()
+ 
+     ch_sequences = ch_fasta
      if (chunk_flag){
          // Chunk the fasta into files with at most params.proteins_chunksize sequences
          SEQKIT_SPLIT2(
@@ -26,7 +35,7 @@ Changes in 'detect_rna/main.nf':
          )
          ch_versions = ch_versions.mix(INFERNAL_CMSEARCH.out.versions.first())
          cmsearch_ch = INFERNAL_CMSEARCH.out.cmsearch_tbl
-@@ -81,29 +83,35 @@
+@@ -81,29 +83,40 @@
          ch_cmsearchdeoverlap = CONCATENATE_CMSEARCH_DEOVERLAP.out.file_out
      }
  
@@ -40,13 +49,18 @@ Changes in 'detect_rna/main.nf':
      ch_versions = ch_versions.mix(EASEL_ESLSFETCH.out.versions.first())
  
 +    // This pipeline uses the cmsearchdeoverlap output instead of matched_seqs_with_coords
-+    ch_easel_with_deoverlap = EASEL_ESLSFETCH.out.easel_coords.join(ch_cmsearchdeoverlap)
++    ch_easel_with_deoverlap = EASEL_ESLSFETCH.out.easel_coords
++        .join(ch_cmsearchdeoverlap)
++        .multiMap { meta, easel_coords, deoverlap ->
++            coords: [ meta, easel_coords ]
++            deoverlap: [ meta, deoverlap ]
++        }
 +
      EXTRACTCOORDS(
 -        EASEL_ESLSFETCH.out.easel_coords,
 -        EASEL_ESLSFETCH.out.matched_seqs_with_coords,
-+        ch_easel_with_deoverlap.map { meta, easel_coords, _deoverlap -> [meta, easel_coords] },
-+        ch_easel_with_deoverlap.map { meta, _easel_coords, deoverlap -> [meta, deoverlap] },
++        ch_easel_with_deoverlap.coords,
++        ch_easel_with_deoverlap.deoverlap,
          separate_subunits
      )
 +

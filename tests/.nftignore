@@ -9,7 +9,6 @@ multiqc/multiqc_plots/{svg,pdf,png}/*.{svg,pdf,png}
 multiqc/multiqc_report.html
 pipeline_info/*.{html,json,txt,yml}
 ERZ101/cds/ERZ101_predicted_orf.ffn.gz
-ERZ101/cds/ERZ101_predicted_cds.faa.gz
 ERZ101/functional-annotation/interpro/ERZ101_interproscan.tsv.gz
 ERZ101/pathways-and-systems/antismash/ERZ101_antismash.gbk.gz
 ERZ101/pathways-and-systems/antismash/ERZ101_antismash.gff.gz
@@ -17,7 +16,15 @@ ERZ101/pathways-and-systems/antismash/ERZ101_merged.json
 ERZ101/pathways-and-systems/dram-distill/ERZ101_metabolism_summary.xlsx.gz
 ERZ101/pathways-and-systems/genome-properties/ERZ101_gp.json.gz
 ERZ101/pathways-and-systems/genome-properties/ERZ101_gp.tsv.gz
-ERZ101/qc/multiqc_report.html
+ERZ102/cds/ERZ101_predicted_orf.ffn.gz
+ERZ102/functional-annotation/interpro/ERZ101_interproscan.tsv.gz
+ERZ102/pathways-and-systems/antismash/ERZ101_antismash.gbk.gz
+ERZ102/pathways-and-systems/antismash/ERZ101_antismash.gff.gz
+ERZ102/pathways-and-systems/antismash/ERZ101_merged.json
+ERZ102/pathways-and-systems/dram-distill/ERZ101_metabolism_summary.xlsx.gz
+ERZ102/pathways-and-systems/genome-properties/ERZ101_gp.json.gz
+ERZ102/pathways-and-systems/genome-properties/ERZ101_gp.tsv.gz
+ERZ102/qc/multiqc_report.html
 ERZ666/qc/multiqc_report.html
 ERZ999/qc/multiqc_report.html
 dram-distill/samplesheet_dram_input.tsv

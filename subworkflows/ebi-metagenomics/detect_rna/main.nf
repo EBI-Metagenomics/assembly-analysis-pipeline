@@ -30,8 +30,8 @@ workflow DETECT_RNA {
 
     main:
 
-    ch_versions = Channel.empty()
-    cmsearch_ch = Channel.empty()
+    ch_versions = channel.empty()
+    cmsearch_ch = channel.empty()
 
     ch_sequences = ch_fasta
     if (chunk_flag){
@@ -91,11 +91,16 @@ workflow DETECT_RNA {
     ch_versions = ch_versions.mix(EASEL_ESLSFETCH.out.versions.first())
 
     // This pipeline uses the cmsearchdeoverlap output instead of matched_seqs_with_coords
-    ch_easel_with_deoverlap = EASEL_ESLSFETCH.out.easel_coords.join(ch_cmsearchdeoverlap)
+    ch_easel_with_deoverlap = EASEL_ESLSFETCH.out.easel_coords
+        .join(ch_cmsearchdeoverlap)
+        .multiMap { meta, easel_coords, deoverlap ->
+            coords: [ meta, easel_coords ]
+            deoverlap: [ meta, deoverlap ]
+        }
 
     EXTRACTCOORDS(
-        ch_easel_with_deoverlap.map { meta, easel_coords, _deoverlap -> [meta, easel_coords] },
-        ch_easel_with_deoverlap.map { meta, _easel_coords, deoverlap -> [meta, deoverlap] },
+        ch_easel_with_deoverlap.coords,
+        ch_easel_with_deoverlap.deoverlap,
         separate_subunits
     )
 
