@@ -83,30 +83,35 @@ workflow DETECT_RNA {
         ch_cmsearchdeoverlap = CONCATENATE_CMSEARCH_DEOVERLAP.out.file_out
     }
 
-    ch_easel = ch_fasta
-                .join(ch_cmsearchdeoverlap)
+    ch_easel = ch_fasta.join(ch_cmsearchdeoverlap)
+
     EASEL_ESLSFETCH(
         ch_easel
     )
     ch_versions = ch_versions.mix(EASEL_ESLSFETCH.out.versions.first())
 
-    // DIFF: ASA uses the cmsearchdeoverlap output instead of matched_seqs_with_coords
+    // This pipeline uses the cmsearchdeoverlap output instead of matched_seqs_with_coords
+    ch_easel_with_deoverlap = EASEL_ESLSFETCH.out.easel_coords.join(ch_cmsearchdeoverlap)
+
     EXTRACTCOORDS(
-        EASEL_ESLSFETCH.out.easel_coords,
-        ch_cmsearchdeoverlap,
+        ch_easel_with_deoverlap.map { meta, easel_coords, _deoverlap -> [meta, easel_coords] },
+        ch_easel_with_deoverlap.map { meta, _easel_coords, deoverlap -> [meta, deoverlap] },
         separate_subunits
     )
+
     ch_versions = ch_versions.mix(EXTRACTCOORDS.out.versions.first())
 
     // To be used as an output channel
-    cmsearchdeoverlap_concat_coords = CMSEARCHTBLOUTDEOVERLAP.out.cmsearch_tblout_deoverlapped
-    if (chunk_flag){
+    cmsearchdeoverlap_concat_coords = channel.empty()
+    if (chunk_flag) {
         // rename the file from `id.deoverlapped` to `id.tblout.deoverlapped`
         // to be consistent with no chunking output name
         cmsearchdeoverlap_concat_coords = CONCATENATE_CMSEARCH_DEOVERLAP.out.file_out
                                           .collectFile { meta, overlap_file ->
                                             ["${meta.id}.tblout.deoverlapped", overlap_file]
                                         }
+    } else {
+        cmsearchdeoverlap_concat_coords = CMSEARCHTBLOUTDEOVERLAP.out.cmsearch_tblout_deoverlapped
     }
 
     emit:
