@@ -35,10 +35,9 @@ workflow DETECT_RNA {
 
     ch_sequences = ch_fasta
     if (chunk_flag){
-        // Chunk the fasta into files with at most params.proteins_chunksize sequences
         SEQKIT_SPLIT2(
             ch_fasta,
-            params.bgc_contigs_chunksize // Define a chunk size for this one
+            params.detect_rna_contigs_chunksize
         )
         ch_versions = ch_versions.mix(SEQKIT_SPLIT2.out.versions)
 

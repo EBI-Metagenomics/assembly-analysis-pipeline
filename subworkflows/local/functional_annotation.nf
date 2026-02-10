@@ -36,7 +36,7 @@ workflow FUNCTIONAL_ANNOTATION {
 
     main:
 
-    ch_versions = Channel.empty()
+    ch_versions = channel.empty()
 
     def ch_proteins_faa = ch_predicted_proteins.map { meta, faa, _gff -> [meta, faa] }
     def ch_proteins_gff = ch_predicted_proteins.map { meta, _faa, gff -> [meta, gff] }

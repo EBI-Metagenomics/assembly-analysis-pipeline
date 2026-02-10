@@ -147,16 +147,21 @@
             "description": "Chunking input fasta files is used to parallelize the execution of some tools",
             "fa_icon": "fas fa-cut",
             "properties": {
+                "detect_rna_contigs_chunksize": {
+                    "default": "100M",
+                    "description": "Number of nucleotide base pairs each chunk should contain at most.",
+                    "type": "string"
+                },
                 "bgc_contigs_chunksize": {
                     "default": "50M",
-                    "description": "Number of nucleotide base pairs each chunk should contain. The proteins are not truncated, and this is the maximum value a record can have per chunk.",
+                    "description": "Number of nucleotide base pairs each chunk should contain at most.",
                     "type": "string"
                 },
                 "proteins_chunksize": {
-                    "default": 10000000,
-                    "description": "Number of amino acids each chunk should contain. The proteins are not truncated, and this is the maximum value a record can have per chunk.",
+                    "default": "100M",
+                    "description": "Number of amino acids each chunk should contain at most.",
                     "fa_icon": "fas fa-weight",
-                    "type": "integer"
+                    "type": "string"
                 }
             },
             "title": "Nucleotide and protein fasta file chunking options",

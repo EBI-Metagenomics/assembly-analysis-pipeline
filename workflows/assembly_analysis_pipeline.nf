@@ -212,7 +212,6 @@ workflow ASSEMBLY_ANALYSIS_PIPELINE {
     * Pathway and systems annotations
     */
     PATHWAYS_AND_SYSTEMS(
-        ch_protein_chunks,
         ASSEMBLY_QC.out.assembly_qc_pass.join(
             COMBINED_GENE_CALLER.out.faa
         ).join(
@@ -221,8 +220,6 @@ workflow ASSEMBLY_ANALYSIS_PIPELINE {
             FUNCTIONAL_ANNOTATION.out.interproscan_tsv
         ),
         // DRAM //
-        COMBINED_GENE_CALLER.out.faa,
-        FUNCTIONAL_ANNOTATION.out.interproscan_tsv,
         FUNCTIONAL_ANNOTATION.out.kegg_orthologs_per_contig_tsv,
         FUNCTIONAL_ANNOTATION.out.dbcan_overview
     )

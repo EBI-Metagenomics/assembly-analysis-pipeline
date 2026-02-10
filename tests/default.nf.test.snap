@@ -1,7 +1,7 @@
 {
     "-profile test": {
         "content": [
-            153,
+            151
             {
                 "ANTISMASH_ANTISMASH": {
                     "antismash": "8.0.1",
@@ -61,9 +61,6 @@
                 },
                 "CONCATENATE_INTERPROSCAN_TSV": {
                     "pigz": "2.3.4"
-                },
-                "CONCATENATE_SANNTIS_GFFS": {
-                    "python": "3.13.1"
                 },
                 "CREATE_GFF_SUMMARY": {
                     "mgnify-pipelines-toolkit": "1.4.9"
