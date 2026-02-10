@@ -3,7 +3,16 @@ Changes in component 'ebi-metagenomics/detect_rna'
 Changes in 'detect_rna/main.nf':
 --- subworkflows/ebi-metagenomics/detect_rna/main.nf
 +++ subworkflows/ebi-metagenomics/detect_rna/main.nf
-@@ -37,17 +37,19 @@
+@@ -30,24 +30,26 @@
+ 
+     main:
+ 
+-    ch_versions = Channel.empty()
+-    cmsearch_ch = Channel.empty()
++    ch_versions = channel.empty()
++    cmsearch_ch = channel.empty()
+ 
+     ch_sequences = ch_fasta
      if (chunk_flag){
          // Chunk the fasta into files with at most params.proteins_chunksize sequences
          SEQKIT_SPLIT2(
@@ -26,18 +35,53 @@ Changes in 'detect_rna/main.nf':
          )
          ch_versions = ch_versions.mix(INFERNAL_CMSEARCH.out.versions.first())
          cmsearch_ch = INFERNAL_CMSEARCH.out.cmsearch_tbl
-@@ -88,9 +90,10 @@
+@@ -81,29 +83,40 @@
+         ch_cmsearchdeoverlap = CONCATENATE_CMSEARCH_DEOVERLAP.out.file_out
+     }
+ 
+-    ch_easel = ch_fasta
+-                .join(ch_cmsearchdeoverlap)
++    ch_easel = ch_fasta.join(ch_cmsearchdeoverlap)
++
+     EASEL_ESLSFETCH(
+         ch_easel
      )
      ch_versions = ch_versions.mix(EASEL_ESLSFETCH.out.versions.first())
  
-+    // DIFF: ASA uses the cmsearchdeoverlap output instead of matched_seqs_with_coords
++    // This pipeline uses the cmsearchdeoverlap output instead of matched_seqs_with_coords
++    ch_easel_with_deoverlap = EASEL_ESLSFETCH.out.easel_coords
++        .join(ch_cmsearchdeoverlap)
++        .multiMap { meta, easel_coords, deoverlap ->
++            coords: [ meta, easel_coords ]
++            deoverlap: [ meta, deoverlap ]
++        }
++
      EXTRACTCOORDS(
-         EASEL_ESLSFETCH.out.easel_coords,
+-        EASEL_ESLSFETCH.out.easel_coords,
 -        EASEL_ESLSFETCH.out.matched_seqs_with_coords,
-+        ch_cmsearchdeoverlap,
++        ch_easel_with_deoverlap.coords,
++        ch_easel_with_deoverlap.deoverlap,
          separate_subunits
      )
++
      ch_versions = ch_versions.mix(EXTRACTCOORDS.out.versions.first())
+ 
+     // To be used as an output channel
+-    cmsearchdeoverlap_concat_coords = CMSEARCHTBLOUTDEOVERLAP.out.cmsearch_tblout_deoverlapped
+-    if (chunk_flag){
++    cmsearchdeoverlap_concat_coords = channel.empty()
++    if (chunk_flag) {
+         // rename the file from `id.deoverlapped` to `id.tblout.deoverlapped`
+         // to be consistent with no chunking output name
+         cmsearchdeoverlap_concat_coords = CONCATENATE_CMSEARCH_DEOVERLAP.out.file_out
+                                           .collectFile { meta, overlap_file ->
+                                             ["${meta.id}.tblout.deoverlapped", overlap_file]
+                                         }
++    } else {
++        cmsearchdeoverlap_concat_coords = CMSEARCHTBLOUTDEOVERLAP.out.cmsearch_tblout_deoverlapped
+     }
+ 
+     emit:
 
 'subworkflows/ebi-metagenomics/detect_rna/tests/ribo.claninfo' is unchanged
 'subworkflows/ebi-metagenomics/detect_rna/tests/main.nf.test.snap' is unchanged
