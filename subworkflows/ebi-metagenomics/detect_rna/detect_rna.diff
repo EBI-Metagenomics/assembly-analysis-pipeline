@@ -3,7 +3,6 @@ Changes in component 'ebi-metagenomics/detect_rna'
 Changes in 'detect_rna/main.nf':
 --- subworkflows/ebi-metagenomics/detect_rna/main.nf
 +++ subworkflows/ebi-metagenomics/detect_rna/main.nf
-@@ -30,24 +30,26 @@
  
      main:
  
@@ -14,11 +13,11 @@ Changes in 'detect_rna/main.nf':
  
      ch_sequences = ch_fasta
      if (chunk_flag){
-         // Chunk the fasta into files with at most params.proteins_chunksize sequences
+-        // Chunk the fasta into files with at most params.proteins_chunksize sequences
          SEQKIT_SPLIT2(
 -            ch_fasta
 +            ch_fasta,
-+            params.bgc_contigs_chunksize // Define a chunk size for this one
++            params.detect_rna_contigs_chunksize
          )
          ch_versions = ch_versions.mix(SEQKIT_SPLIT2.out.versions)
  
@@ -35,7 +34,6 @@ Changes in 'detect_rna/main.nf':
          )
          ch_versions = ch_versions.mix(INFERNAL_CMSEARCH.out.versions.first())
          cmsearch_ch = INFERNAL_CMSEARCH.out.cmsearch_tbl
-@@ -81,29 +83,40 @@
          ch_cmsearchdeoverlap = CONCATENATE_CMSEARCH_DEOVERLAP.out.file_out
      }
  
