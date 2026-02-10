@@ -80,17 +80,12 @@ workflow PATHWAYS_AND_SYSTEMS {
     /* Rearrange the channel. We need to create a channel so that                              */
     /* each chunk of the FASTA has the GFF and IPS TSV (these two are for the whole assembly). */
     /*******************************************************************************************/
-    def ch_chunked_assembly_fasta = SEQKIT_SPLIT2.out.assembly.transpose()
-
-    // Note: if I do "def bgc_channel = .. combine(...)"" I get this error:
-    // def bgc_channel = ch_contigs_and_predicted_proteins.combine(ch_chunked_assembly_fasta, by: 0)
-    // weird, that is why there if def ... = channel.empty() and then I assign it
-    def antismash_channel = channel.empty()
-    antismash_channel = ch_contigs_and_predicted_proteins.combine(ch_chunked_assembly_fasta, by: 0)
+    ch_antismash = ch_contigs_and_predicted_proteins
+        .combine(SEQKIT_SPLIT2.out.assembly.transpose(), by: 0)
         .map { meta, _all_contigs_fasta, _faa, gff, _ips_tsv, contigs_chunk -> [meta, contigs_chunk, gff] }
 
     ANTISMASH_ANTISMASH(
-        antismash_channel,
+        ch_antismash,
         file(params.antismash_database, checkIfExists: true),
         params.antismash_database_version
     )
@@ -124,16 +119,16 @@ workflow PATHWAYS_AND_SYSTEMS {
     ch_versions = ch_versions.mix(ANTISMASH_SUMMARY.out.versions)
 
     // Note: same weirdness as antismash_channel
-    def sanntis_channel = channel.empty()
-    sanntis_channel = ch_contigs_and_predicted_proteins
-        .map { meta, _all_contigs_fasta, faa, _gff, ips_tsv -> [meta, ips_tsv, [], faa] }
+    ch_sanntis = ch_contigs_and_predicted_proteins.map { meta, _all_contigs_fasta, faa, _gff, ips_tsv ->
+        [meta, ips_tsv, [], faa]
+    }
 
     // We run SanntiS only once per assembly. To chunk it, we would need to ensure
     // that each protein chunk contains annotations for only one contig. Otherwise,
     // SanntiS might misannotate sequences, as there is no guarantee that all proteins
     // from a single contig will be present in the same faa chunk.
     SANNTIS(
-        sanntis_channel
+        ch_sanntis
     )
     ch_versions = ch_versions.mix(SANNTIS.out.versions)
 
