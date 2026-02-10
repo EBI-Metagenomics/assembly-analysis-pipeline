@@ -190,10 +190,10 @@ workflow ASSEMBLY_ANALYSIS_PIPELINE {
     /* PROTEINS CHUNKING */
     /*********************/
 
-    // Chunk the fasta into files with at most params.proteins_chunksize sequences
+    // Chunk the fasta into files with at most params.protein_annotation_fasta_chunksize sequences
     SEQKIT_SPLIT2(
         COMBINED_GENE_CALLER.out.faa,
-        params.proteins_chunksize,
+        params.protein_annotation_fasta_chunksize,
     )
     ch_versions = ch_versions.mix(SEQKIT_SPLIT2.out.versions)
 

@@ -1,7 +1,7 @@
 {
     "-profile test": {
         "content": [
-            151
+            151,
             {
                 "ANTISMASH_ANTISMASH": {
                     "antismash": "8.0.1",

@@ -14,7 +14,6 @@ include { KEGGPATHWAYSCOMPLETENESS     } from '../../modules/ebi-metagenomics/ke
 /* LOCAL */
 include { ANTISMASH_JSON_TO_GFF                          } from '../../modules/local/antismash_json_to_gff'
 include { CONCATENATE_GFFS as CONCATENATE_ANTISMASH_GFFS } from '../../modules/local/concatenate_gffs'
-include { CONCATENATE_GFFS as CONCATENATE_SANNTIS_GFFS   } from '../../modules/local/concatenate_gffs'
 include { ANTISMASH_SUMMARY                              } from '../../modules/local/antismash_summary'
 include { SANNTIS_SUMMARY                                } from '../../modules/local/sanntis_summary'
 include { MERGE_ANTISMASH_JSON                           } from '../../modules/local/merge_antismash_json'
@@ -69,10 +68,10 @@ workflow PATHWAYS_AND_SYSTEMS {
     )
     ch_versions = ch_versions.mix(SEQKIT_SEQ_BGC.out.versions)
 
-    // Chunk the fasta into files with at most params.bgc_contigs_chunksize sequences
+    // Chunk the fasta into files with at most params.bgc_analysis_fasta_chunksize sequences
     SEQKIT_SPLIT2(
         SEQKIT_SEQ_BGC.out.fastx,
-        params.bgc_contigs_chunksize
+        params.bgc_analysis_fasta_chunksize
     )
     ch_versions = ch_versions.mix(SEQKIT_SPLIT2.out.versions)
 
