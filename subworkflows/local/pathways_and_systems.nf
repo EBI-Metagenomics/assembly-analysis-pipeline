@@ -27,7 +27,7 @@ workflow PATHWAYS_AND_SYSTEMS {
     // fasta: contigs
     // faa: CGC predictions faa
     // gff: CGC predictions gff
-    // ips_ts: interpsocan concatenated tsv
+    // ips_tsv: interproscan concatenated tsv
     ch_contigs_and_predicted_proteins // tuple (meta, fasta, faa, gff, ips_tsv)
 
     // KO per contig aggregated - single file per assembly
