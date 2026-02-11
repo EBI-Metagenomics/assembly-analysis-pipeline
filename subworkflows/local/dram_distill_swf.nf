@@ -14,7 +14,7 @@ workflow DRAM_DISTILL_SWF {
 
     main:
 
-    ch_versions = Channel.empty()
+    ch_versions = channel.empty()
 
     SUMMARISE_FOR_DRAM_INPUT(
         ch_proteins.join( ko_per_contigs_tsv ).join( interproscan_tsv ).join( dbcan_overview )

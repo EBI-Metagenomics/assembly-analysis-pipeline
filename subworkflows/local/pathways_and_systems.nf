@@ -14,7 +14,6 @@ include { KEGGPATHWAYSCOMPLETENESS     } from '../../modules/ebi-metagenomics/ke
 /* LOCAL */
 include { ANTISMASH_JSON_TO_GFF                          } from '../../modules/local/antismash_json_to_gff'
 include { CONCATENATE_GFFS as CONCATENATE_ANTISMASH_GFFS } from '../../modules/local/concatenate_gffs'
-include { CONCATENATE_GFFS as CONCATENATE_SANNTIS_GFFS   } from '../../modules/local/concatenate_gffs'
 include { ANTISMASH_SUMMARY                              } from '../../modules/local/antismash_summary'
 include { SANNTIS_SUMMARY                                } from '../../modules/local/sanntis_summary'
 include { MERGE_ANTISMASH_JSON                           } from '../../modules/local/merge_antismash_json'
@@ -24,21 +23,12 @@ include { DRAM_DISTILL_SWF                               } from '../../subworkfl
 workflow PATHWAYS_AND_SYSTEMS {
 
     take:
-    // Chunked proteins, used in the functional_annotation mostly, we need this for SanntiS
-    ch_protein_chunks // tuple (meta, faa_chunk)
-
+    // This contains all the proteins (faa and gff) and their IPS annotations
     // fasta: contigs
     // faa: CGC predictions faa
     // gff: CGC predictions gff
-    // ips_ts: interpsocan concatenated tsv (all the IPS annotations)
+    // ips_tsv: interproscan concatenated tsv
     ch_contigs_and_predicted_proteins // tuple (meta, fasta, faa, gff, ips_tsv)
-
-
-    // Non-chunked proteins
-    ch_proteins       // tuple (meta, faa)
-
-    // InterProScan concatenated TSV
-    ch_interproscan_tsv
 
     // KO per contig aggregated - single file per assembly
     ch_kegg_orthologs_per_contig_tsv     // tuple (meta, kos_per_contig_tsv)
@@ -48,7 +38,7 @@ workflow PATHWAYS_AND_SYSTEMS {
 
     main:
 
-    ch_versions = Channel.empty()
+    ch_versions = channel.empty()
 
     KEGGPATHWAYSCOMPLETENESS(
         ch_kegg_orthologs_per_contig_tsv
@@ -78,10 +68,10 @@ workflow PATHWAYS_AND_SYSTEMS {
     )
     ch_versions = ch_versions.mix(SEQKIT_SEQ_BGC.out.versions)
 
-    // Chunk the fasta into files with at most params.bgc_contigs_chunksize sequences
+    // Chunk the fasta into files with at most params.bgc_analysis_fasta_chunksize sequences
     SEQKIT_SPLIT2(
         SEQKIT_SEQ_BGC.out.fastx,
-        params.bgc_contigs_chunksize
+        params.bgc_analysis_fasta_chunksize
     )
     ch_versions = ch_versions.mix(SEQKIT_SPLIT2.out.versions)
 
@@ -89,17 +79,12 @@ workflow PATHWAYS_AND_SYSTEMS {
     /* Rearrange the channel. We need to create a channel so that                              */
     /* each chunk of the FASTA has the GFF and IPS TSV (these two are for the whole assembly). */
     /*******************************************************************************************/
-    def ch_chunked_assembly_fasta = SEQKIT_SPLIT2.out.assembly.transpose()
-
-    // Note: if I do "def bgc_channel = .. combine(...)"" I get this error:
-    // def bgc_channel = ch_contigs_and_predicted_proteins.combine(ch_chunked_assembly_fasta, by: 0)
-    // weird, that is why there if def ... = channel.empty() and then I assign it
-    def antismash_channel = channel.empty()
-    antismash_channel = ch_contigs_and_predicted_proteins.combine(ch_chunked_assembly_fasta, by: 0)
+    ch_antismash = ch_contigs_and_predicted_proteins
+        .combine(SEQKIT_SPLIT2.out.assembly.transpose(), by: 0)
         .map { meta, _all_contigs_fasta, _faa, gff, _ips_tsv, contigs_chunk -> [meta, contigs_chunk, gff] }
 
     ANTISMASH_ANTISMASH(
-        antismash_channel,
+        ch_antismash,
         file(params.antismash_database, checkIfExists: true),
         params.antismash_database_version
     )
@@ -132,30 +117,22 @@ workflow PATHWAYS_AND_SYSTEMS {
     )
     ch_versions = ch_versions.mix(ANTISMASH_SUMMARY.out.versions)
 
-    /*************************************************************************************/
-    /* Rearrange the channel. We need to create a channel so that                        */
-    /* each FAA chunk the IPS TSV (this is the concatenated IPS for the whole assembly). */
-    /* We feed in the whole IPS TSV to avoid having to chunk it and match it the protein */
-    /* chunks, this wastes some memory as SanntiS loads the whole TSV in memory but this */
-    /* should be problematic as the TSV is relativly small (<500MB)                      */
-    /*************************************************************************************/
-    def sanntis_channel = channel.empty()
     // Note: same weirdness as antismash_channel
-    sanntis_channel = ch_contigs_and_predicted_proteins.combine(ch_protein_chunks, by: 0)
-        .map { meta, _all_contigs_fasta, _faa, _gff, ips_tsv, faa_chunk -> [meta, ips_tsv, [], faa_chunk] }
+    ch_sanntis = ch_contigs_and_predicted_proteins.map { meta, _all_contigs_fasta, faa, _gff, ips_tsv ->
+        [meta, ips_tsv, [], faa]
+    }
 
+    // We run SanntiS only once per assembly. To chunk it, we would need to ensure
+    // that each protein chunk contains annotations for only one contig. Otherwise,
+    // SanntiS might misannotate sequences, as there is no guarantee that all proteins
+    // from a single contig will be present in the same faa chunk.
     SANNTIS(
-        sanntis_channel
+        ch_sanntis
     )
     ch_versions = ch_versions.mix(SANNTIS.out.versions)
 
-    CONCATENATE_SANNTIS_GFFS(
-        SANNTIS.out.gff.groupTuple()
-    )
-    ch_versions = ch_versions.mix(CONCATENATE_SANNTIS_GFFS.out.versions)
-
     SANNTIS_SUMMARY(
-        CONCATENATE_SANNTIS_GFFS.out.concatenated_gff
+        SANNTIS.out.gff
     )
     ch_versions = ch_versions.mix(SANNTIS_SUMMARY.out.versions)
 
@@ -163,15 +140,15 @@ workflow PATHWAYS_AND_SYSTEMS {
     * DRAM distill - per assembly and for the whole samplesheet
     */
     DRAM_DISTILL_SWF(
-        ch_proteins,
+        ch_contigs_and_predicted_proteins.map { meta, _fasta, faa, _gff, _ips -> [meta, faa]},
         KEGGPATHWAYSCOMPLETENESS.out.kos_aggregated_by_contig, // This is the aggregated ko per contig file
-        ch_interproscan_tsv,
+        ch_contigs_and_predicted_proteins.map { meta, _fasta, _faa, _gff, ips -> [meta, ips]},
         ch_dbcan_overview
     )
     ch_versions = ch_versions.mix(DRAM_DISTILL_SWF.out.versions)
 
     emit:
     versions = ch_versions
-    sanntis_gff = CONCATENATE_SANNTIS_GFFS.out.concatenated_gff
+    sanntis_gff = SANNTIS.out.gff
     antismash_gff = CONCATENATE_ANTISMASH_GFFS.out.concatenated_gff
 }

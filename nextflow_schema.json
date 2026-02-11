@@ -144,19 +144,24 @@
             ]
         },
         "nucleotide_and_protein_fasta_file_chunking_options": {
-            "description": "Chunking input fasta files is used to parallelize the execution of some tools",
+            "description": "Chunking input fasta files is used to parallelize the execution of some tools. Larger values reduce overhead but limit parallelism. Seqkit split2 is used for the splitting, and the values from the following flags are passed on to the flag --by-length (https://bioinf.shenwei.me/seqkit/usage/#split2)",
             "fa_icon": "fas fa-cut",
             "properties": {
-                "bgc_contigs_chunksize": {
-                    "default": "50M",
-                    "description": "Number of nucleotide base pairs each chunk should contain. The proteins are not truncated, and this is the maximum value a record can have per chunk.",
+                "rna_detection_fasta_chunksize": {
+                    "default": "100M",
+                    "description": "Controls the chunking of the nucleotide contig FASTA files for parallel RNA feature detection. Format follows seqkit --by-length (e.g., '100M' for 100 million base pairs). Used in tools such as Infernal CMsearch/CMscan in the detect RNA subworkflow.",
                     "type": "string"
                 },
-                "proteins_chunksize": {
-                    "default": 10000000,
-                    "description": "Number of amino acids each chunk should contain. The proteins are not truncated, and this is the maximum value a record can have per chunk.",
+                "bgc_analysis_fasta_chunksize": {
+                    "default": "50M",
+                    "description": "Controls the chunking of the nucleotide contig FASTA files for parallel Biosynthetic Gene Cluster analysis. Format follows seqkit --by-length (e.g., '50M' for 50 million base pairs). Used in tools such as antiSMASH in the pathways and systems subworkflow.",
+                    "type": "string"
+                },
+                "protein_annotation_fasta_chunksize": {
+                    "default": "100M",
+                    "description": "Controls the chunking of protein FASTA files for parallel functional annotation. Format follows seqkit --by-length (e.g., '100M' for 100 million amino acids). Used in tools such as InterProScan in the functional annotation subworkflow.",
                     "fa_icon": "fas fa-weight",
-                    "type": "integer"
+                    "type": "string"
                 }
             },
             "title": "Nucleotide and protein fasta file chunking options",
