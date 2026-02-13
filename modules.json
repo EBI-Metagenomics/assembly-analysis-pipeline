@@ -199,7 +199,7 @@
                     },
                     "interproscan": {
                         "branch": "main",
-                        "git_sha": "4592bf891e535ea48274a425230f161ed5110389",
+                        "git_sha": "f4d61e3e3614e4d3baeccc84ddf4a7c094366d44",
                         "installed_by": ["modules"]
                     },
                     "keggpathwayscompleteness": {
