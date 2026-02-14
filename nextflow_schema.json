@@ -148,7 +148,7 @@
             "fa_icon": "fas fa-cut",
             "properties": {
                 "rna_detection_fasta_chunksize": {
-                    "default": "100M",
+                    "default": "50M",
                     "description": "Controls the chunking of the nucleotide contig FASTA files for parallel RNA feature detection. Format follows seqkit --by-length (e.g., '100M' for 100 million base pairs). Used in tools such as Infernal CMsearch/CMscan in the detect RNA subworkflow.",
                     "type": "string"
                 },
@@ -158,7 +158,7 @@
                     "type": "string"
                 },
                 "protein_annotation_fasta_chunksize": {
-                    "default": "100M",
+                    "default": "30M",
                     "description": "Controls the chunking of protein FASTA files for parallel functional annotation. Format follows seqkit --by-length (e.g., '100M' for 100 million amino acids). Used in tools such as InterProScan in the functional annotation subworkflow.",
                     "fa_icon": "fas fa-weight",
                     "type": "string"
