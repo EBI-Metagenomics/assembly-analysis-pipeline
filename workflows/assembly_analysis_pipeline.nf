@@ -190,10 +190,12 @@ workflow ASSEMBLY_ANALYSIS_PIPELINE {
     /* PROTEINS CHUNKING */
     /*********************/
 
-    // Chunk the fasta into files with at most params.protein_annotation_fasta_chunksize sequences
+    // Chunk protein FASTA into files with N sequences each for parallel annotation
+    // Default: 50,000 sequences per chunk (override with --protein_annotation_fasta_chunksize)
     SEQKIT_SPLIT2(
         COMBINED_GENE_CALLER.out.faa,
-        params.protein_annotation_fasta_chunksize,
+        [],                                        // length: (disabled) max number of nucleotides per chunk
+        params.protein_annotation_fasta_chunksize, // size: max number of sequences per chunk
     )
     ch_versions = ch_versions.mix(SEQKIT_SPLIT2.out.versions)
 

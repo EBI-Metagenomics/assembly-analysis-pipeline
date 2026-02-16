@@ -35,9 +35,11 @@ workflow DETECT_RNA {
 
     ch_sequences = ch_fasta
     if (chunk_flag){
+        // Split the contigs FASTA by total nucleotides per chunk
         SEQKIT_SPLIT2(
             ch_fasta,
-            params.rna_detection_fasta_chunksize
+            params.rna_detection_fasta_chunksize, // length: max number of nucleotides per chunk
+            []                                    // size: (disabled) max number of sequences per chunk
         )
         ch_versions = ch_versions.mix(SEQKIT_SPLIT2.out.versions)
 

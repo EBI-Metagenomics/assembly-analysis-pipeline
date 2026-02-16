@@ -1,14 +1,17 @@
 Changes in component 'nf-core/seqkit/split2'
 'modules/nf-core/seqkit/split2/environment.yml' is unchanged
+'modules/nf-core/seqkit/split2/meta.yml' is unchanged
 Changes in 'seqkit/split2/main.nf':
 --- modules/nf-core/seqkit/split2/main.nf
 +++ modules/nf-core/seqkit/split2/main.nf
-@@ -8,10 +8,10 @@
+@@ -8,10 +8,12 @@
          'biocontainers/seqkit:2.8.1--h9ee0642_0' }"
  
      input:
 -    tuple val(meta), path(reads)
 +    tuple val(meta), path(assembly)
++    val(length)
++    val(size)
  
      output:
 -    tuple val(meta), path("**/*.gz"), emit: reads
@@ -16,7 +19,7 @@ Changes in 'seqkit/split2/main.nf':
      path "versions.yml"             , emit: versions
  
      when:
-@@ -20,34 +20,17 @@
+@@ -20,34 +22,37 @@
      script:
      def args   = task.ext.args   ?: ''
      def prefix = task.ext.prefix ?: "${meta.id}"
@@ -28,13 +31,6 @@ Changes in 'seqkit/split2/main.nf':
 -            --threads $task.cpus \\
 -            $reads \\
 -            --out-dir ${prefix}
-+    """
-+    seqkit \\
-+        split2 \\
-+        $args \\
-+        --threads $task.cpus \\
-+        ${assembly} \\
-+        --out-dir ${prefix}
  
 -        cat <<-END_VERSIONS > versions.yml
 -        "${task.process}":
@@ -50,13 +46,38 @@ Changes in 'seqkit/split2/main.nf':
 -            --read1 ${reads[0]} \\
 -            --read2 ${reads[1]} \\
 -            --out-dir ${prefix}
--
++    def has_length = length && length != []
++    def has_size   = size && size != []
+ 
 -        cat <<-END_VERSIONS > versions.yml
 -        "${task.process}":
 -            seqkit: \$(echo \$(seqkit 2>&1) | sed 's/^.*Version: //; s/ .*\$//')
 -        END_VERSIONS
 -        """
--    }
++    // Validate mutually exclusive requirement
++    if (has_length && has_size) {
++        error("Cannot use both --by-length (${length}) and --by-size (${size}) at the same time.")
+     }
++
++    // Validate at least one is required
++    if (!has_length && !has_size) {
++        error("Must provide either 'length' or 'size' parameter. Both cannot be empty.")
++    }
++
++     // We are also tweaking the prefix to prevent names like <assembly_id>.part_001.gz to be used
++     // in favour of <assembly_id>_part_001.gz which is more file name parsing friendly
++     // which helps when concatenating chunked post-processed fasta files, such as the results of interposcan
++
++    def chunk_by_length = has_length ? "--by-length ${length} --by-length-prefix ${meta.id}_" : ""
++    def chunk_by_size   = has_size ? "--by-size ${size} --by-size-prefix ${meta.id}_" : ""
++    """
++    seqkit \\
++        split2 \\
++        $args ${chunk_by_length} ${chunk_by_size} \\
++        --threads $task.cpus \\
++        ${assembly} \\
++        --out-dir ${prefix}
++
 +    cat <<-END_VERSIONS > versions.yml
 +    "${task.process}":
 +        seqkit: \$(echo \$(seqkit 2>&1) | sed 's/^.*Version: //; s/ .*\$//')
@@ -64,11 +85,10 @@ Changes in 'seqkit/split2/main.nf':
 +    """
  }
 
-'modules/nf-core/seqkit/split2/meta.yml' is unchanged
+'modules/nf-core/seqkit/split2/tests/main.nf.test.snap' is unchanged
 'modules/nf-core/seqkit/split2/tests/tags.yml' is unchanged
 'modules/nf-core/seqkit/split2/tests/size.config' is unchanged
-'modules/nf-core/seqkit/split2/tests/main.nf.test.snap' is unchanged
 'modules/nf-core/seqkit/split2/tests/length.config' is unchanged
-'modules/nf-core/seqkit/split2/tests/part.config' is unchanged
 'modules/nf-core/seqkit/split2/tests/main.nf.test' is unchanged
+'modules/nf-core/seqkit/split2/tests/part.config' is unchanged
 ************************************************************
