@@ -37,7 +37,8 @@ workflow DETECT_RNA {
     if (chunk_flag){
         SEQKIT_SPLIT2(
             ch_fasta,
-            params.rna_detection_fasta_chunksize
+            params.rna_detection_fasta_chunksize,
+            null
         )
         ch_versions = ch_versions.mix(SEQKIT_SPLIT2.out.versions)
 

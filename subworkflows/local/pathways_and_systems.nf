@@ -71,7 +71,8 @@ workflow PATHWAYS_AND_SYSTEMS {
     // Chunk the fasta into files with at most params.bgc_analysis_fasta_chunksize sequences
     SEQKIT_SPLIT2(
         SEQKIT_SEQ_BGC.out.fastx,
-        params.bgc_analysis_fasta_chunksize
+        params.bgc_analysis_fasta_chunksize,
+        null
     )
     ch_versions = ch_versions.mix(SEQKIT_SPLIT2.out.versions)
 

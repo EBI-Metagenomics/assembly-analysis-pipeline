@@ -193,6 +193,7 @@ workflow ASSEMBLY_ANALYSIS_PIPELINE {
     // Chunk the fasta into files with at most params.protein_annotation_fasta_chunksize sequences
     SEQKIT_SPLIT2(
         COMBINED_GENE_CALLER.out.faa,
+        null, // length -- this is used to chunk by aa, so each chunk ends with the same number of aa
         params.protein_annotation_fasta_chunksize,
     )
     ch_versions = ch_versions.mix(SEQKIT_SPLIT2.out.versions)

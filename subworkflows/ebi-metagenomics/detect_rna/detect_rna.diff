@@ -3,7 +3,7 @@ Changes in component 'ebi-metagenomics/detect_rna'
 Changes in 'detect_rna/main.nf':
 --- subworkflows/ebi-metagenomics/detect_rna/main.nf
 +++ subworkflows/ebi-metagenomics/detect_rna/main.nf
-@@ -30,24 +30,25 @@
+@@ -30,24 +30,26 @@
  
      main:
  
@@ -18,7 +18,8 @@ Changes in 'detect_rna/main.nf':
          SEQKIT_SPLIT2(
 -            ch_fasta
 +            ch_fasta,
-+            params.rna_detection_fasta_chunksize
++            params.rna_detection_fasta_chunksize,
++            null
          )
          ch_versions = ch_versions.mix(SEQKIT_SPLIT2.out.versions)
  
@@ -35,7 +36,7 @@ Changes in 'detect_rna/main.nf':
          )
          ch_versions = ch_versions.mix(INFERNAL_CMSEARCH.out.versions.first())
          cmsearch_ch = INFERNAL_CMSEARCH.out.cmsearch_tbl
-@@ -81,29 +82,40 @@
+@@ -81,29 +83,40 @@
          ch_cmsearchdeoverlap = CONCATENATE_CMSEARCH_DEOVERLAP.out.file_out
      }
  

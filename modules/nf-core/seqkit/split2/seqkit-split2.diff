@@ -1,14 +1,17 @@
 Changes in component 'nf-core/seqkit/split2'
 'modules/nf-core/seqkit/split2/environment.yml' is unchanged
+'modules/nf-core/seqkit/split2/meta.yml' is unchanged
 Changes in 'seqkit/split2/main.nf':
 --- modules/nf-core/seqkit/split2/main.nf
 +++ modules/nf-core/seqkit/split2/main.nf
-@@ -8,10 +8,10 @@
+@@ -8,10 +8,12 @@
          'biocontainers/seqkit:2.8.1--h9ee0642_0' }"
  
      input:
 -    tuple val(meta), path(reads)
 +    tuple val(meta), path(assembly)
++    val(length)
++    val(nparts)
  
      output:
 -    tuple val(meta), path("**/*.gz"), emit: reads
@@ -16,7 +19,7 @@ Changes in 'seqkit/split2/main.nf':
      path "versions.yml"             , emit: versions
  
      when:
-@@ -20,34 +20,17 @@
+@@ -20,34 +22,28 @@
      script:
      def args   = task.ext.args   ?: ''
      def prefix = task.ext.prefix ?: "${meta.id}"
@@ -28,13 +31,6 @@ Changes in 'seqkit/split2/main.nf':
 -            --threads $task.cpus \\
 -            $reads \\
 -            --out-dir ${prefix}
-+    """
-+    seqkit \\
-+        split2 \\
-+        $args \\
-+        --threads $task.cpus \\
-+        ${assembly} \\
-+        --out-dir ${prefix}
  
 -        cat <<-END_VERSIONS > versions.yml
 -        "${task.process}":
@@ -50,13 +46,30 @@ Changes in 'seqkit/split2/main.nf':
 -            --read1 ${reads[0]} \\
 -            --read2 ${reads[1]} \\
 -            --out-dir ${prefix}
--
++    // Validate
++    if (length != null && nparts != null) {
++        error("Cannot use both --by-length (${length}) and --by-size (${nparts}) simultaneously!")
++    }
++    if (length == null && nparts == null) {
++        error("Neither length nor nparts specified for ${meta.id}. Using seqkit default behavior.")
++    }
+ 
 -        cat <<-END_VERSIONS > versions.yml
 -        "${task.process}":
 -            seqkit: \$(echo \$(seqkit 2>&1) | sed 's/^.*Version: //; s/ .*\$//')
 -        END_VERSIONS
 -        """
 -    }
++    def chunk_by_length = (length != null) ? "--by-length ${length}" : ""
++    def chunk_in_nparts = (nparts != null) ? "--by-size ${nparts}" : ""
++    """
++    seqkit \\
++        split2 \\
++        $args ${chunk_by_length} ${chunk_in_nparts} \\
++        --threads $task.cpus \\
++        ${assembly} \\
++        --out-dir ${prefix}
++
 +    cat <<-END_VERSIONS > versions.yml
 +    "${task.process}":
 +        seqkit: \$(echo \$(seqkit 2>&1) | sed 's/^.*Version: //; s/ .*\$//')
@@ -64,11 +77,10 @@ Changes in 'seqkit/split2/main.nf':
 +    """
  }
 
-'modules/nf-core/seqkit/split2/meta.yml' is unchanged
+'modules/nf-core/seqkit/split2/tests/main.nf.test.snap' is unchanged
 'modules/nf-core/seqkit/split2/tests/tags.yml' is unchanged
 'modules/nf-core/seqkit/split2/tests/size.config' is unchanged
-'modules/nf-core/seqkit/split2/tests/main.nf.test.snap' is unchanged
 'modules/nf-core/seqkit/split2/tests/length.config' is unchanged
-'modules/nf-core/seqkit/split2/tests/part.config' is unchanged
 'modules/nf-core/seqkit/split2/tests/main.nf.test' is unchanged
+'modules/nf-core/seqkit/split2/tests/part.config' is unchanged
 ************************************************************
