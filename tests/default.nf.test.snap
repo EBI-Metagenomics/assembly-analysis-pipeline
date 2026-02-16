@@ -1,18 +1,8 @@
 {
     "-profile test": {
         "content": [
-            151,
+            69,
             {
-                "ANTISMASH_ANTISMASH": {
-                    "antismash": "8.0.1",
-                    "antismash database": "8.0.0"
-                },
-                "ANTISMASH_JSON_TO_GFF": {
-                    "mgnify-pipelines-toolkit": "1.2.0"
-                },
-                "ANTISMASH_SUMMARY": {
-                    "mgnify-pipelines-toolkit": "1.2.0"
-                },
                 "CATPACK_CONTIGS": {
                     "catpack": 6.0,
                     "catpack database": 202501
@@ -23,47 +13,14 @@
                 "COMBINEDGENECALLER_MERGE": {
                     "mgnify-pipelines-toolkit": "1.4.12"
                 },
-                "CONCATENATE_ANTISMASH_GBK": {
-                    "pigz": "2.3.4"
-                },
-                "CONCATENATE_ANTISMASH_GFFS": {
-                    "python": "3.13.1"
-                },
                 "CONCATENATE_CMSEARCH_DEOVERLAP": {
                     "pigz": "2.3.4"
                 },
                 "CONCATENATE_DBCAN_GFFS": {
                     "python": "3.13.1"
                 },
-                "CONCATENATE_DBCAN_HMMOUT": {
-                    "csvtk": "0.31.0"
-                },
-                "CONCATENATE_DBCAN_OVERVIEW": {
-                    "csvtk": "0.31.0"
-                },
-                "CONCATENATE_DBCAN_STANDARD_OUT": {
-                    "csvtk": "0.31.0"
-                },
-                "CONCATENATE_DBCAN_SUBSTRATES": {
-                    "csvtk": "0.31.0"
-                },
-                "CONCATENATE_EGGNOGMAPPER_ANNOTATIONS": {
-                    "pigz": "2.3.4"
-                },
-                "CONCATENATE_EGGNOGMAPPER_ORTHOLOGS": {
-                    "pigz": "2.3.4"
-                },
-                "CONCATENATE_HMMSEARCH_TBLOUT": {
-                    "pigz": "2.3.4"
-                },
                 "CONCATENATE_INTERPROSCAN_GFFS": {
                     "python": "3.13.1"
-                },
-                "CONCATENATE_INTERPROSCAN_TSV": {
-                    "pigz": "2.3.4"
-                },
-                "CREATE_GFF_SUMMARY": {
-                    "mgnify-pipelines-toolkit": "1.4.9"
                 },
                 "DBCAN": {
                     "dbcan": "5.1.2",
@@ -77,20 +34,8 @@
                     "mgnify-pipelines-toolkit": "0.2.1",
                     "uniref90rhea database": 202511
                 },
-                "DRAM_DISTILL_PER_ASSEMBLY": {
-                    "dram": "1.3.5",
-                    "dram databases": "1.3.0"
-                },
-                "DRAM_DISTILL_PER_SAMPLESHEET": {
-                    "dram": "1.3.5",
-                    "dram databases": "1.3.0"
-                },
                 "EASEL_ESLSFETCH": {
                     "easel": 0.49
-                },
-                "EGGNOGMAPPER_ANNOTATIONS": {
-                    "eggnog-mapper": "2.1.12",
-                    "eggnog-mapper database": "5.0.2"
                 },
                 "EGGNOGMAPPER_ORTHOLOGS": {
                     "eggnog-mapper": "2.1.12",
@@ -113,15 +58,6 @@
                 "FRAGGENESCANRS": {
                     "FragGeneScanRs": "1.1.0"
                 },
-                "GENERATEGAF": {
-                    "mgnify-pipelines-toolkit": "1.2.0"
-                },
-                "GENOMEPROPERTIES": {
-                    "Genome Properties": 2.0
-                },
-                "GT_GFF3VALIDATOR": {
-                    "genometools": "1.6.5"
-                },
                 "HMMSEARCH_KOFAMS": {
                     "hmmer": 3.4,
                     "kofam version": 202503
@@ -134,41 +70,15 @@
                     "InterProScan": "5.76-107.0",
                     "InterProScan database": "5.76-107.0"
                 },
-                "INTERPRO_SUMMARY": {
-                    "csvtk": "0.31.0",
-                    "tabix": 1.21
-                },
-                "KEGGPATHWAYSCOMPLETENESS": {
-                    "kegg-pathways-completeness": "1.3.0"
-                },
-                "KEGG_ORTHOLOGS_SUMMARY": {
-                    "biopython": 1.85,
-                    "csvtk": "0.31.0",
-                    "tabix": 1.21
-                },
                 "KRONA_KTIMPORTTEXT": {
                     "krona": "2.8.1"
-                },
-                "MERGE_ANTISMASH_JSON": {
-                    "jq": 1.5
                 },
                 "MGNIFYPIPELINESTOOLKIT_KRONATXTFROMCATCLASSIFICATION": {
                     "mgnify-pipelines-toolkit": "1.4.14"
                 },
-                "MGNIFYPIPELINESTOOLKIT_SUMMARISEGOSLIMS": {
-                    "mgnify-pipelines-toolkit": "1.4.13"
-                },
                 "MINIMAP2_ALIGN": {
                     "minimap2": "2.29-r1283",
                     "samtools": 1.21
-                },
-                "OWLTOOLS": {
-                    "owltools": "2024-06-12T00:00:00+0000",
-                    "golism version": 20160705
-                },
-                "PFAM_SUMMARY": {
-                    "csvtk": "0.31.0",
-                    "tabix": 1.21
                 },
                 "PYRODIGAL": {
                     "pyrodigal": "3.6.3"
@@ -180,44 +90,11 @@
                     "python": "3.9.21",
                     "pyfastax": "2.2.0"
                 },
-                "SANNTIS": {
-                    "SanntiS": "0.9.4.1"
-                },
-                "SANNTIS_SUMMARY": {
-                    "mgnify-pipelines-toolkit": "1.2.0"
-                },
-                "SEQKIT_FIX": {
-                    "csvtk": "0.31.0"
-                },
                 "SEQKIT_GREP": {
                     "seqkit": "2.9.0"
                 },
-                "SEQKIT_SEQ_BGC": {
-                    "seqkit": "v2.9.0"
-                },
                 "SEQKIT_SPLIT2": {
                     "seqkit": "2.8.0"
-                },
-                "SUMMARISE_FOR_DRAM_INPUT": {
-                    "python": "3.13.0"
-                },
-                "TABIX_BGZIPTABIX_GFFSUMMARY": {
-                    "tabix": 1.21
-                },
-                "TABIX_BGZIP_GFFSUMMARY": {
-                    "tabix": 1.2
-                },
-                "TABIX_BGZIP_GO": {
-                    "tabix": 1.2
-                },
-                "TABIX_BGZIP_GOSLIM": {
-                    "tabix": 1.2
-                },
-                "TABIX_BGZIP_KEGGPATHWAYSCOMPLETENESS": {
-                    "tabix": 1.2
-                },
-                "TABIX_BGZIP_KEGGPATHWAYSCOMPLETENESS_PER_CONTIG": {
-                    "tabix": 1.2
                 },
                 "TABIX_BGZIP_RHEAANDCHEBI": {
                     "tabix": 1.2
@@ -228,10 +105,6 @@
             },
             [
                 "ERZ101",
-                "ERZ101/annotation-summary",
-                "ERZ101/annotation-summary/ERZ101_annotation_summary.gff.gz",
-                "ERZ101/annotation-summary/ERZ101_annotation_summary.gff.gz.csi",
-                "ERZ101/annotation-summary/ERZ101_annotation_summary.gff.gz.gzi",
                 "ERZ101/cds",
                 "ERZ101/cds/ERZ101_predicted_cds.faa.gz",
                 "ERZ101/cds/ERZ101_predicted_cds.gff.gz",
@@ -239,54 +112,9 @@
                 "ERZ101/functional-annotation",
                 "ERZ101/functional-annotation/dbcan",
                 "ERZ101/functional-annotation/dbcan/ERZ101_dbcan_cgc.gff.gz",
-                "ERZ101/functional-annotation/dbcan/ERZ101_dbcan_overview.tsv.gz",
-                "ERZ101/functional-annotation/dbcan/ERZ101_dbcan_standard_out.tsv.gz",
-                "ERZ101/functional-annotation/dbcan/ERZ101_dbcan_sub_hmm.tsv.gz",
-                "ERZ101/functional-annotation/dbcan/ERZ101_dbcan_substrates.tsv.gz",
-                "ERZ101/functional-annotation/eggnog",
-                "ERZ101/functional-annotation/eggnog/ERZ101_emapper_annotations.tsv.gz",
-                "ERZ101/functional-annotation/eggnog/ERZ101_emapper_seed_orthologs.tsv.gz",
-                "ERZ101/functional-annotation/go",
-                "ERZ101/functional-annotation/go/ERZ101_go_summary.tsv.gz",
-                "ERZ101/functional-annotation/go/ERZ101_go_summary.tsv.gz.gzi",
-                "ERZ101/functional-annotation/go/ERZ101_goslim_summary.tsv.gz",
-                "ERZ101/functional-annotation/go/ERZ101_goslim_summary.tsv.gz.gzi",
-                "ERZ101/functional-annotation/interpro",
-                "ERZ101/functional-annotation/interpro/ERZ101_interpro_summary.tsv.gz",
-                "ERZ101/functional-annotation/interpro/ERZ101_interpro_summary.tsv.gz.gzi",
-                "ERZ101/functional-annotation/interpro/ERZ101_interproscan.tsv.gz",
-                "ERZ101/functional-annotation/kegg",
-                "ERZ101/functional-annotation/kegg/ERZ101_ko_summary.tsv.gz",
-                "ERZ101/functional-annotation/kegg/ERZ101_ko_summary.tsv.gz.gzi",
-                "ERZ101/functional-annotation/pfam",
-                "ERZ101/functional-annotation/pfam/ERZ101_pfam_summary.tsv.gz",
-                "ERZ101/functional-annotation/pfam/ERZ101_pfam_summary.tsv.gz.gzi",
                 "ERZ101/functional-annotation/rhea-reactions",
                 "ERZ101/functional-annotation/rhea-reactions/ERZ101_proteins2rhea.tsv.gz",
                 "ERZ101/functional-annotation/rhea-reactions/ERZ101_proteins2rhea.tsv.gz.gzi",
-                "ERZ101/pathways-and-systems",
-                "ERZ101/pathways-and-systems/antismash",
-                "ERZ101/pathways-and-systems/antismash/ERZ101_antismash.gbk.gz",
-                "ERZ101/pathways-and-systems/antismash/ERZ101_antismash.gff.gz",
-                "ERZ101/pathways-and-systems/antismash/ERZ101_antismash_summary.tsv.gz",
-                "ERZ101/pathways-and-systems/antismash/ERZ101_antismash_summary.tsv.gz.gzi",
-                "ERZ101/pathways-and-systems/antismash/ERZ101_merged.json",
-                "ERZ101/pathways-and-systems/dram-distill",
-                "ERZ101/pathways-and-systems/dram-distill/ERZ101_dram.html.gz",
-                "ERZ101/pathways-and-systems/dram-distill/ERZ101_dram.tsv.gz",
-                "ERZ101/pathways-and-systems/dram-distill/ERZ101_genome_stats.tsv.gz",
-                "ERZ101/pathways-and-systems/dram-distill/ERZ101_metabolism_summary.xlsx.gz",
-                "ERZ101/pathways-and-systems/genome-properties",
-                "ERZ101/pathways-and-systems/genome-properties/ERZ101_gp.json.gz",
-                "ERZ101/pathways-and-systems/genome-properties/ERZ101_gp.tsv.gz",
-                "ERZ101/pathways-and-systems/genome-properties/ERZ101_gp.txt.gz",
-                "ERZ101/pathways-and-systems/kegg-modules",
-                "ERZ101/pathways-and-systems/kegg-modules/ERZ101_kegg_modules_per_contigs.tsv.gz",
-                "ERZ101/pathways-and-systems/kegg-modules/ERZ101_kegg_modules_per_contigs.tsv.gz.gzi",
-                "ERZ101/pathways-and-systems/kegg-modules/ERZ101_kegg_modules_summary.tsv.gz",
-                "ERZ101/pathways-and-systems/kegg-modules/ERZ101_kegg_modules_summary.tsv.gz.gzi",
-                "ERZ101/pathways-and-systems/sanntis",
-                "ERZ101/pathways-and-systems/sanntis/ERZ101_sanntis.gff.gz",
                 "ERZ101/qc",
                 "ERZ101/qc/ERZ101_filtered_contigs.fasta.gz",
                 "ERZ101/qc/ERZ101_filtered_contigs.fasta.gz.fai",
@@ -295,16 +123,11 @@
                 "ERZ101/qc/decontamination",
                 "ERZ101/qc/decontamination/ERZ101_aligned_to_contaminant.tsv.gz",
                 "ERZ101/qc/decontamination/ERZ101_aligned_to_human.tsv.gz",
-                "ERZ101/qc/multiqc_report.html",
                 "ERZ101/taxonomy",
                 "ERZ101/taxonomy/ERZ101.html",
                 "ERZ101/taxonomy/ERZ101.krona.txt.gz",
                 "ERZ101/taxonomy/ERZ101_contigs_taxonomy.tsv.gz",
                 "ERZ102",
-                "ERZ102/annotation-summary",
-                "ERZ102/annotation-summary/ERZ102_annotation_summary.gff.gz",
-                "ERZ102/annotation-summary/ERZ102_annotation_summary.gff.gz.csi",
-                "ERZ102/annotation-summary/ERZ102_annotation_summary.gff.gz.gzi",
                 "ERZ102/cds",
                 "ERZ102/cds/ERZ102_predicted_cds.faa.gz",
                 "ERZ102/cds/ERZ102_predicted_cds.gff.gz",
@@ -312,54 +135,9 @@
                 "ERZ102/functional-annotation",
                 "ERZ102/functional-annotation/dbcan",
                 "ERZ102/functional-annotation/dbcan/ERZ102_dbcan_cgc.gff.gz",
-                "ERZ102/functional-annotation/dbcan/ERZ102_dbcan_overview.tsv.gz",
-                "ERZ102/functional-annotation/dbcan/ERZ102_dbcan_standard_out.tsv.gz",
-                "ERZ102/functional-annotation/dbcan/ERZ102_dbcan_sub_hmm.tsv.gz",
-                "ERZ102/functional-annotation/dbcan/ERZ102_dbcan_substrates.tsv.gz",
-                "ERZ102/functional-annotation/eggnog",
-                "ERZ102/functional-annotation/eggnog/ERZ102_emapper_annotations.tsv.gz",
-                "ERZ102/functional-annotation/eggnog/ERZ102_emapper_seed_orthologs.tsv.gz",
-                "ERZ102/functional-annotation/go",
-                "ERZ102/functional-annotation/go/ERZ102_go_summary.tsv.gz",
-                "ERZ102/functional-annotation/go/ERZ102_go_summary.tsv.gz.gzi",
-                "ERZ102/functional-annotation/go/ERZ102_goslim_summary.tsv.gz",
-                "ERZ102/functional-annotation/go/ERZ102_goslim_summary.tsv.gz.gzi",
-                "ERZ102/functional-annotation/interpro",
-                "ERZ102/functional-annotation/interpro/ERZ102_interpro_summary.tsv.gz",
-                "ERZ102/functional-annotation/interpro/ERZ102_interpro_summary.tsv.gz.gzi",
-                "ERZ102/functional-annotation/interpro/ERZ102_interproscan.tsv.gz",
-                "ERZ102/functional-annotation/kegg",
-                "ERZ102/functional-annotation/kegg/ERZ102_ko_summary.tsv.gz",
-                "ERZ102/functional-annotation/kegg/ERZ102_ko_summary.tsv.gz.gzi",
-                "ERZ102/functional-annotation/pfam",
-                "ERZ102/functional-annotation/pfam/ERZ102_pfam_summary.tsv.gz",
-                "ERZ102/functional-annotation/pfam/ERZ102_pfam_summary.tsv.gz.gzi",
                 "ERZ102/functional-annotation/rhea-reactions",
                 "ERZ102/functional-annotation/rhea-reactions/ERZ102_proteins2rhea.tsv.gz",
                 "ERZ102/functional-annotation/rhea-reactions/ERZ102_proteins2rhea.tsv.gz.gzi",
-                "ERZ102/pathways-and-systems",
-                "ERZ102/pathways-and-systems/antismash",
-                "ERZ102/pathways-and-systems/antismash/ERZ102_antismash.gbk.gz",
-                "ERZ102/pathways-and-systems/antismash/ERZ102_antismash.gff.gz",
-                "ERZ102/pathways-and-systems/antismash/ERZ102_antismash_summary.tsv.gz",
-                "ERZ102/pathways-and-systems/antismash/ERZ102_antismash_summary.tsv.gz.gzi",
-                "ERZ102/pathways-and-systems/antismash/ERZ102_merged.json",
-                "ERZ102/pathways-and-systems/dram-distill",
-                "ERZ102/pathways-and-systems/dram-distill/ERZ102_dram.html.gz",
-                "ERZ102/pathways-and-systems/dram-distill/ERZ102_dram.tsv.gz",
-                "ERZ102/pathways-and-systems/dram-distill/ERZ102_genome_stats.tsv.gz",
-                "ERZ102/pathways-and-systems/dram-distill/ERZ102_metabolism_summary.xlsx.gz",
-                "ERZ102/pathways-and-systems/genome-properties",
-                "ERZ102/pathways-and-systems/genome-properties/ERZ102_gp.json.gz",
-                "ERZ102/pathways-and-systems/genome-properties/ERZ102_gp.tsv.gz",
-                "ERZ102/pathways-and-systems/genome-properties/ERZ102_gp.txt.gz",
-                "ERZ102/pathways-and-systems/kegg-modules",
-                "ERZ102/pathways-and-systems/kegg-modules/ERZ102_kegg_modules_per_contigs.tsv.gz",
-                "ERZ102/pathways-and-systems/kegg-modules/ERZ102_kegg_modules_per_contigs.tsv.gz.gzi",
-                "ERZ102/pathways-and-systems/kegg-modules/ERZ102_kegg_modules_summary.tsv.gz",
-                "ERZ102/pathways-and-systems/kegg-modules/ERZ102_kegg_modules_summary.tsv.gz.gzi",
-                "ERZ102/pathways-and-systems/sanntis",
-                "ERZ102/pathways-and-systems/sanntis/ERZ102_sanntis.gff.gz",
                 "ERZ102/qc",
                 "ERZ102/qc/ERZ102_filtered_contigs.fasta.gz",
                 "ERZ102/qc/ERZ102_filtered_contigs.fasta.gz.fai",
@@ -367,7 +145,6 @@
                 "ERZ102/qc/ERZ102_quast_stats.tsv.gz",
                 "ERZ102/qc/decontamination",
                 "ERZ102/qc/decontamination/ERZ102_aligned_to_human.tsv.gz",
-                "ERZ102/qc/multiqc_report.html",
                 "ERZ102/taxonomy",
                 "ERZ102/taxonomy/ERZ102.html",
                 "ERZ102/taxonomy/ERZ102.krona.txt.gz",
@@ -375,97 +152,21 @@
                 "ERZ666",
                 "ERZ666/qc",
                 "ERZ666/qc/ERZ666_quast_stats.tsv.gz",
-                "ERZ666/qc/multiqc_report.html",
                 "ERZ999",
                 "ERZ999/qc",
                 "ERZ999/qc/ERZ999_quast_stats.tsv.gz",
-                "ERZ999/qc/multiqc_report.html",
-                "analysed_assemblies.csv",
                 "downstream_samplesheets",
                 "downstream_samplesheets/virify_samplesheet.csv",
                 "dram-distill",
-                "dram-distill/samplesheet_dram.html.gz",
-                "dram-distill/samplesheet_dram.tsv.gz",
-                "dram-distill/samplesheet_dram_input.tsv",
-                "dram-distill/samplesheet_genome_stats.tsv.gz",
-                "dram-distill/samplesheet_metabolism_summary.xlsx.gz",
-                "multiqc",
-                "multiqc/multiqc_data",
-                "multiqc/multiqc_data/multiqc.log",
-                "multiqc/multiqc_data/multiqc_citations.txt",
-                "multiqc/multiqc_data/multiqc_data.json",
-                "multiqc/multiqc_data/multiqc_general_stats.txt",
-                "multiqc/multiqc_data/multiqc_host_decontamination_table.txt",
-                "multiqc/multiqc_data/multiqc_host_decontamination_table_table.txt",
-                "multiqc/multiqc_data/multiqc_human_decontamination_table.txt",
-                "multiqc/multiqc_data/multiqc_human_decontamination_table_table.txt",
-                "multiqc/multiqc_data/multiqc_quast.txt",
-                "multiqc/multiqc_data/multiqc_software_versions.txt",
-                "multiqc/multiqc_data/multiqc_sources.txt",
-                "multiqc/multiqc_data/quast_num_contigs.txt",
-                "multiqc/multiqc_data/quast_table.txt",
-                "multiqc/multiqc_plots",
-                "multiqc/multiqc_plots/pdf",
-                "multiqc/multiqc_plots/pdf/general_stats_table.pdf",
-                "multiqc/multiqc_plots/pdf/host_decontamination_table.pdf",
-                "multiqc/multiqc_plots/pdf/human_decontamination_table.pdf",
-                "multiqc/multiqc_plots/pdf/quast_num_contigs-cnt.pdf",
-                "multiqc/multiqc_plots/pdf/quast_num_contigs-pct.pdf",
-                "multiqc/multiqc_plots/pdf/quast_table.pdf",
-                "multiqc/multiqc_plots/png",
-                "multiqc/multiqc_plots/png/general_stats_table.png",
-                "multiqc/multiqc_plots/png/host_decontamination_table.png",
-                "multiqc/multiqc_plots/png/human_decontamination_table.png",
-                "multiqc/multiqc_plots/png/quast_num_contigs-cnt.png",
-                "multiqc/multiqc_plots/png/quast_num_contigs-pct.png",
-                "multiqc/multiqc_plots/png/quast_table.png",
-                "multiqc/multiqc_plots/svg",
-                "multiqc/multiqc_plots/svg/general_stats_table.svg",
-                "multiqc/multiqc_plots/svg/host_decontamination_table.svg",
-                "multiqc/multiqc_plots/svg/human_decontamination_table.svg",
-                "multiqc/multiqc_plots/svg/quast_num_contigs-cnt.svg",
-                "multiqc/multiqc_plots/svg/quast_num_contigs-pct.svg",
-                "multiqc/multiqc_plots/svg/quast_table.svg",
-                "multiqc/multiqc_report.html",
                 "pipeline_info",
                 "pipeline_info/assembly_analysis_pipeline_software_mqc_versions.yml",
                 "qc_failed_assemblies.csv"
             ],
             [
-                "ERZ101_annotation_summary.gff.gz:md5,1c228bedc129bbd7f71eb59322beceeb",
-                "ERZ101_annotation_summary.gff.gz.csi:md5,a70e5f70ccc09d2f8e7c9ffbfe65db1d",
-                "ERZ101_annotation_summary.gff.gz.gzi:md5,ae516cdccf54e18c35d9d77c7aae27f4",
                 "ERZ101_predicted_cds.gff.gz:md5,a2b9e4f849cff61e9fa825781e9938e9",
                 "ERZ101_dbcan_cgc.gff.gz:md5,e14511869398914ec5ec9037ae60f7b0",
-                "ERZ101_dbcan_overview.tsv.gz:md5,71857c4ba58ecf8345838f2f2aef11cb",
-                "ERZ101_dbcan_standard_out.tsv.gz:md5,6be9ab29b289ff46cc6e4b6fe48dc3d7",
-                "ERZ101_dbcan_sub_hmm.tsv.gz:md5,b9813dc2c2c30d062597f6ff81807706",
-                "ERZ101_dbcan_substrates.tsv.gz:md5,d41d8cd98f00b204e9800998ecf8427e",
-                "ERZ101_emapper_annotations.tsv.gz:md5,acf16652adebcb33083edd74c5ec6e5f",
-                "ERZ101_emapper_seed_orthologs.tsv.gz:md5,57c36dd24cfd371f6a183fcd8cc85619",
-                "ERZ101_go_summary.tsv.gz:md5,7a45b33259c95c377b6a480e5a8e1a65",
-                "ERZ101_go_summary.tsv.gz.gzi:md5,7dea362b3fac8e00956a4952a3d4f474",
-                "ERZ101_goslim_summary.tsv.gz:md5,ea99428ad00b74e90d5797378bef7387",
-                "ERZ101_goslim_summary.tsv.gz.gzi:md5,7dea362b3fac8e00956a4952a3d4f474",
-                "ERZ101_interpro_summary.tsv.gz:md5,5448520d999b40b64f01324a8396cc55",
-                "ERZ101_interpro_summary.tsv.gz.gzi:md5,7dea362b3fac8e00956a4952a3d4f474",
-                "ERZ101_ko_summary.tsv.gz:md5,39cb7a8d66d0381ab5eb5edc56305e9f",
-                "ERZ101_ko_summary.tsv.gz.gzi:md5,7dea362b3fac8e00956a4952a3d4f474",
-                "ERZ101_pfam_summary.tsv.gz:md5,b5f9a4756b2001bef191b7cb654d1a08",
-                "ERZ101_pfam_summary.tsv.gz.gzi:md5,7dea362b3fac8e00956a4952a3d4f474",
                 "ERZ101_proteins2rhea.tsv.gz:md5,d41d8cd98f00b204e9800998ecf8427e",
                 "ERZ101_proteins2rhea.tsv.gz.gzi:md5,c2cb56f4c5bf656faca0986e7eba0308",
-                "ERZ101_antismash_summary.tsv.gz:md5,6ad987c8844dc8cf1ef764afca708c12",
-                "ERZ101_antismash_summary.tsv.gz.gzi:md5,7dea362b3fac8e00956a4952a3d4f474",
-                "ERZ101_dram.html.gz:md5,65198bf5083e96a1e00861290586a0c4",
-                "ERZ101_dram.tsv.gz:md5,b913fe1ba596ac43f9a38058c3aae645",
-                "ERZ101_genome_stats.tsv.gz:md5,3d15bb18cc3cbc687b04e81bcccdb3ff",
-                "ERZ101_gp.txt.gz:md5,f9be4fc7ef35063f20ae8bb5285b8a33",
-                "ERZ101_kegg_modules_per_contigs.tsv.gz:md5,8cfa36f55c1f4be7249c52ea77b0de07",
-                "ERZ101_kegg_modules_per_contigs.tsv.gz.gzi:md5,7dea362b3fac8e00956a4952a3d4f474",
-                "ERZ101_kegg_modules_summary.tsv.gz:md5,9d9859bfbbfac5b1708b6472f7eb74bb",
-                "ERZ101_kegg_modules_summary.tsv.gz.gzi:md5,7dea362b3fac8e00956a4952a3d4f474",
-                "ERZ101_sanntis.gff.gz:md5,df19e1b84ba6f691d20c72b397c88abf",
                 "ERZ101_filtered_contigs.fasta.gz:md5,6499031bc92e9dd14320dc30de65b438",
                 "ERZ101_filtered_contigs.fasta.gz.fai:md5,7a69e27810bebf9e31e84bc9b6d62206",
                 "ERZ101_filtered_contigs.fasta.gz.gzi:md5,4e8f724db1539b04d8cde5564f0b471c",
@@ -475,40 +176,10 @@
                 "ERZ101.html:md5,e56d9f9358ef11fc76a5c4d95bcea909",
                 "ERZ101.krona.txt.gz:md5,e8f24f3ddbf7289920fae9f28ab185c8",
                 "ERZ101_contigs_taxonomy.tsv.gz:md5,79cd8563ff9bca613332d1a516f0ef3e",
-                "ERZ102_annotation_summary.gff.gz:md5,f2ebdb0032c42f788f5843dcafb0bd96",
-                "ERZ102_annotation_summary.gff.gz.csi:md5,1d53d74541aba5644aeb0c6982c6a9ea",
-                "ERZ102_annotation_summary.gff.gz.gzi:md5,ae516cdccf54e18c35d9d77c7aae27f4",
                 "ERZ102_predicted_cds.gff.gz:md5,1716b1f345484cf09c26c7771cd90781",
                 "ERZ102_dbcan_cgc.gff.gz:md5,4c860ec9d2d5406fd4240b28dc5cec58",
-                "ERZ102_dbcan_overview.tsv.gz:md5,cbddee1a15ae311d44f0ee1907470d40",
-                "ERZ102_dbcan_standard_out.tsv.gz:md5,6be9ab29b289ff46cc6e4b6fe48dc3d7",
-                "ERZ102_dbcan_sub_hmm.tsv.gz:md5,e79ebc4d9729d011f154bd2e79e77fcf",
-                "ERZ102_dbcan_substrates.tsv.gz:md5,d41d8cd98f00b204e9800998ecf8427e",
-                "ERZ102_emapper_annotations.tsv.gz:md5,acf16652adebcb33083edd74c5ec6e5f",
-                "ERZ102_emapper_seed_orthologs.tsv.gz:md5,56e8adb2d33977e6e734bac5ec8df8cd",
-                "ERZ102_go_summary.tsv.gz:md5,7a45b33259c95c377b6a480e5a8e1a65",
-                "ERZ102_go_summary.tsv.gz.gzi:md5,7dea362b3fac8e00956a4952a3d4f474",
-                "ERZ102_goslim_summary.tsv.gz:md5,ea99428ad00b74e90d5797378bef7387",
-                "ERZ102_goslim_summary.tsv.gz.gzi:md5,7dea362b3fac8e00956a4952a3d4f474",
-                "ERZ102_interpro_summary.tsv.gz:md5,5448520d999b40b64f01324a8396cc55",
-                "ERZ102_interpro_summary.tsv.gz.gzi:md5,7dea362b3fac8e00956a4952a3d4f474",
-                "ERZ102_ko_summary.tsv.gz:md5,39cb7a8d66d0381ab5eb5edc56305e9f",
-                "ERZ102_ko_summary.tsv.gz.gzi:md5,7dea362b3fac8e00956a4952a3d4f474",
-                "ERZ102_pfam_summary.tsv.gz:md5,b5f9a4756b2001bef191b7cb654d1a08",
-                "ERZ102_pfam_summary.tsv.gz.gzi:md5,7dea362b3fac8e00956a4952a3d4f474",
                 "ERZ102_proteins2rhea.tsv.gz:md5,d41d8cd98f00b204e9800998ecf8427e",
                 "ERZ102_proteins2rhea.tsv.gz.gzi:md5,c2cb56f4c5bf656faca0986e7eba0308",
-                "ERZ102_antismash_summary.tsv.gz:md5,6ad987c8844dc8cf1ef764afca708c12",
-                "ERZ102_antismash_summary.tsv.gz.gzi:md5,7dea362b3fac8e00956a4952a3d4f474",
-                "ERZ102_dram.html.gz:md5,b738e83a36a48c5568aeebbd7fe8873a",
-                "ERZ102_dram.tsv.gz:md5,587f3c80f440c95a7117aa787cf92aa0",
-                "ERZ102_genome_stats.tsv.gz:md5,85722e972b6a388fce9c350f72d9e42d",
-                "ERZ102_gp.txt.gz:md5,f9be4fc7ef35063f20ae8bb5285b8a33",
-                "ERZ102_kegg_modules_per_contigs.tsv.gz:md5,8cfa36f55c1f4be7249c52ea77b0de07",
-                "ERZ102_kegg_modules_per_contigs.tsv.gz.gzi:md5,7dea362b3fac8e00956a4952a3d4f474",
-                "ERZ102_kegg_modules_summary.tsv.gz:md5,9d9859bfbbfac5b1708b6472f7eb74bb",
-                "ERZ102_kegg_modules_summary.tsv.gz.gzi:md5,7dea362b3fac8e00956a4952a3d4f474",
-                "ERZ102_sanntis.gff.gz:md5,df19e1b84ba6f691d20c72b397c88abf",
                 "ERZ102_filtered_contigs.fasta.gz:md5,dcfc40de8e74f662979c8089436e2191",
                 "ERZ102_filtered_contigs.fasta.gz.fai:md5,0fc4caf89637e0f0a36722a24c0e1317",
                 "ERZ102_filtered_contigs.fasta.gz.gzi:md5,03dd37017aa7366aa239bad2a4eac58e",
@@ -519,17 +190,6 @@
                 "ERZ102_contigs_taxonomy.tsv.gz:md5,13147201c1ce2cc4d44202d48948cbe8",
                 "ERZ666_quast_stats.tsv.gz:md5,9b4095efcbe329d05308346bbbe08ed3",
                 "ERZ999_quast_stats.tsv.gz:md5,72b939c0fe473ed347c03348bc130e27",
-                "analysed_assemblies.csv:md5,333c3997aa4621cf3a644719e9021296",
-                "samplesheet_dram.tsv.gz:md5,d9509874f9f6bbc2ab165106655fbce1",
-                "multiqc_citations.txt:md5,2d1a8ef8ba06c7eada06ab3e96552ea4",
-                "multiqc_general_stats.txt:md5,214026c97163f61612fc28449b589f97",
-                "multiqc_host_decontamination_table.txt:md5,b8d06985826c0451c759e08382db2347",
-                "multiqc_host_decontamination_table_table.txt:md5,b8d06985826c0451c759e08382db2347",
-                "multiqc_human_decontamination_table.txt:md5,f8bc5f4b45b46d49826e5d8207a3b8f2",
-                "multiqc_human_decontamination_table_table.txt:md5,f8bc5f4b45b46d49826e5d8207a3b8f2",
-                "multiqc_quast.txt:md5,d8600bbb835979a7817be9827ff85be2",
-                "quast_num_contigs.txt:md5,a078f48987914adbb249f0d8382f31f1",
-                "quast_table.txt:md5,be0aea9b4cf84382aa6dc71787f4203a",
                 "qc_failed_assemblies.csv:md5,3292564aa6122920901d9bb724447ad4"
             ]
         ],
@@ -537,6 +197,6 @@
             "nf-test": "0.9.2",
             "nextflow": "25.10.3"
         },
-        "timestamp": "2026-02-10T00:05:42.727368"
+        "timestamp": "2026-02-16T15:48:54.868465"
     }
 }

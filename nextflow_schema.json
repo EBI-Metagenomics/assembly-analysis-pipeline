@@ -158,10 +158,10 @@
                     "type": "string"
                 },
                 "protein_annotation_fasta_chunksize": {
-                    "default": "50K",
+                    "default": 50000,
                     "description": "Controls the chunking of protein FASTA files for parallel functional annotation. Format follows seqkit --by-size (e.g., '50K' for 50 thousand sequences per chunk). Used in tools such as InterProScan in the functional annotation subworkflow.",
                     "fa_icon": "fas fa-weight",
-                    "type": "string"
+                    "type": "number"
                 }
             },
             "title": "Nucleotide and protein fasta file chunking options",

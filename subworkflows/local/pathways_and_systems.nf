@@ -68,11 +68,11 @@ workflow PATHWAYS_AND_SYSTEMS {
     )
     ch_versions = ch_versions.mix(SEQKIT_SEQ_BGC.out.versions)
 
-    // Chunk the fasta into files with at most params.bgc_analysis_fasta_chunksize sequences
+    // Split the contigs FASTA by total nucleotides per chunk
     SEQKIT_SPLIT2(
         SEQKIT_SEQ_BGC.out.fastx,
-        params.bgc_analysis_fasta_chunksize,
-        null
+        params.bgc_analysis_fasta_chunksize,  // length: max number of nucleotides per chunk
+        []                                    // size: [disabled] max number of sequences per chunk
     )
     ch_versions = ch_versions.mix(SEQKIT_SPLIT2.out.versions)
 
