@@ -28,7 +28,7 @@ process SEQKIT_SPLIT2 {
         error("Cannot use both --by-length (${length}) and --by-size (${size}) simultaneously!")
     }
     if (length == null && size == null) {
-        error("Neither length nor nparts specified for ${meta.id}. Using seqkit default behavior.")
+        error("Neither length nor size specified for ${meta.id}.")
     }
 
     def chunk_by_length = (length != null) ? "--by-length ${length}" : ""

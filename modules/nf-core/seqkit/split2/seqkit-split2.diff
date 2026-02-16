@@ -11,7 +11,7 @@ Changes in 'seqkit/split2/main.nf':
 -    tuple val(meta), path(reads)
 +    tuple val(meta), path(assembly)
 +    val(length)
-+    val(nparts)
++    val(size)
  
      output:
 -    tuple val(meta), path("**/*.gz"), emit: reads
@@ -47,11 +47,11 @@ Changes in 'seqkit/split2/main.nf':
 -            --read2 ${reads[1]} \\
 -            --out-dir ${prefix}
 +    // Validate
-+    if (length != null && nparts != null) {
-+        error("Cannot use both --by-length (${length}) and --by-size (${nparts}) simultaneously!")
++    if (length != null && size != null) {
++        error("Cannot use both --by-length (${length}) and --by-size (${size}) simultaneously!")
 +    }
-+    if (length == null && nparts == null) {
-+        error("Neither length nor nparts specified for ${meta.id}. Using seqkit default behavior.")
++    if (length == null && size == null) {
++        error("Neither length nor size specified for ${meta.id}.")
 +    }
  
 -        cat <<-END_VERSIONS > versions.yml
@@ -61,11 +61,11 @@ Changes in 'seqkit/split2/main.nf':
 -        """
 -    }
 +    def chunk_by_length = (length != null) ? "--by-length ${length}" : ""
-+    def chunk_in_nparts = (nparts != null) ? "--by-size ${nparts}" : ""
++    def chunk_in_size   = (size != null) ? "--by-size ${size}" : ""
 +    """
 +    seqkit \\
 +        split2 \\
-+        $args ${chunk_by_length} ${chunk_in_nparts} \\
++        $args ${chunk_by_length} ${chunk_in_size} \\
 +        --threads $task.cpus \\
 +        ${assembly} \\
 +        --out-dir ${prefix}
