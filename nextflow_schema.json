@@ -147,6 +147,12 @@
             "description": "Chunking input fasta files is used to parallelize the execution of some tools. Larger values reduce overhead but limit parallelism. Seqkit split2 is used for the splitting, and the values from the following flags are passed on to the flag --by-length (https://bioinf.shenwei.me/seqkit/usage/#split2)",
             "fa_icon": "fas fa-cut",
             "properties": {
+                "protein_annotation_fasta_chunksize": {
+                    "default": 15000,
+                    "description": "Controls the chunking of protein FASTA files for parallel functional annotation. Format follows seqkit --by-size (this expects a integer). Used in tools such as InterProScan in the functional annotation subworkflow.",
+                    "fa_icon": "fas fa-weight",
+                    "type": "number"
+                },
                 "rna_detection_fasta_chunksize": {
                     "default": "50M",
                     "description": "Controls the chunking of the nucleotide contig FASTA files for parallel RNA feature detection. Format follows seqkit --by-length (e.g., '100M' for 100 million base pairs). Used in tools such as Infernal CMsearch/CMscan in the detect RNA subworkflow.",
@@ -156,12 +162,6 @@
                     "default": "50M",
                     "description": "Controls the chunking of the nucleotide contig FASTA files for parallel Biosynthetic Gene Cluster analysis. Format follows seqkit --by-length (e.g., '50M' for 50 million base pairs). Used in tools such as antiSMASH in the pathways and systems subworkflow.",
                     "type": "string"
-                },
-                "protein_annotation_fasta_chunksize": {
-                    "default": 50000,
-                    "description": "Controls the chunking of protein FASTA files for parallel functional annotation. Format follows seqkit --by-size (e.g., '50K' for 50 thousand sequences per chunk). Used in tools such as InterProScan in the functional annotation subworkflow.",
-                    "fa_icon": "fas fa-weight",
-                    "type": "number"
                 }
             },
             "title": "Nucleotide and protein fasta file chunking options",
