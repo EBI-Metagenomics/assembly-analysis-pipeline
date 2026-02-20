@@ -4,10 +4,10 @@
 
 ```bash
 # All tests
-python test_filter_gff.py -v
+python filter_gff_by_fasta_sequences_test.py -v
 
 # Single test
-python test_filter_gff.py TestExtractFastaSequenceIds.test_mixed_formats -v
+python filter_gff_by_fasta_sequences_test.py TestExtractFastaSequenceIds.test_mixed_formats -v
 ```
 
 ## Coverage
