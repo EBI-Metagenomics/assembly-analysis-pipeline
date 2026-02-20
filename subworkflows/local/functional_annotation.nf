@@ -148,8 +148,9 @@ workflow FUNCTIONAL_ANNOTATION {
         ch_dbcan
     }
 
-    // DBCan is recieving a protein chunk and the whole assembly GFF so we have modified
-    // the process to filter out the entries in the GFF with only the sequences in the proteins chunk
+    // dbCAN takes a subset (chunk) of proteins and the complete assembly GFF file as input.
+    // We therefore updated the workflow to filter the GFF file, retaining only the entries
+    // associated with the proteins in the given chunk.
     DBCAN(
         ch_dbcan.faa,
         ch_dbcan.gff,
