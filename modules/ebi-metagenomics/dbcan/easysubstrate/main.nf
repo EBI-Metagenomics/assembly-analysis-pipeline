@@ -46,6 +46,9 @@ process DBCAN {
         gzip -c -d ${gff} > ${gff_name}
     fi
 
+    # Filter GFF to only include sequences present in the proteins FASTA file
+    filter_gff_by_fasta_sequences.py ${fasta_name} ${gff_name} ${gff_name}.filtered.gff
+
     run_dbcan \\
         easy_substrate \\
         ${args} \\
@@ -54,7 +57,7 @@ process DBCAN {
         --output_dir results \\
         --input_raw_data ${fasta_name} \\
         --gff_type prodigal \\
-        --input_gff ${gff_name} \\
+        --input_gff ${gff_name}.filtered.gff \\
         --mode ${mode}
 
     # Bulk rename of the results, dbcan doesn't have a prefix parameter

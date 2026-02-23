@@ -140,6 +140,7 @@ workflow FUNCTIONAL_ANNOTATION {
     )
     ch_versions = ch_versions.mix(TABIX_BGZIP_RHEAANDCHEBI.out.versions)
 
+    // The faa is chunked (XXX_001.faa...) but not the GFF (it is the concatenated one directly from the CGC)
     ch_proteins_gff.combine(ch_protein_chunked, by: 0).multiMap { meta, gff, faa ->
         faa: [meta, faa]
         gff: [meta, gff]
@@ -147,6 +148,9 @@ workflow FUNCTIONAL_ANNOTATION {
         ch_dbcan
     }
 
+    // dbCAN takes a subset (chunk) of proteins and the complete assembly GFF file as input.
+    // We therefore updated the workflow to filter the GFF file, retaining only the entries
+    // associated with the proteins in the given chunk.
     DBCAN(
         ch_dbcan.faa,
         ch_dbcan.gff,
