@@ -37,6 +37,14 @@ process DBCAN {
 
     def is_gff_compressed = gff.getExtension() == "gz"
     def gff_name = is_gff_compressed ? gff.getBaseName() : gff
+
+    // This are the columns of the dbcansub_hmm_results.tsv file, which will contain only a subset of the
+    // headers if there are no results for the assembly
+    def dbsub_output_tsv_headers = [
+        'Subfam Name', 'Subfam Composition', 'Subfam EC', 'Substrate',
+        'HMM Length', 'Target Name', 'Target Length', 'i-Evalue',
+        'HMM From', 'HMM To', 'Target From', 'Target To', 'Coverage', 'HMM File Name'
+    ].join("\t")
     """
     if [ "${is_fasta_compressed}" == "true" ]; then
         gzip -c -d ${fasta} > ${fasta_name}
@@ -64,6 +72,46 @@ process DBCAN {
     find results -type f | while read -r file; do
         mv "\$file" "\$(dirname "\$file")/${prefix}_\$(basename "\$file" | tr [:upper:] [:lower:])"
     done
+
+    ##########################################################################
+    # run_dbcan will produce a broken tsv if there are no results to process #
+    ##########################################################################
+    # The chain of warnings and errors are:
+    #######################################################################
+    # WARNING - No dbCAN-sub results to process
+    # INFO    - Found dbcan_hmm results at results/dbCAN_hmm_results.tsv
+    # ERROR   - Error loading diamond results: No columns to parse from file
+    # WARNING - Missing columns in results/dbCANsub_hmm_results.tsv. Expected:
+    # 'Target Name'
+    # 'Subfam Name'
+    # 'Subfam EC'
+    # 'Target From'
+    # 'Target To'
+    # 'i-Evalue'
+    # 
+    # Found:
+    # 'HMM Name'
+    # 'HMM Length'
+    # 'Target Name'
+    # 'Target Length'
+    # 'i-Evalue'
+    # 'HMM From'
+    # 'HMM To'
+    # 'Target From'
+    # 'Target To'
+    # 'Coverage'
+    # 'HMM File Name'
+    
+    # To handle this, if there is only one line in the tsv we override with all the column headers
+    if [[ \$(wc -l < "results/${prefix}_dbcansub_hmm_results.tsv") -eq 1 ]]; then
+        # I'm moving the file as otherwise I was getting a random 'cannot overwrite existing file' error
+        # also, I'm not removing this file because in nfs and such systems this could be problematic as
+        # there is a significant delay, so mv the file makes it easier. The cost of this is just an extra file
+        # that will be deleted when the pipeline finished.
+        mv results/${prefix}_dbcansub_hmm_results.tsv results/${prefix}_dbcansub_hmm_results.tsv_broken_headers
+        echo \"${dbsub_output_tsv_headers}\" > results/${prefix}_dbcansub_hmm_results.tsv
+    fi
+    #######################################################################
 
     gzip results/*.*
 
