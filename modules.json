@@ -123,9 +123,8 @@
                     },
                     "combinedgenecaller/merge": {
                         "branch": "main",
-                        "git_sha": "d1b6f930050ec03c0cef560007a504b3877349b3",
-                        "installed_by": ["combined_gene_caller"],
-                        "patch": "modules/ebi-metagenomics/combinedgenecaller/merge/combinedgenecaller-merge.diff"
+                        "git_sha": "38adca2a1b8b246a3dc80222139effdf9700da40",
+                        "installed_by": ["combined_gene_caller"]
                     },
                     "convertcmscantocmsearch": {
                         "branch": "main",
@@ -244,11 +243,6 @@
                         "installed_by": ["goslim_swf"],
                         "patch": "modules/ebi-metagenomics/owltools/owltools.diff"
                     },
-                    "pyrodigal": {
-                        "branch": "main",
-                        "git_sha": "62a62db0834d95722de5a155778d70074b211dd6",
-                        "installed_by": ["combined_gene_caller"]
-                    },
                     "sanntis": {
                         "branch": "main",
                         "git_sha": "0d489b1617f2015cd99eea7f9369491723eb9260",
@@ -271,7 +265,7 @@
                     },
                     "combined_gene_caller": {
                         "branch": "main",
-                        "git_sha": "cfeff30dbf938786d1f4c3af08b4261d1d7e508e",
+                        "git_sha": "6d8c0aa510aaaca76b4f88b11a1629fc935cdaaa",
                         "installed_by": ["subworkflows"]
                     },
                     "contigs_taxonomic_classification": {

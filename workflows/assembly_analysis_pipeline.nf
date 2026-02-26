@@ -157,9 +157,12 @@ workflow ASSEMBLY_ANALYSIS_PIPELINE {
             ch_cgc
         }
 
+    // TODO: figure a better way to pass on the versions of Pyrodigal and FGSRS
     COMBINED_GENE_CALLER(
         ch_cgc.assembly,
         ch_cgc.ssu_lsu_coords,
+        "3.6.3", // Pyrodigal version
+        "1.1.0"  // FragGeneScanRS version
     )
     ch_versions = ch_versions.mix(COMBINED_GENE_CALLER.out.versions)
 
