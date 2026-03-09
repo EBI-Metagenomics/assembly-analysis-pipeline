@@ -14,9 +14,11 @@ include { KEGGPATHWAYSCOMPLETENESS     } from '../../modules/ebi-metagenomics/ke
 /* LOCAL */
 include { ANTISMASH_JSON_TO_GFF                          } from '../../modules/local/antismash_json_to_gff'
 include { CONCATENATE_GFFS as CONCATENATE_ANTISMASH_GFFS } from '../../modules/local/concatenate_gffs'
+include { CONCATENATE_GFFS as CONCATENATE_SANNTIS_GFFS   } from '../../modules/local/concatenate_gffs'
 include { ANTISMASH_SUMMARY                              } from '../../modules/local/antismash_summary'
 include { SANNTIS_SUMMARY                                } from '../../modules/local/sanntis_summary'
 include { MERGE_ANTISMASH_JSON                           } from '../../modules/local/merge_antismash_json'
+include { FILTER_IPS_AND_FAA_BY_CONTIGS                  } from '../../modules/local/filter_ips_and_faa_by_contigs'
 
 include { DRAM_DISTILL_SWF                               } from '../../subworkflows/local/dram_distill_swf'
 
@@ -118,22 +120,30 @@ workflow PATHWAYS_AND_SYSTEMS {
     )
     ch_versions = ch_versions.mix(ANTISMASH_SUMMARY.out.versions)
 
-    // Note: same weirdness as antismash_channel
-    ch_sanntis = ch_contigs_and_predicted_proteins.map { meta, _all_contigs_fasta, faa, _gff, ips_tsv ->
-        [meta, ips_tsv, [], faa]
-    }
+    // For each chunk we filter the full IPS TSV and FAA to only the proteins belonging
+    // to contigs in that chunk, then run SANNTIS in parallel and merge the results.
+    ch_sanntis_chunks = ch_contigs_and_predicted_proteins
+        .combine(SEQKIT_SPLIT2.out.assembly.transpose(), by: 0)
+        .map { meta, _all_contigs_fasta, faa, _gff, ips_tsv, contigs_chunk ->
+            [meta, contigs_chunk, ips_tsv, faa]
+        }
 
-    // We run SanntiS only once per assembly. To chunk it, we would need to ensure
-    // that each protein chunk contains annotations for only one contig. Otherwise,
-    // SanntiS might misannotate sequences, as there is no guarantee that all proteins
-    // from a single contig will be present in the same faa chunk.
+    FILTER_IPS_AND_FAA_BY_CONTIGS(ch_sanntis_chunks)
+    ch_versions = ch_versions.mix(FILTER_IPS_AND_FAA_BY_CONTIGS.out.versions)
+
     SANNTIS(
-        ch_sanntis
+        FILTER_IPS_AND_FAA_BY_CONTIGS.out.filtered
+            .map { meta, ips, faa -> [meta, ips, [], faa] }
     )
     ch_versions = ch_versions.mix(SANNTIS.out.versions)
 
+    CONCATENATE_SANNTIS_GFFS(
+        SANNTIS.out.gff.groupTuple()
+    )
+    ch_versions = ch_versions.mix(CONCATENATE_SANNTIS_GFFS.out.versions)
+
     SANNTIS_SUMMARY(
-        SANNTIS.out.gff
+        CONCATENATE_SANNTIS_GFFS.out.concatenated_gff
     )
     ch_versions = ch_versions.mix(SANNTIS_SUMMARY.out.versions)
 
@@ -150,6 +160,6 @@ workflow PATHWAYS_AND_SYSTEMS {
 
     emit:
     versions = ch_versions
-    sanntis_gff = SANNTIS.out.gff
+    sanntis_gff = CONCATENATE_SANNTIS_GFFS.out.concatenated_gff
     antismash_gff = CONCATENATE_ANTISMASH_GFFS.out.concatenated_gff
 }
