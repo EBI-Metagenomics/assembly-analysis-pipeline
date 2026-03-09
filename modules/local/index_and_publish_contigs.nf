@@ -37,7 +37,7 @@ process INDEX_AND_PUBLISH_CONTIGS {
 
     script:
     """
-    NUM_SEQS=\$(zcat ${contigs} | grep -c '^>' || true)
+    NUM_SEQS=\$(zcat ${contigs} | grep -c '^>')
 
     if [[ \$NUM_SEQS -eq 0 ]]; then
         EXIT_REASON="insufficient_contigs_after_decontamination"
