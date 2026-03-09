@@ -41,7 +41,7 @@ The `qc` directory contains output files related to the quality control steps of
 
 #### Output files
 
-- **ERZ12345_filtered_contigs.fasta.gz**: This `FASTA` file contains the filtered contigs after the removal of those that are shorter than 500 bases, and which have a proportion of ambiguous bases higher than 10%.
+- **ERZ12345_filtered_contigs.fasta.gz**: This `FASTA` file contains the final processed contigs. Contigs shorter than 500 bases and those with a proportion of ambiguous bases higher than 10% are removed first. If decontamination is enabled, contigs aligning to the PhiX, human, or host reference genomes are also removed. It is bgzip-compressed to allow random access via the accompanying index files.
 - **ERZ12345_filtered_contigs.fasta.gz.gzi**: This file is a compression index for the blockzip compressed filtered_contigs fasta file.
 - **ERZ12345_filtered_contigs.fasta.gz.fai**: This file is a FASTA index for the blockzip compressed filtered_contigs fasta file.
 - **ERZ12345_quast_stats.tsv.gz**: This compressed `tsv` file contains the QUAST summary output, giving an assessment of the quality of the contigs of this assembly.
@@ -337,10 +337,11 @@ ERZ56790,insufficient_contigs_after_n_content_filtering
 
 #### The possible QC failed statuses are
 
-| Status                                         | Description                                                                |
-| ---------------------------------------------- | -------------------------------------------------------------------------- |
-| insufficient_contigs_after_length_filtering    | No contigs remained after applying the minimum length filter.              |
-| insufficient_contigs_after_n_content_filtering | No contigs remained after filtering out sequences with high N-base content |
+| Status                                         | Description                                                                               |
+| ---------------------------------------------- | ----------------------------------------------------------------------------------------- |
+| insufficient_contigs_after_length_filtering    | No contigs remained after applying the minimum length filter.                             |
+| insufficient_contigs_after_n_content_filtering | No contigs remained after filtering out sequences with high N-base content.               |
+| insufficient_contigs_after_decontamination     | No contigs remained after decontamination against PhiX, human, or host reference genomes. |
 
 ### MultiQC
 
