@@ -1,7 +1,7 @@
 {
     "-profile test": {
         "content": [
-            155,
+            157,
             {
                 "ANTISMASH_ANTISMASH": {
                     "antismash": "8.0.1",
@@ -106,8 +106,7 @@
                     "gawk": "5.3.0"
                 },
                 "FILTER_ASSEMBLY": {
-                    "seqkit": "v2.10.0",
-                    "samtools": "1.22.1+htslib-1.22.1"
+                    "seqkit": "v2.9.0"
                 },
                 "FILTER_IPS_AND_FAA_BY_CONTIGS": {
                     "seqkit": "2.13.0",
@@ -132,6 +131,10 @@
                 "HMMSEARCH_KOFAMS": {
                     "hmmer": 3.4,
                     "kofam version": 202503
+                },
+                "INDEX_AND_PUBLISH_CONTIGS": {
+                    "samtools": "1.22.1+htslib-1.22.1",
+                    "bgzip": "1.22.1"
                 },
                 "INFERNAL_CMSEARCH": {
                     "cmsearch": "1.1.5",
@@ -473,10 +476,10 @@
                 "ERZ101_kegg_modules_summary.tsv.gz:md5,9d9859bfbbfac5b1708b6472f7eb74bb",
                 "ERZ101_kegg_modules_summary.tsv.gz.gzi:md5,7dea362b3fac8e00956a4952a3d4f474",
                 "ERZ101_sanntis.gff.gz:md5,df19e1b84ba6f691d20c72b397c88abf",
-                "ERZ101_filtered_contigs.fasta.gz:md5,010fd0b578bdd9629e9a9b41e8b5bbd6",
-                "ERZ101_filtered_contigs.fasta.gz.fai:md5,57034897e5827c1dba986c70145a1d63",
+                "ERZ101_filtered_contigs.fasta.gz:md5,9cf21175bb2e4d5c65110facfb06ef14",
+                "ERZ101_filtered_contigs.fasta.gz.fai:md5,b5f1254f9fa7bad5713d7c056db3d69c",
                 "ERZ101_filtered_contigs.fasta.gz.gzi:md5,5737309e5668e4669c50a0a7f3c7ff0b",
-                "ERZ101_quast_stats.tsv.gz:md5,f1c11d01769d2f12c567067c0f732864",
+                "ERZ101_quast_stats.tsv.gz:md5,3581c09b4443c3b62e4fc910eedf0efe",
                 "ERZ101_aligned_to_contaminant.tsv.gz:md5,bf678dade1ff3067918b61ce0d4225e6",
                 "ERZ101_aligned_to_human.tsv.gz:md5,515849d5bcd7dfbdb518539785d47f50",
                 "ERZ101.html:md5,e56d9f9358ef11fc76a5c4d95bcea909",
@@ -516,10 +519,10 @@
                 "ERZ102_kegg_modules_summary.tsv.gz:md5,9d9859bfbbfac5b1708b6472f7eb74bb",
                 "ERZ102_kegg_modules_summary.tsv.gz.gzi:md5,7dea362b3fac8e00956a4952a3d4f474",
                 "ERZ102_sanntis.gff.gz:md5,df19e1b84ba6f691d20c72b397c88abf",
-                "ERZ102_filtered_contigs.fasta.gz:md5,dcfc40de8e74f662979c8089436e2191",
-                "ERZ102_filtered_contigs.fasta.gz.fai:md5,0fc4caf89637e0f0a36722a24c0e1317",
+                "ERZ102_filtered_contigs.fasta.gz:md5,753656213b909342ae6dd1e8750c3775",
+                "ERZ102_filtered_contigs.fasta.gz.fai:md5,6e6e178bbb564b8d292ba6bce4dd40ef",
                 "ERZ102_filtered_contigs.fasta.gz.gzi:md5,03dd37017aa7366aa239bad2a4eac58e",
-                "ERZ102_quast_stats.tsv.gz:md5,6dbcb902abac2a1435a1af29a87c8808",
+                "ERZ102_quast_stats.tsv.gz:md5,c98abd37d7178cb885601535df368a49",
                 "ERZ102_aligned_to_human.tsv.gz:md5,9654f1968ff591b11032e2447e422951",
                 "ERZ102.html:md5,4bbfb6dff8ab8cb9b1f058b5a94eebdd",
                 "ERZ102.krona.txt.gz:md5,ac2d11d2e91eeb5ca459caff14762973",
@@ -529,18 +532,18 @@
                 "analysed_assemblies.csv:md5,333c3997aa4621cf3a644719e9021296",
                 "samplesheet_dram.tsv.gz:md5,d9509874f9f6bbc2ab165106655fbce1",
                 "multiqc_citations.txt:md5,2d1a8ef8ba06c7eada06ab3e96552ea4",
-                "multiqc_general_stats.txt:md5,8b5ca1d9ddb8883eac63fffefd2ae6b8",
+                "multiqc_general_stats.txt:md5,e9859d7e5ebcbcc222fec497deea93f1",
                 "multiqc_host_decontamination_table.txt:md5,b8d06985826c0451c759e08382db2347",
                 "multiqc_host_decontamination_table_table.txt:md5,b8d06985826c0451c759e08382db2347",
                 "multiqc_human_decontamination_table.txt:md5,f8bc5f4b45b46d49826e5d8207a3b8f2",
                 "multiqc_human_decontamination_table_table.txt:md5,f8bc5f4b45b46d49826e5d8207a3b8f2",
-                "multiqc_quast.txt:md5,dc380d5fca13b91b7c21552ba8cd9f70",
-                "quast_num_contigs.txt:md5,a078f48987914adbb249f0d8382f31f1",
-                "quast_table.txt:md5,4dfa7d5c1a3715c24c29d1fe8c458319",
+                "multiqc_quast.txt:md5,049b013e246ef77508966207d654e84b",
+                "quast_num_contigs.txt:md5,b7c7360a303f1d50f3a1d50242e821a9",
+                "quast_table.txt:md5,213c20ee21a3d9700463cdd53cd9b529",
                 "qc_failed_assemblies.csv:md5,3292564aa6122920901d9bb724447ad4"
             ]
         ],
-        "timestamp": "2026-03-09T09:26:09.063484904",
+        "timestamp": "2026-03-09T20:21:49.498218773",
         "meta": {
             "nf-test": "0.9.4",
             "nextflow": "25.10.0"
