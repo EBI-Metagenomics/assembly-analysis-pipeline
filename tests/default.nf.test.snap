@@ -1,7 +1,7 @@
 {
     "-profile test": {
         "content": [
-            153,
+            157,
             {
                 "ANTISMASH_ANTISMASH": {
                     "antismash": "8.0.1",
@@ -476,10 +476,10 @@
                 "ERZ101_kegg_modules_summary.tsv.gz:md5,9d9859bfbbfac5b1708b6472f7eb74bb",
                 "ERZ101_kegg_modules_summary.tsv.gz.gzi:md5,7dea362b3fac8e00956a4952a3d4f474",
                 "ERZ101_sanntis.gff.gz:md5,df19e1b84ba6f691d20c72b397c88abf",
-                "ERZ101_filtered_contigs.fasta.gz:md5,bce806697f0ae71f8e373a5bcc6e2d6a",
-                "ERZ101_filtered_contigs.fasta.gz.fai:md5,cc5b26969ee389a5b4eef4fa66151993",
-                "ERZ101_filtered_contigs.fasta.gz.gzi:md5,4e8f724db1539b04d8cde5564f0b471c",
-                "ERZ101_quast_stats.tsv.gz:md5,7a10b9f606b7975b9140d7d0ff8c5ae9",
+                "ERZ101_filtered_contigs.fasta.gz:md5,9cf21175bb2e4d5c65110facfb06ef14",
+                "ERZ101_filtered_contigs.fasta.gz.fai:md5,b5f1254f9fa7bad5713d7c056db3d69c",
+                "ERZ101_filtered_contigs.fasta.gz.gzi:md5,5737309e5668e4669c50a0a7f3c7ff0b",
+                "ERZ101_quast_stats.tsv.gz:md5,3581c09b4443c3b62e4fc910eedf0efe",
                 "ERZ101_aligned_to_contaminant.tsv.gz:md5,bf678dade1ff3067918b61ce0d4225e6",
                 "ERZ101_aligned_to_human.tsv.gz:md5,515849d5bcd7dfbdb518539785d47f50",
                 "ERZ101.html:md5,e56d9f9358ef11fc76a5c4d95bcea909",
@@ -532,22 +532,21 @@
                 "analysed_assemblies.csv:md5,333c3997aa4621cf3a644719e9021296",
                 "samplesheet_dram.tsv.gz:md5,d9509874f9f6bbc2ab165106655fbce1",
                 "multiqc_citations.txt:md5,2d1a8ef8ba06c7eada06ab3e96552ea4",
-                "multiqc_general_stats.txt:md5,fdd88f5a9f7d66a49a081daf441fda20",
+                "multiqc_general_stats.txt:md5,e9859d7e5ebcbcc222fec497deea93f1",
                 "multiqc_host_decontamination_table.txt:md5,b8d06985826c0451c759e08382db2347",
                 "multiqc_host_decontamination_table_table.txt:md5,b8d06985826c0451c759e08382db2347",
                 "multiqc_human_decontamination_table.txt:md5,f8bc5f4b45b46d49826e5d8207a3b8f2",
                 "multiqc_human_decontamination_table_table.txt:md5,f8bc5f4b45b46d49826e5d8207a3b8f2",
-                "multiqc_quast.txt:md5,2b35344f44a8b95fa5da5b2681d06398",
+                "multiqc_quast.txt:md5,049b013e246ef77508966207d654e84b",
                 "quast_num_contigs.txt:md5,b7c7360a303f1d50f3a1d50242e821a9",
-                "quast_table.txt:md5,5dea0e054447e86e03d97f0eb0ca8849",
+                "quast_table.txt:md5,213c20ee21a3d9700463cdd53cd9b529",
                 "qc_failed_assemblies.csv:md5,3292564aa6122920901d9bb724447ad4"
             ]
         ],
-        "timestamp": "2026-03-09T09:26:09.063484904",
+        "timestamp": "2026-03-09T20:21:49.498218773",
         "meta": {
-            "nf-test": "0.9.2",
-            "nextflow": "25.10.3"
-        },
-        "timestamp": "2026-03-09T15:15:03.256596"
+            "nf-test": "0.9.4",
+            "nextflow": "25.10.0"
+        }
     }
 }
