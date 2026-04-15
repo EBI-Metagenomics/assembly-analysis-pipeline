@@ -1,10 +1,10 @@
 nextflow_process {
 
-    name "Test EggNOG annotations concatenation"
+    name "Test EggNOG orthologs concatenation"
     script "modules/nf-core/csvtk/concat/main.nf"
     process "CSVTK_CONCAT"
 
-    test("Should concatenate split EggNOG annotation TSVs with a single header") {
+    test("Should concatenate split EggNOG ortholog TSVs with a single header") {
 
         config "tests/modules/local/eggnog_tsv_concat.config"
 
@@ -14,8 +14,8 @@ nextflow_process {
                 input[0] = [
                     [ id:'ERZ_TEST_1' ],
                     [
-                        file("${projectDir}/tests/modules/local/fixtures/eggnog_annotations_concat/chunk_001.emapper.annotations", checkIfExists: true),
-                        file("${projectDir}/tests/modules/local/fixtures/eggnog_annotations_concat/chunk_002.emapper.annotations", checkIfExists: true)
+                        file("${projectDir}/tests/modules/local/fixtures/eggnog_orthologs_concat/chunk_001.emapper.seed_orthologs", checkIfExists: true),
+                        file("${projectDir}/tests/modules/local/fixtures/eggnog_orthologs_concat/chunk_002.emapper.seed_orthologs", checkIfExists: true)
                     ]
                 ]
                 input[1] = "tsv"

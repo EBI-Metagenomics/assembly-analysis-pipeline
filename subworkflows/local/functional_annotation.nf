@@ -1,5 +1,5 @@
 /* NF-CORE */
-include { CAT_CAT as CONCATENATE_EGGNOGMAPPER_ORTHOLOGS        } from '../../modules/nf-core/cat/cat/main'
+include { CSVTK_CONCAT as CONCATENATE_EGGNOGMAPPER_ORTHOLOGS   } from '../../modules/nf-core/csvtk/concat/main'
 include { CSVTK_CONCAT as CONCATENATE_EGGNOGMAPPER_ANNOTATIONS } from '../../modules/nf-core/csvtk/concat/main'
 include { CAT_CAT as CONCATENATE_HMMSEARCH_TBLOUT              } from '../../modules/nf-core/cat/cat/main'
 include { CAT_CAT as CONCATENATE_INTERPROSCAN_TSV              } from '../../modules/nf-core/cat/cat/main'
@@ -84,7 +84,10 @@ workflow FUNCTIONAL_ANNOTATION {
     ch_versions = ch_versions.mix(EGGNOGMAPPER_ANNOTATIONS.out.versions.first())
 
     CONCATENATE_EGGNOGMAPPER_ORTHOLOGS(
-        EGGNOGMAPPER_ORTHOLOGS.out.orthologs.groupTuple()
+        EGGNOGMAPPER_ORTHOLOGS.out.orthologs.groupTuple(),
+        "tsv",
+        "tsv",
+        true // compress
     )
     ch_versions = ch_versions.mix(CONCATENATE_EGGNOGMAPPER_ORTHOLOGS.out.versions.first())
 
