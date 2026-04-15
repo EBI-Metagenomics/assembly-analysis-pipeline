@@ -15,7 +15,7 @@ nextflow_process {
             process {
                 """
                 input[0] = [
-                    [test: "test"],
+                    [id: "test"],
                     file("${projectDir}/tests/modules/local/fixtures/contigs_to_clean.fasta", checkIfExists: true)
                 ]
                 """
@@ -24,7 +24,7 @@ nextflow_process {
 
         then {
             assert process.success
-            def contigs = path(process.out.fastx.get(0).get(1)).fasta
+            def contigs = path(process.out.fasta.get(0).get(1)).fasta
             assert "5percent" in contigs
             assert "10percent" in contigs
             assert !("15percent" in contigs)

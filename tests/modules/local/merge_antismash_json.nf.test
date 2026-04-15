@@ -9,10 +9,13 @@ nextflow_process {
         when {
             process {
                 """
-                json1 = file("fixtures/antismash_jsons/1.json")
-                json2 = file("fixtures/antismash_jsons/2.json")
-                meta = [id: "test"]
-                input = Channel.of([meta, [json1, json2]])
+                input[0] = Channel.of([
+                    [id: "test"],
+                    [
+                        file("${projectDir}/tests/modules/local/fixtures/antismash_jsons/1.json", checkIfExists: true),
+                        file("${projectDir}/tests/modules/local/fixtures/antismash_jsons/2.json", checkIfExists: true)
+                    ]
+                ])
                 """
             }
         }
@@ -21,7 +24,5 @@ nextflow_process {
             assert process.success
             assert snapshot(process.out).match()
         }
-
     }
-
 }

@@ -1,0 +1,51 @@
+{
+    "Should rename a fasta properly": {
+        "content": [
+            {
+                "0": [
+                    [
+                        {
+                            "test": "test"
+                        },
+                        "null.fasta:md5,9a930d3bbe8b1e8888acefeeb00c4448"
+                    ]
+                ],
+                "1": [
+                    [
+                        {
+                            "test": "test"
+                        },
+                        "null_mapping.csv:md5,ced80561c8fff022e0a834644cfdf511"
+                    ]
+                ],
+                "2": [
+                    "versions.yml:md5,dfa60b400d6f684425aa380163112ba5"
+                ],
+                "mapping_csv": [
+                    [
+                        {
+                            "test": "test"
+                        },
+                        "null_mapping.csv:md5,ced80561c8fff022e0a834644cfdf511"
+                    ]
+                ],
+                "renamed_fasta": [
+                    [
+                        {
+                            "test": "test"
+                        },
+                        "null.fasta:md5,9a930d3bbe8b1e8888acefeeb00c4448"
+                    ]
+                ],
+                "versions": [
+                    "versions.yml:md5,dfa60b400d6f684425aa380163112ba5"
+                ]
+            }
+        ],
+        "meta": {
+            "nf-test": "0.9.2",
+            "nextflow": "25.10.3"
+        },
+        "timestamp": "2026-04-15T18:09:08.137989"
+    }
+}

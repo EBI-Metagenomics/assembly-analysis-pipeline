@@ -10,8 +10,8 @@ nextflow_process {
             process {
                 """
                 input[0] = [
-                    [test: "test"], file("https://raw.githubusercontent.com/EBI-Metagenomics/nf-modules/refs/heads/main/modules/ebi-metagenomics/extractcoords/tests/test.fasta"),
-                    "FAKE_PREFIX"
+                    [id: "test"],
+                    file("https://raw.githubusercontent.com/EBI-Metagenomics/nf-modules/refs/heads/main/modules/ebi-metagenomics/extractcoords/tests/test.fasta")
                 ]
                 """
             }
