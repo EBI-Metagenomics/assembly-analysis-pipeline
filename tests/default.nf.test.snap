@@ -48,10 +48,10 @@
                     "csvtk": "0.31.0"
                 },
                 "CONCATENATE_EGGNOGMAPPER_ANNOTATIONS": {
-                    "pigz": "2.3.4"
+                    "csvtk": "0.31.0"
                 },
                 "CONCATENATE_EGGNOGMAPPER_ORTHOLOGS": {
-                    "pigz": "2.3.4"
+                    "csvtk": "0.31.0"
                 },
                 "CONCATENATE_HMMSEARCH_TBLOUT": {
                     "pigz": "2.3.4"
@@ -233,7 +233,7 @@
                     "tabix": 1.2
                 },
                 "Workflow": {
-                    "ebi-metagenomics/assembly-analysis-pipeline": "v6.0.0-rc.6"
+                    "ebi-metagenomics/assembly-analysis-pipeline": "v6.0.1"
                 }
             },
             [
@@ -543,10 +543,10 @@
                 "qc_failed_assemblies.csv:md5,3292564aa6122920901d9bb724447ad4"
             ]
         ],
-        "timestamp": "2026-03-09T20:21:49.498218773",
         "meta": {
-            "nf-test": "0.9.4",
-            "nextflow": "25.10.0"
-        }
+            "nf-test": "0.9.2",
+            "nextflow": "25.10.3"
+        },
+        "timestamp": "2026-04-15T13:01:27.151491"
     }
 }

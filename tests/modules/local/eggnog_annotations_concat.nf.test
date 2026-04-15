@@ -1,0 +1,43 @@
+nextflow_process {
+
+    name "Test EggNOG annotations concatenation"
+    script "modules/nf-core/csvtk/concat/main.nf"
+    process "CSVTK_CONCAT"
+
+    test("Should concatenate split EggNOG annotation TSVs with a single header") {
+
+        config "tests/modules/local/eggnog_tsv_concat.config"
+
+        when {
+            process {
+                """
+                input[0] = [
+                    [ id:'ERZ_TEST_1' ],
+                    [
+                        file("${projectDir}/tests/modules/local/fixtures/eggnog_annotations_concat/chunk_001.emapper.annotations", checkIfExists: true),
+                        file("${projectDir}/tests/modules/local/fixtures/eggnog_annotations_concat/chunk_002.emapper.annotations", checkIfExists: true)
+                    ]
+                ]
+                input[1] = "tsv"
+                input[2] = "tsv"
+                input[3] = true
+                """
+            }
+        }
+
+        then {
+            def lines = path(process.out.csv.get(0).get(1)).linesGzip
+            def headerCount = lines.count { it.startsWith("#query\t") }
+
+            assertAll(
+                { assert process.success },
+                { assert headerCount == 1 },
+                { assert lines.size() == 3 },
+                { assert lines[1].startsWith("ERZ_TEST_1_1\t") },
+                { assert lines[2].startsWith("ERZ_TEST_1_2\t") }
+            )
+        }
+
+    }
+
+}

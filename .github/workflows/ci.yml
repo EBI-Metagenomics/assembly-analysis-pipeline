@@ -3,7 +3,7 @@ name: CI
 on:
   push:
     branches:
-      - dev
+      - main
   pull_request:
   release:
     types: [published]
@@ -73,7 +73,7 @@ jobs:
         env:
           NFT_WORKDIR: "~"
         run: |
-          nf-test test tests/default.nf.test \
+          nf-test test tests/ \
             --profile=+${{ matrix.profile }} \
             --ci \
             --verbose \
@@ -118,3 +118,31 @@ jobs:
         shell: bash
         run: |
           sudo rm -rf /home/ubuntu/tests/
+
+  test-modules-local:
+    name: "Run local module nf-tests"
+    if: "${{ github.event_name != 'push' || (github.event_name == 'push' && github.repository == 'ebi-metagenomics/assembly-analysis-pipeline') }}"
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out pipeline code
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4
+
+      - name: Install Nextflow
+        uses: nf-core/setup-nextflow@v2
+        with:
+          version: "24.10.3"
+
+      - name: Install nf-test
+        uses: nf-core/setup-nf-test@v1
+        with:
+          install-pdiff: true
+
+      - name: Run local module nf-tests
+        shell: bash
+        env:
+          NFT_WORKDIR: "~"
+        run: |
+          nf-test test tests/modules/local \
+            --profile=+docker \
+            --ci \
+            --verbose

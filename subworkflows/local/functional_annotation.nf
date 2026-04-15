@@ -1,15 +1,15 @@
 /* NF-CORE */
-include { CAT_CAT as CONCATENATE_EGGNOGMAPPER_ORTHOLOGS   } from '../../modules/nf-core/cat/cat/main'
-include { CAT_CAT as CONCATENATE_EGGNOGMAPPER_ANNOTATIONS } from '../../modules/nf-core/cat/cat/main'
-include { CAT_CAT as CONCATENATE_HMMSEARCH_TBLOUT         } from '../../modules/nf-core/cat/cat/main'
-include { CAT_CAT as CONCATENATE_INTERPROSCAN_TSV         } from '../../modules/nf-core/cat/cat/main'
-include { CSVTK_CONCAT as CONCATENATE_DBCAN_OVERVIEW      } from '../../modules/nf-core/csvtk/concat/main'
-include { CSVTK_CONCAT as CONCATENATE_DBCAN_STANDARD_OUT  } from '../../modules/nf-core/csvtk/concat/main'
-include { CSVTK_CONCAT as CONCATENATE_DBCAN_SUBSTRATES    } from '../../modules/nf-core/csvtk/concat/main'
-include { CSVTK_CONCAT as CONCATENATE_DBCAN_HMMOUT        } from '../../modules/nf-core/csvtk/concat/main'
-include { TABIX_BGZIP as TABIX_BGZIP_GO                   } from '../../modules/nf-core/tabix/bgzip/main'
-include { TABIX_BGZIP as TABIX_BGZIP_GOSLIM               } from '../../modules/nf-core/tabix/bgzip/main'
-include { TABIX_BGZIP as TABIX_BGZIP_RHEAANDCHEBI         } from '../../modules/nf-core/tabix/bgzip/main'
+include { CSVTK_CONCAT as CONCATENATE_EGGNOGMAPPER_ORTHOLOGS   } from '../../modules/nf-core/csvtk/concat/main'
+include { CSVTK_CONCAT as CONCATENATE_EGGNOGMAPPER_ANNOTATIONS } from '../../modules/nf-core/csvtk/concat/main'
+include { CAT_CAT as CONCATENATE_HMMSEARCH_TBLOUT              } from '../../modules/nf-core/cat/cat/main'
+include { CAT_CAT as CONCATENATE_INTERPROSCAN_TSV              } from '../../modules/nf-core/cat/cat/main'
+include { CSVTK_CONCAT as CONCATENATE_DBCAN_OVERVIEW           } from '../../modules/nf-core/csvtk/concat/main'
+include { CSVTK_CONCAT as CONCATENATE_DBCAN_STANDARD_OUT       } from '../../modules/nf-core/csvtk/concat/main'
+include { CSVTK_CONCAT as CONCATENATE_DBCAN_SUBSTRATES         } from '../../modules/nf-core/csvtk/concat/main'
+include { CSVTK_CONCAT as CONCATENATE_DBCAN_HMMOUT             } from '../../modules/nf-core/csvtk/concat/main'
+include { TABIX_BGZIP as TABIX_BGZIP_GO                        } from '../../modules/nf-core/tabix/bgzip/main'
+include { TABIX_BGZIP as TABIX_BGZIP_GOSLIM                    } from '../../modules/nf-core/tabix/bgzip/main'
+include { TABIX_BGZIP as TABIX_BGZIP_RHEAANDCHEBI              } from '../../modules/nf-core/tabix/bgzip/main'
 
 /* EBI-METAGENOMICS */
 include { INTERPROSCAN                             } from '../../modules/ebi-metagenomics/interproscan/main'
@@ -84,14 +84,20 @@ workflow FUNCTIONAL_ANNOTATION {
     ch_versions = ch_versions.mix(EGGNOGMAPPER_ANNOTATIONS.out.versions.first())
 
     CONCATENATE_EGGNOGMAPPER_ORTHOLOGS(
-        EGGNOGMAPPER_ORTHOLOGS.out.orthologs.groupTuple()
+        EGGNOGMAPPER_ORTHOLOGS.out.orthologs.groupTuple(),
+        "tsv",
+        "tsv",
+        true // compress
     )
     ch_versions = ch_versions.mix(CONCATENATE_EGGNOGMAPPER_ORTHOLOGS.out.versions.first())
 
     CONCATENATE_EGGNOGMAPPER_ANNOTATIONS(
-        EGGNOGMAPPER_ANNOTATIONS.out.annotations.groupTuple()
+        EGGNOGMAPPER_ANNOTATIONS.out.annotations.groupTuple(),
+        "tsv",
+        "tsv",
+        true // compress
     )
-    ch_versions = ch_versions.mix(CONCATENATE_EGGNOGMAPPER_ANNOTATIONS.out.versions.first())
+    ch_versions = ch_versions.mix(CONCATENATE_EGGNOGMAPPER_ANNOTATIONS.out.versions)
 
     CONCATENATE_INTERPROSCAN_GFFS(
         INTERPROSCAN.out.gff3.groupTuple()
@@ -253,7 +259,7 @@ workflow FUNCTIONAL_ANNOTATION {
     dbcan_hmm                      = CONCATENATE_DBCAN_HMMOUT.out.csv
     interproscan_tsv               = CONCATENATE_INTERPROSCAN_TSV.out.file_out
     interproscan_gff3              = CONCATENATE_INTERPROSCAN_GFFS.out.concatenated_gff
-    eggnog_annotations             = CONCATENATE_EGGNOGMAPPER_ANNOTATIONS.out.file_out
+    eggnog_annotations             = CONCATENATE_EGGNOGMAPPER_ANNOTATIONS.out.csv
     kegg_orthologs_per_contig_tsv  = KEGG_ORTHOLOGS_SUMMARY.out.ko_per_contig_tsv
     versions                       = ch_versions
 }

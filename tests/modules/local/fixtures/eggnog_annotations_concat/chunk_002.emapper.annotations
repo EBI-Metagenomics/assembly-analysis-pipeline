@@ -1,0 +1,2 @@
+#query	seed_ortholog	evalue	score	eggNOG_OGs	max_annot_lvl	COG_category	Description	Preferred_name	GOs	EC	KEGG_ko	KEGG_Pathway	KEGG_Module	KEGG_Reaction	KEGG_rclass	BRITE	KEGG_TC	CAZy	BiGG_Reaction	PFAMs
+ERZ_TEST_1_2	seed2	2e-40	180	COG0002	root	K	Example description two	pref2	GO:0002	2.2.2.2	K00002	map00020	M00002	R00002	RC00002	BR:00002	2.A.2	GH2	BRXN2	PF00002
