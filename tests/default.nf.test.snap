@@ -51,7 +51,7 @@
                     "csvtk": "0.31.0"
                 },
                 "CONCATENATE_EGGNOGMAPPER_ORTHOLOGS": {
-                    "pigz": "2.3.4"
+                    "csvtk": "0.31.0"
                 },
                 "CONCATENATE_HMMSEARCH_TBLOUT": {
                     "pigz": "2.3.4"
