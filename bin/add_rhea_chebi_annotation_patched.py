@@ -15,8 +15,10 @@
 # limitations under the License.
 
 import argparse
+import csv
 import hashlib
 import logging
+import re
 import sys
 from pathlib import Path
 
@@ -30,8 +32,28 @@ logging.basicConfig(
     handlers=[logging.StreamHandler()],
 )
 
+# Prodigal: e.g. ERZ23299386_269_1  -> contig ERZ23299386_269
+PRODIGAL_PROTEIN_ID_REGEX = re.compile(r"^(?P<contig_id>.+)_\d+$")
+# FragGeneScan: e.g. ERZ23299386_51568_313_771_+  -> contig ERZ23299386_51568
+FGS_PROTEIN_ID_REGEX = re.compile(r"^(?P<contig_id>.+)_\d+_\d+_[+-]$")
+
+
+def get_contig_id(protein_id):
+    for regex in (FGS_PROTEIN_ID_REGEX, PRODIGAL_PROTEIN_ID_REGEX):
+        match = regex.match(protein_id)
+        if match:
+            return match.group("contig_id")
+
+    raise ValueError(
+        f"Could not parse contig_id from protein_id '{protein_id}': "
+        f"does not match Prodigal pattern '{PRODIGAL_PROTEIN_ID_REGEX.pattern}' "
+        f"or FragGeneScan pattern '{FGS_PROTEIN_ID_REGEX.pattern}'."
+    )
+
 
 def process_lines(lines, output_handler, rhea2reaction_dict, protein_hashes):
+    writer = csv.writer(output_handler, delimiter="\t")
+    writer.writerow(["contig_id", "protein_id", "protein_hash", "rhea_id", "chebi_reaction", "reaction", "top_hit"])
     current_protein = None
     for line in lines:
         parts = line.strip().split("\t")
@@ -40,24 +62,25 @@ def process_lines(lines, output_handler, rhea2reaction_dict, protein_hashes):
             current_protein = protein_id
             protein_rheas = set()
         rhea_list = parts[-1].split("RheaID=")[1].strip('"').split()
-        top_hit = "top hit" if rhea_list and not protein_rheas else ""
+        # Top hit is True if the current match is the first (most significant) one according to DIAMOND
+        top_hit = rhea_list and not protein_rheas
 
         for rhea in rhea_list:
             if rhea not in protein_rheas:
                 chebi_reaction, reaction = rhea2reaction_dict[rhea]
-                contig_id = protein_id.split("_")[0]
+                contig_id = get_contig_id(protein_id)
                 protein_hash = protein_hashes[protein_id]
 
-                print(
-                    contig_id,
-                    protein_id,
-                    protein_hash,
-                    rhea,
-                    chebi_reaction,
-                    reaction,
-                    top_hit,
-                    sep="\t",
-                    file=output_handler,
+                writer.writerow(
+                    [
+                        contig_id,
+                        protein_id,
+                        protein_hash,
+                        rhea,
+                        chebi_reaction,
+                        reaction,
+                        top_hit,
+                    ]
                 )
                 protein_rheas.add(rhea)
 
@@ -78,7 +101,11 @@ def main():
         "--output",
         required=True,
         type=Path,
-        help="Output TSV file with columns: contig_id, protein_id, UniRef90 cluster, rhea_ids, CHEBI reaction participants",
+        help=(
+            "Output TSV file with columns: contig_id, protein_id, protein hash, "
+            "Rhea IDs, CHEBI reaction, reaction definition, 'True' if it is the top hit according to DIAMOND, "
+            "'False' otherwise"
+        ),
     )
     parser.add_argument(
         "-p",
