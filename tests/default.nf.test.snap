@@ -76,8 +76,8 @@
                     "diamond": "2.1.11"
                 },
                 "DIAMOND_RHEACHEBI": {
-                    "diamond": "2.1.11",
-                    "mgnify-pipelines-toolkit": "0.2.1",
+                    "diamond": "2.1.24",
+                    "mgnify-pipelines-toolkit": "1.4.24",
                     "uniref90rhea database": 202511
                 },
                 "DRAM_DISTILL_PER_ASSEMBLY": {
@@ -463,8 +463,8 @@
                 "ERZ101_ko_summary.tsv.gz.gzi:md5,7dea362b3fac8e00956a4952a3d4f474",
                 "ERZ101_pfam_summary.tsv.gz:md5,b5f9a4756b2001bef191b7cb654d1a08",
                 "ERZ101_pfam_summary.tsv.gz.gzi:md5,7dea362b3fac8e00956a4952a3d4f474",
-                "ERZ101_proteins2rhea.tsv.gz:md5,d41d8cd98f00b204e9800998ecf8427e",
-                "ERZ101_proteins2rhea.tsv.gz.gzi:md5,c2cb56f4c5bf656faca0986e7eba0308",
+                "ERZ101_proteins2rhea.tsv.gz:md5,3c0e249df50c1a0cd73bb7f54b5d42a6",
+                "ERZ101_proteins2rhea.tsv.gz.gzi:md5,7dea362b3fac8e00956a4952a3d4f474",
                 "ERZ101_antismash_summary.tsv.gz:md5,0fd7d1a0e04f0a25a8e49a697c986a4f",
                 "ERZ101_antismash_summary.tsv.gz.gzi:md5,7dea362b3fac8e00956a4952a3d4f474",
                 "ERZ101_dram.html.gz:md5,65198bf5083e96a1e00861290586a0c4",
@@ -506,8 +506,8 @@
                 "ERZ102_ko_summary.tsv.gz.gzi:md5,7dea362b3fac8e00956a4952a3d4f474",
                 "ERZ102_pfam_summary.tsv.gz:md5,b5f9a4756b2001bef191b7cb654d1a08",
                 "ERZ102_pfam_summary.tsv.gz.gzi:md5,7dea362b3fac8e00956a4952a3d4f474",
-                "ERZ102_proteins2rhea.tsv.gz:md5,d41d8cd98f00b204e9800998ecf8427e",
-                "ERZ102_proteins2rhea.tsv.gz.gzi:md5,c2cb56f4c5bf656faca0986e7eba0308",
+                "ERZ102_proteins2rhea.tsv.gz:md5,3c0e249df50c1a0cd73bb7f54b5d42a6",
+                "ERZ102_proteins2rhea.tsv.gz.gzi:md5,7dea362b3fac8e00956a4952a3d4f474",
                 "ERZ102_antismash_summary.tsv.gz:md5,6ad987c8844dc8cf1ef764afca708c12",
                 "ERZ102_antismash_summary.tsv.gz.gzi:md5,7dea362b3fac8e00956a4952a3d4f474",
                 "ERZ102_dram.html.gz:md5,b738e83a36a48c5568aeebbd7fe8873a",

@@ -2,9 +2,7 @@ process DIAMOND_RHEACHEBI {
     tag "$meta.id"
     label 'process_high'
 
-    container "${ workflow.containerEngine == 'singularity' && !task.ext.singularity_pull_docker_container ?
-        'oras://community.wave.seqera.io/library/diamond_mgnify-pipelines-toolkit:059c7a2806a8307e' :
-        'community.wave.seqera.io/library/diamond_mgnify-pipelines-toolkit:d550c08ee965686f' }"
+    container "quay.io/microbiome-informatics/diamond_mgnify-pipelines-toolkit:1.4.24"
 
     input:
     tuple val(meta) , path(fasta)
@@ -39,7 +37,7 @@ process DIAMOND_RHEACHEBI {
         --db ${db} \\
         --query ${fasta} \\
         --outfmt 6 qseqid sseqid evalue bitscore salltitles | \\
-    add_rhea_chebi_annotation_patched.py \\
+    add_rhea_chebi_annotation \\
         --diamond_hits - \\
         --proteins ${fasta_name} \\
         --rhea2chebi ${rhea2chebi} \\
