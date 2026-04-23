@@ -76,8 +76,8 @@
                     "diamond": "2.1.11"
                 },
                 "DIAMOND_RHEACHEBI": {
-                    "diamond": "2.1.11",
-                    "mgnify-pipelines-toolkit": "0.2.1",
+                    "diamond": "2.1.24",
+                    "mgnify-pipelines-toolkit": "1.4.24",
                     "uniref90rhea database": 202511
                 },
                 "DRAM_DISTILL_PER_ASSEMBLY": {
