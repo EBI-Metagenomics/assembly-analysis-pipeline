@@ -2,9 +2,7 @@ process DIAMOND_RHEACHEBI {
     tag "$meta.id"
     label 'process_high'
 
-    container "${ workflow.containerEngine == 'singularity' && !task.ext.singularity_pull_docker_container ?
-        'oras://community.wave.seqera.io/library/diamond_pip_mgnify-pipelines-toolkit:09d16ce983f9bfb8' :
-        'community.wave.seqera.io/library/diamond_pip_mgnify-pipelines-toolkit:8006a90d065a79ac' }"
+    container "quay.io/microbiome-informatics/diamond_mgnify-pipelines-toolkit:1.4.24"
 
     input:
     tuple val(meta) , path(fasta)
