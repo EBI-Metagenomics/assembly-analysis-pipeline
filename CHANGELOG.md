@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [6.0.2] - 2026-04-24
+
+### Fixed
+
+- Fixed RHEA annotation output to parse `contig_id` values correctly from protein identifiers and standardised the output header and `top_hit` values.
+
 ## [6.0.1] - 2026-04-15
 
 ### Added
@@ -45,6 +51,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Fixed downstream workflows to consistently use QC-filtered and decontaminated contigs.
 - Fixed reporting and published outputs across MultiQC, downstream samplesheets, and compressed summary files.
 
-[unreleased]: https://github.com/ebi-metagenomics/assembly-analysis-pipeline/compare/v6.0.0...HEAD
+[unreleased]: https://github.com/ebi-metagenomics/assembly-analysis-pipeline/compare/v6.0.2...HEAD
+[6.0.2]: https://github.com/ebi-metagenomics/assembly-analysis-pipeline/compare/v6.0.1...HEAD
 [6.0.1]: https://github.com/ebi-metagenomics/assembly-analysis-pipeline/compare/v6.0.0...060b74274e5a3fcf92fdf76040f95770a5f848c6
 [6.0.0]: https://github.com/ebi-metagenomics/assembly-analysis-pipeline/releases/tag/v6.0.0
