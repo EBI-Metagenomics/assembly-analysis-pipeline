@@ -233,7 +233,7 @@
                     "tabix": 1.2
                 },
                 "Workflow": {
-                    "ebi-metagenomics/assembly-analysis-pipeline": "v6.0.2"
+                    "ebi-metagenomics/assembly-analysis-pipeline": "v6.0.3"
                 }
             },
             [

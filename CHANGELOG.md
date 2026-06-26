@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [6.0.3] - 2026-06-26
+
+### Changed
+
+- Increased the runtime and memory minimap2_align uses by default.
+
 ## [6.0.2] - 2026-04-24
 
 ### Fixed
