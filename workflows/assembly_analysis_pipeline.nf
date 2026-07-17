@@ -56,8 +56,8 @@ workflow ASSEMBLY_ANALYSIS_PIPELINE {
 
     main:
 
-    ch_versions = Channel.empty()
-    ch_multiqc_files = Channel.empty()
+    ch_versions = channel.empty()
+    ch_multiqc_files = channel.empty()
 
     /*
      * FIRE download: Download files from EBI FIRE system if enabled
@@ -66,9 +66,8 @@ workflow ASSEMBLY_ANALYSIS_PIPELINE {
     if ( params.use_fire_download ) {
         // This module will transform the FTP links to FIRE-S3 ones and it will download them
         DOWNLOAD_FROM_FIRE(
-            ch_assembly.map { meta, assembly_fasta -> {
-                    [meta, [assembly_fasta]] // This is workaround as the module expects a list of accessions (for fwd/rev reads)
-                }
+            ch_assembly.map { meta, assembly_fasta ->
+                [meta, [assembly_fasta]] // This is workaround as the module expects a list of accessions (for fwd/rev reads)
             }
         )
         ch_versions = ch_versions.mix(DOWNLOAD_FROM_FIRE.out.versions)
@@ -101,28 +100,26 @@ workflow ASSEMBLY_ANALYSIS_PIPELINE {
     We need to adjust the meta, the human and PhiX references can be either set in the samplesheet, otherwise
     they will be taken from the parameters
     */
-    def renamed_contigs = RENAME_CONTIGS.out.renamed_fasta.map {
-        meta, contigs -> {
-            def new_meta = meta.clone()
-            if ( params.skip_decontamination ) {
-                // We remove the refs from the meta to skip that code
-                new_meta.contaminant_reference = null
-                new_meta.human_reference = null
-                new_meta.phix_reference  = null
-            } else {
-                // If the user didn't provide refs, use the ones in the parameters
-                if (!meta.contaminant_reference) {
-                    new_meta.contaminant_reference = params.contaminant_reference ?: null
-                }
-                if (!meta.human_reference) {
-                    new_meta.human_reference = params.human_reference ?: null
-                }
-                if (!meta.phix_reference) {
-                    new_meta.phix_reference = params.phix_reference ?: null
-                }
+    def renamed_contigs = RENAME_CONTIGS.out.renamed_fasta.map { meta, contigs ->
+        def new_meta = meta.clone()
+        if ( params.skip_decontamination ) {
+            // We remove the refs from the meta to skip that code
+            new_meta.contaminant_reference = null
+            new_meta.human_reference = null
+            new_meta.phix_reference  = null
+        } else {
+            // If the user didn't provide refs, use the ones in the parameters
+            if (!meta.contaminant_reference) {
+                new_meta.contaminant_reference = params.contaminant_reference ?: null
             }
-            [new_meta, contigs]
+            if (!meta.human_reference) {
+                new_meta.human_reference = params.human_reference ?: null
+            }
+            if (!meta.phix_reference) {
+                new_meta.phix_reference = params.phix_reference ?: null
+            }
         }
+        [new_meta, contigs]
     }
 
     ASSEMBLY_QC(
@@ -295,16 +292,16 @@ workflow ASSEMBLY_ANALYSIS_PIPELINE {
     //
     // MODULE: MultiQC
     //
-    ch_multiqc_config = Channel.fromPath(
+    ch_multiqc_config = channel.fromPath(
         "${projectDir}/assets/multiqc_config.yml",
         checkIfExists: true
     )
     ch_multiqc_custom_config = params.multiqc_config
-        ? Channel.fromPath(params.multiqc_config, checkIfExists: true)
-        : Channel.empty()
+        ? channel.fromPath(params.multiqc_config, checkIfExists: true)
+        : channel.empty()
     ch_multiqc_logo = params.multiqc_logo
-        ? Channel.fromPath(params.multiqc_logo, checkIfExists: true)
-        : Channel.fromPath("${projectDir}/assets/mgnify_wordmark_dark_on_light.png", checkIfExists: true)
+        ? channel.fromPath(params.multiqc_logo, checkIfExists: true)
+        : channel.fromPath("${projectDir}/assets/mgnify_wordmark_dark_on_light.png", checkIfExists: true)
 
     if ( params.multiqc_nfschema_print_summary ) {
         // By default we don't record the parameters in the multiqc report, as in production (MGnify) we have paths
@@ -313,7 +310,7 @@ workflow ASSEMBLY_ANALYSIS_PIPELINE {
             workflow,
             parameters_schema: "nextflow_schema.json"
         )
-        ch_workflow_summary = Channel.value(paramsSummaryMultiqc(summary_params))
+        ch_workflow_summary = channel.value(paramsSummaryMultiqc(summary_params))
         ch_multiqc_files = ch_multiqc_files.mix(
             ch_workflow_summary.collectFile(name: 'workflow_summary_mqc.yaml')
         )
@@ -322,7 +319,7 @@ workflow ASSEMBLY_ANALYSIS_PIPELINE {
     ch_multiqc_custom_methods_description = params.multiqc_methods_description
         ? file(params.multiqc_methods_description, checkIfExists: true)
         : file("${projectDir}/assets/methods_description_template.yml", checkIfExists: true)
-    ch_methods_description = Channel.value(
+    ch_methods_description = channel.value(
         methodsDescriptionText(ch_multiqc_custom_methods_description)
     )
 
@@ -370,22 +367,20 @@ workflow ASSEMBLY_ANALYSIS_PIPELINE {
 
     GT_GFF3VALIDATOR.out.success_log
         .join( GT_GFF3VALIDATOR.out.error_log, remainder: true )
-        .map { meta, _gff_success, gff_validation_error -> {
-                def message = "success"
-                if ( gff_validation_error ) {
-                    message = "invalid_summary_gff"
-                }
-                return "${meta.id},${message}"
+        .map { meta, _gff_success, gff_validation_error ->
+            def message = "success"
+            if ( gff_validation_error ) {
+                message = "invalid_summary_gff"
             }
+            return "${meta.id},${message}"
         }
         .collectFile(name: "analysed_assemblies.csv", storeDir: params.outdir, newLine: true, cache: false)
 
     // QC Failed  assemblies //
     ASSEMBLY_QC.out.qc_failed_assemblies
         .filter { _meta, qc_failed_message -> qc_failed_message }
-        .map { meta, qc_failed_message -> {
-                return "${meta.id},${qc_failed_message}"
-            }
+        .map { meta, qc_failed_message ->
+            "${meta.id},${qc_failed_message}"
         }
         .collectFile(name: "qc_failed_assemblies.csv", storeDir: params.outdir, newLine: true, cache: false)
 
@@ -396,13 +391,11 @@ workflow ASSEMBLY_ANALYSIS_PIPELINE {
     // VIRIfy samplesheet //
     ASSEMBLY_QC.out.assembly_qc_pass.join(
         COMBINED_GENE_CALLER.out.faa
-    ).map {
-        meta, _assembly, _faa -> {
-            // We need to handle relative paths
-            def outdir_file = file(params.outdir)
-            def output_full_path = "${outdir_file.getParent()}/${outdir_file.getName()}/${meta.id}"
-            return "${meta.id},${output_full_path}/qc/${meta.id}_filtered_contigs.fasta.gz,,,${output_full_path}/cds/${meta.id}_predicted_cds.faa.gz"
-        }
+    ).map { meta, _assembly, _faa ->
+        // We need to handle relative paths
+        def outdir_file = file(params.outdir)
+        def output_full_path = "${outdir_file.getParent()}/${outdir_file.getName()}/${meta.id}"
+        return "${meta.id},${output_full_path}/qc/${meta.id}_filtered_contigs.fasta.gz,,,${output_full_path}/cds/${meta.id}_predicted_cds.faa.gz"
     }.collectFile(
         name: "virify_samplesheet.csv",
         storeDir: "${params.outdir}/downstream_samplesheets/",

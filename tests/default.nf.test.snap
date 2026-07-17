@@ -120,10 +120,10 @@
                     "FragGeneScanRs": "1.1.0"
                 },
                 "GENERATEGAF": {
-                    "mgnify-pipelines-toolkit": "1.2.0"
+                    "mgnify-pipelines-toolkit": "1.5.3"
                 },
                 "GENOMEPROPERTIES": {
-                    "Genome Properties": 2.0
+                    "Genome Properties": 2.0.2
                 },
                 "GT_GFF3VALIDATOR": {
                     "genometools": "1.6.5"
@@ -166,7 +166,7 @@
                     "mgnify-pipelines-toolkit": "1.4.14"
                 },
                 "MGNIFYPIPELINESTOOLKIT_SUMMARISEGOSLIMS": {
-                    "mgnify-pipelines-toolkit": "1.4.13"
+                    "mgnify-pipelines-toolkit": "1.5.3"
                 },
                 "MINIMAP2_ALIGN": {
                     "minimap2": "2.29-r1283",

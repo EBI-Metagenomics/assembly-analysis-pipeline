@@ -217,9 +217,7 @@ workflow FUNCTIONAL_ANNOTATION {
     */
     HMMSEARCH_KOFAMS(
         ch_protein_chunked.map { meta, faa ->
-            {
-                [meta, file(params.kofam_hmm_database, checkIfExists: true), faa, false, true, true] // boolean flags are: write alignment, tblout and domtbl
-            }
+            [meta, file(params.kofam_hmm_database, checkIfExists: true), faa, false, true, true] // boolean flags are: write alignment, tblout and domtbl
         },
         params.kofam_hmm_database_version
     )

@@ -4,9 +4,7 @@ process GENERATEGAF {
     label 'process_single'
 
     conda "${moduleDir}/environment.yml"
-    container "${ workflow.containerEngine == 'singularity' && !task.ext.singularity_pull_docker_container ?
-        "https://depot.galaxyproject.org/singularity/mgnify-pipelines-toolkit:${params.mpt_version}":
-        "biocontainers/mgnify-pipelines-toolkit:${params.mpt_version}" }"
+    container "microbiome-informatics/mgnify-pipelines-toolkit:1.5.3"
 
     input:
     tuple val(meta), path(ips)
@@ -21,10 +19,8 @@ process GENERATEGAF {
     script:
     def prefix = task.ext.prefix ?: "${meta.id}"
     """
-    gunzip -c ${ips} > ${ips.name.replace(".gz", "")}
-
     generate_gaf \\
-        -i ${ips.name.replace(".gz", "")} \\
+        -i ${ips} \\
         -o ${prefix} \\
 
     cat <<-END_VERSIONS > versions.yml
