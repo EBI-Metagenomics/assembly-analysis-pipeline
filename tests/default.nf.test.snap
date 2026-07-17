@@ -123,7 +123,7 @@
                     "mgnify-pipelines-toolkit": "1.5.3"
                 },
                 "GENOMEPROPERTIES": {
-                    "Genome Properties": 2.0.2
+                    "Genome Properties": "2.0.2"
                 },
                 "GT_GFF3VALIDATOR": {
                     "genometools": "1.6.5"
@@ -166,7 +166,7 @@
                     "mgnify-pipelines-toolkit": "1.4.14"
                 },
                 "MGNIFYPIPELINESTOOLKIT_SUMMARISEGOSLIMS": {
-                    "mgnify-pipelines-toolkit": "1.5.3"
+                    "mgnify-pipelines-toolkit": "1.4.13"
                 },
                 "MINIMAP2_ALIGN": {
                     "minimap2": "2.29-r1283",
@@ -543,10 +543,10 @@
                 "qc_failed_assemblies.csv:md5,3292564aa6122920901d9bb724447ad4"
             ]
         ],
+        "timestamp": "2026-07-17T16:02:14.941052",
         "meta": {
-            "nf-test": "0.9.2",
-            "nextflow": "25.10.3"
-        },
-        "timestamp": "2026-04-15T13:01:27.151491"
+            "nf-test": "0.9.5",
+            "nextflow": "26.04.6"
+        }
     }
 }
