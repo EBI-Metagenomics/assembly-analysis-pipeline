@@ -176,13 +176,13 @@
                     },
                     "generategaf": {
                         "branch": "main",
-                        "git_sha": "31e6276eef26fec7160c53a575b6e27b7ff842a5",
+                        "git_sha": "ae4e619f5460dc34b8e5596dc0c153aca2c20841",
                         "installed_by": ["goslim_swf"],
                         "patch": "modules/ebi-metagenomics/generategaf/generategaf.diff"
                     },
                     "genomeproperties": {
                         "branch": "main",
-                        "git_sha": "7c67b0652fb83c8239bd5bace72364f6676e3e39",
+                        "git_sha": "33d2a4ba110a701407d3eb561da529cea7ca05de",
                         "installed_by": ["modules"],
                         "patch": "modules/ebi-metagenomics/genomeproperties/genomeproperties.diff"
                     },
@@ -288,7 +288,7 @@
                     },
                     "goslim_swf": {
                         "branch": "main",
-                        "git_sha": "62d3b11ec8bbca8a4290b7b098876c29bd12de64",
+                        "git_sha": "ae4e619f5460dc34b8e5596dc0c153aca2c20841",
                         "installed_by": ["subworkflows"],
                         "patch": "subworkflows/ebi-metagenomics/goslim_swf/goslim_swf.diff"
                     }
