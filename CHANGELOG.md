@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [6.0.5] - 2026-07-27
+
+### Changed
+
+- Increased minimap2 memory for host decontamination to 120GB and set `maxRetries` to 3 for both host and human decontamination minimap2 alignment steps, as the previous bump in [#64](https://github.com/EBI-Metagenomics/assembly-analysis-pipeline/pull/64) was still not enough for some genomes.
+
 ## [6.0.3] - 2026-06-26
 
 ### Changed
