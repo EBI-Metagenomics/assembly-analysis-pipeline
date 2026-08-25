@@ -43,6 +43,9 @@ include { GFF_SUMMARY                        } from '../subworkflows/local/gff_s
 include { DETECT_RNA                         } from '../subworkflows/ebi-metagenomics/detect_rna/main'
 include { FUNCTIONAL_ANNOTATION              } from '../subworkflows/local/functional_annotation'
 include { PATHWAYS_AND_SYSTEMS               } from '../subworkflows/local/pathways_and_systems'
+include { ADD_MULTIQC_HEADER as ADD_HUMAN_MULTIQC_HEADER } from '../modules/local/add_multiqc_header'
+include { ADD_MULTIQC_HEADER as ADD_PHIX_MULTIQC_HEADER  } from '../modules/local/add_multiqc_header'
+include { ADD_MULTIQC_HEADER as ADD_HOST_MULTIQC_HEADER  } from '../modules/local/add_multiqc_header'
 
 /*
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -259,11 +262,27 @@ workflow ASSEMBLY_ANALYSIS_PIPELINE {
     ch_versions = ch_versions.mix(GT_GFF3VALIDATOR.out.versions)
 
     // Collect decontamination TSV files for MultiQC per assembly
+    //
+    // Each TSV gets a MultiQC custom-content front-matter header prepended (id,
+    // section_name, pconfig.title) naming the reference genome/database that was
+    // actually used for this assembly (meta.human_reference/phix_reference/
+    // contaminant_reference). This is done on a separate MultiQC-only copy via
+    // ADD_*_MULTIQC_HEADER - the original FILTERPAF output that gets published to
+    // results (see conf/modules.config) is untouched.
+    ADD_HUMAN_MULTIQC_HEADER(ASSEMBLY_QC.out.human_contaminated_contigs_tsv)
+    ch_versions = ch_versions.mix(ADD_HUMAN_MULTIQC_HEADER.out.versions)
+
+    ADD_PHIX_MULTIQC_HEADER(ASSEMBLY_QC.out.phix_contaminated_contigs_tsv)
+    ch_versions = ch_versions.mix(ADD_PHIX_MULTIQC_HEADER.out.versions)
+
+    ADD_HOST_MULTIQC_HEADER(ASSEMBLY_QC.out.host_contaminated_contigs_tsv)
+    ch_versions = ch_versions.mix(ADD_HOST_MULTIQC_HEADER.out.versions)
+
     // Use join with remainder: true to handle optional decontamination channels
     ch_per_assembly_files_compressed = ASSEMBLY_QC.out.quast_report_tsv
-        .join(ASSEMBLY_QC.out.human_contaminated_contigs_tsv, remainder: true)
-        .join(ASSEMBLY_QC.out.phix_contaminated_contigs_tsv, remainder: true)
-        .join(ASSEMBLY_QC.out.host_contaminated_contigs_tsv, remainder: true)
+        .join(ADD_HUMAN_MULTIQC_HEADER.out.tsv, remainder: true)
+        .join(ADD_PHIX_MULTIQC_HEADER.out.tsv, remainder: true)
+        .join(ADD_HOST_MULTIQC_HEADER.out.tsv, remainder: true)
         .map { meta, quast, human, phix, host ->
             def files = [quast]
             if (human) files.add(human)

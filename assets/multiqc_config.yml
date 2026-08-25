@@ -112,12 +112,19 @@ custom_data:
 sp:
   quast:
     fn: "*quast.tsv"
+  # These match the MultiQC-only copies produced by ADD_*_MULTIQC_HEADER
+  # (modules/local/add_multiqc_header.nf) - the "_mqc" suffix distinguishes them
+  # from the FILTERPAF outputs published to results, which are named
+  # "*human_mapped.tsv" etc. without the suffix. Each of these files carries its
+  # own front-matter header (id/section_name/pconfig.title), so the id/section_name
+  # here mainly still serves the sp: -> custom_data key matching and the "headers"
+  # column config below.
   human_decontamination:
-    fn: "*human_mapped.tsv"
+    fn: "*human_mapped_mqc.tsv"
   phix_decontamination:
-    fn: "*phix_mapped.tsv"
+    fn: "*phix_mapped_mqc.tsv"
   host_decontamination:
-    fn: "*contaminant_mapped.tsv"
+    fn: "*contaminant_mapped_mqc.tsv"
 
 ## Prettification
 custom_logo: "mgnify_wordmark_dark_on_light.png"
