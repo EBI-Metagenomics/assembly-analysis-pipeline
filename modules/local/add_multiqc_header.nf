@@ -14,7 +14,6 @@ process ADD_MULTIQC_HEADER {
 
     output:
     tuple val(meta), path("${prefix}_mqc.tsv.gz"), emit: tsv
-    path "versions.yml",                           emit: versions
 
     when:
     task.ext.when == null || task.ext.when
@@ -41,13 +40,9 @@ process ADD_MULTIQC_HEADER {
             echo "#     id: '${mqc_id}_table'"
             echo "#     title: '${mqc_title}'"
         fi
-        zcat ${tsv_gz}
+        gzip -dc ${tsv_gz}
     } | gzip -c > ${prefix}_mqc.tsv.gz
 
-    cat <<-END_VERSIONS > versions.yml
-    "${task.process}":
-        gzip: \$(echo \$(gzip --version 2>&1) | sed 's/^gzip //; s/ .*\$//')
-    END_VERSIONS
     """
 
     stub:
@@ -55,9 +50,5 @@ process ADD_MULTIQC_HEADER {
     """
     touch ${prefix}_mqc.tsv.gz
 
-    cat <<-END_VERSIONS > versions.yml
-    "${task.process}":
-        gzip: \$(echo \$(gzip --version 2>&1) | sed 's/^gzip //; s/ .*\$//')
-    END_VERSIONS
     """
 }

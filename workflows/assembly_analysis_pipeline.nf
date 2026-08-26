@@ -270,13 +270,10 @@ workflow ASSEMBLY_ANALYSIS_PIPELINE {
     // ADD_*_MULTIQC_HEADER - the original FILTERPAF output that gets published to
     // results (see conf/modules.config) is untouched.
     ADD_HUMAN_MULTIQC_HEADER(ASSEMBLY_QC.out.human_contaminated_contigs_tsv)
-    ch_versions = ch_versions.mix(ADD_HUMAN_MULTIQC_HEADER.out.versions)
 
     ADD_PHIX_MULTIQC_HEADER(ASSEMBLY_QC.out.phix_contaminated_contigs_tsv)
-    ch_versions = ch_versions.mix(ADD_PHIX_MULTIQC_HEADER.out.versions)
 
     ADD_HOST_MULTIQC_HEADER(ASSEMBLY_QC.out.host_contaminated_contigs_tsv)
-    ch_versions = ch_versions.mix(ADD_HOST_MULTIQC_HEADER.out.versions)
 
     // Use join with remainder: true to handle optional decontamination channels
     ch_per_assembly_files_compressed = ASSEMBLY_QC.out.quast_report_tsv
