@@ -161,7 +161,8 @@
                     "extractcoords": {
                         "branch": "main",
                         "git_sha": "b8ce29264034badcba2e6bbdd69013220a3fa973",
-                        "installed_by": ["detect_rna"]
+                        "installed_by": ["detect_rna"],
+                        "patch": "modules/ebi-metagenomics/extractcoords/extractcoords.diff"
                     },
                     "filterpaf": {
                         "branch": "main",
@@ -182,9 +183,8 @@
                     },
                     "genomeproperties": {
                         "branch": "main",
-                        "git_sha": "33d2a4ba110a701407d3eb561da529cea7ca05de",
-                        "installed_by": ["modules"],
-                        "patch": "modules/ebi-metagenomics/genomeproperties/genomeproperties.diff"
+                        "git_sha": "a777ee2b2c465286392e18424c8f0708a67314ad",
+                        "installed_by": ["modules"]
                     },
                     "infernal/cmscan": {
                         "branch": "main",

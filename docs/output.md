@@ -94,7 +94,14 @@ The `taxonomy` directory contains output files from taxonomic assignment tools s
 │   ├── ERZ12345_contigs_taxonomy.tsv.gz
 │   ├── ERZ12345.krona.txt.gz
 │   ├── ERZ12345.html
-│   └── ERZ12345_SSU.fasta.gz
+│   ├── ERZ12345_SSU.fasta.gz
+│   ├── ERZ12345_LSU.fasta.gz
+│   ├── ERZ12345_*rRNA_bacteria*.fasta.gz
+│   ├── ERZ12345_*rRNA_archaea*.fasta.gz
+│   ├── ERZ12345_*rRNA_eukarya*.fasta.gz
+│   ├── ERZ12345_*5S.fasta.gz
+│   ├── ERZ12345_*5_8S.fasta.gz
+│   └── ERZ12345_*other_ncRNA.fasta.gz
 ├── functional-annotation
 ├── pathways-and-systems
 └── annotation-summary
@@ -107,6 +114,14 @@ The `taxonomy` directory contains output files from taxonomic assignment tools s
 - **ERZ12345.html**: This `html` file contains the Krona HTML file that interactively displays the distribution of the different taxonomic assignments from [CAT_pack](https://github.com/MGXlab/CAT_pack).
 - **ERZ12345_SSU.fasta.gz**: This `FASTA` file contains all sequences from the assembly's contigs that matched the `SSU` (Small Subunit) rRNA marker gene, as identified by running [cmsearch](http://eddylab.org/infernal/). These sequences represent regions of the contigs that align to the `SSU` model used in the search. This file may be absent if no marker genes of this type were detected in the assembly.
 - **ERZ12345_LSU.fasta.gz**: This `FASTA` file contains sequences matching the `LSU` (Large Subunit) rRNA marker gene, identified in the same way via [cmsearch](http://eddylab.org/infernal/). This file may be absent if no marker genes of this type were detected in the assembly.
+- **`*rRNA_bacteria*.fasta.gz`**: This `FASTA` file contains extracted bacterial rRNA sequences. It may be absent if no bacterial rRNA sequences were detected in the assembly.
+- **`*rRNA_archaea*.fasta.gz`**: This `FASTA` file contains extracted archaeal rRNA sequences. It may be absent if no archaeal rRNA sequences were detected in the assembly.
+- **`*rRNA_eukarya*.fasta.gz`**: This `FASTA` file contains extracted eukaryotic rRNA sequences. It may be absent if no eukaryotic rRNA sequences were detected in the assembly.
+- **`*5S.fasta.gz`**: This `FASTA` file contains extracted 5S rRNA sequences. It may be absent if no 5S rRNA sequences were detected in the assembly.
+- **`*5_8S.fasta.gz`**: This `FASTA` file contains extracted 5.8S rRNA sequences. It may be absent if no 5.8S rRNA sequences were detected in the assembly.
+- **`*other_ncRNA.fasta.gz`**: This `FASTA` file contains extracted non-coding RNA sequences that do not belong to the categories above. It may be absent if no matching ncRNA sequences were detected in the assembly.
+
+The RNA FASTA files produced by `EXTRACTCOORDS` are published under `taxonomy/`, alongside the contig taxonomy and Krona outputs. These files are optional and are only created when the corresponding RNA category is detected.
 
 ### functional-annotation
 
