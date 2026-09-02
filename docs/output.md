@@ -6,12 +6,13 @@ The pipeline operates on a per-assembly basis, and its outputs generally follow 
 
 ## Per-run output files
 
-There are six general categories of results, which are separated into six different output directories by the pipeline, and each successful assembly should have all six of these directories:
+There are seven general categories of results, which are separated into seven different output directories by the pipeline:
 
 ```bash
 ├── qc
 ├── cds
 ├── taxonomy
+├── rnas
 ├── functional-annotation
 ├── pathways-and-systems
 └── annotation-summary
@@ -34,6 +35,7 @@ The `qc` directory contains output files related to the quality control steps of
 │   └── decontamination/
 ├── cds
 ├── taxonomy
+├── rnas
 ├── functional-annotation
 ├── pathways-and-systems
 └── annotation-summary
@@ -72,6 +74,7 @@ The `cds` directory contains output files related to the combined gene caller su
 │   ├── ERZ12345_predicted_cds.faa.gz
 │   └── ERZ12345_predicted_cds.gff.gz
 ├── taxonomy
+├── rnas
 ├── functional-annotation
 ├── pathways-and-systems
 └── annotation-summary
@@ -94,6 +97,27 @@ The `taxonomy` directory contains output files from taxonomic assignment tools s
 │   ├── ERZ12345_contigs_taxonomy.tsv.gz
 │   ├── ERZ12345.krona.txt.gz
 │   ├── ERZ12345.html
+├── rnas
+├── functional-annotation
+├── pathways-and-systems
+└── annotation-summary
+```
+
+#### Output files
+
+- **ERZ12345_contigs_taxonomy.tsv.gz**: This `tsv` file contains the output from [CAT_pack](https://github.com/MGXlab/CAT_pack) that describes taxonomy assignments to contigs in the assembly.
+- **ERZ12345.krona.txt.gz**: This compressed `txt` file contains the Krona text input that is used to generate the Krona HTML file. It contains the distribution of the different taxonomic assignments from the [CAT_pack](https://github.com/MGXlab/CAT_pack) output.
+- **ERZ12345.html**: This `html` file contains the Krona HTML file that interactively displays the distribution of the different taxonomic assignments from [CAT_pack](https://github.com/MGXlab/CAT_pack).
+
+### rnas
+
+The `rnas` directory contains FASTA files produced by `EXTRACTCOORDS`, including SSU, LSU, bacterial, archaeal, eukaryotic, 5S, 5.8S, and other ncRNA sequences. Each file is optional and is only created when the corresponding RNA category is detected.
+
+```bash
+├── qc
+├── cds
+├── taxonomy
+├── rnas
 │   ├── ERZ12345_SSU.fasta.gz
 │   ├── ERZ12345_LSU.fasta.gz
 │   ├── ERZ12345_*rRNA_bacteria*.fasta.gz
@@ -109,19 +133,16 @@ The `taxonomy` directory contains output files from taxonomic assignment tools s
 
 #### Output files
 
-- **ERZ12345_contigs_taxonomy.tsv.gz**: This `tsv` file contains the output from [CAT_pack](https://github.com/MGXlab/CAT_pack) that describes taxonomy assignments to contigs in the assembly.
-- **ERZ12345.krona.txt.gz**: This compressed `txt` file contains the Krona text input that is used to generate the Krona HTML file. It contains the distribution of the different taxonomic assignments from the [CAT_pack](https://github.com/MGXlab/CAT_pack) output.
-- **ERZ12345.html**: This `html` file contains the Krona HTML file that interactively displays the distribution of the different taxonomic assignments from [CAT_pack](https://github.com/MGXlab/CAT_pack).
-- **ERZ12345_SSU.fasta.gz**: This `FASTA` file contains all sequences from the assembly's contigs that matched the `SSU` (Small Subunit) rRNA marker gene, as identified by running [cmsearch](http://eddylab.org/infernal/). These sequences represent regions of the contigs that align to the `SSU` model used in the search. This file may be absent if no marker genes of this type were detected in the assembly.
-- **ERZ12345_LSU.fasta.gz**: This `FASTA` file contains sequences matching the `LSU` (Large Subunit) rRNA marker gene, identified in the same way via [cmsearch](http://eddylab.org/infernal/). This file may be absent if no marker genes of this type were detected in the assembly.
-- **`*rRNA_bacteria*.fasta.gz`**: This `FASTA` file contains extracted bacterial rRNA sequences. It may be absent if no bacterial rRNA sequences were detected in the assembly.
-- **`*rRNA_archaea*.fasta.gz`**: This `FASTA` file contains extracted archaeal rRNA sequences. It may be absent if no archaeal rRNA sequences were detected in the assembly.
-- **`*rRNA_eukarya*.fasta.gz`**: This `FASTA` file contains extracted eukaryotic rRNA sequences. It may be absent if no eukaryotic rRNA sequences were detected in the assembly.
-- **`*5S.fasta.gz`**: This `FASTA` file contains extracted 5S rRNA sequences. It may be absent if no 5S rRNA sequences were detected in the assembly.
-- **`*5_8S.fasta.gz`**: This `FASTA` file contains extracted 5.8S rRNA sequences. It may be absent if no 5.8S rRNA sequences were detected in the assembly.
-- **`*other_ncRNA.fasta.gz`**: This `FASTA` file contains extracted non-coding RNA sequences that do not belong to the categories above. It may be absent if no matching ncRNA sequences were detected in the assembly.
+- **ERZ12345_SSU.fasta.gz**: This `fasta` file contains all sequences from the assembly's contigs that matched the `SSU` (Small Subunit) rRNA marker gene. This file may be absent if no marker genes of this type were detected in the assembly.
+- **ERZ12345_LSU.fasta.gz**: This `fasta` file contains sequences matching the `LSU` (Large Subunit) rRNA marker gene. This file may be absent if no marker genes of this type were detected in the assembly.
+- **`*rRNA_bacteria*.fasta.gz`**: This `fasta` file contains extracted bacterial rRNA sequences. It may be absent if no bacterial rRNA sequences were detected in the assembly.
+- **`*rRNA_archaea*.fasta.gz`**: This `fasta` file contains extracted archaeal rRNA sequences. It may be absent if no archaeal rRNA sequences were detected in the assembly.
+- **`*rRNA_eukarya*.fasta.gz`**: This `fasta` file contains extracted eukaryotic rRNA sequences. It may be absent if no eukaryotic rRNA sequences were detected in the assembly.
+- **`*5S.fasta.gz`**: This `fasta` file contains extracted 5S rRNA sequences. It may be absent if no 5S rRNA sequences were detected in the assembly.
+- **`*5_8S.fasta.gz`**: This `fasta` file contains extracted 5.8S rRNA sequences. It may be absent if no 5.8S rRNA sequences were detected in the assembly.
+- **`*other_ncRNA.fasta.gz`**: This `fasta` file contains extracted non-coding RNA sequences that do not belong to the categories above. It may be absent if no matching ncRNA sequences were detected in the assembly.
 
-The RNA FASTA files produced by `EXTRACTCOORDS` are published under `taxonomy/`, alongside the contig taxonomy and Krona outputs. These files are optional and are only created when the corresponding RNA category is detected.
+These sequences should be interpreted with caution: rRNA genes can be difficult to assemble, for example because of repeats and their high copy number. Their presence, absence, or apparent taxonomic signal should therefore not be used alone to draw definitive conclusions about the assembly or its organisms.
 
 ### functional-annotation
 
@@ -131,6 +152,7 @@ The `functional-annotation` directory contains seven subdirectories of results, 
 ├── qc
 ├── cds
 ├── taxonomy
+├── rnas
 ├── functional-annotation
 │   ├── interpro
 │   │   ├── ERZ12345_interproscan.tsv.gz
@@ -246,6 +268,7 @@ The `pathways-and-systems` directory contains five subdirectories of results, on
 ├── qc
 ├── cds
 ├── taxonomy
+├── rnas
 ├── functional-annotation
 ├── pathways-and-systems
 │   ├── antismash
@@ -328,6 +351,7 @@ This file is compressed and indexed with both a bgzip index and a tabix index (`
 ├── qc
 ├── cds
 ├── taxonomy
+├── rnas
 ├── functional-annotation
 ├── pathways-and-systems
 └── annotation-summary
