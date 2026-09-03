@@ -3,9 +3,7 @@ process FILTER_IPS_AND_FAA_BY_CONTIGS {
     tag "$meta.id"
     label 'process_medium'
 
-    container "${ workflow.containerEngine == 'singularity' && !task.ext.singularity_pull_docker_container ?
-        'oras://community.wave.seqera.io/library/seqkit_python:3dcb98fc808deba4' :
-        'community.wave.seqera.io/library/seqkit_python:fa0b5f9a20082dfc' }"
+    container "microbiome-informatics/seqkit_python:2.13.0_3.11"
 
     input:
     tuple val(meta), path(contigs_chunk), path(ips_tsv), path(faa)
