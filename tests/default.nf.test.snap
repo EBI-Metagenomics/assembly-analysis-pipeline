@@ -468,9 +468,9 @@
                 "ERZ101_quast_stats.tsv.gz:md5,3581c09b4443c3b62e4fc910eedf0efe",
                 "ERZ101_aligned_to_contaminant.tsv.gz:md5,bf678dade1ff3067918b61ce0d4225e6",
                 "ERZ101_aligned_to_human.tsv.gz:md5,515849d5bcd7dfbdb518539785d47f50",
+                "ERZ101_SSU.fasta.gz:md5,bef21b27b1168580e08deab0bc13b721",
                 "ERZ101.html:md5,e56d9f9358ef11fc76a5c4d95bcea909",
                 "ERZ101.krona.txt.gz:md5,e8f24f3ddbf7289920fae9f28ab185c8",
-                "ERZ101_SSU.fasta.gz:md5,bef21b27b1168580e08deab0bc13b721",
                 "ERZ101_contigs_taxonomy.tsv.gz:md5,3f110e2b35b9b2c79be1607c51b27ecf",
                 "ERZ102_annotation_summary.gff.gz:md5,fbbaf2729dc18319f9ee628c28202b24",
                 "ERZ102_annotation_summary.gff.gz.csi:md5,227cc48ce8973f38f00dd7bd67365899",
@@ -511,9 +511,9 @@
                 "ERZ102_filtered_contigs.fasta.gz.gzi:md5,03dd37017aa7366aa239bad2a4eac58e",
                 "ERZ102_quast_stats.tsv.gz:md5,c98abd37d7178cb885601535df368a49",
                 "ERZ102_aligned_to_human.tsv.gz:md5,9654f1968ff591b11032e2447e422951",
+                "ERZ102_SSU.fasta.gz:md5,3573f965e0289691ebb850685c22f5f8",
                 "ERZ102.html:md5,4bbfb6dff8ab8cb9b1f058b5a94eebdd",
                 "ERZ102.krona.txt.gz:md5,ac2d11d2e91eeb5ca459caff14762973",
-                "ERZ102_SSU.fasta.gz:md5,3573f965e0289691ebb850685c22f5f8",
                 "ERZ102_contigs_taxonomy.tsv.gz:md5,13147201c1ce2cc4d44202d48948cbe8",
                 "ERZ666_quast_stats.tsv.gz:md5,9b4095efcbe329d05308346bbbe08ed3",
                 "ERZ999_quast_stats.tsv.gz:md5,72b939c0fe473ed347c03348bc130e27",
@@ -531,7 +531,7 @@
                 "qc_failed_assemblies.csv:md5,3292564aa6122920901d9bb724447ad4"
             ]
         ],
-        "timestamp": "2026-09-03T14:10:29.112689",
+        "timestamp": "2026-09-03T21:56:36.404509",
         "meta": {
             "nf-test": "0.9.5",
             "nextflow": "26.04.6"
