@@ -38,11 +38,11 @@ include { CONTIGS_TAXONOMIC_CLASSIFICATION   } from '../subworkflows/ebi-metagen
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 */
 
-include { RENAME_CONTIGS                     } from '../modules/local/rename_contigs'
-include { GFF_SUMMARY                        } from '../subworkflows/local/gff_summary'
-include { DETECT_RNA                         } from '../subworkflows/ebi-metagenomics/detect_rna/main'
-include { FUNCTIONAL_ANNOTATION              } from '../subworkflows/local/functional_annotation'
-include { PATHWAYS_AND_SYSTEMS               } from '../subworkflows/local/pathways_and_systems'
+include { RENAME_CONTIGS                                 } from '../modules/local/rename_contigs'
+include { GFF_SUMMARY                                    } from '../subworkflows/local/gff_summary'
+include { DETECT_RNA                                     } from '../subworkflows/ebi-metagenomics/detect_rna/main'
+include { FUNCTIONAL_ANNOTATION                          } from '../subworkflows/local/functional_annotation'
+include { PATHWAYS_AND_SYSTEMS                           } from '../subworkflows/local/pathways_and_systems'
 include { ADD_MULTIQC_HEADER as ADD_HUMAN_MULTIQC_HEADER } from '../modules/local/add_multiqc_header'
 include { ADD_MULTIQC_HEADER as ADD_PHIX_MULTIQC_HEADER  } from '../modules/local/add_multiqc_header'
 include { ADD_MULTIQC_HEADER as ADD_HOST_MULTIQC_HEADER  } from '../modules/local/add_multiqc_header'
@@ -266,9 +266,7 @@ workflow ASSEMBLY_ANALYSIS_PIPELINE {
     // Each TSV gets a MultiQC custom-content front-matter header prepended (id,
     // section_name, pconfig.title) naming the reference genome/database that was
     // actually used for this assembly (meta.human_reference/phix_reference/
-    // contaminant_reference). This is done on a separate MultiQC-only copy via
-    // ADD_*_MULTIQC_HEADER - the original FILTERPAF output that gets published to
-    // results (see conf/modules.config) is untouched.
+    // contaminant_reference).
     ADD_HUMAN_MULTIQC_HEADER(ASSEMBLY_QC.out.human_contaminated_contigs_tsv)
 
     ADD_PHIX_MULTIQC_HEADER(ASSEMBLY_QC.out.phix_contaminated_contigs_tsv)
