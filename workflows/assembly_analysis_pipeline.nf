@@ -38,11 +38,11 @@ include { CONTIGS_TAXONOMIC_CLASSIFICATION   } from '../subworkflows/ebi-metagen
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 */
 
-include { RENAME_CONTIGS                                 } from '../modules/local/rename_contigs'
-include { GFF_SUMMARY                                    } from '../subworkflows/local/gff_summary'
-include { DETECT_RNA                                     } from '../subworkflows/ebi-metagenomics/detect_rna/main'
-include { FUNCTIONAL_ANNOTATION                          } from '../subworkflows/local/functional_annotation'
-include { PATHWAYS_AND_SYSTEMS                           } from '../subworkflows/local/pathways_and_systems'
+include { RENAME_CONTIGS                     } from '../modules/local/rename_contigs'
+include { GFF_SUMMARY                        } from '../subworkflows/local/gff_summary'
+include { DETECT_RNA                         } from '../subworkflows/ebi-metagenomics/detect_rna/main'
+include { FUNCTIONAL_ANNOTATION              } from '../subworkflows/local/functional_annotation'
+include { PATHWAYS_AND_SYSTEMS               } from '../subworkflows/local/pathways_and_systems'
 
 /*
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

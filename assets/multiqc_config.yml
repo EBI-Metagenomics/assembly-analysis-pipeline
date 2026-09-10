@@ -116,11 +116,11 @@ sp:
   # (modules/ebi-metagenomics/filterpaf/main.nf) - the "_mqc" suffix distinguishes
   # them from the plain mapped_contigs_tsv output published to results.
   human_decontamination:
-    fn: "*human_mqc.tsv"
+    fn: "*human_mapped_mqc.tsv"
   phix_decontamination:
-    fn: "*phix_mqc.tsv"
+    fn: "*phix_mapped_mqc.tsv"
   host_decontamination:
-    fn: "*contaminant_mqc.tsv"
+    fn: "*contaminant_mapped_mqc.tsv"
 
 ## Prettification
 custom_logo: "mgnify_wordmark_dark_on_light.png"

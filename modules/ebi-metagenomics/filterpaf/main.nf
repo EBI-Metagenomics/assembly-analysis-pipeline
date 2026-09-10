@@ -10,10 +10,10 @@ process FILTERPAF {
     tuple val(meta), path(paf_file)
 
     output:
-    tuple val(meta), path("${prefix}.txt"),           emit: mapped_contigs_txt
-    tuple val(meta), path("${prefix}_mapped.tsv.gz"), emit: mapped_contigs_tsv, optional: true
-    tuple val(meta), path("${prefix}_mqc.tsv.gz"),    emit: mapped_contigs_tsv_mqc, optional: true
-    path "versions.yml",                              emit: versions
+    tuple val(meta), path("${prefix}.txt"),               emit: mapped_contigs_txt
+    tuple val(meta), path("${prefix}_mapped.tsv.gz"),     emit: mapped_contigs_tsv, optional: true
+    tuple val(meta), path("${prefix}_mapped_mqc.tsv.gz"), emit: mapped_contigs_tsv_mqc, optional: true
+    path "versions.yml",                                  emit: versions
 
     script:
     prefix          = task.ext.prefix ?: "${meta.id}"
@@ -69,8 +69,9 @@ process FILTERPAF {
                 echo "#     title: '${mqc_title}'"
             fi
             cat ${prefix}_mapped.tsv
-        } | gzip -c > ${prefix}_mqc.tsv.gz
+        } > ${prefix}_mapped_mqc.tsv
 
+        gzip ${prefix}_mapped_mqc.tsv
         gzip ${prefix}_mapped.tsv
     fi
 
