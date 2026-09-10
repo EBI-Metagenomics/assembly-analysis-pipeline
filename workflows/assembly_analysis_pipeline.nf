@@ -256,11 +256,17 @@ workflow ASSEMBLY_ANALYSIS_PIPELINE {
     ch_versions = ch_versions.mix(GT_GFF3VALIDATOR.out.versions)
 
     // Collect decontamination TSV files for MultiQC per assembly
+    //
+    // Each TSV, as emitted by FILTERPAF, already carries a MultiQC custom-content
+    // front-matter header (id, section_name, pconfig.title) naming the reference
+    // genome/database that was actually used for this assembly
+    // (meta.human_reference/phix_reference/contaminant_reference).
+
     // Use join with remainder: true to handle optional decontamination channels
     ch_per_assembly_files_compressed = ASSEMBLY_QC.out.quast_report_tsv
-        .join(ASSEMBLY_QC.out.human_contaminated_contigs_tsv, remainder: true)
-        .join(ASSEMBLY_QC.out.phix_contaminated_contigs_tsv, remainder: true)
-        .join(ASSEMBLY_QC.out.host_contaminated_contigs_tsv, remainder: true)
+        .join(ASSEMBLY_QC.out.human_contaminated_contigs_tsv_mqc, remainder: true)
+        .join(ASSEMBLY_QC.out.phix_contaminated_contigs_tsv_mqc, remainder: true)
+        .join(ASSEMBLY_QC.out.host_contaminated_contigs_tsv_mqc, remainder: true)
         .map { meta, quast, human, phix, host ->
             def files = [quast]
             if (human) files.add(human)

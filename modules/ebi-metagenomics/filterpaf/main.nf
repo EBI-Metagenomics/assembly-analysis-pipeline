@@ -10,12 +10,16 @@ process FILTERPAF {
     tuple val(meta), path(paf_file)
 
     output:
-    tuple val(meta), path("${prefix}.txt"),           emit: mapped_contigs_txt
-    tuple val(meta), path("${prefix}_mapped.tsv.gz"), emit: mapped_contigs_tsv, optional: true
-    path "versions.yml",                              emit: versions
+    tuple val(meta), path("${prefix}.txt"),               emit: mapped_contigs_txt
+    tuple val(meta), path("${prefix}_mapped.tsv.gz"),     emit: mapped_contigs_tsv, optional: true
+    tuple val(meta), path("${prefix}_mapped_mqc.tsv.gz"), emit: mapped_contigs_tsv_mqc, optional: true
+    path "versions.yml",                                  emit: versions
 
     script:
-    prefix = task.ext.prefix ?: "${meta.id}"
+    prefix          = task.ext.prefix ?: "${meta.id}"
+    def mqc_id      = task.ext.mqc_id      ?: ''
+    def mqc_section = task.ext.mqc_section ?: ''
+    def mqc_title   = task.ext.mqc_title   ?: ''
     """
     # Filter PAF by query coverage and MAPQ
     awk '
@@ -51,6 +55,23 @@ process FILTERPAF {
     else
         # Extract just the sequence IDs from failed sequences
         awk '{print \$1}' ${prefix}_mapped.tsv > ${prefix}.txt
+
+        # Build the MultiQC custom-content copy: same data, with a front-matter
+        # header (id, section_name, pconfig.title) prepended so MultiQC picks it
+        # up as a distinct table naming the reference used for this assembly.
+        {
+            if [ -n "${mqc_id}" ]; then
+                echo "# id: '${mqc_id}'"
+                echo "# section_name: '${mqc_section}'"
+                echo "# plot_type: 'table'"
+                echo "# pconfig:"
+                echo "#     id: '${mqc_id}_table'"
+                echo "#     title: '${mqc_title}'"
+            fi
+            cat ${prefix}_mapped.tsv
+        } > ${prefix}_mapped_mqc.tsv
+
+        gzip ${prefix}_mapped_mqc.tsv
         gzip ${prefix}_mapped.tsv
     fi
 
