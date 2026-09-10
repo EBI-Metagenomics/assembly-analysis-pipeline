@@ -112,15 +112,15 @@ custom_data:
 sp:
   quast:
     fn: "*quast.tsv"
-  # These match the MultiQC-only copies produced by ADD_*_MULTIQC_HEADER
-  # (modules/local/add_multiqc_header.nf) - the "_mqc" suffix distinguishes them
-  # from the FILTERPAF outputs published to results.
+  # These match the MultiQC-only copies produced by FILTERPAF's mapped_contigs_tsv_mqc output
+  # (modules/ebi-metagenomics/filterpaf/main.nf) - the "_mqc" suffix distinguishes
+  # them from the plain mapped_contigs_tsv output published to results.
   human_decontamination:
-    fn: "*human_mapped_mqc.tsv"
+    fn: "*human_mqc.tsv"
   phix_decontamination:
-    fn: "*phix_mapped_mqc.tsv"
+    fn: "*phix_mqc.tsv"
   host_decontamination:
-    fn: "*contaminant_mapped_mqc.tsv"
+    fn: "*contaminant_mqc.tsv"
 
 ## Prettification
 custom_logo: "mgnify_wordmark_dark_on_light.png"

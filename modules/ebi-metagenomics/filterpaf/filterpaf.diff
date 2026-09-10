@@ -3,7 +3,7 @@ Changes in component 'ebi-metagenomics/filterpaf'
 Changes in 'filterpaf/main.nf':
 --- modules/ebi-metagenomics/filterpaf/main.nf
 +++ modules/ebi-metagenomics/filterpaf/main.nf
-@@ -10,14 +10,18 @@
+@@ -10,14 +10,22 @@
      tuple val(meta), path(paf_file)
  
      output:
@@ -11,10 +11,15 @@ Changes in 'filterpaf/main.nf':
 -    path "versions.yml"                    , emit: versions
 +    tuple val(meta), path("${prefix}.txt"),           emit: mapped_contigs_txt
 +    tuple val(meta), path("${prefix}_mapped.tsv.gz"), emit: mapped_contigs_tsv, optional: true
++    tuple val(meta), path("${prefix}_mqc.tsv.gz"),    emit: mapped_contigs_tsv_mqc, optional: true
 +    path "versions.yml",                              emit: versions
  
      script:
-     prefix = task.ext.prefix ?: "${meta.id}"
+-    prefix = task.ext.prefix ?: "${meta.id}"
++    prefix          = task.ext.prefix ?: "${meta.id}"
++    def mqc_id      = task.ext.mqc_id      ?: ''
++    def mqc_section = task.ext.mqc_section ?: ''
++    def mqc_title   = task.ext.mqc_title   ?: ''
      """
      # Filter PAF by query coverage and MAPQ
      awk '
@@ -24,7 +29,7 @@ Changes in 'filterpaf/main.nf':
          {
              query_len = \$2;
              query_start = \$3;
-@@ -35,10 +39,20 @@
+@@ -35,11 +43,37 @@
              identity = matching_bases / total_bases;
  
              if (query_coverage >= ${params.min_qcov} && identity >= ${params.min_pid}) {
@@ -34,7 +39,7 @@ Changes in 'filterpaf/main.nf':
          }
 -    ' ${paf_file} > ${prefix}.txt
 +    ' ${paf_file} > ${prefix}_mapped.tsv
-+
+ 
 +    # Remove TSV file if it only contains the header (no contaminated contigs found)
 +    if [ \$(wc -l < ${prefix}_mapped.tsv) -le 1 ]; then
 +        rm ${prefix}_mapped.tsv
@@ -42,12 +47,29 @@ Changes in 'filterpaf/main.nf':
 +    else
 +        # Extract just the sequence IDs from failed sequences
 +        awk '{print \$1}' ${prefix}_mapped.tsv > ${prefix}.txt
++
++        # Build the MultiQC custom-content copy: same data, with a front-matter
++        # header (id, section_name, pconfig.title) prepended so MultiQC picks it
++        # up as a distinct table naming the reference used for this assembly.
++        {
++            if [ -n "${mqc_id}" ]; then
++                echo "# id: '${mqc_id}'"
++                echo "# section_name: '${mqc_section}'"
++                echo "# plot_type: 'table'"
++                echo "# pconfig:"
++                echo "#     id: '${mqc_id}_table'"
++                echo "#     title: '${mqc_title}'"
++            fi
++            cat ${prefix}_mapped.tsv
++        } | gzip -c > ${prefix}_mqc.tsv.gz
++
 +        gzip ${prefix}_mapped.tsv
 +    fi
- 
++
      cat <<-END_VERSIONS > versions.yml
      "${task.process}":
-@@ -50,6 +64,7 @@
+         gawk: \$(echo \$(gawk --version 2>&1) | sed 's/^.*GNU Awk //; s/, .*\$//')
+@@ -50,6 +84,7 @@
      prefix = task.ext.prefix ?: "${meta.id}"
      """
      touch ${prefix}.txt

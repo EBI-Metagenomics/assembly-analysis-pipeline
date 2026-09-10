@@ -49,11 +49,14 @@ workflow ASSEMBLY_QC {
     ch_versions = ch_versions.mix(QUAST.out.versions)
 
     emit:
-    assembly_qc_pass                = INDEX_AND_PUBLISH_CONTIGS.out.filtered_contigs
-    qc_failed_assemblies            = FILTER_ASSEMBLY.out.exit_reason.mix(INDEX_AND_PUBLISH_CONTIGS.out.exit_reason)
-    quast_report_tsv                = QUAST.out.tsv
-    phix_contaminated_contigs_tsv   = ASSEMBLY_DECONTAMINATION.out.phix_contaminated_contigs_tsv
-    human_contaminated_contigs_tsv  = ASSEMBLY_DECONTAMINATION.out.human_contaminated_contigs_tsv
-    host_contaminated_contigs_tsv   = ASSEMBLY_DECONTAMINATION.out.host_contaminated_contigs_tsv
-    versions                        = ch_versions
+    assembly_qc_pass                   = INDEX_AND_PUBLISH_CONTIGS.out.filtered_contigs
+    qc_failed_assemblies               = FILTER_ASSEMBLY.out.exit_reason.mix(INDEX_AND_PUBLISH_CONTIGS.out.exit_reason)
+    quast_report_tsv                   = QUAST.out.tsv
+    phix_contaminated_contigs_tsv      = ASSEMBLY_DECONTAMINATION.out.phix_contaminated_contigs_tsv
+    human_contaminated_contigs_tsv     = ASSEMBLY_DECONTAMINATION.out.human_contaminated_contigs_tsv
+    host_contaminated_contigs_tsv      = ASSEMBLY_DECONTAMINATION.out.host_contaminated_contigs_tsv
+    phix_contaminated_contigs_tsv_mqc  = ASSEMBLY_DECONTAMINATION.out.phix_contaminated_contigs_tsv_mqc
+    human_contaminated_contigs_tsv_mqc = ASSEMBLY_DECONTAMINATION.out.human_contaminated_contigs_tsv_mqc
+    host_contaminated_contigs_tsv_mqc  = ASSEMBLY_DECONTAMINATION.out.host_contaminated_contigs_tsv_mqc
+    versions                           = ch_versions
 }

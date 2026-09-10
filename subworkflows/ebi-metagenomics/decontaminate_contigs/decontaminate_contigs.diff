@@ -10,9 +10,10 @@ Changes in 'decontaminate_contigs/main.nf':
      emit:
 -    cleaned_contigs = SEQKIT_GREP.out.filter
 -    versions        = ch_versions
-+    cleaned_contigs    = SEQKIT_GREP.out.filter
-+    mapped_contigs_tsv = FILTERPAF.out.mapped_contigs_tsv
-+    versions           = ch_versions
++    cleaned_contigs        = SEQKIT_GREP.out.filter
++    mapped_contigs_tsv     = FILTERPAF.out.mapped_contigs_tsv
++    mapped_contigs_tsv_mqc = FILTERPAF.out.mapped_contigs_tsv_mqc
++    versions               = ch_versions
  }
 
 'subworkflows/ebi-metagenomics/decontaminate_contigs/tests/main.nf.test.snap' is unchanged
