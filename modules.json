@@ -166,7 +166,8 @@
                     "filterpaf": {
                         "branch": "main",
                         "git_sha": "9ce33e33c4f08209b93e3732dab64189eb6612f7",
-                        "installed_by": ["decontaminate_contigs"]                    },
+                        "installed_by": ["decontaminate_contigs"]
+                    },
                     "fraggenescanrs": {
                         "branch": "main",
                         "git_sha": "67fa3c30f1488ebacb1f1a1304cc1c8b43e92e3d",
