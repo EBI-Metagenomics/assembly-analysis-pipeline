@@ -274,7 +274,7 @@
                     "decontaminate_contigs": {
                         "branch": "main",
                         "git_sha": "9ce33e33c4f08209b93e3732dab64189eb6612f7",
-                        "installed_by": ["assembly_decontamination", "decontaminate_assemblies"],
+                        "installed_by": ["decontaminate_assemblies"]
                     },
                     "detect_rna": {
                         "branch": "main",
