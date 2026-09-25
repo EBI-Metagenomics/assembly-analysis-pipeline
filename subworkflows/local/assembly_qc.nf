@@ -1,6 +1,6 @@
 /* LOCAL */
 include { FILTER_ASSEMBLY           } from '../../modules/local/filter_assembly'
-include { ASSEMBLY_DECONTAMINATION  } from '../ebi-metagenomics/assembly_decontamination/main'
+include { DECONTAMINATE_ASSEMBLIES  } from '../ebi-metagenomics/decontaminate_assemblies/main'
 include { INDEX_AND_PUBLISH_CONTIGS } from '../../modules/local/index_and_publish_contigs'
 
 /* NF-CORE */
@@ -30,16 +30,16 @@ workflow ASSEMBLY_QC {
 
     ch_versions = ch_versions.mix( FILTER_ASSEMBLY.out.versions )
 
-    ASSEMBLY_DECONTAMINATION(
+    DECONTAMINATE_ASSEMBLIES(
         FILTER_ASSEMBLY.out.fasta.ifEmpty([])
     )
-    ch_versions = ch_versions.mix(ASSEMBLY_DECONTAMINATION.out.versions)
+    ch_versions = ch_versions.mix(DECONTAMINATE_ASSEMBLIES.out.versions)
 
     // Checks viability, re-compresses as bgzip, indexes, and publishes the final
     // contigs. Single ownership of _filtered_contigs.fasta.gz as a stopgap until
     // we migrate to the workflow-level outputs.
     INDEX_AND_PUBLISH_CONTIGS(
-        ASSEMBLY_DECONTAMINATION.out.cleaned_contigs
+        DECONTAMINATE_ASSEMBLIES.out.cleaned_contigs
     )
     ch_versions = ch_versions.mix(INDEX_AND_PUBLISH_CONTIGS.out.versions)
 
@@ -49,11 +49,14 @@ workflow ASSEMBLY_QC {
     ch_versions = ch_versions.mix(QUAST.out.versions)
 
     emit:
-    assembly_qc_pass                = INDEX_AND_PUBLISH_CONTIGS.out.filtered_contigs
-    qc_failed_assemblies            = FILTER_ASSEMBLY.out.exit_reason.mix(INDEX_AND_PUBLISH_CONTIGS.out.exit_reason)
-    quast_report_tsv                = QUAST.out.tsv
-    phix_contaminated_contigs_tsv   = ASSEMBLY_DECONTAMINATION.out.phix_contaminated_contigs_tsv
-    human_contaminated_contigs_tsv  = ASSEMBLY_DECONTAMINATION.out.human_contaminated_contigs_tsv
-    host_contaminated_contigs_tsv   = ASSEMBLY_DECONTAMINATION.out.host_contaminated_contigs_tsv
-    versions                        = ch_versions
+    assembly_qc_pass                   = INDEX_AND_PUBLISH_CONTIGS.out.filtered_contigs
+    qc_failed_assemblies               = FILTER_ASSEMBLY.out.exit_reason.mix(INDEX_AND_PUBLISH_CONTIGS.out.exit_reason)
+    quast_report_tsv                   = QUAST.out.tsv
+    phix_contaminated_contigs_tsv      = DECONTAMINATE_ASSEMBLIES.out.phix_contaminated_contigs_tsv
+    human_contaminated_contigs_tsv     = DECONTAMINATE_ASSEMBLIES.out.human_contaminated_contigs_tsv
+    host_contaminated_contigs_tsv      = DECONTAMINATE_ASSEMBLIES.out.host_contaminated_contigs_tsv
+    phix_contaminated_contigs_tsv_mqc  = DECONTAMINATE_ASSEMBLIES.out.phix_contaminated_contigs_tsv_mqc
+    human_contaminated_contigs_tsv_mqc = DECONTAMINATE_ASSEMBLIES.out.human_contaminated_contigs_tsv_mqc
+    host_contaminated_contigs_tsv_mqc  = DECONTAMINATE_ASSEMBLIES.out.host_contaminated_contigs_tsv_mqc
+    versions                           = ch_versions
 }
