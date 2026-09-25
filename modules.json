@@ -165,10 +165,8 @@
                     },
                     "filterpaf": {
                         "branch": "main",
-                        "git_sha": "ad73b5f1d3e4ed60ba329d3e5be3afdca32f938f",
-                        "installed_by": ["decontaminate_contigs"],
-                        "patch": "modules/ebi-metagenomics/filterpaf/filterpaf.diff"
-                    },
+                        "git_sha": "9ce33e33c4f08209b93e3732dab64189eb6612f7",
+                        "installed_by": ["decontaminate_contigs"]                    },
                     "fraggenescanrs": {
                         "branch": "main",
                         "git_sha": "67fa3c30f1488ebacb1f1a1304cc1c8b43e92e3d",
@@ -257,12 +255,6 @@
             },
             "subworkflows": {
                 "ebi-metagenomics": {
-                    "assembly_decontamination": {
-                        "branch": "main",
-                        "git_sha": "683ff8e221ce69533846d39e3741c48fbabe3351",
-                        "installed_by": ["subworkflows"],
-                        "patch": "subworkflows/ebi-metagenomics/assembly_decontamination/assembly_decontamination.diff"
-                    },
                     "combined_gene_caller": {
                         "branch": "main",
                         "git_sha": "6d8c0aa510aaaca76b4f88b11a1629fc935cdaaa",
@@ -274,11 +266,15 @@
                         "installed_by": ["subworkflows"],
                         "patch": "subworkflows/ebi-metagenomics/contigs_taxonomic_classification/contigs_taxonomic_classification.diff"
                     },
+                    "decontaminate_assemblies": {
+                        "branch": "main",
+                        "git_sha": "9ce33e33c4f08209b93e3732dab64189eb6612f7",
+                        "installed_by": ["subworkflows"]
+                    },
                     "decontaminate_contigs": {
                         "branch": "main",
-                        "git_sha": "639364111105fb9f2c3ca5fbf543a974c8fb8e9f",
-                        "installed_by": ["assembly_decontamination"],
-                        "patch": "subworkflows/ebi-metagenomics/decontaminate_contigs/decontaminate_contigs.diff"
+                        "git_sha": "9ce33e33c4f08209b93e3732dab64189eb6612f7",
+                        "installed_by": ["assembly_decontamination", "decontaminate_assemblies"],
                     },
                     "detect_rna": {
                         "branch": "main",
