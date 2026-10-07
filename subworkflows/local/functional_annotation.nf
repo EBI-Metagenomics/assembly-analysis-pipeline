@@ -10,10 +10,10 @@ include { CSVTK_CONCAT as CONCATENATE_DBCAN_HMMOUT             } from '../../mod
 include { TABIX_BGZIP as TABIX_BGZIP_GO                        } from '../../modules/nf-core/tabix/bgzip/main'
 include { TABIX_BGZIP as TABIX_BGZIP_GOSLIM                    } from '../../modules/nf-core/tabix/bgzip/main'
 include { TABIX_BGZIP as TABIX_BGZIP_RHEAANDCHEBI              } from '../../modules/nf-core/tabix/bgzip/main'
+include { RUNDBCAN_EASYSUBSTRATE                               } from '../../modules/nf-core/rundbcan/easysubstrate/main'
 
 /* EBI-METAGENOMICS */
 include { INTERPROSCAN                             } from '../../modules/ebi-metagenomics/interproscan/main'
-include { DBCAN                                    } from '../../modules/ebi-metagenomics/dbcan/easysubstrate/main'
 include { GOSLIM_SWF                               } from '../../subworkflows/ebi-metagenomics/goslim_swf/main'
 
 /* LOCAL */
@@ -146,7 +146,7 @@ workflow FUNCTIONAL_ANNOTATION {
     // The faa is chunked (XXX_001.faa...) but not the GFF (it is the concatenated one directly from the CGC)
     ch_proteins_gff.combine(ch_protein_chunked, by: 0).multiMap { meta, gff, faa ->
         faa: [meta, faa]
-        gff: [meta, gff]
+        gff: [meta, gff, "prodigal"]
     }.set {
         ch_dbcan
     }
@@ -154,21 +154,20 @@ workflow FUNCTIONAL_ANNOTATION {
     // dbCAN takes a subset (chunk) of proteins and the complete assembly GFF file as input.
     // We therefore updated the workflow to filter the GFF file, retaining only the entries
     // associated with the proteins in the given chunk.
-    DBCAN(
+    RUNDBCAN_EASYSUBSTRATE(
         ch_dbcan.faa,
         ch_dbcan.gff,
         [file(params.dbcan_database, checkIfExists: true), params.dbcan_database_version],
-        "protein" // mode
     )
-    ch_versions = ch_versions.mix(DBCAN.out.versions)
+    ch_versions = ch_versions.mix(RUNDBCAN_EASYSUBSTRATE.out.versions)
 
     CONCATENATE_DBCAN_GFFS(
-        DBCAN.out.cgc_gff.groupTuple()
+        RUNDBCAN_EASYSUBSTRATE.out.cgc_gff.groupTuple()
     )
     ch_versions = ch_versions.mix(CONCATENATE_DBCAN_GFFS.out.versions)
 
     CONCATENATE_DBCAN_OVERVIEW(
-        DBCAN.out.overview_txt.groupTuple(),
+        RUNDBCAN_EASYSUBSTRATE.out.overview_txt.groupTuple(),
         "tsv",
         "tsv",
         true // compress
@@ -176,7 +175,7 @@ workflow FUNCTIONAL_ANNOTATION {
     ch_versions = ch_versions.mix(CONCATENATE_DBCAN_OVERVIEW.out.versions)
 
     CONCATENATE_DBCAN_STANDARD_OUT(
-        DBCAN.out.cgc_standard_tsv.groupTuple(),
+        RUNDBCAN_EASYSUBSTRATE.out.cgc_standard_tsv.groupTuple(),
         "tsv",
         "tsv",
         true // compress
@@ -184,7 +183,7 @@ workflow FUNCTIONAL_ANNOTATION {
     ch_versions = ch_versions.mix(CONCATENATE_DBCAN_STANDARD_OUT.out.versions)
 
     CONCATENATE_DBCAN_SUBSTRATES(
-        DBCAN.out.substrate_prediction_tsv.groupTuple(),
+        RUNDBCAN_EASYSUBSTRATE.out.substrate_prediction_tsv.groupTuple(),
         "tsv",
         "tsv",
         true // compress
@@ -196,7 +195,7 @@ workflow FUNCTIONAL_ANNOTATION {
     * it looks like this extra column is a duplicated "Coverage". In order to concatenate the
     * tsv with csvtk (which ensures consistency) we run csvtk fix first to adjust the tsvs
     */
-    SEQKIT_FIX(DBCAN.out.dbsub_output_tsv)
+    SEQKIT_FIX(RUNDBCAN_EASYSUBSTRATE.out.dbsub_output_tsv)
 
     ch_versions = ch_versions.mix(SEQKIT_FIX.out.versions.first())
 
