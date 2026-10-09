@@ -159,7 +159,7 @@ workflow FUNCTIONAL_ANNOTATION {
         ch_dbcan.gff,
         [file(params.dbcan_database, checkIfExists: true), params.dbcan_database_version],
     )
-    ch_versions = ch_versions.mix(RUNDBCAN_EASYSUBSTRATE.out.versions)
+    ch_versions = ch_versions.mix(RUNDBCAN_EASYSUBSTRATE.out.versions_rundbcan)
 
     CONCATENATE_DBCAN_GFFS(
         RUNDBCAN_EASYSUBSTRATE.out.cgc_gff.groupTuple()
