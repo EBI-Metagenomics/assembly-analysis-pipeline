@@ -4,7 +4,12 @@ Changes in component 'nf-core/rundbcan/easysubstrate'
 Changes in 'rundbcan/easysubstrate/main.nf':
 --- modules/nf-core/rundbcan/easysubstrate/main.nf
 +++ modules/nf-core/rundbcan/easysubstrate/main.nf
-@@ -14,14 +14,14 @@
+@@ -10,22 +10,23 @@
+     input:
+     tuple val(meta), path(input_raw_data)
+     tuple val(meta2), path(input_gff), val(gff_type)
+-    path dbcan_db
++    tuple path(dbcan_db), val(dbcan_db_version)
  
      output:
      tuple val(meta), path("${prefix}_overview.tsv"), emit: cazyme_annotation
@@ -23,7 +28,13 @@ Changes in 'rundbcan/easysubstrate/main.nf':
      tuple val(meta), path("${prefix}_total_cgc_info.tsv"), emit: total_cgc_info
      tuple val(meta), path("${prefix}_substrate_prediction.tsv"), emit: substrate_prediction
      tuple val(meta), path("${prefix}_synteny_pdf/"), optional: true, emit: synteny_pdf
-@@ -33,33 +33,93 @@
+-    tuple val("${task.process}"), val('rundbcan'), eval("run_dbcan version | sed 's/dbCAN version: //g'"), emit: versions_rundbcan, topic: versions
++    // TODO: revert this change when the migration to topics is done
++    path "versions.yml", emit: versions
+ 
+     when:
+     task.ext.when == null || task.ext.when
+@@ -33,33 +34,99 @@
      script:
      def args = task.ext.args ?: ''
      prefix = task.ext.prefix ?: "${meta.id}"
@@ -122,9 +133,27 @@ Changes in 'rundbcan/easysubstrate/main.nf':
 +    #######################################################################
 +
 +    gzip ${prefix}_*.tsv ${prefix}_*.gff ${prefix}_diamond.out.tc
++
++    cat <<-END_VERSIONS > versions.yml
++    "${task.process}":
++        dbcan: \$(run_dbcan version | sed "s/dbCAN version: //")
++        dbcan_db: "${dbcan_db_version}"
++    END_VERSIONS
      """
  
      stub:
+@@ -79,5 +146,11 @@
+     touch ${prefix}_PUL_blast.out
+     touch ${prefix}_substrate_prediction.tsv
+     mkdir -p ${prefix}_synteny_pdf
++
++    cat <<-END_VERSIONS > versions.yml
++    "${task.process}":
++        dbcan: \$(run_dbcan version | sed "s/dbCAN version: //")
++        dbcan_db: "${dbcan_db_version}"
++    END_VERSIONS
+     """
+ }
 
 'modules/nf-core/rundbcan/easysubstrate/tests/main.nf.test.snap' is unchanged
 'modules/nf-core/rundbcan/easysubstrate/tests/main.nf.test' is unchanged

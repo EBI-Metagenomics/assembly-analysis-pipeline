@@ -10,7 +10,7 @@ process RUNDBCAN_EASYSUBSTRATE {
     input:
     tuple val(meta), path(input_raw_data)
     tuple val(meta2), path(input_gff), val(gff_type)
-    path dbcan_db
+    tuple path(dbcan_db), val(dbcan_db_version)
 
     output:
     tuple val(meta), path("${prefix}_overview.tsv"), emit: cazyme_annotation
@@ -25,7 +25,8 @@ process RUNDBCAN_EASYSUBSTRATE {
     tuple val(meta), path("${prefix}_total_cgc_info.tsv"), emit: total_cgc_info
     tuple val(meta), path("${prefix}_substrate_prediction.tsv"), emit: substrate_prediction
     tuple val(meta), path("${prefix}_synteny_pdf/"), optional: true, emit: synteny_pdf
-    tuple val("${task.process}"), val('rundbcan'), eval("run_dbcan version | sed 's/dbCAN version: //g'"), emit: versions_rundbcan, topic: versions
+    // TODO: revert this change when the migration to topics is done
+    path "versions.yml", emit: versions
 
     when:
     task.ext.when == null || task.ext.when
@@ -120,6 +121,12 @@ process RUNDBCAN_EASYSUBSTRATE {
     #######################################################################
 
     gzip ${prefix}_*.tsv ${prefix}_*.gff ${prefix}_diamond.out.tc
+
+    cat <<-END_VERSIONS > versions.yml
+    "${task.process}":
+        dbcan: \$(run_dbcan version | sed "s/dbCAN version: //")
+        dbcan_db: "${dbcan_db_version}"
+    END_VERSIONS
     """
 
     stub:
@@ -139,5 +146,11 @@ process RUNDBCAN_EASYSUBSTRATE {
     touch ${prefix}_PUL_blast.out
     touch ${prefix}_substrate_prediction.tsv
     mkdir -p ${prefix}_synteny_pdf
+
+    cat <<-END_VERSIONS > versions.yml
+    "${task.process}":
+        dbcan: \$(run_dbcan version | sed "s/dbCAN version: //")
+        dbcan_db: "${dbcan_db_version}"
+    END_VERSIONS
     """
 }
