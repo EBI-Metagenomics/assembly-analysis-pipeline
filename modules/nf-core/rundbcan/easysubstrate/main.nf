@@ -13,17 +13,17 @@ process RUNDBCAN_EASYSUBSTRATE {
     tuple path(dbcan_db), val(dbcan_db_version)
 
     output:
-    tuple val(meta), path("${prefix}_overview.tsv"), emit: cazyme_annotation
-    tuple val(meta), path("${prefix}_dbcan_hmm_results.tsv"), emit: dbcanhmm_results
-    tuple val(meta), path("${prefix}_dbcansub_hmm_results.tsv"), emit: dbcansub_results
+    tuple val(meta), path("${prefix}_overview.tsv.gz"), emit: cazyme_annotation
+    tuple val(meta), path("${prefix}_dbcan_hmm_results.tsv.gz"), emit: dbcanhmm_results
+    tuple val(meta), path("${prefix}_dbcansub_hmm_results.tsv.gz"), emit: dbcansub_results
     tuple val(meta), path("${prefix}_diamond.out"), emit: dbcandiamond_results
-    tuple val(meta), path("${prefix}_cgc.gff"), emit: cgc_gff
-    tuple val(meta), path("${prefix}_cgc_standard_out.tsv"), emit: cgc_standard_out
-    tuple val(meta), path("${prefix}_diamond.out.tc"), emit: diamond_out_tc
-    tuple val(meta), path("${prefix}_tf_hmm_results.tsv"), emit: tf_hmm_results, optional: true
-    tuple val(meta), path("${prefix}_stp_hmm_results.tsv"), emit: stp_hmm_results
-    tuple val(meta), path("${prefix}_total_cgc_info.tsv"), emit: total_cgc_info
-    tuple val(meta), path("${prefix}_substrate_prediction.tsv"), emit: substrate_prediction
+    tuple val(meta), path("${prefix}_cgc.gff.gz"), emit: cgc_gff
+    tuple val(meta), path("${prefix}_cgc_standard_out.tsv.gz"), emit: cgc_standard_out
+    tuple val(meta), path("${prefix}_diamond.out.tc.gz"), emit: diamond_out_tc
+    tuple val(meta), path("${prefix}_tf_hmm_results.tsv.gz"), emit: tf_hmm_results, optional: true
+    tuple val(meta), path("${prefix}_stp_hmm_results.tsv.gz"), emit: stp_hmm_results
+    tuple val(meta), path("${prefix}_total_cgc_info.tsv.gz"), emit: total_cgc_info
+    tuple val(meta), path("${prefix}_substrate_prediction.tsv.gz"), emit: substrate_prediction
     tuple val(meta), path("${prefix}_synteny_pdf/"), optional: true, emit: synteny_pdf
     // TODO: revert this change when the migration to topics is done
     path "versions.yml", emit: versions
@@ -48,6 +48,11 @@ process RUNDBCAN_EASYSUBSTRATE {
     filter_gff_by_fasta_sequences.py --fasta ${input_raw_data} \\
         --gff ${input_gff} \\
         --output ${prefix}_filtered.gff
+
+    # run_dbcan 5.2.9 drops --threads for the substrate prediction step and falls back to
+    # os.cpu_count(), which on HPC returns all the cores of the node. PYTHON_CPU_COUNT (python >= 3.13)
+    # makes os.cpu_count() return the CPUs allocated to the task instead.
+    export PYTHON_CPU_COUNT=${task.cpus}
 
     run_dbcan easy_substrate \\
         --mode protein \\
@@ -131,15 +136,15 @@ process RUNDBCAN_EASYSUBSTRATE {
     touch ${prefix}_overview.tsv.gz
     touch ${prefix}_dbcan_hmm_results.tsv.gz
     touch ${prefix}_dbcansub_hmm_results.tsv.gz
-    touch ${prefix}_diamond.out.gz
+    touch ${prefix}_diamond.out
     touch ${prefix}_cgc.gff.gz
     touch ${prefix}_cgc_standard_out.tsv.gz
     touch ${prefix}_diamond.out.tc.gz
     touch ${prefix}_tf_hmm_results.tsv.gz
     touch ${prefix}_stp_hmm_results.tsv.gz
     touch ${prefix}_total_cgc_info.tsv.gz
-    touch ${prefix}_cgc.faa.gz
-    touch ${prefix}_pul_blast.out.gz
+    touch ${prefix}_cgc.faa
+    touch ${prefix}_pul_blast.out
     touch ${prefix}_substrate_prediction.tsv.gz
     mkdir -p ${prefix}_synteny_pdf
 
