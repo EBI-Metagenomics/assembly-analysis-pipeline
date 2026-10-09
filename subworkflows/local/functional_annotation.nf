@@ -167,7 +167,7 @@ workflow FUNCTIONAL_ANNOTATION {
     ch_versions = ch_versions.mix(CONCATENATE_DBCAN_GFFS.out.versions)
 
     CONCATENATE_DBCAN_OVERVIEW(
-        RUNDBCAN_EASYSUBSTRATE.out.overview_txt.groupTuple(),
+        RUNDBCAN_EASYSUBSTRATE.out.cazyme_annotation.groupTuple(),
         "tsv",
         "tsv",
         true // compress
@@ -175,7 +175,7 @@ workflow FUNCTIONAL_ANNOTATION {
     ch_versions = ch_versions.mix(CONCATENATE_DBCAN_OVERVIEW.out.versions)
 
     CONCATENATE_DBCAN_STANDARD_OUT(
-        RUNDBCAN_EASYSUBSTRATE.out.cgc_standard_tsv.groupTuple(),
+        RUNDBCAN_EASYSUBSTRATE.out.cgc_standard_out.groupTuple(),
         "tsv",
         "tsv",
         true // compress
@@ -183,7 +183,7 @@ workflow FUNCTIONAL_ANNOTATION {
     ch_versions = ch_versions.mix(CONCATENATE_DBCAN_STANDARD_OUT.out.versions)
 
     CONCATENATE_DBCAN_SUBSTRATES(
-        RUNDBCAN_EASYSUBSTRATE.out.substrate_prediction_tsv.groupTuple(),
+        RUNDBCAN_EASYSUBSTRATE.out.substrate_prediction.groupTuple(),
         "tsv",
         "tsv",
         true // compress
@@ -195,7 +195,7 @@ workflow FUNCTIONAL_ANNOTATION {
     * it looks like this extra column is a duplicated "Coverage". In order to concatenate the
     * tsv with csvtk (which ensures consistency) we run csvtk fix first to adjust the tsvs
     */
-    SEQKIT_FIX(RUNDBCAN_EASYSUBSTRATE.out.dbsub_output_tsv)
+    SEQKIT_FIX(RUNDBCAN_EASYSUBSTRATE.out.dbcanhmm_results)
 
     ch_versions = ch_versions.mix(SEQKIT_FIX.out.versions.first())
 
