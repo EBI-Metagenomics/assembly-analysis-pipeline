@@ -410,9 +410,7 @@
                 "multiqc/multiqc_data/multiqc_data.json",
                 "multiqc/multiqc_data/multiqc_general_stats.txt",
                 "multiqc/multiqc_data/multiqc_host_decontamination_table.txt",
-                "multiqc/multiqc_data/multiqc_host_decontamination_table_table.txt",
                 "multiqc/multiqc_data/multiqc_human_decontamination_table.txt",
-                "multiqc/multiqc_data/multiqc_human_decontamination_table_table.txt",
                 "multiqc/multiqc_data/multiqc_quast.txt",
                 "multiqc/multiqc_data/multiqc_software_versions.txt",
                 "multiqc/multiqc_data/multiqc_sources.txt",
@@ -540,19 +538,17 @@
                 "multiqc_citations.txt:md5,2d1a8ef8ba06c7eada06ab3e96552ea4",
                 "multiqc_general_stats.txt:md5,e9859d7e5ebcbcc222fec497deea93f1",
                 "multiqc_host_decontamination_table.txt:md5,b8d06985826c0451c759e08382db2347",
-                "multiqc_host_decontamination_table_table.txt:md5,b8d06985826c0451c759e08382db2347",
                 "multiqc_human_decontamination_table.txt:md5,f8bc5f4b45b46d49826e5d8207a3b8f2",
-                "multiqc_human_decontamination_table_table.txt:md5,f8bc5f4b45b46d49826e5d8207a3b8f2",
                 "multiqc_quast.txt:md5,049b013e246ef77508966207d654e84b",
                 "quast_num_contigs.txt:md5,b7c7360a303f1d50f3a1d50242e821a9",
                 "quast_table.txt:md5,213c20ee21a3d9700463cdd53cd9b529",
                 "qc_failed_assemblies.csv:md5,3292564aa6122920901d9bb724447ad4"
             ]
         ],
-        "timestamp": "2026-09-04T10:53:49.136013",
+        "timestamp": "2026-10-09T12:47:56.500725949",
         "meta": {
             "nf-test": "0.9.5",
-            "nextflow": "26.04.6"
+            "nextflow": "26.04.0"
         }
     }
 }
