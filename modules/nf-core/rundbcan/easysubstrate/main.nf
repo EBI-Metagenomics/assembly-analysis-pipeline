@@ -52,6 +52,7 @@ process RUNDBCAN_EASYSUBSTRATE {
     # run_dbcan 5.2.9 drops --threads for the substrate prediction step and falls back to
     # os.cpu_count(), which on HPC returns all the cores of the node. PYTHON_CPU_COUNT (python >= 3.13)
     # makes os.cpu_count() return the CPUs allocated to the task instead.
+    # BUG: https://github.com/bcb-unl/run_dbcan/issues/73 (closed but the issue wasn't solved)
     export PYTHON_CPU_COUNT=${task.cpus}
 
     run_dbcan easy_substrate \\
