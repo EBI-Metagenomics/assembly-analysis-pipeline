@@ -60,20 +60,20 @@ process RUNDBCAN_EASYSUBSTRATE {
         ${args}
 
     mv overview.tsv             ${prefix}_overview.tsv
-    mv dbcan_hmm_results.tsv    ${prefix}_dbcan_hmm_results.tsv
-    mv dbcansub_hmm_results.tsv ${prefix}_dbcansub_hmm_results.tsv
+    mv dbCAN_hmm_results.tsv    ${prefix}_dbcan_hmm_results.tsv
+    mv dbCANsub_hmm_results.tsv ${prefix}_dbcansub_hmm_results.tsv
     mv diamond.out              ${prefix}_diamond.out
     mv cgc.gff                  ${prefix}_cgc.gff
     mv cgc_standard_out.tsv     ${prefix}_cgc_standard_out.tsv
     mv diamond.out.tc           ${prefix}_diamond.out.tc
-    mv stp_hmm_results.tsv      ${prefix}_stp_hmm_results.tsv
+    mv STP_hmm_results.tsv      ${prefix}_stp_hmm_results.tsv
     mv total_cgc_info.tsv       ${prefix}_total_cgc_info.tsv
-    mv cgc.faa                  ${prefix}_cgc.faa
-    mv pul_blast.out            ${prefix}_pul_blast.out
+    mv CGC.faa                  ${prefix}_cgc.faa
+    mv PUL_blast.out            ${prefix}_pul_blast.out
     mv substrate_prediction.tsv ${prefix}_substrate_prediction.tsv
     mv synteny_pdf/             ${prefix}_synteny_pdf/
-    if [ -f tf_hmm_results.tsv ]; then
-        mv tf_hmm_results.tsv   ${prefix}_tf_hmm_results.tsv
+    if [ -f TF_hmm_results.tsv ]; then
+        mv TF_hmm_results.tsv   ${prefix}_tf_hmm_results.tsv
     fi
 
     ##########################################################################
@@ -111,7 +111,7 @@ process RUNDBCAN_EASYSUBSTRATE {
         # also, I'm not removing this file because in nfs and such systems this could be problematic as
         # there is a significant delay, so mv the file makes it easier. The cost of this is just an extra file
         # that will be deleted when the pipeline finished.
-        mv ${prefix}_dbcansub_hmm_results.tsv /${prefix}_dbcansub_hmm_results.tsv_broken_headers
+        mv ${prefix}_dbcansub_hmm_results.tsv ${prefix}_dbcansub_hmm_results.tsv_broken_headers
         echo \"${dbsub_output_tsv_headers}\" > ${prefix}_dbcansub_hmm_results.tsv
     fi
     #######################################################################
@@ -129,17 +129,17 @@ process RUNDBCAN_EASYSUBSTRATE {
     prefix = task.ext.prefix ?: "${meta.id}"
     """
     touch ${prefix}_overview.tsv.gz
-    touch ${prefix}_dbCAN_hmm_results.tsv.gz
-    touch ${prefix}_dbCANsub_hmm_results.tsv.gz
+    touch ${prefix}_dbcan_hmm_results.tsv.gz
+    touch ${prefix}_dbcansub_hmm_results.tsv.gz
     touch ${prefix}_diamond.out.gz
     touch ${prefix}_cgc.gff.gz
     touch ${prefix}_cgc_standard_out.tsv.gz
     touch ${prefix}_diamond.out.tc.gz
-    touch ${prefix}_TF_hmm_results.tsv.gz
-    touch ${prefix}_STP_hmm_results.tsv.gz
+    touch ${prefix}_tf_hmm_results.tsv.gz
+    touch ${prefix}_stp_hmm_results.tsv.gz
     touch ${prefix}_total_cgc_info.tsv.gz
-    touch ${prefix}_CGC.faa.gz
-    touch ${prefix}_PUL_blast.out.gz
+    touch ${prefix}_cgc.faa.gz
+    touch ${prefix}_pul_blast.out.gz
     touch ${prefix}_substrate_prediction.tsv.gz
     mkdir -p ${prefix}_synteny_pdf
 
