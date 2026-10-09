@@ -35,12 +35,6 @@ process RUNDBCAN_EASYSUBSTRATE {
     def args = task.ext.args ?: ''
     prefix = task.ext.prefix ?: "${meta.id}"
 
-    def is_fasta_compressed = input_raw_data.getExtension() == "gz"
-    def fasta_name = is_fasta_compressed ? input_raw_data.getBaseName() : input_raw_data
-
-    def is_gff_compressed = input_gff.getExtension() == "gz"
-    def gff_name = is_gff_compressed ? input_gff.getBaseName() : input_gff
-
     // This are the columns of the dbcansub_hmm_results.tsv file, which will contain only a subset of the
     // headers if there are no results for the assembly
     def dbsub_output_tsv_headers = [
@@ -51,14 +45,16 @@ process RUNDBCAN_EASYSUBSTRATE {
     """
 
     # Filter GFF to only include sequences present in the proteins FASTA file
-    filter_gff_by_fasta_sequences.py ${fasta_name} ${gff_name} ${gff_name}.filtered.gff
+    filter_gff_by_fasta_sequences.py --fasta ${input_raw_data} \\
+        --gff ${input_gff} \\
+        --output ${prefix}_filtered.gff
 
     run_dbcan easy_substrate \\
         --mode protein \\
         --db_dir ${dbcan_db} \\
         --input_raw_data ${input_raw_data} \\
         --output_dir . \\
-        --input_gff ${gff_name}.filtered.gff \\
+        --input_gff ${prefix}_filtered.gff \\
         --gff_type ${gff_type} \\
         --threads ${task.cpus} \\
         ${args}
@@ -132,19 +128,19 @@ process RUNDBCAN_EASYSUBSTRATE {
     stub:
     prefix = task.ext.prefix ?: "${meta.id}"
     """
-    touch ${prefix}_overview.tsv
-    touch ${prefix}_dbCAN_hmm_results.tsv
-    touch ${prefix}_dbCANsub_hmm_results.tsv
-    touch ${prefix}_diamond.out
-    touch ${prefix}_cgc.gff
-    touch ${prefix}_cgc_standard_out.tsv
-    touch ${prefix}_diamond.out.tc
-    touch ${prefix}_TF_hmm_results.tsv
-    touch ${prefix}_STP_hmm_results.tsv
-    touch ${prefix}_total_cgc_info.tsv
-    touch ${prefix}_CGC.faa
-    touch ${prefix}_PUL_blast.out
-    touch ${prefix}_substrate_prediction.tsv
+    touch ${prefix}_overview.tsv.gz
+    touch ${prefix}_dbCAN_hmm_results.tsv.gz
+    touch ${prefix}_dbCANsub_hmm_results.tsv.gz
+    touch ${prefix}_diamond.out.gz
+    touch ${prefix}_cgc.gff.gz
+    touch ${prefix}_cgc_standard_out.tsv.gz
+    touch ${prefix}_diamond.out.tc.gz
+    touch ${prefix}_TF_hmm_results.tsv.gz
+    touch ${prefix}_STP_hmm_results.tsv.gz
+    touch ${prefix}_total_cgc_info.tsv.gz
+    touch ${prefix}_CGC.faa.gz
+    touch ${prefix}_PUL_blast.out.gz
+    touch ${prefix}_substrate_prediction.tsv.gz
     mkdir -p ${prefix}_synteny_pdf
 
     cat <<-END_VERSIONS > versions.yml
