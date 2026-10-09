@@ -14,14 +14,14 @@ process EXTRACTCOORDS {
     val separate_subunits
 
     output:
-    tuple val(meta), path("sequence-categorisation/*SSU.fasta")           , optional: true, emit: ssu_fasta
-    tuple val(meta), path("sequence-categorisation/*LSU.fasta")           , optional: true, emit: lsu_fasta
-    tuple val(meta), path("sequence-categorisation/*rRNA_bacteria*.fasta"), optional: true, emit: rrna_bacteria
-    tuple val(meta), path("sequence-categorisation/*rRNA_archaea*.fasta") , optional: true, emit: rrna_archaea
-    tuple val(meta), path("sequence-categorisation/*rRNA_eukarya*.fasta") , optional: true, emit: eukarya
-    tuple val(meta), path("sequence-categorisation/*5S.fasta")            , optional: true, emit: fiveS_fasta
-    tuple val(meta), path("sequence-categorisation/*5_8S.fasta")          , optional: true, emit: five_eightS_fasta
-    tuple val(meta), path("sequence-categorisation/*other_ncRNA.fasta")   , optional: true, emit: ncrna_fasta
+    tuple val(meta), path("sequence-categorisation/*SSU.fasta.gz")           , optional: true, emit: ssu_fasta
+    tuple val(meta), path("sequence-categorisation/*LSU.fasta.gz")           , optional: true, emit: lsu_fasta
+    tuple val(meta), path("sequence-categorisation/*rRNA_bacteria*.fasta.gz"), optional: true, emit: rrna_bacteria
+    tuple val(meta), path("sequence-categorisation/*rRNA_archaea*.fasta.gz") , optional: true, emit: rrna_archaea
+    tuple val(meta), path("sequence-categorisation/*rRNA_eukarya*.fasta.gz") , optional: true, emit: eukarya
+    tuple val(meta), path("sequence-categorisation/*5S.fasta.gz")            , optional: true, emit: fiveS_fasta
+    tuple val(meta), path("sequence-categorisation/*5_8S.fasta.gz")          , optional: true, emit: five_eightS_fasta
+    tuple val(meta), path("sequence-categorisation/*other_ncRNA.fasta.gz")   , optional: true, emit: ncrna_fasta
     tuple val(meta), path("*concat_SSU_LSU_coords.txt")                   , emit: concat_ssu_lsu_coords
     path "versions.yml"                                                   , emit: versions
 
@@ -37,6 +37,8 @@ process EXTRACTCOORDS {
     get_subunits_coords -i $matched_seqs_with_coords -s SSU -l LSU
 
     cat SSU_coords LSU_coords > ${prefix}_concat_SSU_LSU_coords.txt
+
+    gzip sequence-categorisation/*.fasta
 
     cat <<-END_VERSIONS > versions.yml
     "${task.process}":

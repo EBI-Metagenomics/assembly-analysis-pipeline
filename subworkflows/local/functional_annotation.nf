@@ -62,10 +62,7 @@ workflow FUNCTIONAL_ANNOTATION {
     ch_versions = ch_versions.mix(CONCATENATE_INTERPROSCAN_TSV.out.versions)
 
     /*
-     * EggNOG mapper results are concatenated (TSV and GFF) and passed on to downstream tools:
-     * - GO Slim subworkflow
-     * - Genomes properties
-     * The concatenated TSV is also used to extract the PFAM and InterPro summaries
+     * EggNOG mapper results are concatenated (TSV and GFF)
     */
     EGGNOGMAPPER_ORTHOLOGS(
         ch_protein_chunked,

@@ -144,14 +144,11 @@ workflow ASSEMBLY_ANALYSIS_PIPELINE {
     * Protein prediction with the combined-gene-caller, and masking the rRNAs genes
     */
     // We need to sync the sequences and the rRNA outputs //
-    ASSEMBLY_QC.out.assembly_qc_pass
+    ch_cgc = ASSEMBLY_QC.out.assembly_qc_pass
         .join(DETECT_RNA.out.concat_ssu_lsu_coords)
         .multiMap { meta, assembly_fasta, ssu_lsu_coords ->
             assembly: [meta, assembly_fasta]
             ssu_lsu_coords: [meta, ssu_lsu_coords]
-        }
-        .set {
-            ch_cgc
         }
 
     // TODO: figure a better way to pass on the versions of Pyrodigal and FGSRS
