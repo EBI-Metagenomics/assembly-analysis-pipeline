@@ -195,7 +195,7 @@ workflow FUNCTIONAL_ANNOTATION {
     * it looks like this extra column is a duplicated "Coverage". In order to concatenate the
     * tsv with csvtk (which ensures consistency) we run csvtk fix first to adjust the tsvs
     */
-    SEQKIT_FIX(RUNDBCAN_EASYSUBSTRATE.out.dbcanhmm_results)
+    SEQKIT_FIX(RUNDBCAN_EASYSUBSTRATE.out.dbcansub_results)
 
     ch_versions = ch_versions.mix(SEQKIT_FIX.out.versions.first())
 
