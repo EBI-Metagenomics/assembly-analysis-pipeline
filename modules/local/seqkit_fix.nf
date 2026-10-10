@@ -19,7 +19,7 @@ process SEQKIT_FIX {
     script:
     prefix = task.ext.prefix ?: "${meta.id}"
     """
-    csvtk fix --tabs ${tsv} > ${prefix}.tsv.gz
+    csvtk fix --tabs ${tsv} -o ${prefix}.tsv.gz
 
     cat <<-END_VERSIONS > versions.yml
     "${task.process}":
@@ -28,9 +28,9 @@ process SEQKIT_FIX {
     """
 
     stub:
+    prefix = task.ext.prefix ?: "${meta.id}"
     """
-    touch ${prefix}.tsv
-    gunzip ${prefix}.tsv
+    echo "" | gzip > ${prefix}.tsv.gz
 
     cat <<-END_VERSIONS > versions.yml
     "${task.process}":
