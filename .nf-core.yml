@@ -34,6 +34,7 @@ lint:
     - .github/actions/nf-test/action.yml
     - .github/workflows/linting_comment.yml
     - .github/workflows/branch.yml
+    - .github/workflows/pr-comment.yml
     - conf/igenomes.config
     - conf/igenomes_ignored.config
     - conf/igenomes.config
@@ -42,6 +43,7 @@ lint:
     - assets/nf-core-assembly-analysis-pipeline_logo_light.png
     - docs/images/nf-core-assembly-analysis-pipeline_logo_light.png
     - docs/images/nf-core-assembly-analysis-pipeline_logo_dark.png
+    - docs/CONTRIBUTING.md
     - .github/ISSUE_TEMPLATE/config.yml
     - .github/workflows/awstest.yml
     - .github/workflows/awsfulltest.yml

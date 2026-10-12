@@ -1,0 +1,3 @@
+U00096	.	CDS	1	909	.	-	.	protein_id=AAC77079.1;CGC_annotation=TF|0043644+TF|HTH_AraC+STP|HTH_18
+U00096	.	CDS	1192	2547	.	+	.	protein_id=AAC77080.1;CGC_annotation=CAZyme|GH4_e0
+U00096	.	CDS	2650	4071	.	+	.	protein_id=AAC77081.2;CGC_annotation=TC|2.A.2.1.1

@@ -39,13 +39,15 @@ process INTERPROSCAN {
     def prefix = task.ext.prefix ?: "${meta.id}"
     def is_compressed = fasta.extension == "gz"
     def fasta_file_name = fasta.name - ~/\.gz$/
+    // Give the JVM half of the task memory; the rest is for the native tools IPS spawns (hmmer, rpsblast, etc.)
+    def jvm_heap_gb = Math.max(4, (task.memory.toGiga() * 0.5) as int)
     """
     if [ "$is_compressed" == "true" ]; then
         gzip -c -d ${fasta} > ${fasta_file_name}
     fi
 
-    # Set the max memory for the JVM
-    export JAVA_OPTS="-Xmx${task.memory.toGiga()}G"
+    # Set the max memory for the JVM. interproscan.sh ignores JAVA_OPTS, but the JVM always reads JAVA_TOOL_OPTIONS
+    export JAVA_TOOL_OPTIONS="-Xmx${jvm_heap_gb}G"
 
     # -dp (disable precalculation) is on so no online dependency
     interproscan.sh \\

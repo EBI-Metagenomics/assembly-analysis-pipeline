@@ -14,6 +14,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import fileinput
 import logging
 from pathlib import Path
 import re
@@ -88,7 +89,7 @@ def extract_fasta_sequence_ids(fasta_file: Path) -> set[str]:
     """
     fasta_ids: set[str] = set()
 
-    with open(fasta_file, "r") as fh:
+    with fileinput.input(fasta_file, openhook=fileinput.hook_compressed) as fh:
         for line_num, line in enumerate(fh, start=1):
             if line.startswith(">"):
                 seq_id = _parse_fasta_header(line.rstrip("\n"), line_num)
@@ -112,7 +113,9 @@ def filter_gff_by_sequence_ids(
     """
     gff_sequence_ids: set[str] = set()
 
-    with open(gff_file, "r") as infile, open(output_file, "w") as outfile:
+    with fileinput.input(
+        gff_file, openhook=fileinput.hook_compressed
+    ) as infile, fileinput.hook_compressed(output_file, "w") as outfile:
         for line_num, line in enumerate(infile, start=1):
 
             if line.startswith("#"):
@@ -153,10 +156,26 @@ def main() -> None:
         description="Filter a GFF file to only include features for sequences present in a FASTA file."
     )
     parser.add_argument(
-        "fasta_file", help="Input FASTA file containing protein sequences.", type=Path
+        "--fasta",
+        dest="fasta_file",
+        required=True,
+        type=Path,
+        help="Input FASTA file containing protein sequences (optionally gzipped).",
     )
-    parser.add_argument("gff_file", help="Input GFF file to be filtered.", type=Path)
-    parser.add_argument("output_file", help="Output filtered GFF file.", type=Path)
+    parser.add_argument(
+        "--gff",
+        dest="gff_file",
+        required=True,
+        type=Path,
+        help="Input GFF file to be filtered (optionally gzipped).",
+    )
+    parser.add_argument(
+        "--output",
+        dest="output_file",
+        required=True,
+        type=Path,
+        help="Output filtered GFF file (gzipped if the name ends in .gz).",
+    )
     parser.add_argument(
         "--verbose",
         "-v",

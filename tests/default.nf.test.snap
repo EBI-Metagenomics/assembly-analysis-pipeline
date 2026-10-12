@@ -68,10 +68,6 @@
                 "CREATE_GFF_SUMMARY": {
                     "mgnify-pipelines-toolkit": "1.4.9"
                 },
-                "DBCAN": {
-                    "dbcan": "5.1.2",
-                    "dbcan_db": "4.1.4-V13"
-                },
                 "DIAMOND_BLASTP": {
                     "diamond": "2.1.11"
                 },
@@ -189,6 +185,10 @@
                 "RENAME_CONTIGS": {
                     "python": "3.9.21",
                     "pyfastax": "2.2.0"
+                },
+                "RUNDBCAN_EASYSUBSTRATE": {
+                    "dbcan": "5.2.9",
+                    "dbcan_db": "v5-2_9-13-2025"
                 },
                 "SANNTIS": {
                     "SanntiS": "0.9.4.1"
@@ -448,10 +448,10 @@
                 "ERZ101_annotation_summary.gff.gz.csi:md5,d87619e95adab1761233f9ba24ca7f80",
                 "ERZ101_annotation_summary.gff.gz.gzi:md5,ae516cdccf54e18c35d9d77c7aae27f4",
                 "ERZ101_predicted_cds.gff.gz:md5,aa149f822f5c05de1c63674a22f911d4",
-                "ERZ101_dbcan_cgc.gff.gz:md5,83e22b309e638d71766423f3cc7ad498",
-                "ERZ101_dbcan_overview.tsv.gz:md5,71857c4ba58ecf8345838f2f2aef11cb",
+                "ERZ101_dbcan_cgc.gff.gz:md5,42ae034eda12ecd3fb4326b56a4ea471",
+                "ERZ101_dbcan_overview.tsv.gz:md5,310284b66f1d97fd7b2727f6c46927f0",
                 "ERZ101_dbcan_standard_out.tsv.gz:md5,6be9ab29b289ff46cc6e4b6fe48dc3d7",
-                "ERZ101_dbcan_sub_hmm.tsv.gz:md5,05bc3a17c1ffcd562352bf10cc4d8da9",
+                "ERZ101_dbcan_sub_hmm.tsv.gz:md5,a21ade603e31f8db19f77d447d74b198",
                 "ERZ101_dbcan_substrates.tsv.gz:md5,d41d8cd98f00b204e9800998ecf8427e",
                 "ERZ101_emapper_annotations.tsv.gz:md5,acf16652adebcb33083edd74c5ec6e5f",
                 "ERZ101_emapper_seed_orthologs.tsv.gz:md5,57c36dd24cfd371f6a183fcd8cc85619",
@@ -492,10 +492,10 @@
                 "ERZ102_annotation_summary.gff.gz.csi:md5,227cc48ce8973f38f00dd7bd67365899",
                 "ERZ102_annotation_summary.gff.gz.gzi:md5,ae516cdccf54e18c35d9d77c7aae27f4",
                 "ERZ102_predicted_cds.gff.gz:md5,667b002af23d2763b3d946767be7d80e",
-                "ERZ102_dbcan_cgc.gff.gz:md5,4c860ec9d2d5406fd4240b28dc5cec58",
-                "ERZ102_dbcan_overview.tsv.gz:md5,cbddee1a15ae311d44f0ee1907470d40",
+                "ERZ102_dbcan_cgc.gff.gz:md5,8fc908d3215175cbb2793e7b88787f82",
+                "ERZ102_dbcan_overview.tsv.gz:md5,b4385d15192b697e7fde675fd00f562e",
                 "ERZ102_dbcan_standard_out.tsv.gz:md5,6be9ab29b289ff46cc6e4b6fe48dc3d7",
-                "ERZ102_dbcan_sub_hmm.tsv.gz:md5,e79ebc4d9729d011f154bd2e79e77fcf",
+                "ERZ102_dbcan_sub_hmm.tsv.gz:md5,2a76a3048fdd85c2a215d43857882178",
                 "ERZ102_dbcan_substrates.tsv.gz:md5,d41d8cd98f00b204e9800998ecf8427e",
                 "ERZ102_emapper_annotations.tsv.gz:md5,acf16652adebcb33083edd74c5ec6e5f",
                 "ERZ102_emapper_seed_orthologs.tsv.gz:md5,56e8adb2d33977e6e734bac5ec8df8cd",
@@ -545,7 +545,7 @@
                 "qc_failed_assemblies.csv:md5,3292564aa6122920901d9bb724447ad4"
             ]
         ],
-        "timestamp": "2026-10-09T12:47:56.500725949",
+        "timestamp": "2026-10-09T23:58:05.579527685",
         "meta": {
             "nf-test": "0.9.5",
             "nextflow": "26.04.0"
