@@ -1,4 +1,6 @@
 .DS_Store
+# HMMER hit order depends on how proteins are partitioned.
+*/functional-annotation/kegg/*_ko_hits.tblout.gz
 multiqc/multiqc_data/multiqc.parquet
 multiqc/multiqc_data/multiqc.log
 multiqc/multiqc_data/multiqc_data.json
