@@ -371,17 +371,17 @@ This file is compressed and indexed with both a bgzip index and a tabix index (`
 
 The file starts with `##gff-version 3`. Each feature row has nine tab-separated columns, with no column-name header. Coordinates and columns 1–8 are inherited from the combined gene caller; the summary step extends column 9.
 
-| Column | Name         | Contents in this pipeline                                                                                                                                                           |
-| ------ | ------------ | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| 1      | `seqid`      | Contig identifier.                                                                                                                                                                  |
-| 2      | `source`     | Gene caller: `Pyrodigal` or `FragGeneScanRS`, with `_v<version>` appended when the caller version is supplied. This remains the gene caller after functional annotations are added. |
-| 3      | `type`       | `CDS`. Functional annotations and BGC membership are attached to these rows rather than emitted as separate features.                                                               |
-| 4      | `start`      | Start coordinate on the contig, using 1-based, inclusive coordinates.                                                                                                               |
-| 5      | `end`        | End coordinate on the contig, using 1-based, inclusive coordinates.                                                                                                                 |
-| 6      | `score`      | `.`; the combined gene caller does not write a score. Annotation hit scores are not copied here.                                                                                    |
-| 7      | `strand`     | `+` or `-`.                                                                                                                                                                         |
-| 8      | `phase`      | `.`; the combined gene caller does not write a phase.                                                                                                                               |
-| 9      | `attributes` | Semicolon-separated `key=value` pairs. `ID` identifies the predicted protein; additional keys depend on the available annotation hits.                                              |
+| Column | Name         | Contents in this pipeline                                                                                                                                                                                                                               |
+| ------ | ------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 1      | `seqid`      | Contig identifier.                                                                                                                                                                                                                                      |
+| 2      | `source`     | Gene caller: `Pyrodigal` or `FragGeneScanRS`, with `_v<version>` appended when the caller version is supplied. This remains the gene caller after functional annotations are added.                                                                     |
+| 3      | `type`       | `CDS`. Functional annotations and BGC membership are attached to these rows rather than emitted as separate features.                                                                                                                                   |
+| 4      | `start`      | Start coordinate on the contig, using 1-based, inclusive coordinates.                                                                                                                                                                                   |
+| 5      | `end`        | End coordinate on the contig, using 1-based, inclusive coordinates.                                                                                                                                                                                     |
+| 6      | `score`      | `.`; the combined gene caller does not write a score. Annotation hit scores are not copied here.                                                                                                                                                        |
+| 7      | `strand`     | `+` or `-`.                                                                                                                                                                                                                                             |
+| 8      | `phase`      | `.`; the combined gene caller does not write a phase.                                                                                                                                                                                                   |
+| 9      | `attributes` | Annotations as semicolon-separated `key=value` pairs. The combined gene caller supplies the predicted protein `ID`; additional keys depend on the available annotation hits. See [Annotations in column 9](#annotations-in-column-9) below for details. |
 
 #### Annotations in column 9
 
