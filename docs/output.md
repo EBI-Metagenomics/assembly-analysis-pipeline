@@ -170,6 +170,8 @@ The `functional-annotation` directory contains seven subdirectories of results, 
 │   │   ├── ERZ12345_emapper_seed_orthologs.tsv.gz
 │   │   └── ERZ12345_emapper_annotations.tsv.gz
 │   ├── kegg
+│   │   ├── ERZ12345_ko_hits.tblout.gz
+│   │   ├── ERZ12345_ko_hits.domtblout.gz
 │   │   ├── ERZ12345_ko_summary.tsv.gz
 │   │   └── ERZ12345_ko_summary.tsv.gz.gzi
 │   ├── rhea-reactions
@@ -240,8 +242,10 @@ This subdirectory contains the output of running [EggNOG-mapper](https://github.
 
 This subdirectory contains the results of identifying KEGG Orthologs (KOs) in the assembly’s proteins using [hmmsearch](https://github.com/EddyRivasLab/hmmer), with their occurrences summarised in a count table.
 
-- **ERZ12345_ko_summary.tsv.gz**: This `tsv` file listing the counts of each KO detected in the assembly.
+- **ERZ12345_ko_summary.tsv.gz**: This `tsv` file lists the number of unique proteins assigned to each KO from reported HMMER domain hits.
 - **ERZ12345_ko_summary.tsv.gz.gzi**: This file is an index for the KO summary count file.
+- **ERZ12345_ko_hits.tblout.gz**: HMMER sequence hits passing gathering thresholds, with comment headers and footers removed.
+- **ERZ12345_ko_hits.domtblout.gz**: HMMER domain hits used for KO summaries, with comment headers and footers removed.
 
 #### Output files - rhea-reactions
 

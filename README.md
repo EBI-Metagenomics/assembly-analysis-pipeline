@@ -49,7 +49,7 @@ The MGnify assembly analysis pipeline, version 6.0.0 and onwards, provides the f
 | [extractcoords](https://github.com/EBI-Metagenomics/mgnify-pipelines-toolkit)                     | 1.2.0                | Processes output from easel-sfetch to extract SSU and LSU sequences (this tool is part of the mgnify-pipelines-toolkit).                          |
 | [FragGeneScanRs](https://github.com/unipept/FragGeneScanRs)                                       | 1.1.0                | CDS calling; this tool specializes in calling fragmented CDS                                                                                      |
 | [generategaf](https://github.com/EBI-Metagenomics/mgnify-pipelines-toolkit)                       | 1.2.0                | Script that generates a GO Annotation File (GAF) from an InterProScan result TSV file (this tool is part of the mgnify-pipelines-toolkit).        |
-| [Genome Properties](https://www.ebi.ac.uk/interpro/genomeproperties/)                             | 2.0                  | Uses protein signatures as evidence to determine the presence of each step within a property                                                      |
+| [Genome Properties](https://www.ebi.ac.uk/interpro/genomeproperties/)                             | 2.1.0                | Uses protein signatures as evidence to determine the presence of each step within a property                                                      |
 | [Infernal - cmscan](http://eddylab.org/infernal/)                                                 | 1.1.5                | RNA sequence searching                                                                                                                            |
 | [InterProScan](https://www.ebi.ac.uk/interpro/download/InterProScan/)                             | 5.76-107.0           | Functionally characterizes nucleotide or protein sequences by scanning them against the InterPro database.                                        |
 | [HMMER](http://hmmer.org/)                                                                        | 3.4                  | Used to annotate CDS with KO                                                                                                                      |
@@ -106,6 +106,23 @@ Each genome should be organized as follows:
 
 > [!IMPORTANT]
 > FASTA files must use the `.fna` extension.
+
+## Technical details
+
+### KOfam reference thresholds
+
+We prepare KOfam references with our [MGnify reference database pipeline](https://github.com/EBI-Metagenomics/reference-databases-preprocessing-pipeline). It copies score thresholds from `ko_list` into each HMM profile as gathering thresholds (GA values):
+
+| `score_type` | Full-sequence GA | Domain GA   |
+| ------------ | ---------------- | ----------- |
+| `domain`     | `threshold`      | `threshold` |
+| `full`       | `threshold`      | `25.00`     |
+
+`HMMSEARCH_KOFAMS` uses HMMER 3.4 with `--noali --cut_ga`. Each hit must pass the full-sequence and domain thresholds. HMMER stops if any profile has no GA values. During analysis, `ko_list` supplies KO descriptions only.
+
+As in [MGnify v5](https://github.com/EBI-Metagenomics/pipeline-v5), KO summaries use domain hits (`--domtblout`) and count each protein once per KO. A protein can have several KOs. The sequence table (`--tblout`) is published as raw output. Exact agreement with MGnify v5 requires equivalent protein inputs, reference profiles and HMMER versions.
+
+To update existing results, rerun HMMER, KO summaries, KEGG modules and DRAM. The final GFF gets its `kegg` attributes from eggNOG.
 
 ## How to run
 

@@ -8,7 +8,7 @@ process KEGG_ORTHOLOGS_SUMMARY {
         : 'community.wave.seqera.io/library/csvtk_tabix_pip_biopython:7eabdb397e7420a3'}"
 
     input:
-    tuple val(meta), path(hmmsearch_concatenated_tblout)
+    tuple val(meta), path(hmmsearch_concatenated_domtblout)
     path(ko_list_txt)
 
     output:
@@ -25,7 +25,8 @@ process KEGG_ORTHOLOGS_SUMMARY {
     prefix = task.ext.prefix ?: "${meta.id}"
     """
     # This mini-pipeline executes a series of steps to process the hmmsearch output:
-    # 1. Parses the hmmsearch_concatenated_tblout using biopython - reading from the stdin into the stdout (less IO)
+    # 1. Streams KO/protein pairs from all concatenated domtblout tables, skipping comments and blank lines throughout.
+    #    Deduplicates KO/protein pairs with csvtk before reducing protein IDs to contig IDs.
     # 2. Extracts the contig ID from the protein ID format (e.g., transforms ERZxxx_1_2 to ERZxxx_1), including those from FGS. The proteins are used against the KOFams HMMs
     # 3. Uses the `tee` command to split the output into two distinct streams:
     #    - Stream 1:
@@ -58,7 +59,9 @@ process KEGG_ORTHOLOGS_SUMMARY {
     # Configure csvtk to use tabs
     export CSVTK_T=true
 
-    hmmsearch_tblout_to_tsv.py ${hmmsearch_concatenated_tblout} | csvtk replace --no-header-row --fields 2 --pattern '^([A-Za-z0-9]+_[0-9]+).*\$' --replacement '\$1' | \\
+    hmmsearch_domtblout_to_tsv.py ${hmmsearch_concatenated_domtblout} | \\
+    csvtk uniq --num-cpus ${task.cpus} --no-header-row --fields 1,2 | \\
+    csvtk replace --num-cpus ${task.cpus} --no-header-row --fields 2 --pattern '^([A-Za-z0-9]+_[0-9]+).*\$' --replacement '\$1' | \\
     tee \\
         >(csvtk cut --num-cpus ${task.cpus} --no-header-row --fields 1 | \\
             csvtk add-header --num-cpus ${task.cpus} --no-header-row --names ko | \\
@@ -94,7 +97,7 @@ process KEGG_ORTHOLOGS_SUMMARY {
     }
 
     # Check if the input file has lines and if the output files are not empty
-    if check_gz_file_lines "${hmmsearch_concatenated_tblout}"; then
+    if check_gz_file_lines "${hmmsearch_concatenated_domtblout}"; then
         # If the input file has lines, check the output files
         if ! check_gz_file_lines "${prefix}_ko_summary.tsv.gz" || ! check_gz_file_lines "${prefix}_ko_per_contig.tsv.gz"; then
             echo "Error: One or more output files do not have at least 2 lines."

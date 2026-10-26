@@ -1,0 +1,29 @@
+nextflow_process {
+    name "Test HMMER table concatenation"
+    script "modules/local/concatenate_hmmer_tables.nf"
+    process "CONCATENATE_HMMER_TABLES"
+
+    test("Should remove chunk metadata while retaining all hit rows") {
+        when {
+            process {
+                """
+                input[0] = [
+                    [id: 'ERZ_TEST'],
+                    [
+                        file("${projectDir}/tests/modules/local/concatenate_hmmer_tables/fixtures/chunk_2.tbl.gz", checkIfExists: true),
+                        file("${projectDir}/tests/modules/local/concatenate_hmmer_tables/fixtures/chunk_1.tbl.gz", checkIfExists: true)
+                    ]
+                ]
+                """
+            }
+        }
+        then {
+            assert process.success
+            assert path(process.out.file_out.get(0).get(1)).linesGzip == [
+                'protein_1 - K00001 - 1e-20 80.0',
+                'protein_1 - K00001 - 1e-20 80.0',
+                'protein_2 - K00002 - 1e-30 90.0'
+            ]
+        }
+    }
+}
