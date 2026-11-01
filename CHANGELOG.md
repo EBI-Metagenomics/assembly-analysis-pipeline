@@ -14,7 +14,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 
 - Remove per-chunk HMMER comment headers and footers from published KO hit tables, omitting run-specific paths, timestamps and command lines while preserving all hit rows.
-- Upgraded Genome Properties to version (v2.1.0)[https://github.com/EBI-Metagenomics/genome-properties/releases/tag/v2.1.0]
+- Upgraded Genome Properties to version (v2.1.0)[https://github.com/EBI-Metagenomics/genome-properties/releases/tag/v2.1.0] (PR #67)
 
 ### Fixed
 
