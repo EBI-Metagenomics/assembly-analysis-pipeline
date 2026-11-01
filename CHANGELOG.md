@@ -19,7 +19,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 
 - Restore KOfam-specific `--cut_ga` threshold reporting. Weak matches below the embedded profile gathering cutoffs no longer contribute to KO counts, contig annotations, KEGG module completeness or DRAM inputs. Published raw KO tables now contain HMMER output after gathering-threshold filtering. Regenerate affected results by rerunning HMMER and dependent stages with a compatible reference database; this restores v5's threshold mechanism without claiming identical v5 or KofamScan assignments.
-- Generate KO summaries from reported domain hits and count unique protein–KO pairs, matching v5's assignment and counting rules. Parse all concatenated tables and gzip members regardless of chunk order; previously only the first nonempty chunk was parsed. Regenerate KO summaries, KO-to-contig tables, KEGG module completeness and affected DRAM outputs from domain tables, rerunning HMMER if these were not retained. Final GFF `kegg` attributes use the separate eggNOG annotation stream.
+- Generate KO summaries from reported domain hits and count unique protein–KO pairs, matching MGnify pipeline-v5's assignment and counting rules. Parse all concatenated tables and gzip members regardless of chunk order; previously only the first nonempty chunk was parsed. Regenerate KO summaries, KO-to-contig tables, KEGG module completeness and affected DRAM outputs from domain tables, rerunning HMMER if these were not retained. Final GFF `kegg` attributes use the separate eggNOG annotation stream.
 
 ## [6.0.5] - 2026-07-27
 
