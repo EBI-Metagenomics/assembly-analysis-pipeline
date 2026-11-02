@@ -1,0 +1,861 @@
+Changes in component 'nf-core/htslib/bgziptabix'
+'modules/nf-core/htslib/bgziptabix/environment.yml' is unchanged
+Changes in 'htslib/bgziptabix/meta.yml':
+--- modules/nf-core/htslib/bgziptabix/meta.yml
++++ modules/nf-core/htslib/bgziptabix/meta.yml
+@@ -111,6 +111,12 @@
+       - xz --version | sed '1! d; s/xz (XZ Utils) //':
+           type: eval
+           description: The expression to obtain the version of the tool
++  versions:
++    - versions.yml:
++        type: file
++        description: File containing software versions
++        pattern: "versions.yml"
++        ontologies: []
+ topics:
+   versions:
+     - - ${task.process}:
+
+Changes in 'htslib/bgziptabix/main.nf':
+--- modules/nf-core/htslib/bgziptabix/main.nf
++++ modules/nf-core/htslib/bgziptabix/main.nf
+@@ -23,6 +23,7 @@
+     // all htslib tools have the same version, we use bgzip
+     tuple val("${task.process}"), val('htslib'), eval("bgzip --version | sed '1! d; s/bgzip (htslib) //'"), topic: versions, emit: versions_htslib
+     tuple val("${task.process}"), val('xz'), eval("xz --version | sed '1! d; s/xz (XZ Utils) //'"), topic: versions, emit: versions_xz
++    path "versions.yml", emit: versions
+ 
+     when:
+     task.ext.when == null || task.ext.when
+@@ -78,6 +79,12 @@
+ 
+     ${gzi_cmd}
+     ${tabix_cmd}
++
++    cat <<-END_VERSIONS > versions.yml
++    "${task.process}":
++        htslib: \$(bgzip --version | sed '1! d; s/bgzip (htslib) //')
++        xz: \$(xz --version | sed '1! d; s/xz (XZ Utils) //')
++    END_VERSIONS
+     """
+ 
+     stub:
+@@ -93,7 +100,7 @@
+     outfile = action == "compress" ? (out_ext ? "${prefix}.${out_ext}.gz" : "${prefix}.gz") : (out_ext ? "${prefix}.${out_ext}" : "${prefix}")
+ 
+     def touch_cmd = action == "compress" ? "echo | bgzip -c" : "echo"
+-    def index_fmt = args2.contains('-C') ? 'csi' : 'tbi'
++    def index_fmt = args2.contains('-C') || args2.contains('--csi') ? 'csi' : 'tbi'
+     def tabix_cmd = make_index ? "touch ${outfile}.${index_fmt}" : ""
+     def link_tabix_cmd = make_index && infile_tbi ? "ln -s ${infile_tbi} ${outfile}.${infile_tbi.extension}" : ""
+     def gzi_cmd = make_gzi ? "touch ${outfile}.gzi" : ""
+@@ -105,5 +112,11 @@
+     ${gzi_cmd}
+     ${tabix_cmd}
+     ${link_tabix_cmd}
++
++    cat <<-END_VERSIONS > versions.yml
++    "${task.process}":
++        htslib: \$(bgzip --version | sed '1! d; s/bgzip (htslib) //')
++        xz: \$(xz --version | sed '1! d; s/xz (XZ Utils) //')
++    END_VERSIONS
+     """
+ }
+
+Changes in 'htslib/bgziptabix/tests/main.nf.test.snap':
+--- modules/nf-core/htslib/bgziptabix/tests/main.nf.test.snap
++++ modules/nf-core/htslib/bgziptabix/tests/main.nf.test.snap
+@@ -16,23 +16,26 @@
+                         "test.fastq.gz:md5,4161df271f9bfcd25d5845a1e220dbec"
+                     ]
+                 ],
+-                "versions_htslib": [
+-                    [
+-                        "HTSLIB_BGZIPTABIX",
+-                        "htslib",
+-                        "1.25"
+-                    ]
+-                ],
+-                "versions_xz": [
+-                    [
+-                        "HTSLIB_BGZIPTABIX",
+-                        "xz",
+-                        "5.8.3"
+-                    ]
+-                ]
+-            }
+-        ],
+-        "timestamp": "2026-10-11T14:08:59.995948",
++                "versions": [
++                    "versions.yml:md5,80335cf4f69abfac1c53ca3822e058ed"
++                ],
++                "versions_htslib": [
++                    [
++                        "HTSLIB_BGZIPTABIX",
++                        "htslib",
++                        "1.25"
++                    ]
++                ],
++                "versions_xz": [
++                    [
++                        "HTSLIB_BGZIPTABIX",
++                        "xz",
++                        "5.8.3"
++                    ]
++                ]
++            }
++        ],
++        "timestamp": "2026-11-02T15:36:30.209842",
+         "meta": {
+             "nf-test": "0.9.5",
+             "nextflow": "26.04.6"
+@@ -55,23 +58,26 @@
+                         "test.gz:md5,b8d852a2b1ee52ed64d83046dcdb9de2"
+                     ]
+                 ],
+-                "versions_htslib": [
+-                    [
+-                        "HTSLIB_BGZIPTABIX",
+-                        "htslib",
+-                        "1.25"
+-                    ]
+-                ],
+-                "versions_xz": [
+-                    [
+-                        "HTSLIB_BGZIPTABIX",
+-                        "xz",
+-                        "5.8.3"
+-                    ]
+-                ]
+-            }
+-        ],
+-        "timestamp": "2026-10-11T14:10:00.395037",
++                "versions": [
++                    "versions.yml:md5,80335cf4f69abfac1c53ca3822e058ed"
++                ],
++                "versions_htslib": [
++                    [
++                        "HTSLIB_BGZIPTABIX",
++                        "htslib",
++                        "1.25"
++                    ]
++                ],
++                "versions_xz": [
++                    [
++                        "HTSLIB_BGZIPTABIX",
++                        "xz",
++                        "5.8.3"
++                    ]
++                ]
++            }
++        ],
++        "timestamp": "2026-11-02T15:38:03.454803",
+         "meta": {
+             "nf-test": "0.9.5",
+             "nextflow": "26.04.6"
+@@ -94,23 +100,26 @@
+                         "test.vcf:md5,68b329da9893e34099c7d8ad5cb9c940"
+                     ]
+                 ],
+-                "versions_htslib": [
+-                    [
+-                        "HTSLIB_BGZIPTABIX",
+-                        "htslib",
+-                        "1.25"
+-                    ]
+-                ],
+-                "versions_xz": [
+-                    [
+-                        "HTSLIB_BGZIPTABIX",
+-                        "xz",
+-                        "5.8.3"
+-                    ]
+-                ]
+-            }
+-        ],
+-        "timestamp": "2026-10-12T12:39:42.78879",
++                "versions": [
++                    "versions.yml:md5,80335cf4f69abfac1c53ca3822e058ed"
++                ],
++                "versions_htslib": [
++                    [
++                        "HTSLIB_BGZIPTABIX",
++                        "htslib",
++                        "1.25"
++                    ]
++                ],
++                "versions_xz": [
++                    [
++                        "HTSLIB_BGZIPTABIX",
++                        "xz",
++                        "5.8.3"
++                    ]
++                ]
++            }
++        ],
++        "timestamp": "2026-11-02T15:40:00.329926",
+         "meta": {
+             "nf-test": "0.9.5",
+             "nextflow": "26.04.6"
+@@ -133,23 +142,26 @@
+                         "test.tar:md5,39e9e71fd16cfd09ceca12cd46e6abce"
+                     ]
+                 ],
+-                "versions_htslib": [
+-                    [
+-                        "HTSLIB_BGZIPTABIX",
+-                        "htslib",
+-                        "1.25"
+-                    ]
+-                ],
+-                "versions_xz": [
+-                    [
+-                        "HTSLIB_BGZIPTABIX",
+-                        "xz",
+-                        "5.8.3"
+-                    ]
+-                ]
+-            }
+-        ],
+-        "timestamp": "2026-10-11T14:09:07.872533",
++                "versions": [
++                    "versions.yml:md5,80335cf4f69abfac1c53ca3822e058ed"
++                ],
++                "versions_htslib": [
++                    [
++                        "HTSLIB_BGZIPTABIX",
++                        "htslib",
++                        "1.25"
++                    ]
++                ],
++                "versions_xz": [
++                    [
++                        "HTSLIB_BGZIPTABIX",
++                        "xz",
++                        "5.8.3"
++                    ]
++                ]
++            }
++        ],
++        "timestamp": "2026-11-02T15:36:41.895451",
+         "meta": {
+             "nf-test": "0.9.5",
+             "nextflow": "26.04.6"
+@@ -177,23 +189,26 @@
+                         "test.vcf.gz:md5,68b329da9893e34099c7d8ad5cb9c940"
+                     ]
+                 ],
+-                "versions_htslib": [
+-                    [
+-                        "HTSLIB_BGZIPTABIX",
+-                        "htslib",
+-                        "1.25"
+-                    ]
+-                ],
+-                "versions_xz": [
+-                    [
+-                        "HTSLIB_BGZIPTABIX",
+-                        "xz",
+-                        "5.8.3"
+-                    ]
+-                ]
+-            }
+-        ],
+-        "timestamp": "2026-10-11T14:11:20.779204",
++                "versions": [
++                    "versions.yml:md5,80335cf4f69abfac1c53ca3822e058ed"
++                ],
++                "versions_htslib": [
++                    [
++                        "HTSLIB_BGZIPTABIX",
++                        "htslib",
++                        "1.25"
++                    ]
++                ],
++                "versions_xz": [
++                    [
++                        "HTSLIB_BGZIPTABIX",
++                        "xz",
++                        "5.8.3"
++                    ]
++                ]
++            }
++        ],
++        "timestamp": "2026-11-02T15:39:43.292616",
+         "meta": {
+             "nf-test": "0.9.5",
+             "nextflow": "26.04.6"
+@@ -216,23 +231,26 @@
+                         "test.vcf:md5,68b329da9893e34099c7d8ad5cb9c940"
+                     ]
+                 ],
+-                "versions_htslib": [
+-                    [
+-                        "HTSLIB_BGZIPTABIX",
+-                        "htslib",
+-                        "1.25"
+-                    ]
+-                ],
+-                "versions_xz": [
+-                    [
+-                        "HTSLIB_BGZIPTABIX",
+-                        "xz",
+-                        "5.8.3"
+-                    ]
+-                ]
+-            }
+-        ],
+-        "timestamp": "2026-10-11T14:11:08.17501",
++                "versions": [
++                    "versions.yml:md5,80335cf4f69abfac1c53ca3822e058ed"
++                ],
++                "versions_htslib": [
++                    [
++                        "HTSLIB_BGZIPTABIX",
++                        "htslib",
++                        "1.25"
++                    ]
++                ],
++                "versions_xz": [
++                    [
++                        "HTSLIB_BGZIPTABIX",
++                        "xz",
++                        "5.8.3"
++                    ]
++                ]
++            }
++        ],
++        "timestamp": "2026-11-02T15:39:26.571857",
+         "meta": {
+             "nf-test": "0.9.5",
+             "nextflow": "26.04.6"
+@@ -260,23 +278,26 @@
+                         "test.vcf.gz:md5,8e722884ffb75155212a3fc053918766"
+                     ]
+                 ],
+-                "versions_htslib": [
+-                    [
+-                        "HTSLIB_BGZIPTABIX",
+-                        "htslib",
+-                        "1.25"
+-                    ]
+-                ],
+-                "versions_xz": [
+-                    [
+-                        "HTSLIB_BGZIPTABIX",
+-                        "xz",
+-                        "5.8.3"
+-                    ]
+-                ]
+-            }
+-        ],
+-        "timestamp": "2026-10-11T14:10:14.495151",
++                "versions": [
++                    "versions.yml:md5,80335cf4f69abfac1c53ca3822e058ed"
++                ],
++                "versions_htslib": [
++                    [
++                        "HTSLIB_BGZIPTABIX",
++                        "htslib",
++                        "1.25"
++                    ]
++                ],
++                "versions_xz": [
++                    [
++                        "HTSLIB_BGZIPTABIX",
++                        "xz",
++                        "5.8.3"
++                    ]
++                ]
++            }
++        ],
++        "timestamp": "2026-11-02T15:38:20.076066",
+         "meta": {
+             "nf-test": "0.9.5",
+             "nextflow": "26.04.6"
+@@ -299,23 +320,26 @@
+                         "test.fastq:md5,4161df271f9bfcd25d5845a1e220dbec"
+                     ]
+                 ],
+-                "versions_htslib": [
+-                    [
+-                        "HTSLIB_BGZIPTABIX",
+-                        "htslib",
+-                        "1.25"
+-                    ]
+-                ],
+-                "versions_xz": [
+-                    [
+-                        "HTSLIB_BGZIPTABIX",
+-                        "xz",
+-                        "5.8.3"
+-                    ]
+-                ]
+-            }
+-        ],
+-        "timestamp": "2026-10-11T14:08:56.744648",
++                "versions": [
++                    "versions.yml:md5,80335cf4f69abfac1c53ca3822e058ed"
++                ],
++                "versions_htslib": [
++                    [
++                        "HTSLIB_BGZIPTABIX",
++                        "htslib",
++                        "1.25"
++                    ]
++                ],
++                "versions_xz": [
++                    [
++                        "HTSLIB_BGZIPTABIX",
++                        "xz",
++                        "5.8.3"
++                    ]
++                ]
++            }
++        ],
++        "timestamp": "2026-11-02T15:36:25.679984",
+         "meta": {
+             "nf-test": "0.9.5",
+             "nextflow": "26.04.6"
+@@ -343,23 +367,26 @@
+                         "test.vcf.gz:md5,68b329da9893e34099c7d8ad5cb9c940"
+                     ]
+                 ],
+-                "versions_htslib": [
+-                    [
+-                        "HTSLIB_BGZIPTABIX",
+-                        "htslib",
+-                        "1.25"
+-                    ]
+-                ],
+-                "versions_xz": [
+-                    [
+-                        "HTSLIB_BGZIPTABIX",
+-                        "xz",
+-                        "5.8.3"
+-                    ]
+-                ]
+-            }
+-        ],
+-        "timestamp": "2026-10-11T14:10:54.243319",
++                "versions": [
++                    "versions.yml:md5,80335cf4f69abfac1c53ca3822e058ed"
++                ],
++                "versions_htslib": [
++                    [
++                        "HTSLIB_BGZIPTABIX",
++                        "htslib",
++                        "1.25"
++                    ]
++                ],
++                "versions_xz": [
++                    [
++                        "HTSLIB_BGZIPTABIX",
++                        "xz",
++                        "5.8.3"
++                    ]
++                ]
++            }
++        ],
++        "timestamp": "2026-11-02T15:39:09.88372",
+         "meta": {
+             "nf-test": "0.9.5",
+             "nextflow": "26.04.6"
+@@ -392,23 +419,26 @@
+                         "test.vcf.gz:md5,8e722884ffb75155212a3fc053918766"
+                     ]
+                 ],
+-                "versions_htslib": [
+-                    [
+-                        "HTSLIB_BGZIPTABIX",
+-                        "htslib",
+-                        "1.25"
+-                    ]
+-                ],
+-                "versions_xz": [
+-                    [
+-                        "HTSLIB_BGZIPTABIX",
+-                        "xz",
+-                        "5.8.3"
+-                    ]
+-                ]
+-            }
+-        ],
+-        "timestamp": "2026-10-11T14:10:28.115679",
++                "versions": [
++                    "versions.yml:md5,80335cf4f69abfac1c53ca3822e058ed"
++                ],
++                "versions_htslib": [
++                    [
++                        "HTSLIB_BGZIPTABIX",
++                        "htslib",
++                        "1.25"
++                    ]
++                ],
++                "versions_xz": [
++                    [
++                        "HTSLIB_BGZIPTABIX",
++                        "xz",
++                        "5.8.3"
++                    ]
++                ]
++            }
++        ],
++        "timestamp": "2026-11-02T15:38:36.497838",
+         "meta": {
+             "nf-test": "0.9.5",
+             "nextflow": "26.04.6"
+@@ -436,23 +466,26 @@
+                         "test.fastq.gz:md5,4161df271f9bfcd25d5845a1e220dbec"
+                     ]
+                 ],
+-                "versions_htslib": [
+-                    [
+-                        "HTSLIB_BGZIPTABIX",
+-                        "htslib",
+-                        "1.25"
+-                    ]
+-                ],
+-                "versions_xz": [
+-                    [
+-                        "HTSLIB_BGZIPTABIX",
+-                        "xz",
+-                        "5.8.3"
+-                    ]
+-                ]
+-            }
+-        ],
+-        "timestamp": "2026-10-11T14:10:41.577004",
++                "versions": [
++                    "versions.yml:md5,80335cf4f69abfac1c53ca3822e058ed"
++                ],
++                "versions_htslib": [
++                    [
++                        "HTSLIB_BGZIPTABIX",
++                        "htslib",
++                        "1.25"
++                    ]
++                ],
++                "versions_xz": [
++                    [
++                        "HTSLIB_BGZIPTABIX",
++                        "xz",
++                        "5.8.3"
++                    ]
++                ]
++            }
++        ],
++        "timestamp": "2026-11-02T15:38:53.55178",
+         "meta": {
+             "nf-test": "0.9.5",
+             "nextflow": "26.04.6"
+@@ -475,23 +508,26 @@
+                         "test.vcf:md5,8e722884ffb75155212a3fc053918766"
+                     ]
+                 ],
+-                "versions_htslib": [
+-                    [
+-                        "HTSLIB_BGZIPTABIX",
+-                        "htslib",
+-                        "1.25"
+-                    ]
+-                ],
+-                "versions_xz": [
+-                    [
+-                        "HTSLIB_BGZIPTABIX",
+-                        "xz",
+-                        "5.8.3"
+-                    ]
+-                ]
+-            }
+-        ],
+-        "timestamp": "2026-10-11T14:08:39.55638",
++                "versions": [
++                    "versions.yml:md5,80335cf4f69abfac1c53ca3822e058ed"
++                ],
++                "versions_htslib": [
++                    [
++                        "HTSLIB_BGZIPTABIX",
++                        "htslib",
++                        "1.25"
++                    ]
++                ],
++                "versions_xz": [
++                    [
++                        "HTSLIB_BGZIPTABIX",
++                        "xz",
++                        "5.8.3"
++                    ]
++                ]
++            }
++        ],
++        "timestamp": "2026-11-02T15:36:02.822096",
+         "meta": {
+             "nf-test": "0.9.5",
+             "nextflow": "26.04.6"
+@@ -514,23 +550,26 @@
+                         "test.tar.gz:md5,39e9e71fd16cfd09ceca12cd46e6abce"
+                     ]
+                 ],
+-                "versions_htslib": [
+-                    [
+-                        "HTSLIB_BGZIPTABIX",
+-                        "htslib",
+-                        "1.25"
+-                    ]
+-                ],
+-                "versions_xz": [
+-                    [
+-                        "HTSLIB_BGZIPTABIX",
+-                        "xz",
+-                        "5.8.3"
+-                    ]
+-                ]
+-            }
+-        ],
+-        "timestamp": "2026-10-11T14:09:13.19205",
++                "versions": [
++                    "versions.yml:md5,80335cf4f69abfac1c53ca3822e058ed"
++                ],
++                "versions_htslib": [
++                    [
++                        "HTSLIB_BGZIPTABIX",
++                        "htslib",
++                        "1.25"
++                    ]
++                ],
++                "versions_xz": [
++                    [
++                        "HTSLIB_BGZIPTABIX",
++                        "xz",
++                        "5.8.3"
++                    ]
++                ]
++            }
++        ],
++        "timestamp": "2026-11-02T15:36:50.577944",
+         "meta": {
+             "nf-test": "0.9.5",
+             "nextflow": "26.04.6"
+@@ -558,23 +597,26 @@
+                         "test.vcf.gz:md5,8e722884ffb75155212a3fc053918766"
+                     ]
+                 ],
+-                "versions_htslib": [
+-                    [
+-                        "HTSLIB_BGZIPTABIX",
+-                        "htslib",
+-                        "1.25"
+-                    ]
+-                ],
+-                "versions_xz": [
+-                    [
+-                        "HTSLIB_BGZIPTABIX",
+-                        "xz",
+-                        "5.8.3"
+-                    ]
+-                ]
+-            }
+-        ],
+-        "timestamp": "2026-10-11T14:08:42.734076",
++                "versions": [
++                    "versions.yml:md5,80335cf4f69abfac1c53ca3822e058ed"
++                ],
++                "versions_htslib": [
++                    [
++                        "HTSLIB_BGZIPTABIX",
++                        "htslib",
++                        "1.25"
++                    ]
++                ],
++                "versions_xz": [
++                    [
++                        "HTSLIB_BGZIPTABIX",
++                        "xz",
++                        "5.8.3"
++                    ]
++                ]
++            }
++        ],
++        "timestamp": "2026-11-02T15:36:07.388019",
+         "meta": {
+             "nf-test": "0.9.5",
+             "nextflow": "26.04.6"
+@@ -611,6 +653,9 @@
+                         "5.8.3"
+                     ]
+                 ],
++                "5": [
++                    "versions.yml:md5,80335cf4f69abfac1c53ca3822e058ed"
++                ],
+                 "gzi": [
+                     
+                 ],
+@@ -625,6 +670,9 @@
+                         "test:md5,b8d852a2b1ee52ed64d83046dcdb9de2"
+                     ]
+                 ],
++                "versions": [
++                    "versions.yml:md5,80335cf4f69abfac1c53ca3822e058ed"
++                ],
+                 "versions_htslib": [
+                     [
+                         "HTSLIB_BGZIPTABIX",
+@@ -641,23 +689,26 @@
+                 ]
+             },
+             {
+-                "versions_htslib": [
+-                    [
+-                        "HTSLIB_BGZIPTABIX",
+-                        "htslib",
+-                        "1.25"
+-                    ]
+-                ],
+-                "versions_xz": [
+-                    [
+-                        "HTSLIB_BGZIPTABIX",
+-                        "xz",
+-                        "5.8.3"
+-                    ]
+-                ]
+-            }
+-        ],
+-        "timestamp": "2026-10-11T14:09:34.546457",
++                "versions": [
++                    "versions.yml:md5,80335cf4f69abfac1c53ca3822e058ed"
++                ],
++                "versions_htslib": [
++                    [
++                        "HTSLIB_BGZIPTABIX",
++                        "htslib",
++                        "1.25"
++                    ]
++                ],
++                "versions_xz": [
++                    [
++                        "HTSLIB_BGZIPTABIX",
++                        "xz",
++                        "5.8.3"
++                    ]
++                ]
++            }
++        ],
++        "timestamp": "2026-11-02T15:37:22.212041",
+         "meta": {
+             "nf-test": "0.9.5",
+             "nextflow": "26.04.6"
+@@ -680,23 +731,26 @@
+                         "test.vcf.gz:md5,8e722884ffb75155212a3fc053918766"
+                     ]
+                 ],
+-                "versions_htslib": [
+-                    [
+-                        "HTSLIB_BGZIPTABIX",
+-                        "htslib",
+-                        "1.25"
+-                    ]
+-                ],
+-                "versions_xz": [
+-                    [
+-                        "HTSLIB_BGZIPTABIX",
+-                        "xz",
+-                        "5.8.3"
+-                    ]
+-                ]
+-            }
+-        ],
+-        "timestamp": "2026-10-11T14:08:53.402936",
++                "versions": [
++                    "versions.yml:md5,80335cf4f69abfac1c53ca3822e058ed"
++                ],
++                "versions_htslib": [
++                    [
++                        "HTSLIB_BGZIPTABIX",
++                        "htslib",
++                        "1.25"
++                    ]
++                ],
++                "versions_xz": [
++                    [
++                        "HTSLIB_BGZIPTABIX",
++                        "xz",
++                        "5.8.3"
++                    ]
++                ]
++            }
++        ],
++        "timestamp": "2026-11-02T15:36:21.175583",
+         "meta": {
+             "nf-test": "0.9.5",
+             "nextflow": "26.04.6"
+@@ -723,6 +777,9 @@
+                         },
+                         "example.vcf.gz:md5,8e722884ffb75155212a3fc053918766"
+                     ]
++                ],
++                "versions": [
++                    "versions.yml:md5,80335cf4f69abfac1c53ca3822e058ed"
+                 ],
+                 "versions_htslib": [
+                     [
+@@ -741,7 +798,7 @@
+             },
+             "bc7bf3ee9e8430e064c539eb81e59bf9"
+         ],
+-        "timestamp": "2026-10-11T14:08:47.194495",
++        "timestamp": "2026-11-02T15:36:12.217221",
+         "meta": {
+             "nf-test": "0.9.5",
+             "nextflow": "26.04.6"
+@@ -764,23 +821,26 @@
+                         "test.vcf:md5,8e722884ffb75155212a3fc053918766"
+                     ]
+                 ],
+-                "versions_htslib": [
+-                    [
+-                        "HTSLIB_BGZIPTABIX",
+-                        "htslib",
+-                        "1.25"
+-                    ]
+-                ],
+-                "versions_xz": [
+-                    [
+-                        "HTSLIB_BGZIPTABIX",
+-                        "xz",
+-                        "5.8.3"
+-                    ]
+-                ]
+-            }
+-        ],
+-        "timestamp": "2026-10-11T14:08:50.337306",
++                "versions": [
++                    "versions.yml:md5,80335cf4f69abfac1c53ca3822e058ed"
++                ],
++                "versions_htslib": [
++                    [
++                        "HTSLIB_BGZIPTABIX",
++                        "htslib",
++                        "1.25"
++                    ]
++                ],
++                "versions_xz": [
++                    [
++                        "HTSLIB_BGZIPTABIX",
++                        "xz",
++                        "5.8.3"
++                    ]
++                ]
++            }
++        ],
++        "timestamp": "2026-11-02T15:36:16.730116",
+         "meta": {
+             "nf-test": "0.9.5",
+             "nextflow": "26.04.6"
+
+'modules/nf-core/htslib/bgziptabix/tests/nextflow.config' is unchanged
+'modules/nf-core/htslib/bgziptabix/tests/main.nf.test' is unchanged
+'modules/nf-core/htslib/bgziptabix/.conda-lock/linux_amd64-bd-0923e29158171c28_1.txt' is unchanged
+'modules/nf-core/htslib/bgziptabix/.conda-lock/linux_arm64-bd-3acc2684784cd5dc_1.txt' is unchanged
+************************************************************

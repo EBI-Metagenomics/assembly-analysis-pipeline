@@ -40,6 +40,12 @@
                         "installed_by": ["modules"],
                         "patch": "modules/nf-core/hmmer/hmmsearch/hmmer-hmmsearch.diff"
                     },
+                    "htslib/bgziptabix": {
+                        "branch": "master",
+                        "git_sha": "0fc371314e7612fa13b8164bd86b53683a59a8f0",
+                        "installed_by": ["modules"],
+                        "patch": "modules/nf-core/htslib/bgziptabix/htslib-bgziptabix.diff"
+                    },
                     "multiqc": {
                         "branch": "master",
                         "git_sha": "cf17ca47590cc578dfb47db1c2a44ef86f89976d",
@@ -85,11 +91,6 @@
                         "git_sha": "69fdb99a8affa55adfda16966aa4568e103dc1b6",
                         "installed_by": ["modules"],
                         "patch": "modules/nf-core/tabix/bgzip/tabix-bgzip.diff"
-                    },
-                    "tabix/bgziptabix": {
-                        "branch": "master",
-                        "git_sha": "f2cfcf9d3f6a2d123e6c44aefa788aa232204a7a",
-                        "installed_by": ["modules"]
                     }
                 }
             },
@@ -199,7 +200,8 @@
                     "interproscan": {
                         "branch": "main",
                         "git_sha": "f4d61e3e3614e4d3baeccc84ddf4a7c094366d44",
-                        "installed_by": ["modules"]
+                        "installed_by": ["modules"],
+                        "patch": "modules/ebi-metagenomics/interproscan/interproscan.diff"
                     },
                     "keggpathwayscompleteness": {
                         "branch": "main",

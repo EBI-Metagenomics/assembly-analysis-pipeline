@@ -1,6 +1,5 @@
 /* NF-CORE */
-include { TABIX_BGZIP as TABIX_BGZIP_GFFSUMMARY } from '../../modules/nf-core/tabix/bgzip/main'
-include { TABIX_BGZIPTABIX as TABIX_BGZIPTABIX_GFFSUMMARY } from '../../modules/nf-core/tabix/bgziptabix/main'
+include { HTSLIB_BGZIPTABIX as HTSLIB_BGZIPTABIX_GFFSUMMARY } from '../../modules/nf-core/htslib/bgziptabix/main'
 
 /* LOCAL */
 include { CREATE_GFF_SUMMARY } from '../../modules/local/create_gff_summary.nf'
@@ -8,30 +7,30 @@ include { CREATE_GFF_SUMMARY } from '../../modules/local/create_gff_summary.nf'
 
 workflow GFF_SUMMARY {
     take:
-        ch_annotations
+    ch_annotations
 
     main:
-        ch_versions = Channel.empty()
+    ch_versions = channel.empty()
 
-        CREATE_GFF_SUMMARY(ch_annotations)
-        ch_versions = ch_versions.mix(CREATE_GFF_SUMMARY.out.versions)
+    CREATE_GFF_SUMMARY(ch_annotations)
+    ch_versions = ch_versions.mix(CREATE_GFF_SUMMARY.out.versions)
 
-        // bgzip to get .gz and .gzi (.gzi is useful for generic paginated access to the .gff like other bgzipped .tsv files)
-        TABIX_BGZIP_GFFSUMMARY(
-            CREATE_GFF_SUMMARY.out.gff_summary
-        )
-        ch_versions = ch_versions.mix(TABIX_BGZIP_GFFSUMMARY.out.versions)
-
-        // tabix to get .csi (.csi is like .tbi - index of genomic regions in the gff, but with better scaling for large contigs/metagenomes)
-        TABIX_BGZIPTABIX_GFFSUMMARY(
-            CREATE_GFF_SUMMARY.out.gff_summary  // todo: ideally tabix module would take the .gz as input instead of the uncompressed file (to avoid recompressing)
-        )
-        ch_versions = ch_versions.mix(TABIX_BGZIPTABIX_GFFSUMMARY.out.versions)
+    // bgzip to get the .gz and .gzi (.gzi is useful for generic paginated access to the .gff like other bgzipped .tsv files)
+    // and tabix to get the .csi (.csi is like .tbi - index of genomic regions in the gff, but with better scaling for large contigs/metagenomes)
+    HTSLIB_BGZIPTABIX_GFFSUMMARY(
+        // The two empty inputs are optional: an existing .tbi/.csi index of the input (to link instead of running tabix)
+        // and a regions file (tabix -R). The input is not indexed yet and we index the whole file, so neither is used.
+        CREATE_GFF_SUMMARY.out.gff_summary.map { meta, gff -> [meta, gff, [], []] },
+        "compress", // action
+        true,       // make_index
+        "gff"       // out_ext, the output is {prefix}.gff.gz
+    )
+    ch_versions = ch_versions.mix(HTSLIB_BGZIPTABIX_GFFSUMMARY.out.versions)
 
     emit:
-        gff_summary              = CREATE_GFF_SUMMARY.out.gff_summary
-        compressed_gff_summary   = TABIX_BGZIP_GFFSUMMARY.out.output
-        bgzip_index              = TABIX_BGZIP_GFFSUMMARY.out.gzi
-        tabix_index              = TABIX_BGZIPTABIX_GFFSUMMARY.out.gz_csi
-        versions                 = ch_versions
+    gff_summary              = CREATE_GFF_SUMMARY.out.gff_summary
+    compressed_gff_summary   = HTSLIB_BGZIPTABIX_GFFSUMMARY.out.output
+    bgzip_index              = HTSLIB_BGZIPTABIX_GFFSUMMARY.out.gzi
+    tabix_index              = HTSLIB_BGZIPTABIX_GFFSUMMARY.out.index
+    versions                 = ch_versions
 }
