@@ -6,7 +6,7 @@ nextflow_process {
 
     test("Should concatenate split EggNOG ortholog TSVs with a single header") {
 
-        config "tests/modules/local/eggnog_tsv_concat.config"
+        config "tests/modules/local/eggnog_concat/concat.config"
 
         when {
             process {
@@ -14,8 +14,8 @@ nextflow_process {
                 input[0] = [
                     [ id:'ERZ_TEST_1' ],
                     [
-                        file("${projectDir}/tests/modules/local/fixtures/eggnog_orthologs_concat/chunk_001.emapper.seed_orthologs", checkIfExists: true),
-                        file("${projectDir}/tests/modules/local/fixtures/eggnog_orthologs_concat/chunk_002.emapper.seed_orthologs", checkIfExists: true)
+                        file("${projectDir}/tests/modules/local/eggnog_concat/fixtures/orthologs/chunk_001.emapper.seed_orthologs", checkIfExists: true),
+                        file("${projectDir}/tests/modules/local/eggnog_concat/fixtures/orthologs/chunk_002.emapper.seed_orthologs", checkIfExists: true)
                     ]
                 ]
                 input[1] = "tsv"

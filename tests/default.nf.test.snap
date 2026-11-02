@@ -1,7 +1,7 @@
 {
     "-profile test": {
         "content": [
-            157,
+            159,
             {
                 "ANTISMASH_ANTISMASH": {
                     "antismash": "8.0.1",
@@ -52,6 +52,9 @@
                 },
                 "CONCATENATE_EGGNOGMAPPER_ORTHOLOGS": {
                     "csvtk": "0.31.0"
+                },
+                "CONCATENATE_HMMSEARCH_DOMTBLOUT": {
+                    "pigz": "2.3.4"
                 },
                 "CONCATENATE_HMMSEARCH_TBLOUT": {
                     "pigz": "2.3.4"
@@ -266,6 +269,8 @@
                 "ERZ101/functional-annotation/interpro/ERZ101_interpro_summary.tsv.gz.gzi",
                 "ERZ101/functional-annotation/interpro/ERZ101_interproscan.tsv.gz",
                 "ERZ101/functional-annotation/kegg",
+                "ERZ101/functional-annotation/kegg/ERZ101_ko_hits.tblout.gz",
+                "ERZ102/functional-annotation/kegg/ERZ101_ko_hits.domtblout.out.gz",
                 "ERZ101/functional-annotation/kegg/ERZ101_ko_summary.tsv.gz",
                 "ERZ101/functional-annotation/kegg/ERZ101_ko_summary.tsv.gz.gzi",
                 "ERZ101/functional-annotation/pfam",
@@ -341,6 +346,8 @@
                 "ERZ102/functional-annotation/interpro/ERZ102_interpro_summary.tsv.gz.gzi",
                 "ERZ102/functional-annotation/interpro/ERZ102_interproscan.tsv.gz",
                 "ERZ102/functional-annotation/kegg",
+                "ERZ102/functional-annotation/kegg/ERZ102_ko_hits.tblout.gz",
+                "ERZ102/functional-annotation/kegg/ERZ102_ko_hits.domtblout.out.gz",
                 "ERZ102/functional-annotation/kegg/ERZ102_ko_summary.tsv.gz",
                 "ERZ102/functional-annotation/kegg/ERZ102_ko_summary.tsv.gz.gzi",
                 "ERZ102/functional-annotation/pfam",

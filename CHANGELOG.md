@@ -7,6 +7,21 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- Publish raw KOfam HMMER hits as `{id}/functional-annotation/kegg/{id}_ko_hits.tblout.gz` and `{id}/functional-annotation/kegg/{id}_ko_hits.domtblout.gz`
+
+### Changed
+
+- Remove per-chunk HMMER comment headers and footers from published KO hit tables, omitting run-specific paths, timestamps and command lines while preserving all hit rows (PR #72).
+- Upgraded Genome Properties to version (v2.1.0)[https://github.com/EBI-Metagenomics/genome-properties/releases/tag/v2.1.0] (PR #67)
+- Added the hmmsearch of KOfams tbout and domtbout to the outputs
+
+### Fixed
+
+- Restore KOfam-specific `--cut_ga` threshold reporting. Weak matches below the embedded profile gathering cutoffs no longer contribute to KO counts, contig annotations, KEGG module completeness or DRAM inputs. Published raw KO tables now contain HMMER output after gathering-threshold filtering (PR #72).
+- Generate KO summaries from reported domain hits and count unique protein–KO pairs, matching MGnify pipeline-v5's assignment and counting rules. Parse all concatenated tables and gzip members regardless of chunk order; previously only the first nonempty chunk was parsed (PR #72).
+
 ## [6.0.5] - 2026-07-27
 
 ### Changed

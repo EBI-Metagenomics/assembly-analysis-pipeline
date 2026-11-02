@@ -17,6 +17,6 @@ coverage
 .vscode/settings.json
 
 # Test files
-tests/modules/local/fixtures/antismash_jsons/2.json
+tests/modules/local/merge_antismash_json/fixtures/2.json
 tests/reference_databases/antismash/as-js/0.13/antismash.js
-tests/modules/local/fixtures/antismash_jsons/1.json
+tests/modules/local/merge_antismash_json/fixtures/1.json

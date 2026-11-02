@@ -16,7 +16,7 @@ nextflow_process {
                 """
                 input[0] = [
                     [id: "test"],
-                    file("${projectDir}/tests/modules/local/fixtures/contigs_to_clean.fasta", checkIfExists: true)
+                    file("${projectDir}/tests/modules/local/filter_assembly/fixtures/contigs_to_clean.fasta", checkIfExists: true)
                 ]
                 """
             }

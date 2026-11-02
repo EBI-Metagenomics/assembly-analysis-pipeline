@@ -1,16 +1,17 @@
 /* NF-CORE */
-include { CSVTK_CONCAT as CONCATENATE_EGGNOGMAPPER_ORTHOLOGS   } from '../../modules/nf-core/csvtk/concat/main'
-include { CSVTK_CONCAT as CONCATENATE_EGGNOGMAPPER_ANNOTATIONS } from '../../modules/nf-core/csvtk/concat/main'
-include { CAT_CAT as CONCATENATE_HMMSEARCH_TBLOUT              } from '../../modules/nf-core/cat/cat/main'
-include { CAT_CAT as CONCATENATE_INTERPROSCAN_TSV              } from '../../modules/nf-core/cat/cat/main'
-include { CSVTK_CONCAT as CONCATENATE_DBCAN_OVERVIEW           } from '../../modules/nf-core/csvtk/concat/main'
-include { CSVTK_CONCAT as CONCATENATE_DBCAN_STANDARD_OUT       } from '../../modules/nf-core/csvtk/concat/main'
-include { CSVTK_CONCAT as CONCATENATE_DBCAN_SUBSTRATES         } from '../../modules/nf-core/csvtk/concat/main'
-include { CSVTK_CONCAT as CONCATENATE_DBCAN_HMMOUT             } from '../../modules/nf-core/csvtk/concat/main'
-include { TABIX_BGZIP as TABIX_BGZIP_GO                        } from '../../modules/nf-core/tabix/bgzip/main'
-include { TABIX_BGZIP as TABIX_BGZIP_GOSLIM                    } from '../../modules/nf-core/tabix/bgzip/main'
-include { TABIX_BGZIP as TABIX_BGZIP_RHEAANDCHEBI              } from '../../modules/nf-core/tabix/bgzip/main'
-include { RUNDBCAN_EASYSUBSTRATE                               } from '../../modules/nf-core/rundbcan/easysubstrate/main'
+include { CSVTK_CONCAT as CONCATENATE_EGGNOGMAPPER_ORTHOLOGS          } from '../../modules/nf-core/csvtk/concat/main'
+include { CSVTK_CONCAT as CONCATENATE_EGGNOGMAPPER_ANNOTATIONS        } from '../../modules/nf-core/csvtk/concat/main'
+include { CONCATENATE_HMMER_TABLES as CONCATENATE_HMMSEARCH_TBLOUT    } from '../../modules/local/concatenate_hmmer_tables'
+include { CONCATENATE_HMMER_TABLES as CONCATENATE_HMMSEARCH_DOMTBLOUT } from '../../modules/local/concatenate_hmmer_tables'
+include { CAT_CAT as CONCATENATE_INTERPROSCAN_TSV                     } from '../../modules/nf-core/cat/cat/main'
+include { CSVTK_CONCAT as CONCATENATE_DBCAN_OVERVIEW                  } from '../../modules/nf-core/csvtk/concat/main'
+include { CSVTK_CONCAT as CONCATENATE_DBCAN_STANDARD_OUT              } from '../../modules/nf-core/csvtk/concat/main'
+include { CSVTK_CONCAT as CONCATENATE_DBCAN_SUBSTRATES                } from '../../modules/nf-core/csvtk/concat/main'
+include { CSVTK_CONCAT as CONCATENATE_DBCAN_HMMOUT                    } from '../../modules/nf-core/csvtk/concat/main'
+include { TABIX_BGZIP as TABIX_BGZIP_GO                               } from '../../modules/nf-core/tabix/bgzip/main'
+include { TABIX_BGZIP as TABIX_BGZIP_GOSLIM                           } from '../../modules/nf-core/tabix/bgzip/main'
+include { TABIX_BGZIP as TABIX_BGZIP_RHEAANDCHEBI                     } from '../../modules/nf-core/tabix/bgzip/main'
+include { RUNDBCAN_EASYSUBSTRATE                                      } from '../../modules/nf-core/rundbcan/easysubstrate/main'
 
 /* EBI-METAGENOMICS */
 include { INTERPROSCAN                             } from '../../modules/ebi-metagenomics/interproscan/main'
@@ -220,13 +221,18 @@ workflow FUNCTIONAL_ANNOTATION {
     ch_versions = ch_versions.mix(HMMSEARCH_KOFAMS.out.versions)
 
     /*
-    * We concatenate the tblout together, this file is not valid as it has the comments too (the ones that start with #)
-    * but because the pipeline processes this file subsequently in this pipeline, this doesn't matter
+    * Combine hit tables without per-chunk comment headers and footers.
     */
     CONCATENATE_HMMSEARCH_TBLOUT(
         HMMSEARCH_KOFAMS.out.target_summary.groupTuple()
     )
     ch_versions = ch_versions.mix(CONCATENATE_HMMSEARCH_TBLOUT.out.versions)
+
+    // Summarise only domains passing both sequence and domain gathering cutoffs.
+    CONCATENATE_HMMSEARCH_DOMTBLOUT(
+        HMMSEARCH_KOFAMS.out.domain_summary.groupTuple()
+    )
+    ch_versions = ch_versions.mix(CONCATENATE_HMMSEARCH_DOMTBLOUT.out.versions)
 
     //************************************************//
     //                    Summaries                   //
@@ -243,7 +249,7 @@ workflow FUNCTIONAL_ANNOTATION {
     ch_versions = ch_versions.mix(INTERPRO_SUMMARY.out.versions)
 
     KEGG_ORTHOLOGS_SUMMARY(
-        CONCATENATE_HMMSEARCH_TBLOUT.out.file_out,
+        CONCATENATE_HMMSEARCH_DOMTBLOUT.out.file_out,
         file(params.ko_list_txt, checkIfExists: true)
     )
     ch_versions = ch_versions.mix(KEGG_ORTHOLOGS_SUMMARY.out.versions)
