@@ -1,0 +1,83 @@
+{
+    "Should create all declared outputs in stub mode": {
+        "content": [
+            {
+                "0": [
+                    [
+                        {
+                            "id": "ERZ_TEST"
+                        },
+                        "ERZ_TEST_ko_summary.tsv.gz:md5,d41d8cd98f00b204e9800998ecf8427e"
+                    ]
+                ],
+                "1": [
+                    [
+                        {
+                            "id": "ERZ_TEST"
+                        },
+                        "ERZ_TEST_ko_summary.tsv.gz.gzi:md5,c2cb56f4c5bf656faca0986e7eba0308"
+                    ]
+                ],
+                "2": [
+                    [
+                        {
+                            "id": "ERZ_TEST"
+                        },
+                        "ERZ_TEST_ko_per_contig.tsv.gz:md5,d41d8cd98f00b204e9800998ecf8427e"
+                    ]
+                ],
+                "3": [
+                    [
+                        {
+                            "id": "ERZ_TEST"
+                        },
+                        "ERZ_TEST_ko_per_contig.tsv.gz.gzi:md5,c2cb56f4c5bf656faca0986e7eba0308"
+                    ]
+                ],
+                "4": [
+                    "versions.yml:md5,a2704c0ce0edc1490bdc67a65f989bda"
+                ],
+                "ko_per_contig_tsv": [
+                    [
+                        {
+                            "id": "ERZ_TEST"
+                        },
+                        "ERZ_TEST_ko_per_contig.tsv.gz:md5,d41d8cd98f00b204e9800998ecf8427e"
+                    ]
+                ],
+                "ko_per_contig_tsv_gzi": [
+                    [
+                        {
+                            "id": "ERZ_TEST"
+                        },
+                        "ERZ_TEST_ko_per_contig.tsv.gz.gzi:md5,c2cb56f4c5bf656faca0986e7eba0308"
+                    ]
+                ],
+                "ko_summary_tsv": [
+                    [
+                        {
+                            "id": "ERZ_TEST"
+                        },
+                        "ERZ_TEST_ko_summary.tsv.gz:md5,d41d8cd98f00b204e9800998ecf8427e"
+                    ]
+                ],
+                "ko_summary_tsv_gzi": [
+                    [
+                        {
+                            "id": "ERZ_TEST"
+                        },
+                        "ERZ_TEST_ko_summary.tsv.gz.gzi:md5,c2cb56f4c5bf656faca0986e7eba0308"
+                    ]
+                ],
+                "versions": [
+                    "versions.yml:md5,a2704c0ce0edc1490bdc67a65f989bda"
+                ]
+            }
+        ],
+        "timestamp": "2026-11-02T13:27:48.975878",
+        "meta": {
+            "nf-test": "0.9.5",
+            "nextflow": "26.04.6"
+        }
+    }
+}

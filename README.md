@@ -111,18 +111,16 @@ Each genome should be organized as follows:
 
 ### KOfam reference thresholds
 
-We prepare KOfam references with our [MGnify reference database pipeline](https://github.com/EBI-Metagenomics/reference-databases-preprocessing-pipeline). It copies score thresholds from `ko_list` into each HMM profile as gathering thresholds (GA values):
+We prepare KOfam references with our [MGnify reference database pipeline](https://github.com/EBI-Metagenomics/reference-databases-preprocessing-pipeline). It adds score thresholds from `ko_list` into each HMM profile as gathering thresholds (GA values):
 
 | `score_type` | Full-sequence GA | Domain GA   |
 | ------------ | ---------------- | ----------- |
 | `domain`     | `threshold`      | `threshold` |
 | `full`       | `threshold`      | `25.00`     |
 
-`HMMSEARCH_KOFAMS` uses HMMER 3.4 with `--noali --cut_ga`. Each hit must pass the full-sequence and domain thresholds. HMMER stops if any profile has no GA values. During analysis, `ko_list` supplies KO descriptions only.
+`HMMSEARCH_KOFAMS` uses HMMER 3.4 with `--noali --cut_ga`. Each hit must pass the full-sequence and domain thresholds. During analysis, `ko_list` supplies KO descriptions only.
 
-As in [MGnify v5](https://github.com/EBI-Metagenomics/pipeline-v5), KO summaries use domain hits (`--domtblout`) and count each protein once per KO. A protein can have several KOs. The sequence table (`--tblout`) is published as raw output. Exact agreement with MGnify v5 requires equivalent protein inputs, reference profiles and HMMER versions.
-
-To update existing results, rerun HMMER, KO summaries, KEGG modules and DRAM. The final GFF gets its `kegg` attributes from eggNOG.
+As in [MGnify v5](https://github.com/EBI-Metagenomics/pipeline-v5), KO summaries use domain hits (`--domtblout`) and count each protein once per KO and a protein can have several KOs.
 
 ## How to run
 
