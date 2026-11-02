@@ -2,7 +2,8 @@ process CREATE_GFF_SUMMARY {
     tag "${meta.id}"
     label 'process_low'
 
-    container "microbiome-informatics/mgnify-pipelines-toolkit:1.4.9"
+    # TODO: tmp meaure to test https://github.com/EBI-Metagenomics/mgnify-pipelines-toolkit/pull/166 with real data
+    container "microbiome-informatics/mgnify-pipelines-toolkit:b860a75"
 
     input:
     tuple val(meta), path(cds), path(ips), path(eggnog), path(dbcan_overview), path(dbcan_hmm), path(sanntis), path(antismash)
