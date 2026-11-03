@@ -2,7 +2,7 @@ process CREATE_GFF_SUMMARY {
     tag "${meta.id}"
     label 'process_low'
 
-    # TODO: tmp meaure to test https://github.com/EBI-Metagenomics/mgnify-pipelines-toolkit/pull/166 with real data
+    // TODO: tmp meaure to test https://github.com/EBI-Metagenomics/mgnify-pipelines-toolkit/pull/166 with real data
     container "microbiome-informatics/mgnify-pipelines-toolkit:b860a75"
 
     input:
