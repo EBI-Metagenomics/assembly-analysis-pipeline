@@ -2,7 +2,7 @@ process CREATE_GFF_SUMMARY {
     tag "${meta.id}"
     label 'process_low'
 
-    container "microbiome-informatics/mgnify-pipelines-toolkit:1.4.9"
+    container "microbiome-informatics/mgnify-pipelines-toolkit:1.5.6"
 
     input:
     tuple val(meta), path(cds), path(ips), path(eggnog), path(dbcan_overview), path(dbcan_hmm), path(sanntis), path(antismash)
