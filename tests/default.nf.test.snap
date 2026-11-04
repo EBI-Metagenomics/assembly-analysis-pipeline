@@ -1,7 +1,7 @@
 {
     "-profile test": {
         "content": [
-            159,
+            157,
             {
                 "ANTISMASH_ANTISMASH": {
                     "antismash": "8.0.1",
@@ -69,7 +69,7 @@
                     "python": "3.13.1"
                 },
                 "CREATE_GFF_SUMMARY": {
-                    "mgnify-pipelines-toolkit": "1.4.9"
+                    "mgnify-pipelines-toolkit": "1.5.6"
                 },
                 "DIAMOND_BLASTP": {
                     "diamond": "2.1.11"
@@ -130,6 +130,10 @@
                 "HMMSEARCH_KOFAMS": {
                     "hmmer": 3.4,
                     "kofam version": 202503
+                },
+                "HTSLIB_BGZIPTABIX_GFFSUMMARY": {
+                    "htslib": 1.25,
+                    "xz": "5.8.3"
                 },
                 "INDEX_AND_PUBLISH_CONTIGS": {
                     "samtools": "1.22.1+htslib-1.22.1",
@@ -214,12 +218,6 @@
                 "SUMMARISE_FOR_DRAM_INPUT": {
                     "python": "3.13.0"
                 },
-                "TABIX_BGZIPTABIX_GFFSUMMARY": {
-                    "tabix": 1.21
-                },
-                "TABIX_BGZIP_GFFSUMMARY": {
-                    "tabix": 1.2
-                },
                 "TABIX_BGZIP_GO": {
                     "tabix": 1.2
                 },
@@ -269,8 +267,8 @@
                 "ERZ101/functional-annotation/interpro/ERZ101_interpro_summary.tsv.gz.gzi",
                 "ERZ101/functional-annotation/interpro/ERZ101_interproscan.tsv.gz",
                 "ERZ101/functional-annotation/kegg",
+                "ERZ101/functional-annotation/kegg/ERZ101_ko_hits.domtblout.gz",
                 "ERZ101/functional-annotation/kegg/ERZ101_ko_hits.tblout.gz",
-                "ERZ102/functional-annotation/kegg/ERZ101_ko_hits.domtblout.out.gz",
                 "ERZ101/functional-annotation/kegg/ERZ101_ko_summary.tsv.gz",
                 "ERZ101/functional-annotation/kegg/ERZ101_ko_summary.tsv.gz.gzi",
                 "ERZ101/functional-annotation/pfam",
@@ -346,8 +344,8 @@
                 "ERZ102/functional-annotation/interpro/ERZ102_interpro_summary.tsv.gz.gzi",
                 "ERZ102/functional-annotation/interpro/ERZ102_interproscan.tsv.gz",
                 "ERZ102/functional-annotation/kegg",
+                "ERZ102/functional-annotation/kegg/ERZ102_ko_hits.domtblout.gz",
                 "ERZ102/functional-annotation/kegg/ERZ102_ko_hits.tblout.gz",
-                "ERZ102/functional-annotation/kegg/ERZ102_ko_hits.domtblout.out.gz",
                 "ERZ102/functional-annotation/kegg/ERZ102_ko_summary.tsv.gz",
                 "ERZ102/functional-annotation/kegg/ERZ102_ko_summary.tsv.gz.gzi",
                 "ERZ102/functional-annotation/pfam",
@@ -468,7 +466,8 @@
                 "ERZ101_goslim_summary.tsv.gz.gzi:md5,7dea362b3fac8e00956a4952a3d4f474",
                 "ERZ101_interpro_summary.tsv.gz:md5,5448520d999b40b64f01324a8396cc55",
                 "ERZ101_interpro_summary.tsv.gz.gzi:md5,7dea362b3fac8e00956a4952a3d4f474",
-                "ERZ101_ko_summary.tsv.gz:md5,39cb7a8d66d0381ab5eb5edc56305e9f",
+                "ERZ101_ko_hits.domtblout.gz:md5,c23e0daeb2f43c98b445838d8f5c25bb",
+                "ERZ101_ko_summary.tsv.gz:md5,7cf1ee4b56e10dac14784fdae4a3a5ed",
                 "ERZ101_ko_summary.tsv.gz.gzi:md5,7dea362b3fac8e00956a4952a3d4f474",
                 "ERZ101_pfam_summary.tsv.gz:md5,b5f9a4756b2001bef191b7cb654d1a08",
                 "ERZ101_pfam_summary.tsv.gz.gzi:md5,7dea362b3fac8e00956a4952a3d4f474",
@@ -512,7 +511,8 @@
                 "ERZ102_goslim_summary.tsv.gz.gzi:md5,7dea362b3fac8e00956a4952a3d4f474",
                 "ERZ102_interpro_summary.tsv.gz:md5,5448520d999b40b64f01324a8396cc55",
                 "ERZ102_interpro_summary.tsv.gz.gzi:md5,7dea362b3fac8e00956a4952a3d4f474",
-                "ERZ102_ko_summary.tsv.gz:md5,39cb7a8d66d0381ab5eb5edc56305e9f",
+                "ERZ102_ko_hits.domtblout.gz:md5,5064c2a7c906790777ea28d0b1f5eaab",
+                "ERZ102_ko_summary.tsv.gz:md5,7cf1ee4b56e10dac14784fdae4a3a5ed",
                 "ERZ102_ko_summary.tsv.gz.gzi:md5,7dea362b3fac8e00956a4952a3d4f474",
                 "ERZ102_pfam_summary.tsv.gz:md5,b5f9a4756b2001bef191b7cb654d1a08",
                 "ERZ102_pfam_summary.tsv.gz.gzi:md5,7dea362b3fac8e00956a4952a3d4f474",
@@ -552,7 +552,7 @@
                 "qc_failed_assemblies.csv:md5,3292564aa6122920901d9bb724447ad4"
             ]
         ],
-        "timestamp": "2026-10-09T23:58:05.579527685",
+        "timestamp": "2026-11-04T14:52:56.599437989",
         "meta": {
             "nf-test": "0.9.5",
             "nextflow": "26.04.0"
