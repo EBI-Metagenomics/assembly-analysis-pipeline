@@ -114,6 +114,7 @@
                     "type": "string"
                 },
                 "skip_decontamination": {
+                    "default": false,
                     "description": "Skip the decontamination process.",
                     "help_text": "When set to true, assemblies will not be decontaminated.",
                     "type": "boolean"
