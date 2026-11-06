@@ -44,10 +44,12 @@ process RUNDBCAN_EASYSUBSTRATE {
     ].join("\t")
     """
 
-    # Filter GFF to only include sequences present in the proteins FASTA file
-    filter_gff_by_fasta_sequences.py --fasta ${input_raw_data} \\
-        --gff ${input_gff} \\
-        --output ${prefix}_filtered.gff
+    # run_dbcan reads the GFF as plain text only
+    if [[ "${input_gff}" == *.gz ]]; then
+        gzip -cd ${input_gff} > input.gff
+    else
+        ln -s ${input_gff} input.gff
+    fi
 
     # run_dbcan 5.2.9 drops --threads for the substrate prediction step and falls back to
     # os.cpu_count(), which on HPC returns all the cores of the node. PYTHON_CPU_COUNT (python >= 3.13)
@@ -60,7 +62,7 @@ process RUNDBCAN_EASYSUBSTRATE {
         --db_dir ${dbcan_db} \\
         --input_raw_data ${input_raw_data} \\
         --output_dir . \\
-        --input_gff ${prefix}_filtered.gff \\
+        --input_gff input.gff \\
         --gff_type ${gff_type} \\
         --threads ${task.cpus} \\
         ${args}
