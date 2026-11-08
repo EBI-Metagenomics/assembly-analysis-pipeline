@@ -1,0 +1,73 @@
+nextflow_process {
+
+    name "Test Process FILTER_GFF_BY_CONTIGS"
+    script "modules/local/filter_gff_by_contigs.nf"
+    process "FILTER_GFF_BY_CONTIGS"
+
+    test("Should keep only the CDS of the contigs in the chunk") {
+
+        when {
+            process {
+                """
+                input[0] = Channel.of([
+                    [id: "test"],
+                    file("${projectDir}/tests/modules/local/filter_gff_by_contigs/fixtures/chunk_with_cds.fasta.gz", checkIfExists: true),
+                    file("${projectDir}/tests/modules/local/filter_gff_by_contigs/fixtures/assembly_cgc.gff.gz", checkIfExists: true)
+                ])
+                """
+            }
+        }
+
+        then {
+            def gff_lines = path(process.out.filtered[0][2]).linesGzip
+            assert process.success
+            // ERZTEST_2 is not in the chunk, and ERZTEST_10 must not match ERZTEST_1
+            assert gff_lines.findAll { !it.startsWith("#") }.collect { it.split("\t")[0] } == ["ERZTEST_1", "ERZTEST_1", "ERZTEST_3"]
+            assert gff_lines[0] == "##gff-version 3"
+            assert snapshot(process.out).match()
+        }
+    }
+
+    test("Should skip a chunk without CDS") {
+
+        when {
+            process {
+                """
+                input[0] = Channel.of([
+                    [id: "test"],
+                    file("${projectDir}/tests/modules/local/filter_gff_by_contigs/fixtures/chunk_without_cds.fasta.gz", checkIfExists: true),
+                    file("${projectDir}/tests/modules/local/filter_gff_by_contigs/fixtures/assembly_cgc.gff.gz", checkIfExists: true)
+                ])
+                """
+            }
+        }
+
+        then {
+            assert process.success
+            assert process.out.filtered.size() == 0
+            assert snapshot(process.out.versions).match()
+        }
+    }
+
+    test("Stub") {
+
+        options "-stub"
+
+        when {
+            process {
+                """
+                input[0] = Channel.of([
+                    [id: "test"],
+                    file("${projectDir}/tests/modules/local/filter_gff_by_contigs/fixtures/chunk_with_cds.fasta.gz", checkIfExists: true),
+                    file("${projectDir}/tests/modules/local/filter_gff_by_contigs/fixtures/assembly_cgc.gff.gz", checkIfExists: true)
+                ])
+                """
+            }
+        }
+
+        then {
+            assert process.success
+            assert snapshot(process.out).match()
+        }
+    }
+}
