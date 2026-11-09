@@ -19,26 +19,6 @@ include { PIPELINE_COMPLETION         } from './subworkflows/local/utils_nfcore_
 
 /*
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    TYPED PARAMETERS
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-*/
-
-// Nextflow passes CLI flags as strings (e.g. --skip_decontamination -> "true").
-// The Boolean type makes Nextflow cast them before the nf-schema validation.
-// The defaults must match nextflow.config.
-params {
-    interpro_licensed_software: Boolean     = false
-    monochrome_logs: Boolean                = false
-    multiqc_nfschema_print_summary: Boolean = false
-    plaintext_email: Boolean                = false
-    skip_decontamination: Boolean           = false
-    use_fire_download: Boolean              = false
-    validate_params: Boolean                = true
-    version: Boolean                        = false
-}
-
-/*
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     NAMED WORKFLOWS FOR PIPELINE
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 */
