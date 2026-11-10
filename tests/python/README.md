@@ -12,7 +12,6 @@ python -m unittest discover -s tests/python -v
 
 ```bash
 python tests/python/filter_ips_by_contigs_test.py -v
-python tests/python/filter_gff_by_fasta_sequences_test.py -v
 ```
 
 ## Run a single test case or method
@@ -24,7 +23,6 @@ python tests/python/filter_ips_by_contigs_test.py TestContigIdFromProteinId.test
 
 ## Test coverage
 
-| Test file                               | Script under test                      | Coverage                                                                                                                                |
-| --------------------------------------- | -------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------- |
-| `filter_ips_by_contigs_test.py`         | `bin/filter_ips_by_contigs.py`         | FASTA parsing, protein ID resolution (Pyrodigal and FragGeneScanRS formats), IPS TSV filtering, gzip output, stdout protein ID emission |
-| `filter_gff_by_fasta_sequences_test.py` | `bin/filter_gff_by_fasta_sequences.py` | FASTA sequence ID extraction, GFF filtering by sequence ID, header preservation                                                         |
+| Test file                       | Script under test              | Coverage                                                                                                                                |
+| ------------------------------- | ------------------------------ | --------------------------------------------------------------------------------------------------------------------------------------- |
+| `filter_ips_by_contigs_test.py` | `bin/filter_ips_by_contigs.py` | FASTA parsing, protein ID resolution (Pyrodigal and FragGeneScanRS formats), IPS TSV filtering, gzip output, stdout protein ID emission |

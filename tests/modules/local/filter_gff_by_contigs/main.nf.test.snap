@@ -1,0 +1,84 @@
+{
+    "Should skip a chunk without CDS": {
+        "content": [
+            [
+                "versions.yml:md5,8f0a0a51b336774250e64bbb0cc11766"
+            ]
+        ],
+        "timestamp": "2026-11-08T10:44:40.917442",
+        "meta": {
+            "nf-test": "0.9.5",
+            "nextflow": "26.04.6"
+        }
+    },
+    "Stub": {
+        "content": [
+            {
+                "0": [
+                    [
+                        {
+                            "id": "test"
+                        },
+                        "chunk_with_cds.fasta.gz:md5,2a86932a2e9b6c1c2a1208ca16bdb6f5",
+                        "chunk_with_cds.gff.gz:md5,df19e1b84ba6f691d20c72b397c88abf"
+                    ]
+                ],
+                "1": [
+                    "versions.yml:md5,8f0a0a51b336774250e64bbb0cc11766"
+                ],
+                "filtered": [
+                    [
+                        {
+                            "id": "test"
+                        },
+                        "chunk_with_cds.fasta.gz:md5,2a86932a2e9b6c1c2a1208ca16bdb6f5",
+                        "chunk_with_cds.gff.gz:md5,df19e1b84ba6f691d20c72b397c88abf"
+                    ]
+                ],
+                "versions": [
+                    "versions.yml:md5,8f0a0a51b336774250e64bbb0cc11766"
+                ]
+            }
+        ],
+        "timestamp": "2026-11-08T10:44:44.712261",
+        "meta": {
+            "nf-test": "0.9.5",
+            "nextflow": "26.04.6"
+        }
+    },
+    "Should keep only the CDS of the contigs in the chunk": {
+        "content": [
+            {
+                "0": [
+                    [
+                        {
+                            "id": "test"
+                        },
+                        "chunk_with_cds.fasta.gz:md5,2a86932a2e9b6c1c2a1208ca16bdb6f5",
+                        "chunk_with_cds.gff.gz:md5,3a3eeb2bf78f0f2b0d53a663e534185b"
+                    ]
+                ],
+                "1": [
+                    "versions.yml:md5,8f0a0a51b336774250e64bbb0cc11766"
+                ],
+                "filtered": [
+                    [
+                        {
+                            "id": "test"
+                        },
+                        "chunk_with_cds.fasta.gz:md5,2a86932a2e9b6c1c2a1208ca16bdb6f5",
+                        "chunk_with_cds.gff.gz:md5,3a3eeb2bf78f0f2b0d53a663e534185b"
+                    ]
+                ],
+                "versions": [
+                    "versions.yml:md5,8f0a0a51b336774250e64bbb0cc11766"
+                ]
+            }
+        ],
+        "timestamp": "2026-11-08T10:44:37.136907",
+        "meta": {
+            "nf-test": "0.9.5",
+            "nextflow": "26.04.6"
+        }
+    }
+}

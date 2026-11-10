@@ -19,6 +19,7 @@ include { ANTISMASH_SUMMARY                              } from '../../modules/l
 include { SANNTIS_SUMMARY                                } from '../../modules/local/sanntis_summary'
 include { MERGE_ANTISMASH_JSON                           } from '../../modules/local/merge_antismash_json'
 include { FILTER_IPS_AND_FAA_BY_CONTIGS                  } from '../../modules/local/filter_ips_and_faa_by_contigs'
+include { FILTER_GFF_BY_CONTIGS                          } from '../../modules/local/filter_gff_by_contigs'
 
 include { DRAM_DISTILL_SWF                               } from '../../subworkflows/local/dram_distill_swf'
 
@@ -82,12 +83,17 @@ workflow PATHWAYS_AND_SYSTEMS {
     /* Rearrange the channel. We need to create a channel so that                              */
     /* each chunk of the FASTA has the GFF and IPS TSV (these two are for the whole assembly). */
     /*******************************************************************************************/
-    ch_antismash = ch_contigs_and_predicted_proteins
+    ch_antismash_chunks = ch_contigs_and_predicted_proteins
         .combine(SEQKIT_SPLIT2.out.assembly.transpose(), by: 0)
         .map { meta, _all_contigs_fasta, _faa, gff, _ips_tsv, contigs_chunk -> [meta, contigs_chunk, gff] }
 
+    // antiSMASH parses the full GFF for each chunk, so we keep only the CDS of the contigs in the chunk.
+    // Chunks without CDS are skipped, as antiSMASH fails on them.
+    FILTER_GFF_BY_CONTIGS(ch_antismash_chunks)
+    ch_versions = ch_versions.mix(FILTER_GFF_BY_CONTIGS.out.versions)
+
     ANTISMASH_ANTISMASH(
-        ch_antismash,
+        FILTER_GFF_BY_CONTIGS.out.filtered,
         file(params.antismash_database, checkIfExists: true),
         params.antismash_database_version
     )
