@@ -4,6 +4,7 @@
     "title": "ebi-metagenomics/assembly-analysis-pipeline pipeline - params.input schema",
     "description": "Schema for the file provided with params.input",
     "type": "array",
+    "uniqueEntries": ["sample"],
     "items": {
         "type": "object",
         "properties": {
