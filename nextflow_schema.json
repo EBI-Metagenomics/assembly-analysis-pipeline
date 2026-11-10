@@ -159,8 +159,8 @@
                     "type": "string"
                 },
                 "bgc_analysis_fasta_chunksize": {
-                    "default": "50M",
-                    "description": "Controls the chunking of the nucleotide contig FASTA files for parallel Biosynthetic Gene Cluster analysis. Format follows seqkit --by-length (e.g., '50M' for 50 million base pairs). Used in tools such as antiSMASH in the pathways and systems subworkflow.",
+                    "default": "25M",
+                    "description": "Controls the chunking of the nucleotide contig FASTA files for parallel Biosynthetic Gene Cluster analysis. Format follows seqkit --by-length (e.g., '25M' for 25 million base pairs). Used in tools such as antiSMASH in the pathways and systems subworkflow.",
                     "type": "string"
                 }
             },

@@ -51,7 +51,7 @@ The subworkflow uses minimap2 to map the contigs against the references and remo
 To use the decontamination functionality, configure the following parameters:
 
 - `--reference_genomes_folder`: Path to the folder containing all reference genome subfolders
-- `--skip_decontamination`: Set to `true` to skip the decontamination process entirely (default: `false`)
+- `--skip_decontamination`: Add this flag to skip the decontamination process entirely (default: `false`)
 
 > [!NOTE]
 > The decontamination reference genome files are expected to exist in the `--reference_genomes_folder` directory using the folder structure described above.

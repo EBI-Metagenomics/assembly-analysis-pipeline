@@ -40,7 +40,7 @@ Changes in 'rundbcan/easysubstrate/main.nf':
  
      when:
      task.ext.when == null || task.ext.when
-@@ -33,51 +34,124 @@
+@@ -33,51 +34,127 @@
      script:
      def args = task.ext.args ?: ''
      prefix = task.ext.prefix ?: "${meta.id}"
@@ -54,14 +54,17 @@ Changes in 'rundbcan/easysubstrate/main.nf':
 +    ].join("\t")
      """
 +
-+    # Filter GFF to only include sequences present in the proteins FASTA file
-+    filter_gff_by_fasta_sequences.py --fasta ${input_raw_data} \\
-+        --gff ${input_gff} \\
-+        --output ${prefix}_filtered.gff
++    # run_dbcan reads the GFF as plain text only
++    if [[ "${input_gff}" == *.gz ]]; then
++        gzip -cd ${input_gff} > input.gff
++    else
++        ln -s ${input_gff} input.gff
++    fi
 +
 +    # run_dbcan 5.2.9 drops --threads for the substrate prediction step and falls back to
 +    # os.cpu_count(), which on HPC returns all the cores of the node. PYTHON_CPU_COUNT (python >= 3.13)
 +    # makes os.cpu_count() return the CPUs allocated to the task instead.
++    # BUG: https://github.com/bcb-unl/run_dbcan/issues/73 (closed but the issue wasn't solved)
 +    export PYTHON_CPU_COUNT=${task.cpus}
  
      run_dbcan easy_substrate \\
@@ -70,7 +73,7 @@ Changes in 'rundbcan/easysubstrate/main.nf':
          --input_raw_data ${input_raw_data} \\
          --output_dir . \\
 -        --input_gff ${input_gff} \\
-+        --input_gff ${prefix}_filtered.gff \\
++        --input_gff input.gff \\
          --gff_type ${gff_type} \\
 +        --threads ${task.cpus} \\
          ${args}
