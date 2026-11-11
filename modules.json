@@ -130,7 +130,7 @@
                     },
                     "combinedgenecaller/merge": {
                         "branch": "main",
-                        "git_sha": "38adca2a1b8b246a3dc80222139effdf9700da40",
+                        "git_sha": "c2efceba07b4da5076ba2e28048ba20763ee3203",
                         "installed_by": ["combined_gene_caller"]
                     },
                     "convertcmscantocmsearch": {
@@ -260,7 +260,7 @@
                 "ebi-metagenomics": {
                     "combined_gene_caller": {
                         "branch": "main",
-                        "git_sha": "6d8c0aa510aaaca76b4f88b11a1629fc935cdaaa",
+                        "git_sha": "2d0b6c9e3a6b5889b0dcf5c7c23dc6ec8567efc0",
                         "installed_by": ["subworkflows"]
                     },
                     "contigs_taxonomic_classification": {

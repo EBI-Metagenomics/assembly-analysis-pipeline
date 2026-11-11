@@ -392,19 +392,27 @@ workflow ASSEMBLY_ANALYSIS_PIPELINE {
     /************************/
 
     // VIRIfy samplesheet //
+    // This samplesheet format requires VIRIfy > v4.0.0
     ASSEMBLY_QC.out.assembly_qc_pass.join(
         COMBINED_GENE_CALLER.out.faa
-    ).map { meta, _assembly, _faa ->
+    ).join(
+        COMBINED_GENE_CALLER.out.gff
+    ).map { meta, _assembly, _faa, _gff ->
         // We need to handle relative paths
         def outdir_file = file(params.outdir)
         def output_full_path = "${outdir_file.getParent()}/${outdir_file.getName()}/${meta.id}"
-        return "${meta.id},${output_full_path}/qc/${meta.id}_filtered_contigs.fasta.gz,,,${output_full_path}/cds/${meta.id}_predicted_cds.faa.gz"
+        return [
+            meta.id,
+            "${output_full_path}/qc/${meta.id}_filtered_contigs.fasta.gz",
+            "${output_full_path}/cds/${meta.id}_predicted_cds.faa.gz",
+            "${output_full_path}/cds/${meta.id}_predicted_cds.gff.gz"
+        ].join(",")
     }.collectFile(
         name: "virify_samplesheet.csv",
         storeDir: "${params.outdir}/downstream_samplesheets/",
         newLine: true,
         cache: false,
-        seed: "id,assembly,fastq_1,fastq_2,proteins"
+        seed: ["id", "assembly", "proteins_faa", "proteins_gff"].join(",")
     )
 
     emit:

@@ -8,19 +8,20 @@ process SANNTIS_SUMMARY {
     tuple val(meta), path(sanntis_gff)
 
     output:
-    tuple val(meta), path("*_summary.tsv.gz"),     emit: sanntis_summary,       optional: true
-    tuple val(meta), path("*_summary.tsv.gz.gzi"), emit: sanntis_summary_index, optional: true
-    path "versions.yml",                           emit: versions
+    tuple val(meta), path("${prefix}_sanntis_summary.tsv.gz"),     emit: sanntis_summary,       optional: true
+    tuple val(meta), path("${prefix}_sanntis_summary.tsv.gz.gzi"), emit: sanntis_summary_index, optional: true
+    path "versions.yml",                                           emit: versions
 
     script:
+    prefix = task.ext.prefix ?: "${meta.id}"
     """
     # SanntiS produces GFF with just the #gff header if no BGC were found
     if [ "\$(zcat "${sanntis_gff}" | wc -l)" -gt 1 ]; then
         summarise_sanntis_bgcs \\
             --sanntis-gff ${sanntis_gff} \\
-            --output ${sanntis_gff.simpleName}_summary.tsv
+            --output ${prefix}_sanntis_summary.tsv
 
-        bgzip -@${task.cpus} --index ${sanntis_gff.simpleName}_summary.tsv
+        bgzip -@${task.cpus} --index ${prefix}_sanntis_summary.tsv
     fi
 
     cat <<-END_VERSIONS > versions.yml
@@ -30,9 +31,10 @@ process SANNTIS_SUMMARY {
     """
 
     stub:
+    prefix = task.ext.prefix ?: "${meta.id}"
     """
-    touch ${sanntis_gff.simpleName}_summary.tsv
-    bgzip -@${task.cpus} --index ${sanntis_gff.simpleName}_summary.tsv
+    touch ${prefix}_sanntis_summary.tsv
+    bgzip -@${task.cpus} --index ${prefix}_sanntis_summary.tsv
 
     cat <<-END_VERSIONS > versions.yml
     "${task.process}":

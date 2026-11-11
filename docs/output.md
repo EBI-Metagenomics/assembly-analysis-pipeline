@@ -84,7 +84,7 @@ The `cds` directory contains output files related to the combined gene caller su
 
 - **ERZ12345_predicted_orf.ffn.gz**: This `FASTA` file contains the nucleotide sequences of each predicted Open Reading Frame (ORF) by the combined gene caller, making up the collection of genes detected in the assembly.
 - **ERZ12345_predicted_cds.faa.gz**: This `FASTA` file contains the amino acid sequences of each predicted ORF, making up the collection of proteins detected in the assembly.
-- **ERZ12345_predicted_cds.gff.gz**: This `gff` file contains the Coding DNA Sequences regions in the GFF3 format.
+- **ERZ12345_predicted_cds.gff.gz**: This `gff` file contains the Coding DNA Sequences regions in the GFF3 format. The features are sorted by contig and start position.
 
 ### taxonomy
 
@@ -457,6 +457,17 @@ Just as the pipeline generates https://github.com/WrightonLabCSU/DRAM outputs on
 ### Downstream samplesheets
 
 The pipeline also generates downstream samplesheets for other pipelines in the `downstream_samplesheets/` directory.
+
+#### VIRIfy
+
+The `virify_samplesheet.csv` file is an input samplesheet for the [VIRIfy](https://github.com/EBI-Metagenomics/emg-viral-pipeline) pipeline. This format requires VIRIfy > v4.0.0.
+
+| Column       | Description                                                           |
+| ------------ | --------------------------------------------------------------------- |
+| id           | The assembly accession (for example, `ERZ12345`).                     |
+| assembly     | The path to the QC-filtered contigs (`*_filtered_contigs.fasta.gz`).  |
+| proteins_faa | The path to the predicted proteins (`*_predicted_cds.faa.gz`).        |
+| proteins_gff | The path to the predicted CDS annotations (`*_predicted_cds.gff.gz`). |
 
 ### Pipeline info
 
