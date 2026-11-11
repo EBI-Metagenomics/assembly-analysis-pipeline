@@ -33,6 +33,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Restore KOfam-specific `--cut_ga` threshold reporting. Weak matches below the embedded profile gathering cutoffs no longer contribute to KO counts, contig annotations, KEGG module completeness or DRAM inputs. Published raw KO tables now contain HMMER output after gathering-threshold filtering (PR #72).
 - Generate KO summaries from reported domain hits and count unique protein–KO pairs, matching MGnify pipeline-v5's assignment and counting rules. Parse all concatenated tables and gzip members regardless of chunk order; previously only the first nonempty chunk was parsed (PR #72).
+- Count distinct proteins per entry in the InterPro and Pfam summaries, matching MGnify pipeline-v5. Previously, each InterProScan match was counted, so a protein with more than one match to the same entry was counted more than once.
 
 ## [6.0.5] - 2026-07-27
 

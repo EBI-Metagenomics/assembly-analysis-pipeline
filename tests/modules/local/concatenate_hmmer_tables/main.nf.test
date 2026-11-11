@@ -4,16 +4,26 @@ nextflow_process {
     process "CONCATENATE_HMMER_TABLES"
 
     test("Should remove chunk metadata while retaining all hit rows") {
+        setup {
+            run("TABIX_BGZIP") {
+                script "modules/nf-core/tabix/bgzip/main.nf"
+                process {
+                    """
+                    input[0] = Channel.of(
+                        [[id: 'chunk_2'], file("${projectDir}/tests/modules/local/concatenate_hmmer_tables/fixtures/chunk_2.tbl", checkIfExists: true)],
+                        [[id: 'chunk_1'], file("${projectDir}/tests/modules/local/concatenate_hmmer_tables/fixtures/chunk_1.tbl", checkIfExists: true)]
+                    )
+                    """
+                }
+            }
+        }
         when {
             process {
                 """
-                input[0] = [
-                    [id: 'ERZ_TEST'],
-                    [
-                        file("${projectDir}/tests/modules/local/concatenate_hmmer_tables/fixtures/chunk_2.tbl.gz", checkIfExists: true),
-                        file("${projectDir}/tests/modules/local/concatenate_hmmer_tables/fixtures/chunk_1.tbl.gz", checkIfExists: true)
-                    ]
-                ]
+                input[0] = TABIX_BGZIP.out.output
+                    .map { _meta, table -> table }
+                    .collect()
+                    .map { tables -> [[id: 'ERZ_TEST'], tables] }
                 """
             }
         }

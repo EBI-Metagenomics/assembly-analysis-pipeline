@@ -1,0 +1,7 @@
+# target name accession query name accession
+protein_1 - K00001 - 1e-20 80.0
+protein_2 - K00002 - 1e-30 90.0
+
+# Query file: /work/run_2/proteins.part_2.faa
+# Date: run-specific timestamp
+# [ok]
