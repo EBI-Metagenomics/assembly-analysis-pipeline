@@ -4,13 +4,23 @@ nextflow_process {
     process "INTERPRO_SUMMARY"
 
     test("Should count each protein once per InterPro accession") {
+        setup {
+            run("TABIX_BGZIP") {
+                script "modules/nf-core/tabix/bgzip/main.nf"
+                process {
+                    """
+                    input[0] = [
+                        [id: 'interproscan'],
+                        file("${projectDir}/tests/modules/local/interpro_summary/fixtures/interproscan.tsv", checkIfExists: true)
+                    ]
+                    """
+                }
+            }
+        }
         when {
             process {
                 """
-                input[0] = [
-                    [id: 'ERZ_TEST'],
-                    file("${projectDir}/tests/modules/local/interpro_summary/fixtures/interproscan.tsv.gz", checkIfExists: true)
-                ]
+                input[0] = TABIX_BGZIP.out.output.map { _meta, tsv -> [[id: 'ERZ_TEST'], tsv] }
                 """
             }
         }

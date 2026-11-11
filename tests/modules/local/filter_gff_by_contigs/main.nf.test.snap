@@ -19,7 +19,7 @@
                         {
                             "id": "test"
                         },
-                        "chunk_with_cds.fasta.gz:md5,2a86932a2e9b6c1c2a1208ca16bdb6f5",
+                        "chunk_with_cds.fasta.gz:md5,68b329da9893e34099c7d8ad5cb9c940",
                         "chunk_with_cds.gff.gz:md5,df19e1b84ba6f691d20c72b397c88abf"
                     ]
                 ],
@@ -31,7 +31,7 @@
                         {
                             "id": "test"
                         },
-                        "chunk_with_cds.fasta.gz:md5,2a86932a2e9b6c1c2a1208ca16bdb6f5",
+                        "chunk_with_cds.fasta.gz:md5,68b329da9893e34099c7d8ad5cb9c940",
                         "chunk_with_cds.gff.gz:md5,df19e1b84ba6f691d20c72b397c88abf"
                     ]
                 ],
@@ -40,7 +40,7 @@
                 ]
             }
         ],
-        "timestamp": "2026-11-08T10:44:44.712261",
+        "timestamp": "2026-11-11T15:34:37.032877",
         "meta": {
             "nf-test": "0.9.5",
             "nextflow": "26.04.6"

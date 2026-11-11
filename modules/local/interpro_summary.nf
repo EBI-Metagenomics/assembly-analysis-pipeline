@@ -22,22 +22,29 @@ process INTERPRO_SUMMARY {
     script:
     prefix = task.ext.prefix ?: "${meta.id}"
     """
-    # This csvtk minipipeline counts the distinct proteins for each InterPro accession:
-    # . Fix the quotation, sometimes the TSV has quotes where it shouldn't
-    # . Picks the rows with an InterPro hit which are those where the InterPro column is not empty or with "-" character
-    # . Extracts the 1st protein accession, 12th InterPro annotations - accession (e.g. IPR002093) and 13th InterPro annotations - description (e.g. BRCA2 repeat)
-    # . Keeps one row per protein/InterPro accession pair, a protein with more than one hit for the same accession is counted once
-    # . Counts the distinct proteins of each InterPro accession (we use accession and description because we need the description too)
-    # . Adds headers ('interpro_accession', 'description' and 'count') the TSV.
-    # . The TSV is compressed with bgzip (which is fully compatible with gzip), the index is (.gzi) used on the website.
+    # Count distinct proteins for each InterPro accession.
 
-    csvtk fix-quotes --tabs --no-header-row ${interproscan_tsv} | \\
-    csvtk filter2 --tabs --no-header-row --filter '\$12 != "" && \$12 != "-"' | \\
-    csvtk cut --tabs --no-header-row --fields 1,12,13 | \\
-    csvtk uniq --tabs --no-header-row --fields 1,2 | \\
-    csvtk freq --tabs --no-header-row --fields 2,3 --reverse --sort-by-freq | \\
-    csvtk add-header --tabs --no-header-row --names interpro_accession,description,count | \\
-    bgzip --stdout -@${task.cpus} --index --index-name ${prefix}_interpro_summary.tsv.gz.gzi > ${prefix}_interpro_summary.tsv.gz
+    # Fix quotation marks in the TSV.
+    csvtk fix-quotes --tabs --no-header-row ${interproscan_tsv} |
+
+    # Keep rows with an InterPro hit (column 12 is neither empty nor "-").
+    csvtk filter2 --tabs --no-header-row --filter '\$12 != "" && \$12 != "-"' |
+
+    # Extract protein accession (column 1), InterPro accession (column 12)
+    # and InterPro description (column 13).
+    csvtk cut --tabs --no-header-row --fields 1,12,13 |
+
+    # Keep one row per protein/InterPro accession pair.
+    csvtk uniq --tabs --no-header-row --fields 1,2 |
+
+    # Count distinct proteins per InterPro accession and description.
+    csvtk freq --tabs --no-header-row --fields 2,3 --reverse --sort-by-freq |
+
+    # Add headers and compress the TSV with bgzip, creating a .gzi index.
+    csvtk add-header --tabs --no-header-row --names interpro_accession,description,count |
+    bgzip --stdout -@${task.cpus} --index \\
+        --index-name ${prefix}_interpro_summary.tsv.gz.gzi \\
+        > ${prefix}_interpro_summary.tsv.gz
 
     cat <<-END_VERSIONS > versions.yml
     "${task.process}":
