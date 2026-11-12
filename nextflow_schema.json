@@ -34,7 +34,6 @@
                     "type": "string"
                 },
                 "use_fire_download": {
-                    "default": false,
                     "description": "Enable downloading files from EBI FIRE system (EBI network only).",
                     "fa_icon": "fas fa-download",
                     "help_text": "This feature is only available on the EBI network and is disabled by default. When enabled, the pipeline translates ENA FTP URLs and ENA HTTP URLs to EBI's FIRE S3 URLs and downloads assembly files directly from the FIRE system for faster download. Requires ENA FTP URLs or ENA HTTP links in the assembly_fasta column and FIRE_ACCESS_KEY/FIRE_SECRET_KEY environment variables.",
@@ -114,7 +113,6 @@
                     "type": "string"
                 },
                 "skip_decontamination": {
-                    "default": false,
                     "description": "Skip the decontamination process.",
                     "help_text": "When set to true, assemblies will not be decontaminated.",
                     "type": "boolean"
