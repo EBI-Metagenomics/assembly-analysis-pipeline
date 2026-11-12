@@ -1,0 +1,8 @@
+##gff-version 3
+# Sequence Data: seqnum=1;seqlen=120;seqhdr="ERZTEST_1"
+ERZTEST_1	pyrodigal_v3.6.3	CDS	1	60	10.0	+	0	ID=ERZTEST_1_1;partial=10
+ERZTEST_1	pyrodigal_v3.6.3	CDS	61	120	10.0	-	0	ID=ERZTEST_1_2;partial=01
+# Sequence Data: seqnum=2;seqlen=60;seqhdr="ERZTEST_2"
+ERZTEST_2	pyrodigal_v3.6.3	CDS	1	60	10.0	+	0	ID=ERZTEST_2_1;partial=11
+ERZTEST_3	FragGeneScanRS_v1.1.0	CDS	1	60	.	+	0	ID=ERZTEST_3_1_60_+
+ERZTEST_10	pyrodigal_v3.6.3	CDS	1	60	10.0	+	0	ID=ERZTEST_10_1;partial=11

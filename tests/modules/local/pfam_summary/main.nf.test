@@ -1,0 +1,42 @@
+nextflow_process {
+    name "Test Process PFAM_SUMMARY"
+    script "modules/local/pfam_summary.nf"
+    process "PFAM_SUMMARY"
+
+    test("Should count each protein once per Pfam accession") {
+        setup {
+            run("TABIX_BGZIP") {
+                script "modules/nf-core/tabix/bgzip/main.nf"
+                process {
+                    """
+                    input[0] = [
+                        [id: 'interproscan'],
+                        file("${projectDir}/tests/modules/local/pfam_summary/fixtures/interproscan.tsv", checkIfExists: true)
+                    ]
+                    """
+                }
+            }
+        }
+        when {
+            process {
+                """
+                input[0] = TABIX_BGZIP.out.output.map { _meta, tsv -> [[id: 'ERZ_TEST'], tsv] }
+                """
+            }
+        }
+        then {
+            assert process.success
+            // PF00005 has 4 hits on 3 proteins (ERZ1_1_1 has 2 hits)
+            // PF13304 has 3 hits on 2 proteins (ERZ1_4_1 has 2 hits), these hits have no InterPro accession
+            // PF00072 has 2 hits on 1 protein (ERZ1_3_1)
+            // The rows of other analyses (Gene3D, SUPERFAMILY, MobiDBLite) are not counted
+            assert path(process.out.pfam_summary.get(0).get(1)).linesGzip == [
+                'pfam\tdescription\tcount',
+                'PF00005\tABC transporter\t3',
+                'PF13304\tAAA domain, putative AbiEii toxin, Type IV TA system\t2',
+                'PF00072\tResponse regulator receiver domain\t1'
+            ]
+            assert path(process.out.pfam_summary_gzi.get(0).get(1)).exists()
+        }
+    }
+}

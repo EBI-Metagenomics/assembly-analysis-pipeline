@@ -4,10 +4,6 @@ include { CSVTK_CONCAT as CONCATENATE_EGGNOGMAPPER_ANNOTATIONS        } from '..
 include { CONCATENATE_HMMER_TABLES as CONCATENATE_HMMSEARCH_TBLOUT    } from '../../modules/local/concatenate_hmmer_tables'
 include { CONCATENATE_HMMER_TABLES as CONCATENATE_HMMSEARCH_DOMTBLOUT } from '../../modules/local/concatenate_hmmer_tables'
 include { CAT_CAT as CONCATENATE_INTERPROSCAN_TSV                     } from '../../modules/nf-core/cat/cat/main'
-include { CSVTK_CONCAT as CONCATENATE_DBCAN_OVERVIEW                  } from '../../modules/nf-core/csvtk/concat/main'
-include { CSVTK_CONCAT as CONCATENATE_DBCAN_STANDARD_OUT              } from '../../modules/nf-core/csvtk/concat/main'
-include { CSVTK_CONCAT as CONCATENATE_DBCAN_SUBSTRATES                } from '../../modules/nf-core/csvtk/concat/main'
-include { CSVTK_CONCAT as CONCATENATE_DBCAN_HMMOUT                    } from '../../modules/nf-core/csvtk/concat/main'
 include { TABIX_BGZIP as TABIX_BGZIP_GO                               } from '../../modules/nf-core/tabix/bgzip/main'
 include { TABIX_BGZIP as TABIX_BGZIP_GOSLIM                           } from '../../modules/nf-core/tabix/bgzip/main'
 include { TABIX_BGZIP as TABIX_BGZIP_RHEAANDCHEBI                     } from '../../modules/nf-core/tabix/bgzip/main'
@@ -20,9 +16,7 @@ include { GOSLIM_SWF                               } from '../../subworkflows/eb
 /* LOCAL */
 include { EGGNOGMAPPER_ORTHOLOGS                            } from '../../modules/local/eggnogmapper_orthologs'
 include { EGGNOGMAPPER_ANNOTATIONS                          } from '../../modules/local/eggnogmapper_annotations'
-include { SEQKIT_FIX                                        } from '../../modules/local/seqkit_fix'
 include { CONCATENATE_GFFS as CONCATENATE_INTERPROSCAN_GFFS } from '../../modules/local/concatenate_gffs'
-include { CONCATENATE_GFFS as CONCATENATE_DBCAN_GFFS        } from '../../modules/local/concatenate_gffs'
 include { PFAM_SUMMARY                                      } from '../../modules/local/pfam_summary'
 include { INTERPRO_SUMMARY                                  } from '../../modules/local/interpro_summary'
 include { HMMER_HMMSEARCH as HMMSEARCH_KOFAMS               } from '../../modules/nf-core/hmmer/hmmsearch/main'
@@ -40,7 +34,6 @@ workflow FUNCTIONAL_ANNOTATION {
     ch_versions = channel.empty()
 
     def ch_proteins_faa = ch_predicted_proteins.map { meta, faa, _gff -> [meta, faa] }
-    def ch_proteins_gff = ch_predicted_proteins.map { meta, _faa, gff -> [meta, gff] }
 
     /*
      * InterProScan results are concatenated (TSV and GFF) and passed on to downstream tools:
@@ -144,69 +137,20 @@ workflow FUNCTIONAL_ANNOTATION {
     )
     ch_versions = ch_versions.mix(TABIX_BGZIP_RHEAANDCHEBI.out.versions)
 
-    // The faa is chunked (XXX_001.faa...) but not the GFF (it is the concatenated one directly from the CGC)
-    ch_proteins_gff.combine(ch_protein_chunked, by: 0).multiMap { meta, gff, faa ->
+    // dbCAN runs on the whole assembly. Chunking it would need a complex merge of the CGC results.
+    ch_predicted_proteins.multiMap { meta, faa, gff ->
         faa: [meta, faa]
         gff: [meta, gff, "prodigal"]
     }.set {
         ch_dbcan
     }
 
-    // dbCAN takes a subset (chunk) of proteins and the complete assembly GFF file as input.
-    // We therefore updated the workflow to filter the GFF file, retaining only the entries
-    // associated with the proteins in the given chunk.
     RUNDBCAN_EASYSUBSTRATE(
         ch_dbcan.faa,
         ch_dbcan.gff,
         [file(params.dbcan_database, checkIfExists: true), params.dbcan_database_version],
     )
     ch_versions = ch_versions.mix(RUNDBCAN_EASYSUBSTRATE.out.versions)
-
-    CONCATENATE_DBCAN_GFFS(
-        RUNDBCAN_EASYSUBSTRATE.out.cgc_gff.groupTuple()
-    )
-    ch_versions = ch_versions.mix(CONCATENATE_DBCAN_GFFS.out.versions)
-
-    CONCATENATE_DBCAN_OVERVIEW(
-        RUNDBCAN_EASYSUBSTRATE.out.cazyme_annotation.groupTuple(),
-        "tsv",
-        "tsv",
-        true // compress
-    )
-    ch_versions = ch_versions.mix(CONCATENATE_DBCAN_OVERVIEW.out.versions)
-
-    CONCATENATE_DBCAN_STANDARD_OUT(
-        RUNDBCAN_EASYSUBSTRATE.out.cgc_standard_out.groupTuple(),
-        "tsv",
-        "tsv",
-        true // compress
-    )
-    ch_versions = ch_versions.mix(CONCATENATE_DBCAN_STANDARD_OUT.out.versions)
-
-    CONCATENATE_DBCAN_SUBSTRATES(
-        RUNDBCAN_EASYSUBSTRATE.out.substrate_prediction.groupTuple(),
-        "tsv",
-        "tsv",
-        true // compress
-    )
-    ch_versions = ch_versions.mix(CONCATENATE_DBCAN_SUBSTRATES.out.versions)
-
-    /*
-    * The dbsub_output is a valid TSV, it contains an extra column with no header
-    * it looks like this extra column is a duplicated "Coverage". In order to concatenate the
-    * tsv with csvtk (which ensures consistency) we run csvtk fix first to adjust the tsvs
-    */
-    SEQKIT_FIX(RUNDBCAN_EASYSUBSTRATE.out.dbcansub_results)
-
-    ch_versions = ch_versions.mix(SEQKIT_FIX.out.versions.first())
-
-    CONCATENATE_DBCAN_HMMOUT(
-        SEQKIT_FIX.out.fixed_tsv.groupTuple(),
-        "tsv",
-        "tsv",
-        true // compress
-    )
-    ch_versions = ch_versions.mix(CONCATENATE_DBCAN_HMMOUT.out.versions)
 
     /*
     * KEGG orthologs annotation. This step uses hmmsearch to annotation the sequences aginst the kofam HMM models.
@@ -255,8 +199,8 @@ workflow FUNCTIONAL_ANNOTATION {
     ch_versions = ch_versions.mix(KEGG_ORTHOLOGS_SUMMARY.out.versions)
 
     emit:
-    dbcan_overview                 = CONCATENATE_DBCAN_OVERVIEW.out.csv
-    dbcan_hmm                      = CONCATENATE_DBCAN_HMMOUT.out.csv
+    dbcan_overview                 = RUNDBCAN_EASYSUBSTRATE.out.cazyme_annotation
+    dbcan_hmm                      = RUNDBCAN_EASYSUBSTRATE.out.dbcansub_results
     interproscan_tsv               = CONCATENATE_INTERPROSCAN_TSV.out.file_out
     interproscan_gff3              = CONCATENATE_INTERPROSCAN_GFFS.out.concatenated_gff
     eggnog_annotations             = CONCATENATE_EGGNOGMAPPER_ANNOTATIONS.out.csv

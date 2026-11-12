@@ -1,0 +1,42 @@
+nextflow_process {
+    name "Test Process INTERPRO_SUMMARY"
+    script "modules/local/interpro_summary.nf"
+    process "INTERPRO_SUMMARY"
+
+    test("Should count each protein once per InterPro accession") {
+        setup {
+            run("TABIX_BGZIP") {
+                script "modules/nf-core/tabix/bgzip/main.nf"
+                process {
+                    """
+                    input[0] = [
+                        [id: 'interproscan'],
+                        file("${projectDir}/tests/modules/local/interpro_summary/fixtures/interproscan.tsv", checkIfExists: true)
+                    ]
+                    """
+                }
+            }
+        }
+        when {
+            process {
+                """
+                input[0] = TABIX_BGZIP.out.output.map { _meta, tsv -> [[id: 'ERZ_TEST'], tsv] }
+                """
+            }
+        }
+        then {
+            assert process.success
+            // IPR027417 has 5 hits on 4 proteins (ERZ1_1_1 has 2 hits)
+            // IPR003439 has 4 hits on 3 proteins (ERZ1_1_1 has 2 hits)
+            // IPR001789 has 2 hits on 1 protein (ERZ1_3_1)
+            // The rows without an InterPro accession ("-") are not counted
+            assert path(process.out.interpro_summary.get(0).get(1)).linesGzip == [
+                'interpro_accession\tdescription\tcount',
+                'IPR027417\tP-loop containing nucleoside triphosphate hydrolase\t4',
+                'IPR003439\tABC transporter-like, ATP-binding domain\t3',
+                'IPR001789\tSignal transduction response regulator, receiver domain\t1'
+            ]
+            assert path(process.out.interpro_summary_gzi.get(0).get(1)).exists()
+        }
+    }
+}

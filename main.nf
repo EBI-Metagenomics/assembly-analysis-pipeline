@@ -16,6 +16,7 @@
 include { ASSEMBLY_ANALYSIS_PIPELINE  } from './workflows/assembly_analysis_pipeline'
 include { PIPELINE_INITIALISATION     } from './subworkflows/local/utils_nfcore_assembly_analysis_pipeline_pipeline'
 include { PIPELINE_COMPLETION         } from './subworkflows/local/utils_nfcore_assembly_analysis_pipeline_pipeline'
+
 /*
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     NAMED WORKFLOWS FOR PIPELINE

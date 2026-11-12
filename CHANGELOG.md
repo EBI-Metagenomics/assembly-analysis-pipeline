@@ -7,20 +7,33 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [6.1.0] - 2026-11-10
+
 ### Added
 
 - Publish raw KOfam HMMER hits as `{id}/functional-annotation/kegg/{id}_ko_hits.tblout.gz` and `{id}/functional-annotation/kegg/{id}_ko_hits.domtblout.gz`
+- Added the decontamination reference accession to the MultiQC report (PR #68).
+- Added a pipeline schema diagram (`schema.png` and `schema.svg`) (PR #69).
+- Documented the attributes of the GFF 9th column in `docs/output.md` (PR #71).
+- Added the predicted CDS GFF (`proteins_gff`) to the VIRify downstream samplesheet. This samplesheet format requires VIRify > v4.0.0.
 
 ### Changed
 
 - Remove per-chunk HMMER comment headers and footers from published KO hit tables, omitting run-specific paths, timestamps and command lines while preserving all hit rows (PR #72).
-- Upgraded Genome Properties to version (v2.1.0)[https://github.com/EBI-Metagenomics/genome-properties/releases/tag/v2.1.0] (PR #67)
-- Added the hmmsearch of KOfams tbout and domtbout to the outputs
+- Upgraded Genome Properties to version [v2.1.0](https://github.com/EBI-Metagenomics/genome-properties/releases/tag/v2.1.0) (PR #67)
+- Published the extracted rRNA sequences in `{id}/rnas/` instead of `{id}/taxonomy/` (PR #67).
+- Upgraded run_dbCAN to 5.2.9 and the default `--dbcan_database_version` to `v5-2_9-13-2025`. run_dbCAN now reads compressed inputs (PR #70).
+- Set the InterProScan JVM heap to half of the task memory, so the native tools have memory too (PR #70).
+- Replaced the two tabix steps of the annotation summary GFF with one `htslib/bgziptabix` step. It writes the `.gff.gz`, `.gzi` and `.csi` files (PR #73).
+- Upgraded the combined gene caller. The predicted CDS GFF is now sorted by contig and start position.
+- Upgraded mgnify-pipelines-toolkit to 1.5.6 (PR #74).
+- Changed the VIRify downstream samplesheet header to `id,assembly,proteins_faa,proteins_gff`.
 
 ### Fixed
 
 - Restore KOfam-specific `--cut_ga` threshold reporting. Weak matches below the embedded profile gathering cutoffs no longer contribute to KO counts, contig annotations, KEGG module completeness or DRAM inputs. Published raw KO tables now contain HMMER output after gathering-threshold filtering (PR #72).
 - Generate KO summaries from reported domain hits and count unique protein–KO pairs, matching MGnify pipeline-v5's assignment and counting rules. Parse all concatenated tables and gzip members regardless of chunk order; previously only the first nonempty chunk was parsed (PR #72).
+- Count distinct proteins per entry in the InterPro and Pfam summaries, matching MGnify pipeline-v5. Previously, each InterProScan match was counted, so a protein with more than one match to the same entry was counted more than once.
 
 ## [6.0.5] - 2026-07-27
 
@@ -78,7 +91,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Fixed downstream workflows to consistently use QC-filtered and decontaminated contigs.
 - Fixed reporting and published outputs across MultiQC, downstream samplesheets, and compressed summary files.
 
-[unreleased]: https://github.com/ebi-metagenomics/assembly-analysis-pipeline/compare/v6.0.2...HEAD
-[6.0.2]: https://github.com/ebi-metagenomics/assembly-analysis-pipeline/compare/v6.0.1...HEAD
+[unreleased]: https://github.com/ebi-metagenomics/assembly-analysis-pipeline/compare/v6.1.0...HEAD
+[6.1.0]: https://github.com/ebi-metagenomics/assembly-analysis-pipeline/compare/6.0.5...v6.1.0
+[6.0.5]: https://github.com/ebi-metagenomics/assembly-analysis-pipeline/compare/v6.0.3...6.0.5
+[6.0.3]: https://github.com/ebi-metagenomics/assembly-analysis-pipeline/compare/v6.0.2...v6.0.3
+[6.0.2]: https://github.com/ebi-metagenomics/assembly-analysis-pipeline/compare/v6.0.1...v6.0.2
 [6.0.1]: https://github.com/ebi-metagenomics/assembly-analysis-pipeline/compare/v6.0.0...060b74274e5a3fcf92fdf76040f95770a5f848c6
 [6.0.0]: https://github.com/ebi-metagenomics/assembly-analysis-pipeline/releases/tag/v6.0.0

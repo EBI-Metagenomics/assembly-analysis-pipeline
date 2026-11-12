@@ -1,0 +1,155 @@
+nextflow_process {
+
+    name "Test Process FILTER_GFF_BY_CONTIGS"
+    script "modules/local/filter_gff_by_contigs.nf"
+    process "FILTER_GFF_BY_CONTIGS"
+
+    test("Should keep only the CDS of the contigs in the chunk") {
+
+        setup {
+            run("TABIX_BGZIP", alias: "BGZIP_FASTA") {
+                script "modules/nf-core/tabix/bgzip/main.nf"
+                process {
+                    """
+                    input[0] = [
+                        [id: "chunk_with_cds"],
+                        file("${projectDir}/tests/modules/local/filter_gff_by_contigs/fixtures/chunk_with_cds.fasta", checkIfExists: true)
+                    ]
+                    """
+                }
+            }
+            run("TABIX_BGZIP", alias: "BGZIP_GFF") {
+                script "modules/nf-core/tabix/bgzip/main.nf"
+                process {
+                    """
+                    input[0] = [
+                        [id: "assembly_cgc"],
+                        file("${projectDir}/tests/modules/local/filter_gff_by_contigs/fixtures/assembly_cgc.gff", checkIfExists: true)
+                    ]
+                    """
+                }
+            }
+        }
+
+        when {
+            process {
+                """
+                input[0] = BGZIP_FASTA.out.output
+                    .combine(BGZIP_GFF.out.output)
+                    .map { _fasta_meta, fasta, _gff_meta, gff -> [[id: "test"], fasta, gff] }
+                """
+            }
+        }
+
+        then {
+            assert process.success
+            // The chunk is emitted unchanged
+            assert path(process.out.filtered[0][1]).linesGzip == [
+                ">ERZTEST_1 len=120",
+                "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
+                "CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC",
+                ">ERZTEST_3",
+                "GGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGG"
+            ]
+            // ERZTEST_2 is not in the chunk, and ERZTEST_10 must not match ERZTEST_1
+            // The "# Sequence Data" comments are not kept
+            assert path(process.out.filtered[0][2]).linesGzip == [
+                "##gff-version 3",
+                "ERZTEST_1\tpyrodigal_v3.6.3\tCDS\t1\t60\t10.0\t+\t0\tID=ERZTEST_1_1;partial=10",
+                "ERZTEST_1\tpyrodigal_v3.6.3\tCDS\t61\t120\t10.0\t-\t0\tID=ERZTEST_1_2;partial=01",
+                "ERZTEST_3\tFragGeneScanRS_v1.1.0\tCDS\t1\t60\t.\t+\t0\tID=ERZTEST_3_1_60_+"
+            ]
+            assert snapshot(process.out).match()
+        }
+    }
+
+    test("Should skip a chunk without CDS") {
+
+        setup {
+            run("TABIX_BGZIP", alias: "BGZIP_FASTA") {
+                script "modules/nf-core/tabix/bgzip/main.nf"
+                process {
+                    """
+                    input[0] = [
+                        [id: "chunk_without_cds"],
+                        file("${projectDir}/tests/modules/local/filter_gff_by_contigs/fixtures/chunk_without_cds.fasta", checkIfExists: true)
+                    ]
+                    """
+                }
+            }
+            run("TABIX_BGZIP", alias: "BGZIP_GFF") {
+                script "modules/nf-core/tabix/bgzip/main.nf"
+                process {
+                    """
+                    input[0] = [
+                        [id: "assembly_cgc"],
+                        file("${projectDir}/tests/modules/local/filter_gff_by_contigs/fixtures/assembly_cgc.gff", checkIfExists: true)
+                    ]
+                    """
+                }
+            }
+        }
+
+        when {
+            process {
+                """
+                input[0] = BGZIP_FASTA.out.output
+                    .combine(BGZIP_GFF.out.output)
+                    .map { _fasta_meta, fasta, _gff_meta, gff -> [[id: "test"], fasta, gff] }
+                """
+            }
+        }
+
+        then {
+            assert process.success
+            assert process.out.filtered.size() == 0
+            assert snapshot(process.out.versions).match()
+        }
+    }
+
+    test("Stub") {
+
+        options "-stub"
+
+        setup {
+            run("TABIX_BGZIP", alias: "BGZIP_FASTA") {
+                script "modules/nf-core/tabix/bgzip/main.nf"
+                process {
+                    """
+                    input[0] = [
+                        [id: "chunk_with_cds"],
+                        file("${projectDir}/tests/modules/local/filter_gff_by_contigs/fixtures/chunk_with_cds.fasta", checkIfExists: true)
+                    ]
+                    """
+                }
+            }
+            run("TABIX_BGZIP", alias: "BGZIP_GFF") {
+                script "modules/nf-core/tabix/bgzip/main.nf"
+                process {
+                    """
+                    input[0] = [
+                        [id: "assembly_cgc"],
+                        file("${projectDir}/tests/modules/local/filter_gff_by_contigs/fixtures/assembly_cgc.gff", checkIfExists: true)
+                    ]
+                    """
+                }
+            }
+        }
+
+        when {
+            process {
+                """
+                input[0] = BGZIP_FASTA.out.output
+                    .combine(BGZIP_GFF.out.output)
+                    .map { _fasta_meta, fasta, _gff_meta, gff -> [[id: "test"], fasta, gff] }
+                """
+            }
+        }
+
+        then {
+            assert process.success
+            assert path(process.out.filtered[0][2]).linesGzip == ["##gff-version 3"]
+            assert snapshot(process.out).match()
+        }
+    }
+}
