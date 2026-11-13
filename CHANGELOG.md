@@ -34,6 +34,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Restore KOfam-specific `--cut_ga` threshold reporting. Weak matches below the embedded profile gathering cutoffs no longer contribute to KO counts, contig annotations, KEGG module completeness or DRAM inputs. Published raw KO tables now contain HMMER output after gathering-threshold filtering (PR #72).
 - Generate KO summaries from reported domain hits and count unique protein–KO pairs, matching MGnify pipeline-v5's assignment and counting rules. Parse all concatenated tables and gzip members regardless of chunk order; previously only the first nonempty chunk was parsed (PR #72).
 - Count distinct proteins per entry in the InterPro and Pfam summaries, matching MGnify pipeline-v5. Previously, each InterProScan match was counted, so a protein with more than one match to the same entry was counted more than once.
+- Upgraded SanntiS to [0.9.6](https://github.com/Finn-Lab/SanntiS/releases/tag/0.9.6). In `--is_protein` mode, SanntiS now sorts the CDSs by genomic position before prediction. Previously, it used the order of the proteins in the FASTA file, which could give wrong BGC regions when the file was not in genomic order.
 
 ## [6.0.5] - 2026-07-27
 

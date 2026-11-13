@@ -246,7 +246,7 @@
                     },
                     "sanntis": {
                         "branch": "main",
-                        "git_sha": "0d489b1617f2015cd99eea7f9369491723eb9260",
+                        "git_sha": "a4810d3a81fc381f2cf11e7a3049472949b4760b",
                         "installed_by": ["modules"]
                     },
                     "seqkit/grep": {
