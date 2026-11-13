@@ -4,9 +4,11 @@ process EXTRACTCOORDS {
     label 'process_single'
 
     conda "${moduleDir}/environment.yml"
-    container "${ workflow.containerEngine == 'singularity' && !task.ext.singularity_pull_docker_container ?
-        'https://depot.galaxyproject.org/singularity/mgnify-pipelines-toolkit:1.2.11--pyhdfd78af_0':
-        'biocontainers/mgnify-pipelines-toolkit:1.2.11--pyhdfd78af_0' }"
+    // TODO: testing - https://github.com/EBI-Metagenomics/mgnify-pipelines-toolkit/pull/168
+    container "quay.io/microbiome-informatics/mgnify-pipelines-toolkit:385b408"
+    // container "${ workflow.containerEngine == 'singularity' && !task.ext.singularity_pull_docker_container ?
+    //     'https://depot.galaxyproject.org/singularity/mgnify-pipelines-toolkit:1.2.11--pyhdfd78af_0':
+    //     'biocontainers/mgnify-pipelines-toolkit:1.2.11--pyhdfd78af_0' }"
 
     input:
     tuple val(meta), path(easel_coords_fasta)
