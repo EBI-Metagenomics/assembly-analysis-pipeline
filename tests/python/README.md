@@ -26,3 +26,4 @@ python tests/python/filter_ips_by_contigs_test.py TestContigIdFromProteinId.test
 | Test file                       | Script under test              | Coverage                                                                                                                                |
 | ------------------------------- | ------------------------------ | --------------------------------------------------------------------------------------------------------------------------------------- |
 | `filter_ips_by_contigs_test.py` | `bin/filter_ips_by_contigs.py` | FASTA parsing, protein ID resolution (Pyrodigal and FragGeneScanRS formats), IPS TSV filtering, gzip output, stdout protein ID emission |
+| `summarise_for_dram_test.py`    | `bin/summarise_for_dram.py`    | KO separator, CAZy families of all the proteins on a contig (sorted), Pfam accessions that the DRAM 1.3.5 regex can read                |
