@@ -40,10 +40,10 @@ nextflow_process {
             // The script writes the contigs in a random order
             assert lines[1..-1].sort() == [
                 // KOs: "," without a space, because DRAM splits on "," and does not strip the values
-                // Pfam: ".1" placeholder version, because the DRAM regex needs a suffix
+                // Pfam: ".0" placeholder version, because the DRAM regex needs a suffix
                 // CAZy: the consensus families of all the proteins on the contig, sorted.
                 // GT51 (ERZ12345_1_4) has no consensus.
-                'ERZ12345_1\tERZ12345\tERZ12345_ERZ12345_1\tERZ12345_1\tK00001,K00002,K00003\tABC transporter [PF00005.1]; 7 transmembrane receptor [PF00001.1]\tCE4; GH31; GT2; GT4',
+                'ERZ12345_1\tERZ12345\tERZ12345_ERZ12345_1\tERZ12345_1\tK00001,K00002,K00003\tABC transporter [PF00005.0]; 7 transmembrane receptor [PF00001.0]\tCE4; GH31; GT2; GT4',
                 // CBM50 (ERZ12345_2_1) has no consensus
                 'ERZ12345_2\tERZ12345\tERZ12345_ERZ12345_2\tERZ12345_2\t\t\t',
                 'ERZ12345_3\tERZ12345\tERZ12345_ERZ12345_3\tERZ12345_3\t\t\t'

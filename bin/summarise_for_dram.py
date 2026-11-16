@@ -83,8 +83,7 @@ def extract_cazy_families_from_dbcan(dbcan_overview_tsv: Path) -> dict:
                     if not dbcan == "-":
                         consensus.add(dbcan)
 
-            if len(consensus) > 0:
-                cazys[contig].update(consensus)
+            cazys[contig].update(consensus)
 
     # DRAM 1.3.5 splits cazy_id on "; "
     # https://github.com/WrightonLabCSU/DRAM/blob/91a902480c49adc52e991d898f73cf48ea3df174/mag_annotator/utils.py#L86-L87
@@ -117,13 +116,13 @@ def extract_pfam_annotations(interproscan_summary_tsv: Path) -> dict:
             if analysis.strip() == "Pfam":
                 # DRAM only matches Pfam accessions with a version suffix (regex
                 # \[PF\d\d\d\d\d.\d*\]), but InterProScan reports them without one.
-                # The ".1" is a placeholder, not the real entry version; DRAM
-                # removes the suffix before it uses the accession.
+                # The ".0" is a placeholder, not a real entry version (Pfam versions
+                # start at 1); DRAM removes the suffix before it uses the accession.
                 # DRAM 1.3.5 parsing rules:
                 # https://github.com/WrightonLabCSU/DRAM/blob/91a902480c49adc52e991d898f73cf48ea3df174/mag_annotator/utils.py#L97-L99
                 # https://github.com/WrightonLabCSU/DRAM/blob/91a902480c49adc52e991d898f73cf48ea3df174/mag_annotator/utils.py#L126-L128
                 pfams[contig].append(
-                    f"{signature_description} [{signature_accession}.1]"
+                    f"{signature_description} [{signature_accession}.0]"
                 )
 
     for contig in pfams:
