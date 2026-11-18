@@ -84,7 +84,7 @@
                     "eggnog-mapper database": "5.0.2"
                 },
                 "EXTRACTCOORDS": {
-                    "mgnify-pipelines-toolkit": "1.2.11"
+                    "mgnify-pipelines-toolkit": "1.5.7"
                 },
                 "FILTERPAF": {
                     "gawk": "5.3.0"
@@ -186,7 +186,7 @@
                     "dbcan_db": "v5-2_9-13-2025"
                 },
                 "SANNTIS": {
-                    "SanntiS": "0.9.4.1"
+                    "SanntiS": "0.9.6"
                 },
                 "SANNTIS_SUMMARY": {
                     "mgnify-pipelines-toolkit": "1.2.0"
@@ -535,7 +535,7 @@
                 "qc_failed_assemblies.csv:md5,3292564aa6122920901d9bb724447ad4"
             ]
         ],
-        "timestamp": "2026-11-10T20:11:41.949581553",
+        "timestamp": "2026-11-18T16:02:27.778135187",
         "meta": {
             "nf-test": "0.9.5",
             "nextflow": "26.04.0"
