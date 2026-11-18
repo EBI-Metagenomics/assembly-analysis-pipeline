@@ -1,0 +1,86 @@
+nextflow_process {
+    name "Test Process SUMMARISE_FOR_DRAM_INPUT"
+    script "modules/local/summarise_for_dram_input.nf"
+    process "SUMMARISE_FOR_DRAM_INPUT"
+
+    test("Should write the KO, Pfam and CAZy columns that DRAM 1.3.5 can read") {
+        setup {
+            run("TABIX_BGZIP") {
+                script "modules/nf-core/tabix/bgzip/main.nf"
+                process {
+                    """
+                    def fixtures = "${projectDir}/tests/modules/local/summarise_for_dram_input/fixtures"
+                    input[0] = Channel.of(
+                        [[id: 'fasta'], file("\${fixtures}/proteins.faa", checkIfExists: true)],
+                        [[id: 'ko'], file("\${fixtures}/ko_per_contig.tsv", checkIfExists: true)],
+                        [[id: 'ips'], file("\${fixtures}/interproscan.tsv", checkIfExists: true)],
+                        [[id: 'dbcan'], file("\${fixtures}/dbcan_overview.tsv", checkIfExists: true)]
+                    )
+                    """
+                }
+            }
+        }
+        when {
+            process {
+                """
+                input[0] = TABIX_BGZIP.out.output
+                    .map { meta, gz -> [meta.id, gz] }
+                    .toList()
+                    .map { files ->
+                        def gz = files.collectEntries()
+                        [[id: 'ERZ12345'], gz.fasta, gz.ko, gz.ips, gz.dbcan]
+                    }
+                """
+            }
+        }
+        then {
+            assert process.success
+            def lines = path(process.out.dram_summary.get(0).get(1)).readLines()
+            assert lines[0] == '\tfasta\tscaffold\tgene_position\tkegg_id\tpfam_hits\tcazy_id'
+            // The script writes the contigs in a random order
+            assert lines[1..-1].sort() == [
+                // KOs: "," without a space, because DRAM splits on "," and does not strip the values
+                // Pfam: ".0" placeholder version, because the DRAM regex needs a suffix
+                // CAZy: the consensus families of all the proteins on the contig, sorted.
+                // GT51 (ERZ12345_1_4) has no consensus.
+                'ERZ12345_1\tERZ12345\tERZ12345_ERZ12345_1\tERZ12345_1\tK00001,K00002,K00003\tABC transporter [PF00005.0]; 7 transmembrane receptor [PF00001.0]\tCE4; GH31; GT2; GT4',
+                // CBM50 (ERZ12345_2_1) has no consensus
+                'ERZ12345_2\tERZ12345\tERZ12345_ERZ12345_2\tERZ12345_2\t\t\t',
+                'ERZ12345_3\tERZ12345\tERZ12345_ERZ12345_3\tERZ12345_3\t\t\t'
+            ]
+
+            // Regex that DRAM 1.3.5 uses to read the pfam_hits column
+            // https://github.com/WrightonLabCSU/DRAM/blob/91a902480c49adc52e991d898f73cf48ea3df174/mag_annotator/utils.py#L97-L99
+            def dram_pfam_regex = /\[PF\d\d\d\d\d.\d*\]/
+            // Without the version, the DRAM regex does not match the accession
+            // Comparison: a PFAM accession with no version...
+            assert ('ABC transporter [PF00005]' =~ dram_pfam_regex).findAll() == []
+            // ... versus the versioned accession from our tweak
+            def pfam_hits = lines[1..-1].find { it.startsWith('ERZ12345_1\t') }.split('\t')[5]
+            def dram_accessions = (pfam_hits =~ dram_pfam_regex).findAll().collect { it[1..-2].split('\\.')[0] }
+            assert dram_accessions == ['PF00005', 'PF00001']
+        }
+    }
+
+    test("Should write the output file in stub mode") {
+        options "-stub"
+        when {
+            process {
+                """
+                def fixtures = "${projectDir}/tests/modules/local/summarise_for_dram_input/fixtures"
+                input[0] = [
+                    [id: 'ERZ12345'],
+                    file("\${fixtures}/proteins.faa", checkIfExists: true),
+                    file("\${fixtures}/ko_per_contig.tsv", checkIfExists: true),
+                    file("\${fixtures}/interproscan.tsv", checkIfExists: true),
+                    file("\${fixtures}/dbcan_overview.tsv", checkIfExists: true)
+                ]
+                """
+            }
+        }
+        then {
+            assert process.success
+            assert file(process.out.dram_summary.get(0).get(1)).name == 'ERZ12345_summary_for_dram.tsv'
+        }
+    }
+}

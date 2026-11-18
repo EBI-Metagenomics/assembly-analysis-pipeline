@@ -41,7 +41,7 @@ process SUMMARISE_FOR_DRAM_INPUT {
     stub:
     prefix = task.ext.prefix ?: "${meta.id}"
     """
-    touch ${prefix}_dram_summary.tsv
+    touch ${prefix}_summary_for_dram.tsv
 
     cat <<-END_VERSIONS > versions.yml
     "${task.process}":

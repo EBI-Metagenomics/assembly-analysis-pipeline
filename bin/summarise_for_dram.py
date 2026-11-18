@@ -44,13 +44,18 @@ def extract_kegg_orthologs_annotations(aggregated_kos_per_contig: Path) -> dict:
         # ERZ1049444_314477_1     K00083  K17818  K22132  K13980
         for row in csv_reader:
             contig_id, *kos = row
-            keggs[contig_id] = "; ".join(kos)
+            # No space after the comma: DRAM splits on "," and does not strip the KOs
+            # DRAM 1.3.5 parsing rules:
+            # https://github.com/WrightonLabCSU/DRAM/blob/91a902480c49adc52e991d898f73cf48ea3df174/mag_annotator/utils.py#L76-L77
+            # https://github.com/WrightonLabCSU/DRAM/blob/91a902480c49adc52e991d898f73cf48ea3df174/mag_annotator/utils.py#L114-L115
+            # https://github.com/WrightonLabCSU/DRAM/blob/91a902480c49adc52e991d898f73cf48ea3df174/mag_annotator/summarize_genomes.py#L240-L246
+            keggs[contig_id] = ",".join(kos)
     return keggs
 
 
 def extract_cazy_families_from_dbcan(dbcan_overview_tsv: Path) -> dict:
     """Extract and gather the CAZy families per contig from the run_DBCan overview file"""
-    cazys = defaultdict(list)
+    cazys = defaultdict(set)
 
     with gzip.open(dbcan_overview_tsv, "rt") as f:
         csv_reader = csv.reader(f, delimiter="\t")
@@ -78,10 +83,11 @@ def extract_cazy_families_from_dbcan(dbcan_overview_tsv: Path) -> dict:
                     if not dbcan == "-":
                         consensus.add(dbcan)
 
-            if len(consensus) > 0:
-                cazys[contig] = "; ".join(consensus)
+            cazys[contig].update(consensus)
 
-    return cazys
+    # DRAM 1.3.5 splits cazy_id on "; "
+    # https://github.com/WrightonLabCSU/DRAM/blob/91a902480c49adc52e991d898f73cf48ea3df174/mag_annotator/utils.py#L86-L87
+    return {contig: "; ".join(sorted(families)) for contig, families in cazys.items()}
 
 
 def extract_pfam_annotations(interproscan_summary_tsv: Path) -> dict:
@@ -108,7 +114,16 @@ def extract_pfam_annotations(interproscan_summary_tsv: Path) -> dict:
             ) = line
             contig = get_contig_id(protein_id)
             if analysis.strip() == "Pfam":
-                pfams[contig].append(f"{signature_description} [{signature_accession}]")
+                # DRAM only matches Pfam accessions with a version suffix (regex
+                # \[PF\d\d\d\d\d.\d*\]), but InterProScan reports them without one.
+                # The ".0" is a placeholder, not a real entry version (Pfam versions
+                # start at 1); DRAM removes the suffix before it uses the accession.
+                # DRAM 1.3.5 parsing rules:
+                # https://github.com/WrightonLabCSU/DRAM/blob/91a902480c49adc52e991d898f73cf48ea3df174/mag_annotator/utils.py#L97-L99
+                # https://github.com/WrightonLabCSU/DRAM/blob/91a902480c49adc52e991d898f73cf48ea3df174/mag_annotator/utils.py#L126-L128
+                pfams[contig].append(
+                    f"{signature_description} [{signature_accession}.0]"
+                )
 
     for contig in pfams:
         pfams[contig] = "; ".join(pfams[contig])
