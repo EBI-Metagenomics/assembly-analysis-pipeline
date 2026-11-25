@@ -108,6 +108,7 @@ class Station:
     lines: list
     optional: bool
     input: tuple | None = None  # (label, caption lines, note lines)
+    rewrap: bool = True  # False: a folded map keeps the line breaks of the description and note
     x: float = 0.0
     top: float = 0.0  # highest track in use at the station (set by the layout)
     bottom: float = 0.0  # lowest track in use at the station (set by the layout)
@@ -264,7 +265,8 @@ def parse(spec):
         icon = icon and (icon.get("label", ""), text_lines(icon.get("caption")), text_lines(icon.get("note")))
         stations.append(Station(names=names, branches=branches, desc=text_lines(raw.get("desc")),
                                 note=text_lines(raw.get("note")), lane=lane, stage=stage, col=col,
-                                lines=list(st_lines), optional=bool(raw.get("optional")), input=icon))
+                                lines=list(st_lines), optional=bool(raw.get("optional")), input=icon,
+                                rewrap=bool(raw.get("rewrap", True))))
 
     seen = {}
     for s in stations:
@@ -1097,14 +1099,14 @@ def render_folded(m, font_b64=None):
                 stages=[st for st in m.stages if st[0] not in vertical], stations=mid, inputs=[], outputs=[])
     # Fewer line breaks in the station descriptions: one line in the columns (the labels are next to
     # the lines, so there is room), and as few lines as fit the column width in the bottom row.
-    for s in left_st + right_st:
+    for s in [s for s in left_st + right_st if s.rewrap]:
         s.desc = [" ".join(s.desc)] if s.desc else []
         s.note = [" ".join(s.note)] if s.note else []
     col_w = {}
     for s in mid:
         col_w[(s.stage, s.col)] = max(col_w.get((s.stage, s.col), 0), station_width(row, s))
     for s in mid:
-        if not s.fork:
+        if s.rewrap and not s.fork:
             s.desc = rewrap(s.desc, col_w[(s.stage, s.col)], SIZE["desc"])
             s.note = rewrap(s.note, col_w[(s.stage, s.col)], SIZE["note"])
     lay = Layout(row)

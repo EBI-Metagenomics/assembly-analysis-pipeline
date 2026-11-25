@@ -15,7 +15,6 @@ subtitle = "MGnify v6 annotation of metagenome assemblies"
 
 [legend]
 optional = "Optional (depends on parameters / samplesheet)"
-note = "antiSMASH and SanntiS use only the contigs longer than --bgc_min_contig_length."
 
 [[lines]]
 id = "contigs"
@@ -139,7 +138,7 @@ note = "(rRNAs masked)"
 stage = "taxonomy"
 lane = "trunk"
 tool = "DIAMOND\nCAT_pack\nKrona"
-desc = "Contig\ntaxonomy"
+desc = "Taxonomic classification"
 
 # 4. Functional annotation
 # InterProScan starts the InterProScan line. OWLTools uses the InterProScan results.
@@ -165,7 +164,8 @@ lane = "proteins"
 col = 2
 lines = ["proteins"]
 tool = "eggNOG-mapper"
-desc = "Orthologs"
+desc = "eggNOG\northologs"
+rewrap = false  # keep the line break
 
 [[stations]]
 stage = "functional"
@@ -214,6 +214,7 @@ col = 2
 lines = ["contigs"]
 tool = "antiSMASH"
 desc = "BGC\ndetection"
+note = "(--bgc_min_contig_length)"
 
 [[stations]]
 stage = "pathways"
@@ -221,6 +222,7 @@ lane = "ips"
 col = 2
 tool = "SanntiS"
 desc = "BGC\ndetection"
+note = "(--bgc_min_contig_length)"
 
 [[stations]]
 stage = "pathways"
