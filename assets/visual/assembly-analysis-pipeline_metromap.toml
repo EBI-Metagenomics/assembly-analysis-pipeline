@@ -1,0 +1,272 @@
+# Metro map of ebi-metagenomics/assembly-analysis-pipeline.
+# Render: python3 <mi-agentic>/skills/mi-metro-map/scripts/metromap.py assets/assembly-analysis-pipeline_metromap.toml \
+#     --font MavenPro.ttf --png assets/assembly-analysis-pipeline_metromap.png
+#
+# The lines are data types. The contigs line runs on the trunk from input to the summary.
+# The proteins line starts at the combined gene caller. It goes down to the lower lane for the
+# protein annotation and the pathways, and it joins the contigs again for the summary GFF.
+# The InterProScan line starts at InterProScan and goes through the steps that use the
+# InterProScan results. It joins the proteins line again at DRAM.
+
+[title]
+org = "ebi-metagenomics/"
+name = "assembly-analysis-pipeline"
+subtitle = "MGnify v6 annotation of metagenome assemblies"
+
+[legend]
+optional = "Optional (depends on parameters / samplesheet)"
+note = "antiSMASH and SanntiS use only the contigs longer than --bgc_min_contig_length."
+
+[[lines]]
+id = "contigs"
+label = "Contigs"
+color = "#1C7ED6"
+
+[[lines]]
+id = "proteins"
+label = "Predicted proteins (CDS)"
+color = "#0CA678"
+start = "station"  # starts at the combined gene caller
+
+[[lines]]
+id = "ips"
+label = "InterProScan annotations"
+color = "#AE3EC9"
+start = "station"  # starts at InterProScan
+end = "station"    # joins the proteins line at DRAM
+
+# Lanes from top to bottom.
+[[lanes]]
+id = "trunk"
+lines = ["contigs", "proteins"]
+
+[[lanes]]
+id = "ips"
+lines = ["ips"]
+
+[[lanes]]
+id = "proteins"
+lines = ["ips", "proteins"]
+
+# Stages from left to right.
+[[stages]]
+id = "qc"
+title = "Assembly QC &\ndecontamination"
+
+[[stages]]
+id = "genes"
+title = "RNA detection &\ngene calling"
+
+[[stages]]
+id = "taxonomy"
+title = "Contig\ntaxonomy"
+
+[[stages]]
+id = "functional"
+title = "Functional annotation"
+
+[[stages]]
+id = "pathways"
+title = "Pathways & systems"
+
+[[stages]]
+id = "summary"
+title = "Summary &\nreporting"
+
+# 1. Assembly QC & decontamination
+[[stations]]
+stage = "qc"
+lane = "trunk"
+lines = ["contigs"]
+tool = "boto3"
+desc = "Download from\nEBI FIRE"
+note = "(--use_fire_download)"
+optional = true
+
+[[stations]]
+stage = "qc"
+lane = "trunk"
+lines = ["contigs"]
+tool = "SeqKit"
+desc = "Length &\nN-content\nfiltering"
+note = "(--min_contig_length)"
+
+[[stations]]
+stage = "qc"
+lane = "trunk"
+lines = ["contigs"]
+tool = "minimap2"
+desc = "Human, PhiX &\ncontaminant\nremoval"
+note = "(--skip_decontamination)"
+optional = true
+input = { label = "FASTA", caption = "Reference\ngenomes" }
+
+[[stations]]
+stage = "qc"
+lane = "trunk"
+lines = ["contigs"]
+tool = "QUAST"
+desc = "Assembly\nstatistics"
+
+# 2. RNA detection & gene calling
+[[stations]]
+stage = "genes"
+lane = "trunk"
+lines = ["contigs"]
+tool = "Infernal\ncmsearch"
+desc = "rRNA\ndetection"
+
+[[stations]]
+stage = "genes"
+lane = "trunk"
+lines = ["contigs", "proteins"]
+tool = "Pyrodigal\nFragGeneScanRS"
+desc = "Combined\ngene caller"
+note = "(rRNAs masked)"
+
+# 3. Contig taxonomy
+[[stations]]
+stage = "taxonomy"
+lane = "trunk"
+tool = "DIAMOND\nCAT_pack\nKrona"
+desc = "Contig\ntaxonomy"
+
+# 4. Functional annotation
+# InterProScan starts the InterProScan line. OWLTools uses the InterProScan results.
+# The other tools use only the proteins.
+[[stations]]
+stage = "functional"
+lane = "proteins"
+col = 1
+lines = ["ips", "proteins"]
+tool = "InterProScan"
+desc = "Domains &\nfamilies"
+
+[[stations]]
+stage = "functional"
+lane = "ips"
+col = 2
+tool = "OWLTools"
+desc = "GO & GO-slim\nterms"
+
+[[stations]]
+stage = "functional"
+lane = "proteins"
+col = 2
+lines = ["proteins"]
+tool = "eggNOG-mapper"
+desc = "Orthologs"
+
+[[stations]]
+stage = "functional"
+lane = "proteins"
+col = 3
+lines = ["proteins"]
+tool = "run_dbCAN"
+desc = "CAZymes"
+
+[[stations]]
+stage = "functional"
+lane = "proteins"
+col = 4
+lines = ["proteins"]
+tool = "HMMER"
+desc = "KEGG\northologs\n(KOfam)"
+
+[[stations]]
+stage = "functional"
+lane = "proteins"
+col = 5
+lines = ["proteins"]
+tool = "DIAMOND"
+desc = "Rhea\nreactions"
+
+# 5. Pathways & systems
+[[stations]]
+stage = "pathways"
+lane = "ips"
+col = 1
+tool = "Genome Properties"
+desc = "Pathways &\nsystems"
+
+[[stations]]
+stage = "pathways"
+lane = "proteins"
+col = 1
+lines = ["proteins"]
+tool = "kegg-pathways-completeness"
+desc = "KEGG module\ncompleteness"
+
+[[stations]]
+stage = "pathways"
+lane = "trunk"
+col = 2
+lines = ["contigs"]
+tool = "antiSMASH"
+desc = "BGC\ndetection"
+
+[[stations]]
+stage = "pathways"
+lane = "ips"
+col = 2
+tool = "SanntiS"
+desc = "BGC\ndetection"
+
+[[stations]]
+stage = "pathways"
+lane = "proteins"
+col = 3
+lines = ["ips", "proteins"]
+tool = "DRAM"
+desc = "Metabolic\nsummary"
+note = "(per assembly &\nsamplesheet)"
+
+# 6. Summary & reporting
+[[stations]]
+stage = "summary"
+lane = "trunk"
+tool = "gff_toolkit"
+desc = "Annotation\nsummary GFF"
+
+[[stations]]
+stage = "summary"
+lane = "trunk"
+tool = "GenomeTools"
+desc = "GFF\nvalidation"
+note = "(non-fatal)"
+
+[[stations]]
+stage = "summary"
+lane = "trunk"
+lines = ["contigs"]
+tool = "MultiQC"
+desc = "QC reports"
+note = "(per assembly &\nsamplesheet)"
+
+[[inputs]]
+label = "CSV"
+caption = "Samplesheet"
+
+[[inputs]]
+label = "FASTA"
+caption = "Assembly\ncontigs"
+
+[[outputs]]
+label = "FASTA"
+caption = "Filtered\ncontigs"
+
+[[outputs]]
+label = "FAA"
+caption = "Predicted\nproteins"
+
+[[outputs]]
+label = "TSV"
+caption = "Annotation\ntables"
+
+[[outputs]]
+label = "GFF"
+caption = "Annotation\nsummary"
+
+[[outputs]]
+label = "HTML"
+caption = "Reports"
