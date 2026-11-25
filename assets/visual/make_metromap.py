@@ -13,6 +13,13 @@ The style is the style of the MGnify pipeline maps (miassembler, metaViraVerse):
 - a black dot for a mandatory step, an empty station for an optional step;
 - file icons, input triangles, output bars, a title and a legend.
 
+By default the map is one long row. A ``[layout]`` table with ``down`` (the first
+stages) and ``up`` (the last stages) folds the map into a U, so that it is more
+square: the ``down`` stages are a column on the left (the lines go down), the other
+stages are the bottom row, and the ``up`` stages are a column on the right (the lines
+go up). The lines bend through 90 degrees between the columns and the row. The title
+and the legend go in the space above the bottom row.
+
 This script comes from the mi-metro-map skill of EBI-Metagenomics/mi-agentic
 (``skills/mi-metro-map/scripts/metromap.py``). The spec format is in
 ``skills/mi-metro-map/references/spec.md`` of that repository. Change the spec, not
@@ -31,6 +38,7 @@ import math
 import shutil
 import subprocess
 import sys
+import textwrap
 import tomllib
 from dataclasses import dataclass, field
 from itertools import pairwise
@@ -48,6 +56,9 @@ DOT = 5.5  # radius of the black dot of a mandatory station
 SIZE = {"name": 28, "desc": 26, "note": 22}
 LH = {"name": 32, "desc": 30, "note": 28}
 FILL = {"name": "#000", "desc": "#000", "note": "#555"}
+# Other text: the legend and the map title (the pipeline name keeps its size)
+NAME_SIZE = [86]  # the pipeline name (a list, so that the style can change it)
+TSIZE = {"legend": 34, "item": 28, "lnote": 24, "org": 46, "subtitle": 28}
 NAME_DY = 30  # last tool-name baseline, above the highest track in use at the station
 DESC_DY = 44  # first description baseline, below the lowest track in use at the station
 FORK_DY = 45  # branch offset of a fork with two branches
@@ -70,6 +81,16 @@ TITLE_LH = 32
 ICON = (62 * 1.25, 80 * 1.25)
 SMALL_ICON = (62, 80)
 
+# Folded layout (a [layout] table with 'down' and 'up' stages)
+BEND = 90  # radius of the innermost line in a bend between a column and the bottom row
+VGAP = 24  # minimum space between the labels of two stations in a column
+MIN_VPITCH = 96  # minimum distance between two stations in a column
+ROW_GAP = 40  # minimum space between the column boxes and the bottom row boxes
+FILE_GAP = 30  # space between two file icons in a row
+LEGEND_GROUP_GAP = 16  # space between the lines and the symbols in a one-column legend
+COL_TITLE_GAP = 30  # extra space between the title of a column box and its first station
+COL_EXTRA = 120  # extra width of the column boxes, on the side towards the middle of the map
+
 
 class SpecError(Exception):
     """The spec has errors. The message lists all of them."""
@@ -87,6 +108,7 @@ class Station:
     lines: list
     optional: bool
     input: tuple | None = None  # (label, caption lines, note lines)
+    rewrap: bool = True  # False: a folded map keeps the line breaks of the description and note
     x: float = 0.0
     top: float = 0.0  # highest track in use at the station (set by the layout)
     bottom: float = 0.0  # lowest track in use at the station (set by the layout)
@@ -108,10 +130,21 @@ class Model:
     stations: list
     inputs: list  # [(label, caption lines, lane or None)]
     outputs: list
+    fold: tuple | None = None  # (down stage ids, up stage ids) of a folded map
     weight: int = field(init=False)
 
     def __post_init__(self):
         self.weight = self.style["tool_weight"]
+
+
+def set_font_delta(delta):
+    """Make all the text ``delta`` larger, except the pipeline name and the labels on the file icons.
+
+    The line heights grow by the same amount.
+    """
+    for d in (SIZE, LH, TSIZE):
+        for k in d:
+            d[k] += delta
 
 
 def text_lines(value):
@@ -171,7 +204,7 @@ def parse(spec):
     if not lanes:
         errors.append("the spec has no [[lanes]]")
 
-    style = {"numbered_stages": False, "tool_weight": 700}
+    style = {"numbered_stages": False, "tool_weight": 700, "font_delta": 0, "name_size": 86}
     style.update(spec.get("style", {}))
     stages = []
     for st in spec.get("stages", []):
@@ -183,6 +216,19 @@ def parse(spec):
             title[0] = f"{len(stages) + 1}. {title[0]}"
         stages.append((st["id"], title))
     stage_ids = [s[0] for s in stages]
+
+    layout = spec.get("layout", {})
+    down, up = list(layout.get("down", [])), list(layout.get("up", []))
+    fold = None
+    if down or up:
+        n = len(stage_ids)
+        if not down or not up:
+            errors.append("layout: give both 'down' and 'up'")
+        elif down != stage_ids[:len(down)] or up != stage_ids[n - len(up):] or len(down) + len(up) >= n:
+            errors.append("layout: 'down' must be the first stages and 'up' the last stages, "
+                          "with one or more stages between them")
+        else:
+            fold = (down, up)
 
     stations = []
     last_col = {}
@@ -219,7 +265,8 @@ def parse(spec):
         icon = icon and (icon.get("label", ""), text_lines(icon.get("caption")), text_lines(icon.get("note")))
         stations.append(Station(names=names, branches=branches, desc=text_lines(raw.get("desc")),
                                 note=text_lines(raw.get("note")), lane=lane, stage=stage, col=col,
-                                lines=list(st_lines), optional=bool(raw.get("optional")), input=icon))
+                                lines=list(st_lines), optional=bool(raw.get("optional")), input=icon,
+                                rewrap=bool(raw.get("rewrap", True))))
 
     seen = {}
     for s in stations:
@@ -236,6 +283,21 @@ def parse(spec):
     for sid, _ in stages:
         if not any(s.stage == sid for s in stations):
             errors.append(f"stage '{sid}' has no stations")
+    if fold:
+        vertical = set(fold[0]) | set(fold[1])
+        cols = [(s.stage, s.col) for s in stations if s.stage in vertical]
+        if len(cols) != len(set(cols)):
+            errors.append("two stations of a 'down' or 'up' stage share a col")
+        if any(s.fork for s in stations if s.stage in vertical):
+            errors.append("a station of a 'down' or 'up' stage cannot have 'branches'")
+        for lid, info in lines.items():
+            where = {"down" if s.stage in fold[0] else "up" if s.stage in fold[1] else "mid"
+                     for s in stations if lid in s.lines}
+            left = "down" in where or info["start"] == "input"
+            right = "up" in where or info["end"] == "output"
+            if left and right and "mid" not in where:
+                errors.append(f"line '{lid}' goes from the left column to the right column: "
+                              "it needs a station in a stage between them")
 
     def files(key):
         out = []
@@ -244,7 +306,10 @@ def parse(spec):
                 errors.append(f"{key} {f}: needs 'label'")
             if f.get("lane") is not None and f["lane"] not in lanes:
                 errors.append(f"{key} {f}: unknown lane '{f['lane']}'")
-            out.append((f.get("label", ""), text_lines(f.get("caption")), f.get("lane")))
+            row = f.get("row", 1)
+            if not isinstance(row, int) or row < 1:
+                errors.append(f"{key} {f}: 'row' must be a positive integer")
+            out.append((f.get("label", ""), text_lines(f.get("caption")), f.get("lane"), row))
         return out
 
     inputs, outputs = files("inputs"), files("outputs")
@@ -253,7 +318,7 @@ def parse(spec):
     legend = {"mandatory": "Mandatory", "optional": "Optional", "input": "Input", "output": "Output", "note": ""}
     legend.update(spec.get("legend", {}))
     return Model(title=spec.get("title", {}), style=style, legend=legend, lines=lines, lanes=lanes,
-                 stages=stages, stations=stations, inputs=inputs, outputs=outputs)
+                 stages=stages, stations=stations, inputs=inputs, outputs=outputs, fold=fold)
 
 
 # ---------------------------------------------------------------------------
@@ -421,7 +486,7 @@ class Layout:
     def file_column_width(files):
         if not files:
             return 0
-        return max([ICON[0] + 16] + [text_width(c, SIZE["desc"]) for _, caps, _ in files for c in caps])
+        return max([ICON[0] + 16] + [text_width(c, SIZE["desc"]) for _, caps, *_ in files for c in caps])
 
     def curve(self, gap):
         """x range of a curve in the gap between column gap and column gap + 1.
@@ -592,15 +657,15 @@ def draw_station(lay, s):
         out.append(text(x, lay.y(s.lane, y), t, SIZE[kind], m.weight if kind == "name" else 400, fill=FILL[kind]))
     if s.input:
         label, caption, note = s.input
-        out += file_icon(s.x - SMALL_ICON[0] / 2, lay.y(s.lane, s.icon_y), label, caption, note, SMALL_ICON, True)
+        out += file_icon(s.x - SMALL_ICON[0] / 2, lay.y(s.lane, s.icon_y), label, caption, note, SMALL_ICON, "right")
     return out
 
 
-def file_icon(x, y, label, caption, note=(), size=ICON, caption_right=False):
+def file_icon(x, y, label, caption, note=(), size=ICON, caption_side="below"):
     """nf-core style document icon; (x, y) is the top-left corner.
 
-    The caption goes below the icon, or on its right (for a station input). The note
-    lines (grey) follow the caption.
+    The caption goes below the icon, or on its right or left (for a station input). The
+    note lines (grey) follow the caption.
     """
     w, h = size
     sc = w / 62
@@ -614,10 +679,11 @@ def file_icon(x, y, label, caption, note=(), size=ICON, caption_right=False):
                f'height="{fmt(26 * sc)}" rx="4" fill="#000"/>')
     out.append(text(x + w / 2, y + h * 0.42 + 19 * sc, label, 18 * sc, 700, fill="#fff"))
     items = [("desc", c) for c in caption] + [("note", n) for n in note]
-    if caption_right:
+    if caption_side in ("right", "left"):
         first = y + h / 2 - block_height(items) / 2 + 8
+        cx, anchor = (x + w + 18, "start") if caption_side == "right" else (x - 18, "end")
         for _, yy, t, kind in stack(0, first, items, up=False):
-            out.append(text(x + w + 18, yy, t, SIZE[kind], anchor="start", fill=FILL[kind]))
+            out.append(text(cx, yy, t, SIZE[kind], anchor=anchor, fill=FILL[kind]))
     else:
         for _, yy, t, kind in stack(0, y + h + 32, items, up=False):
             out.append(text(x + w / 2, yy, t, SIZE[kind], fill=FILL[kind]))
@@ -630,12 +696,12 @@ def file_column(lay, files, centre_x):
     :return: A tuple ``(svg parts, bottom y)``.
     """
     gap = 40
-    heights = [ICON[1] + 40 + LH["desc"] * len(c) for _, c, _ in files]
+    heights = [ICON[1] + 40 + LH["desc"] * len(c) for _, c, *_ in files]
     y = lay.box_top
-    if not any(lane for _, _, lane in files):  # centre the stack on the boxes if it fits
+    if not any(f[2] for f in files):  # centre the stack on the boxes if it fits
         y = max(y, (lay.box_top + lay.box_bottom - sum(heights) - gap * (len(files) - 1)) / 2)
     out = []
-    for (label, caption, lane), h in zip(files, heights):
+    for (label, caption, lane, _), h in zip(files, heights):
         if lane:
             centre = lay.y(lane, (len(lay.m.lanes[lane]) - 1) * GAP / 2)
             y = max(y, centre - h / 2 + 20)
@@ -664,56 +730,102 @@ def termini(lay, end):
     return out
 
 
-def legend(lay, top):
-    """Title (bottom left) and legend box (bottom right). Returns (svg parts, bottom y)."""
-    m = lay.m
-    out = []
-    left = lay.boxes[0][0]
-    t = m.title
-    title_w = max(text_width(t.get("org", ""), 46, 700), text_width(t.get("name", ""), 86, 800),
-                  text_width(t.get("subtitle", ""), 28))
-    if t.get("org"):
-        out.append(text(left, top + 70, t["org"], 46, 700, "start", "#555"))
-    if t.get("name"):
-        out.append(text(left, top + 140, t["name"], 86, 800, "start"))
-    if t.get("subtitle"):
-        out.append(text(left, top + 190, t["subtitle"], 28, 400, "start", "#444"))
-
+def legend_symbols(m):
     symbols = [("mandatory", m.legend["mandatory"])]
     if any(s.optional for s in m.stations):
         symbols.append(("optional", m.legend["optional"]))
-    symbols += [("in", m.legend["input"]), ("out", m.legend["output"])]
-    lines_w = 120 + max(text_width(v["label"], 28) for v in m.lines.values())
-    sym_w = 52 + max(text_width(lab, 28) for _, lab in symbols)
+    return symbols + [("in", m.legend["input"]), ("out", m.legend["output"])]
+
+
+def legend_note(m, folded):
+    """Lines of the legend note. In a folded map the note wraps to the width of the legend items."""
     note = m.legend["note"]
-    bw = max(30 + lines_w + 40 + sym_w + 30, text_width(note, 24) + 60)
-    rows = max(len(m.lines), len(symbols))
-    bh = 100 + (rows - 1) * 42 + 40 + (40 if note else 0)
-    bx, by = lay.boxes[-1][1] - bw, top
+    if not folded or not note:
+        return [note] if note else []
+    items_w = 120 + max(text_width(lab, TSIZE["item"]) for lab in
+                        [v["label"] for v in m.lines.values()] + [lab for _, lab in legend_symbols(m)])
+    return textwrap.wrap(note, max(20, int(items_w / text_width("x", TSIZE["lnote"]))))
+
+
+def legend_size(m, folded=False):
+    """Widths of the title and the legend box, and height of the legend box.
+
+    :param folded: True: the lines and the symbols are in one column (a taller, narrower box).
+    """
+    t = m.title
+    # In a folded map the width of the pipeline name is measured better (0.51 em per character in the
+    # 800 weight of Maven Pro), because the legend box is as wide as the name.
+    name_w = (len(t.get("name", "")) * NAME_SIZE[0] * 0.51 if folded
+              else text_width(t.get("name", ""), NAME_SIZE[0], 800))
+    title_w = max(text_width(t.get("org", ""), TSIZE["org"], 700), name_w,
+                  text_width(t.get("subtitle", ""), TSIZE["subtitle"]))
+    symbols = legend_symbols(m)
+    lines_w = 120 + max(text_width(v["label"], TSIZE["item"]) for v in m.lines.values())
+    sym_w = 52 + max(text_width(lab, TSIZE["item"]) for _, lab in symbols)
+    note = legend_note(m, folded)
+    if folded:  # the box is at least as wide as the pipeline name (it goes below it)
+        bw = max([30 + max(lines_w, 120 + sym_w - 52) + 30, name_w]
+                 + [text_width(n, TSIZE["lnote"]) + 60 for n in note])
+        rows = len(m.lines) + len(symbols)
+        bh = 100 + (rows - 1) * 42 + LEGEND_GROUP_GAP + 40 + LH["note"] * len(note) + (12 if note else 0)
+    else:
+        bw = max([30 + lines_w + 40 + sym_w + 30] + [text_width(n, TSIZE["lnote"]) + 60 for n in note])
+        rows = max(len(m.lines), len(symbols))
+        bh = 100 + (rows - 1) * 42 + 40 + (40 if note else 0)
+    return title_w, bw, bh, lines_w
+
+
+def legend(m, left, right, top, folded=False):
+    """Title (on the left) and legend box (on the right, or below the title if there is no room).
+
+    :param folded: True: the input and output symbols point down and up.
+    :return: A tuple ``(svg parts, bottom y)``.
+    """
+    out = []
+    t = m.title
+    title_w, bw, bh, lines_w = legend_size(m, folded)
+    if t.get("org"):
+        out.append(text(left, top + 70, t["org"], TSIZE["org"], 700, "start", "#555"))
+    if t.get("name"):
+        out.append(text(left, top + 140, t["name"], NAME_SIZE[0], 800, "start"))
+    if t.get("subtitle"):
+        out.append(text(left, top + 190, t["subtitle"], TSIZE["subtitle"], 400, "start", "#444"))
+
+    symbols = legend_symbols(m)
+    note = legend_note(m, folded)
+    bx, by = right - bw, top
     if bx < left + title_w + 60:  # no room on the right of the title: put the legend below it
         bx, by = left, top + 230
     out.append(f'<rect x="{fmt(bx)}" y="{fmt(by)}" width="{fmt(bw)}" height="{fmt(bh)}" rx="24" fill="#E9E9E9"/>')
-    out.append(text(bx + 30, by + 50, "Legend", 34, 700, "start"))
+    out.append(text(bx + 30, by + 50, "Legend", TSIZE["legend"], 700, "start"))
     for i, v in enumerate(m.lines.values()):
         y = by + 100 + i * 42
         out.append(f'<line x1="{fmt(bx + 30)}" y1="{fmt(y)}" x2="{fmt(bx + 100)}" y2="{fmt(y)}" '
                    f'stroke="{v["color"]}" stroke-width="{LW + 3}"/>')
-        out.append(text(bx + 120, y + 8, v["label"], 28, 400, "start"))
+        out.append(text(bx + 120, y + 8, v["label"], TSIZE["item"], 400, "start"))
     sx = bx + 30 + lines_w + 40
     for i, (kind, lab) in enumerate(symbols):
         y, cx = by + 100 + i * 42, sx + 20
+        if folded:  # one column: the symbols below the lines, centred on the line samples
+            y = by + 100 + (len(m.lines) + i) * 42 + LEGEND_GROUP_GAP
+            cx, sx = bx + 65, bx + 120 - 52
         if kind in ("mandatory", "optional"):
             out.append(f'<circle cx="{fmt(cx)}" cy="{fmt(y)}" r="{R}" fill="#fff" stroke="#000" stroke-width="4"/>')
             if kind == "mandatory":
                 out.append(f'<circle cx="{fmt(cx)}" cy="{fmt(y)}" r="{DOT}" fill="#000"/>')
+        elif kind == "in" and folded:
+            out.append(f'<path d="M{fmt(cx - 14)},{fmt(y - 10)} L{fmt(cx)},{fmt(y + 12)} '
+                       f'L{fmt(cx + 14)},{fmt(y - 10)} Z" fill="#000"/>')
         elif kind == "in":
             out.append(f'<path d="M{fmt(cx - 10)},{fmt(y - 14)} L{fmt(cx + 12)},{fmt(y)} '
                        f'L{fmt(cx - 10)},{fmt(y + 14)} Z" fill="#000"/>')
+        elif folded:
+            out.append(f'<rect x="{fmt(cx - 15)}" y="{fmt(y - 5)}" width="30" height="10" fill="#000"/>')
         else:
             out.append(f'<rect x="{fmt(cx - 5)}" y="{fmt(y - 15)}" width="10" height="30" fill="#000"/>')
-        out.append(text(sx + 52, y + 9, lab, 28, 400, "start"))
-    if note:
-        out.append(text(bx + 30, by + bh - 25, note, 24, 400, "start", "#555"))
+        out.append(text(sx + 52, y + 9, lab, TSIZE["item"], 400, "start"))
+    for i, n in enumerate(note):
+        out.append(text(bx + 30, by + bh - 25 - (len(note) - 1 - i) * LH["note"], n, TSIZE["lnote"], 400, "start", "#555"))
     return out, max(by + bh, top + 200)
 
 
@@ -724,24 +836,14 @@ def render(m, font_b64=None):
     :param font_b64: A TTF font as base64, to embed in the SVG, or ``None``.
     :return: A tuple ``(svg text, width, height)``.
     """
+    if m.fold:
+        return render_folded(m, font_b64)
     lay = Layout(m)
-    body = []
-    for x0, x1, title in lay.boxes:
-        body.append(f'<rect x="{fmt(x0)}" y="{fmt(lay.box_top)}" width="{fmt(x1 - x0)}" '
-                    f'height="{fmt(lay.box_bottom - lay.box_top)}" rx="24" fill="#E9E9E9"/>')
-        body += [text(x0 + 24, lay.box_top + 46 + i * TITLE_LH, t, SIZE["name"], 700, "start", "#8A8A8A")
-                 for i, t in enumerate(title)]
-    for ln, routes in lay.routes.items():
-        for pts in routes:
-            d = path_through([(x, lay.y(lane, y)) for x, lane, y in pts])
-            body.append(f'<path d="{d}" fill="none" stroke="{m.lines[ln]["color"]}" stroke-width="{LW}" '
-                        f'stroke-linejoin="round"/>')
-    body += termini(lay, end=False) + termini(lay, end=True)
-    for s in m.stations:
-        body += draw_station(lay, s)
+    boxes, lines, stations = draw_row(lay)
+    body = boxes + lines + termini(lay, end=False) + termini(lay, end=True) + stations
     # The legend is below the stage boxes. The file icons are on the left and right of the boxes,
     # so they can go lower than the boxes.
-    parts, bottom = legend(lay, lay.box_bottom + 40)
+    parts, bottom = legend(m, lay.boxes[0][0], lay.boxes[-1][1], lay.box_bottom + 40)
     body += parts
     for files, x in [(m.inputs, MARGIN + lay.in_w / 2), (m.outputs, lay.x_end + 11 + TERMINUS_GAP + lay.out_w / 2)]:
         if files:
@@ -749,13 +851,398 @@ def render(m, font_b64=None):
             body += parts
             bottom = max(bottom, icons_bottom)
 
-    w, h = math.ceil(lay.width), math.ceil(bottom + 40)
+    return svg_document(body, math.ceil(lay.width), math.ceil(bottom + 40), font_b64)
+
+
+def svg_document(body, w, h, font_b64):
     head = [f'<svg xmlns="http://www.w3.org/2000/svg" width="{w}" height="{h}" viewBox="0 0 {w} {h}">']
     if font_b64:
         head.append("<defs><style>@font-face{font-family:'Maven Pro';font-weight:400 900;"
                     f"src:url(data:font/ttf;base64,{font_b64}) format('truetype');}}</style></defs>")
     head.append(f'<rect width="{w}" height="{h}" fill="#fff"/>')
     return "\n".join(head + body + ["</svg>"]), w, h
+
+
+def draw_row(lay):
+    """Stage boxes, lines and stations of a row. Returns three lists of svg parts."""
+    m = lay.m
+    boxes, lines, stations = [], [], []
+    for x0, x1, title in lay.boxes:
+        boxes.append(f'<rect x="{fmt(x0)}" y="{fmt(lay.box_top)}" width="{fmt(x1 - x0)}" '
+                     f'height="{fmt(lay.box_bottom - lay.box_top)}" rx="24" fill="#E9E9E9"/>')
+        boxes += [text(x0 + 24, lay.box_top + 46 + i * TITLE_LH, t, SIZE["name"], 700, "start", "#8A8A8A")
+                  for i, t in enumerate(title)]
+    for ln, routes in lay.routes.items():
+        for pts in routes:
+            d = path_through([(x, lay.y(lane, y)) for x, lane, y in pts])
+            lines.append(line_path(d, m.lines[ln]["color"]))
+    for s in m.stations:
+        stations += draw_station(lay, s)
+    return boxes, lines, stations
+
+
+def line_path(d, color):
+    return f'<path d="{d}" fill="none" stroke="{color}" stroke-width="{LW}" stroke-linejoin="round"/>'
+
+
+def group(parts, dx, dy):
+    return [f'<g transform="translate({fmt(dx)},{fmt(dy)})">'] + parts + ["</g>"]
+
+
+# ---------------------------------------------------------------------------
+# Folded layout: a column down on the left, the bottom row, a column up on the right
+# ---------------------------------------------------------------------------
+
+
+def hpill(x0, x1, y, r, **attrs):
+    extra = " ".join(f'{k.replace("_", "-")}="{v}"' for k, v in attrs.items())
+    return (f'<rect x="{fmt(x0 - r)}" y="{fmt(y - r)}" width="{fmt(x1 - x0 + 2 * r)}" height="{fmt(2 * r)}" '
+            f'rx="{fmt(r)}" {extra}/>')
+
+
+class Column:
+    """The stations of the 'down' stages (left column) or of the 'up' stages (right column).
+
+    The lines are vertical, at the x given by ``xs``. In the left column the lines go down
+    and the labels are on the right of the lines; in the right column the lines go up and
+    the labels are on the left. The positions are relative until :meth:`move`.
+    """
+
+    def __init__(self, m, stage_ids, xs, down, head_extra=0.0):
+        """:param head_extra: Extra space between each box title and the first station of the box."""
+        self.m, self.xs, self.down = m, xs, down
+        self.lo, self.hi = min(xs.values()), max(xs.values())
+        self.anchor = "start" if down else "end"
+        self.lx = self.hi + R + 14 if down else self.lo - R - 14
+        titles = dict(m.stages)
+        self.y, self.stations, self.boxes = {}, [], []
+        cursor = 0.0
+        for sid in stage_ids:
+            title = [" ".join(titles[sid])]  # one line: the box is as wide as the title needs
+            head = 46 + (len(title) - 1) * TITLE_LH + 26 + COL_TITLE_GAP + head_extra
+            prev = None
+            for s in sorted((s for s in m.stations if s.stage == sid), key=lambda s: s.col):
+                rects = self.rects(s, 0)
+                t, b = min(r[2] for r in rects), max(r[3] for r in rects)
+                if down:  # (y, bottom of the station) of the previous station
+                    y = cursor + head - t if prev is None else max(prev[0] + MIN_VPITCH, prev[1] + VGAP - t)
+                    prev = (y, y + b)
+                else:  # (y, top of the station) of the previous station
+                    y = cursor - 24 - b if prev is None else min(prev[0] - MIN_VPITCH, prev[1] - VGAP - b)
+                    prev = (y, y + t)
+                self.y[id(s)] = y
+                self.stations.append(s)
+            if down:
+                self.boxes.append([cursor, prev[1] + 24, title])
+                cursor = prev[1] + 24 + STAGE_GAP
+            else:
+                self.boxes.append([prev[1] - head, cursor, title])
+                cursor = prev[1] - head - STAGE_GAP
+        rects = [r for s in self.stations for r in self.rects(s, self.y[id(s)])]
+        for _, _, title in self.boxes:
+            for t in title:
+                w = text_width(t, SIZE["name"], 700)
+                rects.append((self.lx if down else self.lx - w, self.lx + w if down else self.lx, 0, 0))
+        self.x0 = min([r[0] for r in rects] + [self.lo - R]) - STAGE_PAD
+        self.x1 = max([r[1] for r in rects] + [self.hi + R]) + STAGE_PAD
+        if down:
+            self.x1 += COL_EXTRA
+        else:
+            self.x0 -= COL_EXTRA
+
+    def move(self, dy):
+        for k in self.y:
+            self.y[k] += dy
+        for box in self.boxes:
+            box[0] += dy
+            box[1] += dy
+
+    @property
+    def top(self):
+        return min(b[0] for b in self.boxes)
+
+    @property
+    def bottom(self):
+        return max(b[1] for b in self.boxes)
+
+    def labels(self, s, y):
+        """[((x, baseline y, text, kind), rect)]: the tool names next to the station, the description below them."""
+        items = [("name", n) for n in s.names] + [("desc", d) for d in s.desc] + [("note", t) for t in s.note]
+        first = y - (len(s.names) - 1) * LH["name"] / 2 + 0.35 * SIZE["name"]
+        out = []
+        for lb in stack(self.lx, first, items, up=False):
+            x, yy, t, kind = lb
+            w = text_width(t, SIZE[kind], self.m.weight if kind == "name" else 400)
+            x0 = x if self.down else x - w
+            out.append((lb, (x0, x0 + w, yy - 0.8 * SIZE[kind], yy + 0.25 * SIZE[kind])))
+        return out
+
+    def icon(self, s, y):
+        """Top-left corner of the station input icon, on the other side of the lines than the labels."""
+        w, h = SMALL_ICON
+        return (self.lo - R - 18 - w if self.down else self.hi + R + 18), y - h / 2
+
+    def rects(self, s, y):
+        xs = [self.xs[ln] for ln in s.lines]
+        rects = [r for _, r in self.labels(s, y)] + [(min(xs) - R, max(xs) + R, y - R, y + R)]
+        if s.input:
+            (ix, iy), (w, h) = self.icon(s, y), SMALL_ICON
+            items = [("desc", c) for c in s.input[1]] + [("note", n) for n in s.input[2]]
+            cw = max([text_width(t, SIZE[k]) for k, t in items], default=0)
+            ch = max(h, block_height(items) + 40)
+            cx0 = ix - 18 - cw if self.down else ix + w + 18
+            rects += [(ix, ix + w, iy, iy + h), (cx0, cx0 + cw, y - ch / 2, y + ch / 2)]
+        return rects
+
+    def draw_boxes(self):
+        out = []
+        for y0, y1, title in self.boxes:
+            out.append(f'<rect x="{fmt(self.x0)}" y="{fmt(y0)}" width="{fmt(self.x1 - self.x0)}" '
+                       f'height="{fmt(y1 - y0)}" rx="24" fill="#E9E9E9"/>')
+            out += [text(self.lx, y0 + 46 + i * TITLE_LH, t, SIZE["name"], 700, self.anchor, "#8A8A8A")
+                    for i, t in enumerate(title)]
+        return out
+
+    def draw_stations(self):
+        out = []
+        for s in self.stations:
+            y = self.y[id(s)]
+            xs = [self.xs[ln] for ln in s.lines]
+            out.append(hpill(min(xs), max(xs), y, R, fill="#fff", stroke="#000", stroke_width=4))
+            if not s.optional:
+                out.append(hpill(min(xs), max(xs), y, DOT, fill="#000"))
+            for (x, yy, t, kind), _ in self.labels(s, y):
+                out.append(text(x, yy, t, SIZE[kind], self.m.weight if kind == "name" else 400,
+                                self.anchor, FILL[kind]))
+            if s.input:
+                label, caption, note = s.input
+                ix, iy = self.icon(s, y)
+                out += file_icon(ix, iy, label, caption, note, SMALL_ICON, "left" if self.down else "right")
+        return out
+
+
+def rewrap(lines, max_w, size):
+    """Wrap the words of the lines again, in as few lines as fit ``max_w``. Keeps the lines if that is not fewer."""
+    out = []
+    for word in " ".join(lines).split():
+        if out and text_width(out[-1] + " " + word, size) <= max_w:
+            out[-1] += " " + word
+        else:
+            out.append(word)
+    return out if len(out) < len(lines) else lines
+
+
+def file_width(f):
+    return max([ICON[0] + 16] + [text_width(c, SIZE["desc"]) for c in f[1]])
+
+
+def file_row(files, centre, y, x_min=-math.inf, x_max=math.inf, slot=None):
+    """File icons side by side, centred on ``centre`` and moved to stay in [x_min, x_max] if they can.
+
+    :param slot: The width of each icon with its caption (default: its own width).
+    :return: A tuple ``(svg parts, (x0, x1))``.
+    """
+    widths = [slot or file_width(f) for f in files]
+    total = sum(widths) + FILE_GAP * (len(files) - 1)
+    x = centre - total / 2
+    x = min(x, x_max - total)
+    x = max(x, x_min)
+    x0, out = x, []
+    for (label, caption, *_), w in zip(files, widths):
+        out += file_icon(x + w / 2 - ICON[0] / 2, y, label, caption)
+        x += w + FILE_GAP
+    return out, (x0, x0 + total)
+
+
+def file_rows(files, centre, y0=0.0):
+    """File icons in rows (the ``row`` of each file, from the top), each row centred on ``centre``.
+
+    :param y0: Top of the first row.
+    :return: A tuple ``(svg parts, (x0, x1), height)``.
+    """
+    rows = [[f for f in files if f[3] == row] for row in sorted({f[3] for f in files})]
+    # All the icons have the same width, so that the icons of the rows are in columns.
+    slot = max((file_width(f) for f in files), default=0)
+    out, x0, x1, y = [], math.inf, -math.inf, 0
+    for i, in_row in enumerate(rows):
+        parts, (a2, z2) = file_row(in_row, centre, y0 + y, slot=slot)
+        out += parts
+        x0, x1, y = min(x0, a2), max(x1, z2), y + file_row_height(in_row) + (FILE_GAP if i < len(rows) - 1 else 0)
+    return out, (x0, x1), y
+
+
+def file_row_height(files):
+    return max((ICON[1] + 32 + LH["desc"] * (len(c) - 1) + 10 for _, c, *_ in files), default=0)
+
+
+def render_folded(m, font_b64=None):
+    """Make the SVG of a folded map (see :func:`render`)."""
+    down, up = m.fold
+    vertical = set(down) | set(up)
+    mid = [s for s in m.stations if s.stage not in vertical]
+    left_st = [s for s in m.stations if s.stage in down]
+    right_st = [s for s in m.stations if s.stage in up]
+
+    def on(ln, stations):
+        return [s for s in stations if ln in s.lines]
+
+    in_left = [ln for ln, i in m.lines.items() if on(ln, left_st) or i["start"] == "input"]
+    in_right = [ln for ln, i in m.lines.items() if on(ln, right_st) or i["end"] == "output"]
+
+    # The bottom row: the usual layout. The lines from the left column start at its left end,
+    # the lines to the right column end at its right end.
+    row_lines = {ln: dict(i, start="input" if ln in in_left else "station",
+                          end="output" if ln in in_right else "station")
+                 for ln, i in m.lines.items() if on(ln, mid)}
+    row = Model(title=m.title, style=m.style, legend=m.legend, lines=row_lines,
+                lanes={k: v for k, v in m.lanes.items() if any(s.lane == k for s in mid)},
+                stages=[st for st in m.stages if st[0] not in vertical], stations=mid, inputs=[], outputs=[])
+    # Fewer line breaks in the station descriptions: one line in the columns (the labels are next to
+    # the lines, so there is room), and as few lines as fit the column width in the bottom row.
+    for s in [s for s in left_st + right_st if s.rewrap]:
+        s.desc = [" ".join(s.desc)] if s.desc else []
+        s.note = [" ".join(s.note)] if s.note else []
+    col_w = {}
+    for s in mid:
+        col_w[(s.stage, s.col)] = max(col_w.get((s.stage, s.col), 0), station_width(row, s))
+    for s in mid:
+        if s.rewrap and not s.fork:
+            s.desc = rewrap(s.desc, col_w[(s.stage, s.col)], SIZE["desc"])
+            s.note = rewrap(s.note, col_w[(s.stage, s.col)], SIZE["note"])
+    lay = Layout(row)
+    entry = {ln: lay.y(*lay.routes[ln][0][0][1:]) for ln in row_lines if ln in in_left}
+    exit_ = {ln: lay.y(*lay.routes[ln][0][-1][1:]) for ln in row_lines if ln in in_right}
+
+    # The order of the tracks in a column keeps the lines parallel in the bends: the line that is
+    # highest in the bottom row is on the inside of the bend.
+    order = list(m.lines)
+
+    def ranked(lines, ends):
+        return sorted(lines, key=lambda ln: (0, ends[ln]) if ln in ends else (1, order.index(ln)))
+
+    left_rank, right_rank = ranked(in_left, entry), ranked(in_right, exit_)
+    dx = BEND - lay.x_start  # the left column is at x = 0
+    x_end = lay.x_end + dx
+    left_xs = {ln: -k * GAP for k, ln in enumerate(left_rank)}
+    right_xs = {ln: x_end + BEND + k * GAP for k, ln in enumerate(right_rank)}
+    left = Column(m, down, left_xs, down=True)
+    right = Column(m, up, right_xs, down=False)
+
+    # y: the file icons at the top, then the input and output termini, then the columns.
+    xin = [left.xs[ln] for ln in in_left if m.lines[ln]["start"] == "input"]
+    xout = [right.xs[ln] for ln in in_right if m.lines[ln]["end"] == "output"]
+    # The file icons are centred on the input triangle and on the output bar.
+    out_centre = (min(xout or [right.lo]) + max(xout or [right.hi])) / 2
+    in_svg, in_x, in_h = file_rows(m.inputs, (min(xin or [0]) + max(xin or [0])) / 2)
+    _, out_x, out_h = file_rows(m.outputs, out_centre)
+    y_in, y_out = in_h + 14, out_h + 14
+    col_top = y_in + 26 + TERMINUS_GAP
+    title_w, bw, bh, _ = legend_size(m, folded=True)
+    mx0 = left.x1 + 60
+
+    def radius(rank, ln):
+        return BEND + rank.index(ln) * GAP
+
+    def place(left, right):
+        """B (the top of the bottom row boxes), c (the bottom of the right column is at B + c) and the
+        width of the title and legend in the top right corner (None if they go below the map)."""
+        # The row is below the left column, and each bend starts below the last station of its line.
+        b = left.bottom + ROW_GAP
+        for ln in entry:
+            last = max(left.y[id(s)] for s in on(ln, left_st)) if on(ln, left_st) else col_top
+            b = max(b, last + R + 10 + radius(left_rank, ln) - (entry[ln] - lay.box_top))
+        # The right column is above the bottom row, with room for the output bar and icons above it.
+        lowest = max(right.y[id(s)] for s in right_st)
+        c = min([-ROW_GAP] + [exit_[ln] - lay.box_top - radius(right_rank, ln) - 10 - R - lowest for ln in exit_])
+        b = max(b, y_out + 11 + TERMINUS_GAP - right.top - c)
+        # The title and the legend go in the middle of the white space between the columns, above the
+        # bottom row, if they are not too wide. The bottom row goes down if they are too tall.
+        x0 = left.x1 + 40
+        x1 = min(right.x0, out_x[0] if m.outputs else right.x0) - 40
+        for w, h in [(title_w + 60 + bw, max(bh, 200)), (max(title_w, bw), 230 + bh)]:
+            if w <= x1 - x0:
+                b = max(b, h + 2 * ROW_GAP)
+                return b, c, ((x0 + x1 - w) / 2, w, h)
+        return b, c, None
+
+    # If the bottom row is lower than the left column needs, all the column boxes get taller (the same
+    # extra space below each title), so that the left column stays close to the bottom row.
+    extra = 0.0
+    for _ in range(50):
+        left = Column(m, down, left_xs, down=True, head_extra=extra)
+        left.move(col_top)
+        right = Column(m, up, right_xs, down=False, head_extra=extra)
+        b, c, corner = place(left, right)
+        free = b - ROW_GAP - left.bottom
+        if free <= 1:
+            break
+        extra += free / len(down)
+    right.move(b + c)
+    dy = b - lay.box_top
+    # The output bar and icons are just above the right column.
+    y_out = right.top - TERMINUS_GAP - 11
+    out_top = y_out - 14 - out_h
+    out_svg, out_x, _ = file_rows(m.outputs, out_centre, out_top)
+
+    # Lines: the left column with its bends, the bottom row, the right column with its bends.
+    lines = []
+    for ln in in_left:
+        info, x = m.lines[ln], left.xs[ln]
+        ys = [left.y[id(s)] for s in on(ln, left_st)]
+        ya = y_in if info["start"] == "input" else min(ys)
+        if ln in entry:
+            r, ye = radius(left_rank, ln), entry[ln] + dy
+            d = f"M{fmt(x)},{fmt(ya)} V{fmt(ye - r)} A{fmt(r)},{fmt(r)} 0 0 0 {fmt(x + r)},{fmt(ye)}"
+        else:
+            d = f"M{fmt(x)},{fmt(ya)} V{fmt(max(ys))}"
+        lines.append(line_path(d, info["color"]))
+    for ln in in_right:
+        info, x = m.lines[ln], right.xs[ln]
+        ys = [right.y[id(s)] for s in on(ln, right_st)]
+        yt = y_out + 11 if info["end"] == "output" else min(ys)
+        if ln in exit_:
+            r, ye = radius(right_rank, ln), exit_[ln] + dy
+            d = f"M{fmt(x_end)},{fmt(ye)} A{fmt(r)},{fmt(r)} 0 0 0 {fmt(x_end + r)},{fmt(ye - r)} V{fmt(yt)}"
+        else:
+            d = f"M{fmt(x)},{fmt(max(ys))} V{fmt(yt)}"
+        lines.append(line_path(d, info["color"]))
+
+    # Termini: input triangles above the left column, output bar above the right column.
+    termini_svg = []
+    if xin:
+        a, z = min(xin) - 12, max(xin) + 12
+        termini_svg.append(f'<path d="M{fmt(a)},{fmt(y_in)} L{fmt(z)},{fmt(y_in)} '
+                           f'L{fmt((a + z) / 2)},{fmt(y_in + 26)} Z" fill="#000"/>')
+    if xout:
+        termini_svg.append(f'<rect x="{fmt(min(xout) - 12)}" y="{fmt(y_out)}" '
+                           f'width="{fmt(max(xout) - min(xout) + 24)}" height="11" fill="#000"/>')
+
+    row_boxes, row_lines_svg, row_stations = draw_row(lay)
+    body = (left.draw_boxes() + group(row_boxes, dx, dy) + right.draw_boxes()
+            + lines + group(row_lines_svg, dx, dy) + termini_svg
+            + left.draw_stations() + group(row_stations, dx, dy) + right.draw_stations())
+
+    xs, ys = [left.x0, right.x1, lay.boxes[0][0] + dx, lay.boxes[-1][1] + dx], [0, lay.box_bottom + dy]
+    for parts, (a, z) in [(in_svg, in_x), (out_svg, out_x)]:
+        if parts:
+            body += parts
+            xs += [a, z]
+
+    # Title and legend: in the middle of the white space (see above), else below the bottom row.
+    if corner:
+        lx, w, h = corner
+        top = (b - h) / 2 - 30  # the title text starts about 30 below ``top``
+        parts, bottom = legend(m, lx, lx + w, top, folded=True)
+    else:
+        lx, w = left.x0, max(right.x1 - left.x0, title_w + 60 + bw)
+        parts, bottom = legend(m, lx, lx + w, lay.box_bottom + dy + 40, folded=True)
+    body += parts
+    xs += [lx, lx + w]
+    ys.append(bottom)
+
+    x0, x1, y0, y1 = min(xs), max(xs), min(ys), max(ys)
+    w, h = math.ceil(x1 - x0 + 2 * MARGIN), math.ceil(y1 - y0 + MARGIN + 40)
+    return svg_document(group(body, MARGIN - x0, MARGIN - y0), w, h, font_b64)
 
 
 CHROME = ["/Applications/Google Chrome.app/Contents/MacOS/Google Chrome", "google-chrome", "chromium",
@@ -784,6 +1271,8 @@ def main(argv=None):
             model = parse(tomllib.load(f))
     except (SpecError, tomllib.TOMLDecodeError) as e:
         sys.exit(f"{a.spec}: errors in the spec:\n{e}")
+    set_font_delta(model.style["font_delta"])
+    NAME_SIZE[0] = model.style["name_size"]
     font = base64.b64encode(a.font.read_bytes()).decode() if a.font else None
     svg, w, h = render(model, font)
     out = a.out or a.spec.with_suffix(".svg")

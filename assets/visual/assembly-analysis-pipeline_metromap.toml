@@ -15,7 +15,6 @@ subtitle = "MGnify v6 annotation of metagenome assemblies"
 
 [legend]
 optional = "Optional (depends on parameters / samplesheet)"
-note = "antiSMASH and SanntiS use only the contigs longer than --bgc_min_contig_length."
 
 [[lines]]
 id = "contigs"
@@ -35,7 +34,18 @@ color = "#AE3EC9"
 start = "station"  # starts at InterProScan
 end = "station"    # joins the proteins line at DRAM
 
-# Lanes from top to bottom.
+[style]
+font_delta = 4  # all text 4 larger than the default (not the pipeline name or the icon labels)
+name_size = 76  # the pipeline name (default 86)
+
+# Fold the map into a U so that it is more square: the QC, gene calling and taxonomy stages
+# go down on the left, the functional annotation and pathways stages are the bottom row, and
+# the summary stage goes up on the right.
+[layout]
+down = ["qc", "genes", "taxonomy"]
+up = ["summary"]
+
+# Lanes of the bottom row, from top to bottom.
 [[lanes]]
 id = "trunk"
 lines = ["contigs", "proteins"]
@@ -99,7 +109,6 @@ tool = "minimap2"
 desc = "Human, PhiX &\ncontaminant\nremoval"
 note = "(--skip_decontamination)"
 optional = true
-input = { label = "FASTA", caption = "Reference\ngenomes" }
 
 [[stations]]
 stage = "qc"
@@ -129,7 +138,7 @@ note = "(rRNAs masked)"
 stage = "taxonomy"
 lane = "trunk"
 tool = "DIAMOND\nCAT_pack\nKrona"
-desc = "Contig\ntaxonomy"
+desc = "Taxonomic classification"
 
 # 4. Functional annotation
 # InterProScan starts the InterProScan line. OWLTools uses the InterProScan results.
@@ -155,7 +164,8 @@ lane = "proteins"
 col = 2
 lines = ["proteins"]
 tool = "eggNOG-mapper"
-desc = "Orthologs"
+desc = "eggNOG\northologs"
+rewrap = false  # keep the line break
 
 [[stations]]
 stage = "functional"
@@ -204,6 +214,7 @@ col = 2
 lines = ["contigs"]
 tool = "antiSMASH"
 desc = "BGC\ndetection"
+note = "(--bgc_min_contig_length)"
 
 [[stations]]
 stage = "pathways"
@@ -211,6 +222,7 @@ lane = "ips"
 col = 2
 tool = "SanntiS"
 desc = "BGC\ndetection"
+note = "(--bgc_min_contig_length)"
 
 [[stations]]
 stage = "pathways"
@@ -218,7 +230,7 @@ lane = "proteins"
 col = 3
 lines = ["ips", "proteins"]
 tool = "DRAM"
-desc = "Metabolic\nsummary"
+desc = "Metabolic summary"
 note = "(per assembly &\nsamplesheet)"
 
 # 6. Summary & reporting
@@ -251,22 +263,28 @@ caption = "Samplesheet"
 label = "FASTA"
 caption = "Assembly\ncontigs"
 
+# The output icons are in rows above the right column: reports, annotations, sequences.
 [[outputs]]
-label = "FASTA"
-caption = "Filtered\ncontigs"
+row = 1
+label = "HTML"
+caption = "Reports"
 
 [[outputs]]
-label = "FAA"
-caption = "Predicted\nproteins"
-
-[[outputs]]
+row = 2
 label = "TSV"
 caption = "Annotation\ntables"
 
 [[outputs]]
+row = 2
 label = "GFF"
 caption = "Annotation\nsummary"
 
 [[outputs]]
-label = "HTML"
-caption = "Reports"
+row = 3
+label = "FASTA"
+caption = "Filtered\ncontigs"
+
+[[outputs]]
+row = 3
+label = "FAA"
+caption = "Predicted\nproteins"
