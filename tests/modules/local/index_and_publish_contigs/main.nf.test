@@ -1,0 +1,48 @@
+nextflow_process {
+    name "Test Process INDEX_AND_PUBLISH_CONTIGS"
+    script "modules/local/index_and_publish_contigs.nf"
+    process "INDEX_AND_PUBLISH_CONTIGS"
+
+    test("Should emit a QC reason for a valid gzip with no contigs") {
+        when {
+            params {
+                outdir = "$outputDir"
+            }
+            process {
+                """
+                input[0] = [
+                    [id: 'empty'],
+                    file("${projectDir}/tests/modules/local/index_and_publish_contigs/fixtures/empty.fasta.gz", checkIfExists: true)
+                ]
+                """
+            }
+        }
+        then {
+            assert process.success
+            assert process.out.exit_reason == [
+                [[id: 'empty'], 'insufficient_contigs_after_decontamination']
+            ]
+            assert process.out.filtered_contigs == []
+        }
+    }
+
+    test("Should fail when the input cannot be decompressed") {
+        when {
+            params {
+                outdir = "$outputDir"
+            }
+            process {
+                """
+                input[0] = [
+                    [id: 'invalid_gzip'],
+                    file("${projectDir}/tests/modules/local/filter_assembly/fixtures/contigs_to_clean.fasta", checkIfExists: true)
+                ]
+                """
+            }
+        }
+        then {
+            assert process.failed
+            assert process.errorReport.contains('not in gzip format')
+        }
+    }
+}

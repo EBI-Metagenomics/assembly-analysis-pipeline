@@ -31,7 +31,7 @@ workflow ASSEMBLY_QC {
     ch_versions = ch_versions.mix( FILTER_ASSEMBLY.out.versions )
 
     DECONTAMINATE_ASSEMBLIES(
-        FILTER_ASSEMBLY.out.fasta.ifEmpty([])
+        FILTER_ASSEMBLY.out.fasta
     )
     ch_versions = ch_versions.mix(DECONTAMINATE_ASSEMBLIES.out.versions)
 
@@ -44,7 +44,7 @@ workflow ASSEMBLY_QC {
     ch_versions = ch_versions.mix(INDEX_AND_PUBLISH_CONTIGS.out.versions)
 
     QUAST(
-        ch_assembly.mix( INDEX_AND_PUBLISH_CONTIGS.out.filtered_contigs.ifEmpty([]) ).groupTuple()
+        ch_assembly.mix(INDEX_AND_PUBLISH_CONTIGS.out.filtered_contigs).groupTuple()
     )
     ch_versions = ch_versions.mix(QUAST.out.versions)
 

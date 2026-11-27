@@ -1,6 +1,6 @@
 # Metro map of ebi-metagenomics/assembly-analysis-pipeline.
-# Render: python3 <mi-agentic>/skills/mi-metro-map/scripts/metromap.py assets/assembly-analysis-pipeline_metromap.toml \
-#     --font MavenPro.ttf --png assets/assembly-analysis-pipeline_metromap.png
+# Render: python3 assets/visuals/make_metromap.py assets/visuals/assembly-analysis-pipeline_metromap.toml \
+#     --font MavenPro.ttf --png assets/visuals/assembly-analysis-pipeline_metromap.png
 #
 # The lines are data types. The contigs line runs on the trunk from input to the summary.
 # The proteins line starts at the combined gene caller. It goes down to the lower lane for the

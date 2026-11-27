@@ -1,0 +1,31 @@
+nextflow_workflow {
+    name "Test Subworkflow ASSEMBLY_QC"
+    script "subworkflows/local/assembly_qc.nf"
+    workflow "ASSEMBLY_QC"
+    config "./nextflow.config"
+
+    test("Should report QC failures when no assembly passes the initial filter") {
+        when {
+            params {
+                min_contig_length = 500
+                outdir = "$outputDir"
+            }
+            workflow {
+                """
+                input[0] = channel.of([
+                    [id: 'short'],
+                    file("${projectDir}/tests/assembly_qc_fail_length_filtered.fasta.gz", checkIfExists: true)
+                ])
+                """
+            }
+        }
+        then {
+            assert workflow.success
+            assert workflow.out.assembly_qc_pass == []
+            assert workflow.out.qc_failed_assemblies == [
+                [[id: 'short'], 'insufficient_contigs_after_length_filtering']
+            ]
+            assert workflow.out.quast_report_tsv.collect { meta, _report -> meta.id } == ['short']
+        }
+    }
+}

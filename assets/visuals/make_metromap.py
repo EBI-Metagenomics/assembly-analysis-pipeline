@@ -20,12 +20,16 @@ stages are the bottom row, and the ``up`` stages are a column on the right (the 
 go up). The lines bend through 90 degrees between the columns and the row. The title
 and the legend go in the space above the bottom row.
 
+The script writes two themes: MAP.svg (light) and MAP_dark.svg (dark), and the
+same two PNGs with ``--png``.
+
 This script comes from the mi-metro-map skill of EBI-Metagenomics/mi-agentic
 (``skills/mi-metro-map/scripts/metromap.py``). The spec format is in
 ``skills/mi-metro-map/references/spec.md`` of that repository. Change the spec, not
-this copy: make script changes in mi-agentic and copy the script again.
+this copy. To change the script, change it in the mi-metro-map skill of
+EBI-Metagenomics/mi-agentic, run the tests of that repository, and copy the script again.
 
-The script needs Python 3.11 or later and no other packages.
+The script needs Python 3.11 or later. It uses only the Python standard library.
 
 Usage::
 
@@ -35,6 +39,7 @@ Usage::
 import argparse
 import base64
 import math
+import re
 import shutil
 import subprocess
 import sys
@@ -59,6 +64,7 @@ FILL = {"name": "#000", "desc": "#000", "note": "#555"}
 # Other text: the legend and the map title (the pipeline name keeps its size)
 NAME_SIZE = [86]  # the pipeline name (a list, so that the style can change it)
 TSIZE = {"legend": 34, "item": 28, "lnote": 24, "org": 46, "subtitle": 28}
+BASE_SIZES = [dict(d) for d in (SIZE, LH, TSIZE)]  # the sizes for font_delta = 0
 NAME_DY = 30  # last tool-name baseline, above the highest track in use at the station
 DESC_DY = 44  # first description baseline, below the lowest track in use at the station
 FORK_DY = 45  # branch offset of a fork with two branches
@@ -128,7 +134,7 @@ class Model:
     lanes: dict  # id -> list of tracks (each a list of line ids), lanes from top to bottom
     stages: list  # [(id, title lines)], from left to right
     stations: list
-    inputs: list  # [(label, caption lines, lane or None)]
+    inputs: list  # [(label, caption lines, lane or None, row)]
     outputs: list
     fold: tuple | None = None  # (down stage ids, up stage ids) of a folded map
     weight: int = field(init=False)
@@ -140,11 +146,11 @@ class Model:
 def set_font_delta(delta):
     """Make all the text ``delta`` larger, except the pipeline name and the labels on the file icons.
 
-    The line heights grow by the same amount.
+    The line heights grow by the same amount. The delta is relative to the default sizes.
     """
-    for d in (SIZE, LH, TSIZE):
+    for d, base in zip((SIZE, LH, TSIZE), BASE_SIZES):
         for k in d:
-            d[k] += delta
+            d[k] = base[k] + delta
 
 
 def text_lines(value):
@@ -836,6 +842,8 @@ def render(m, font_b64=None):
     :param font_b64: A TTF font as base64, to embed in the SVG, or ``None``.
     :return: A tuple ``(svg text, width, height)``.
     """
+    set_font_delta(m.style["font_delta"])
+    NAME_SIZE[0] = m.style["name_size"]
     if m.fold:
         return render_folded(m, font_b64)
     lay = Layout(m)
@@ -1036,18 +1044,16 @@ def file_width(f):
     return max([ICON[0] + 16] + [text_width(c, SIZE["desc"]) for c in f[1]])
 
 
-def file_row(files, centre, y, x_min=-math.inf, x_max=math.inf, slot=None):
-    """File icons side by side, centred on ``centre`` and moved to stay in [x_min, x_max] if they can.
+def file_row(files, centre, y, slot=None):
+    """File icons side by side, centred on ``centre``.
 
     :param slot: The width of each icon with its caption (default: its own width).
     :return: A tuple ``(svg parts, (x0, x1))``.
     """
     widths = [slot or file_width(f) for f in files]
     total = sum(widths) + FILE_GAP * (len(files) - 1)
-    x = centre - total / 2
-    x = min(x, x_max - total)
-    x = max(x, x_min)
-    x0, out = x, []
+    x = x0 = centre - total / 2
+    out = []
     for (label, caption, *_), w in zip(files, widths):
         out += file_icon(x + w / 2 - ICON[0] / 2, y, label, caption)
         x += w + FILE_GAP
@@ -1138,19 +1144,18 @@ def render_folded(m, font_b64=None):
     y_in, y_out = in_h + 14, out_h + 14
     col_top = y_in + 26 + TERMINUS_GAP
     title_w, bw, bh, _ = legend_size(m, folded=True)
-    mx0 = left.x1 + 60
 
     def radius(rank, ln):
         return BEND + rank.index(ln) * GAP
 
     def place(left, right):
-        """B (the top of the bottom row boxes), c (the bottom of the right column is at B + c) and the
-        width of the title and legend in the top right corner (None if they go below the map)."""
+        """b (the top of the bottom row boxes), c (the bottom of the right column is at b + c) and
+        (x, width, height) of the title and legend between the columns (None if they go below the map)."""
         # The row is below the left column, and each bend starts below the last station of its line.
         b = left.bottom + ROW_GAP
-        for ln in entry:
+        for ln, ye in entry.items():
             last = max(left.y[id(s)] for s in on(ln, left_st)) if on(ln, left_st) else col_top
-            b = max(b, last + R + 10 + radius(left_rank, ln) - (entry[ln] - lay.box_top))
+            b = max(b, last + R + 10 + radius(left_rank, ln) - (ye - lay.box_top))
         # The right column is above the bottom row, with room for the output bar and icons above it.
         lowest = max(right.y[id(s)] for s in right_st)
         c = min([-ROW_GAP] + [exit_[ln] - lay.box_top - radius(right_rank, ln) - 10 - R - lowest for ln in exit_])
@@ -1245,6 +1250,28 @@ def render_folded(m, font_b64=None):
     return svg_document(group(body, MARGIN - x0, MARGIN - y0), w, h, font_b64)
 
 
+# The dark theme swaps the neutral colours of the light theme. The line colours do not change.
+# The roles swap together: for example, a station is a dark circle with a light ring.
+DARK = {
+    "#fff": "#0D1117",  # background, station and icon fill (the GitHub dark background)
+    "#000": "#E6EDF3",  # text, rings, dots, icon outlines, input triangles, output bars
+    "#444": "#B1BAC4",  # subtitle
+    "#555": "#9DA7B3",  # notes, org
+    "#8A8A8A": "#8B949E",  # stage titles
+    "#E9E9E9": "#21262D",  # stage boxes, legend box
+}
+
+
+def dark(svg):
+    """The dark theme of a light SVG."""
+    return re.sub(r'(fill|stroke)="(#[0-9A-Fa-f]+)"', lambda m: f'{m[1]}="{DARK.get(m[2], m[2])}"', svg)
+
+
+def dark_path(path):
+    """``map.svg`` -> ``map_dark.svg``."""
+    return path.with_name(f"{path.stem}_dark{path.suffix}")
+
+
 CHROME = ["/Applications/Google Chrome.app/Contents/MacOS/Google Chrome", "google-chrome", "chromium",
           "chromium-browser", "chrome"]
 
@@ -1262,25 +1289,25 @@ def render_png(svg, png, w, h):
 def main(argv=None):
     ap = argparse.ArgumentParser(description=__doc__.split("\n\n")[0])
     ap.add_argument("spec", type=Path, help="TOML spec of the map")
-    ap.add_argument("--out", type=Path, help="SVG file (default: the spec path with .svg)")
+    ap.add_argument("--out", type=Path, help="SVG file (default: the spec path with .svg). "
+                    "The dark theme goes to the same name with _dark.")
     ap.add_argument("--font", type=Path, help="TTF to embed in the SVG (Maven Pro)")
-    ap.add_argument("--png", type=Path, help="also write a PNG (needs Chrome or Chromium)")
+    ap.add_argument("--png", type=Path, help="also write PNGs, light and _dark (needs Chrome or Chromium)")
     a = ap.parse_args(argv)
     try:
         with open(a.spec, "rb") as f:
             model = parse(tomllib.load(f))
     except (SpecError, tomllib.TOMLDecodeError) as e:
         sys.exit(f"{a.spec}: errors in the spec:\n{e}")
-    set_font_delta(model.style["font_delta"])
-    NAME_SIZE[0] = model.style["name_size"]
     font = base64.b64encode(a.font.read_bytes()).decode() if a.font else None
     svg, w, h = render(model, font)
     out = a.out or a.spec.with_suffix(".svg")
-    out.write_text(svg)
-    print(f"wrote {out} ({w} x {h})")
-    if a.png:
-        render_png(out, a.png, w, h)
-        print(f"wrote {a.png}")
+    for svg_path, png_path, content in [(out, a.png, svg), (dark_path(out), a.png and dark_path(a.png), dark(svg))]:
+        svg_path.write_text(content)
+        print(f"wrote {svg_path} ({w} x {h})")
+        if png_path:
+            render_png(svg_path, png_path, w, h)
+            print(f"wrote {png_path}")
 
 
 if __name__ == "__main__":

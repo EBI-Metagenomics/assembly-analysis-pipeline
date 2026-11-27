@@ -11,7 +11,10 @@
 
 This repository contains the [MGnify](https://www.ebi.ac.uk/metagenomics) assembly analysis pipeline, from version 6.0.0 onwards. For version 5.0 of the pipeline, please [follow this link](https://github.com/EBI-Metagenomics/pipeline-v5).
 
-![V6 Schema](assets/visual/assembly-analysis-pipeline_metromap.png)
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="assets/visuals/assembly-analysis-pipeline_metromap_dark.png">
+  <img alt="V6 Schema" src="assets/visuals/assembly-analysis-pipeline_metromap.png">
+</picture>
 
 ## Pipeline description
 
